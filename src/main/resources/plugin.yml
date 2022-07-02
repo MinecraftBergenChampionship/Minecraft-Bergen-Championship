@@ -1,4 +1,4 @@
 name: Minecraft Bruh Championship
 version: '${project.version}'
 main: me.rspacerr.minecraftbruhchampionship.MinecraftBruhChampionship
-api-version: 1.18
+api-version: 1.18.2
