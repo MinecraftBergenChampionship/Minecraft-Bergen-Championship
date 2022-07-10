@@ -1,4 +1,14 @@
-name: Minecraft Bruh Championship
+name: MCC
 version: '${project.version}'
-main: me.rspacerr.minecraftbruhchampionship.MinecraftBruhChampionship
-api-version: 1.18.2
+author: kotayka_
+main: com.kotayka.mcc.mainGame.MCC
+api-version: 1.18
+depend:
+  [ProtocolLib]
+commands:
+  npc:
+    description: Spawn NPC at location
+  start:
+    description: Start a game
+  mccteam:
+    description: Teams
