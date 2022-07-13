@@ -43,7 +43,7 @@ public class Players {
         loadScoreboardVars(p.getUniqueId());
         mcc.createTeams(x);
 
-        for (Participant player : partipants) {
+        for (Participant player : participants) {
             mcc.teams.get(player.ign)[team.indexOf(player.team)].addEntry(p.getName());
         }
     }
