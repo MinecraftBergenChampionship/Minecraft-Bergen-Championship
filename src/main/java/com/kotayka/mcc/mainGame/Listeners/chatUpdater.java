@@ -2,7 +2,6 @@ package com.kotayka.mcc.mainGame.Listeners;
 
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,7 +22,7 @@ public class chatUpdater implements Listener {
         Player player = event.getPlayer();
         String message = event.getMessage();
         ChatColor color = ChatColor.GRAY;
-        for (Participant p : players.partipants) {
+        for (Participant p : players.participants) {
             if (event.getPlayer() == p.player) {
                 switch (p.team) {
                     case "RedRabbits":

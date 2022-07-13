@@ -121,7 +121,7 @@ public final class MCC extends JavaPlugin implements Listener {
                                         place=String.valueOf(tgttos.playerAmount)+"th";
                                         break;
                                 }
-                                for (Participant p : players.partipants) {
+                                for (Participant p : players.participants) {
                                     if (event.getPlayer().getName().equals(p.ign)) {
                                         p.roundCoins+=tgttos.playerPoints;
                                         Bukkit.broadcastMessage(p.toString());
@@ -222,7 +222,7 @@ public final class MCC extends JavaPlugin implements Listener {
     }
 
     public void changeScoreboard(String scoreboardName) {
-        for (Participant p : players.partipants) {
+        for (Participant p : players.participants) {
             switch(scoreboardName) {
                 case "Lobby":
                     scoreboards.get(p.ign).getObjective("lobby").setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -248,7 +248,7 @@ public final class MCC extends JavaPlugin implements Listener {
                     tempArray[i] = (Integer) teamManager.roundScores.get(teamList[i]);
                 }
                 Arrays.sort(tempArray, Collections.reverseOrder());
-                for (Participant p : players.partipants) {
+                for (Participant p : players.participants) {
                     switch(game.stage) {
                         case "Lobby":
                             break;
@@ -340,7 +340,7 @@ public final class MCC extends JavaPlugin implements Listener {
         }
 
         List<String> tn = new ArrayList<>(Arrays.asList(teamNames));
-        teamManager = new teamManager(players.partipants, tn, this);
+        teamManager = new teamManager(players.participants, tn, this);
 
         for (String team : teamNamesFull) {
             teamManager.roundScores.put(team, 0);

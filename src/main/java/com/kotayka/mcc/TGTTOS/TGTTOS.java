@@ -1,18 +1,14 @@
 package com.kotayka.mcc.TGTTOS;
 
-import com.kotayka.mcc.TGTTOS.managers.Firework;
 import com.kotayka.mcc.TGTTOS.managers.NPCManager;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
-import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
@@ -130,7 +126,7 @@ public class TGTTOS {
 
                 ItemStack[] item = items.get(gameRound);
 
-                for (Participant p : players.partipants) {
+                for (Participant p : players.participants) {
                     for (ItemStack i : item) {
                         if (i.getType() == Material.WHITE_WOOL) {
                             ItemStack wool = new ItemStack(Material.WHITE_WOOL);

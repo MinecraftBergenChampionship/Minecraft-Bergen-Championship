@@ -1,6 +1,5 @@
 package com.kotayka.mcc.mainGame.commands;
 
-import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,12 +20,12 @@ public class playerCommand implements CommandExecutor {
             if (players.players.contains(sender)) {
                 players.players.remove(sender);
                 int p = 0;
-                for (int i =0; i < players.partipants.size(); i++) {
-                    if (players.partipants.get(i).player == sender) {
+                for (int i = 0; i < players.participants.size(); i++) {
+                    if (players.participants.get(i).player == sender) {
                         p = i;
                     }
                 }
-                players.partipants.remove(p);
+                players.participants.remove(p);
                 sender.sendMessage("You are now a spectator");
             }
             else {
