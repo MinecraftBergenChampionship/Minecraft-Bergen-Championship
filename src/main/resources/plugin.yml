@@ -12,3 +12,7 @@ commands:
     description: Start a game
   mccteam:
     description: Teams
+  world:
+    description: prints out world
+  spec:
+    description: toggles spectator mode

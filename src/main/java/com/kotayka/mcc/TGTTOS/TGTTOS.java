@@ -4,10 +4,7 @@ import com.kotayka.mcc.TGTTOS.managers.Firework;
 import com.kotayka.mcc.TGTTOS.managers.NPCManager;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -31,11 +28,13 @@ public class TGTTOS {
     public int playerAmount = 0;
     public int playerPoints;
 
-    public int timeLeft;
+    public int timeLeft = 120;
     public String[] mapOrder = {"Cliff", "Meatball", "Skydive", "Glide", "Boats", "Pit", "Walls"};
     public List<Location> spawnPoints = new ArrayList<>();
     public List<int[]> npcSpawnpoints = new ArrayList<>();
     public List<ItemStack[]> items = new ArrayList<>();
+
+    public World world;
 
     public TGTTOS(Players players, NPCManager npcManager, Plugin plugin) {
         this.players = players;
@@ -49,14 +48,21 @@ public class TGTTOS {
 
     public void loadMaps() {
 
+        if (Bukkit.getWorld("TGTTOSAWAP") == null) {
+            world = Bukkit.getWorld("world");
+        }
+        else {
+            world = Bukkit.getWorld("TGTTOSAWAP");
+        }
 
-        Location cliffSpawn = new Location(players.players.get(0).getWorld(), -148, 1, -284);
-        Location meatballSpawn = new Location(players.players.get(0).getWorld(), 657, -10, 130);
-        Location skydiveSpawn = new Location(players.players.get(0).getWorld(), 757, 53, 442);
-        Location glideSpawn = new Location(players.players.get(0).getWorld(), -176, 1, 174);
-        Location boatsSpawn = new Location(players.players.get(0).getWorld(), 175, 1, -96);
-        Location pitSpawn = new Location(players.players.get(0).getWorld(), 34, 1, 585);
-        Location wallsSpawn = new Location(players.players.get(0).getWorld(), 215, -24, 341);
+
+        Location cliffSpawn = new Location(world, -148, 1, -284);
+        Location meatballSpawn = new Location(world, 657, -10, 130);
+        Location skydiveSpawn = new Location(world, 757, 53, 442);
+        Location glideSpawn = new Location(world, -176, 1, 174);
+        Location boatsSpawn = new Location(world, 175, 1, -96);
+        Location pitSpawn = new Location(world, 34, 1, 585);
+        Location wallsSpawn = new Location(world, 215, -24, 341);
 
         int[] cliffNPC = {5, -262, -274, -256, -269};
         int[] meatballNPC = {64, 655,128, 659, 132};
@@ -124,41 +130,46 @@ public class TGTTOS {
 
                 ItemStack[] item = items.get(gameRound);
 
-                for (ItemStack i : item) {
-                    for (Participant p : players.partipants) {
+                for (Participant p : players.partipants) {
+                    for (ItemStack i : item) {
                         if (i.getType() == Material.WHITE_WOOL) {
-                            i.setAmount(64);
+                            ItemStack wool = new ItemStack(Material.WHITE_WOOL);
+                            wool.setAmount(64);
                             switch (p.team) {
                                 case "RedRabbits":
-                                    i.setType(Material.RED_WOOL);
+                                    wool.setType(Material.RED_WOOL);
                                     break;
                                 case "YellowYaks":
-                                    i.setType(Material.YELLOW_WOOL);
+                                    wool.setType(Material.YELLOW_WOOL);
                                     break;
                                 case "GreenGuardians":
-                                    i.setType(Material.GREEN_WOOL);
+                                    wool.setType(Material.GREEN_WOOL);
                                     break;
                                 case "BlueBats":
-                                    i.setType(Material.BLUE_WOOL);
+                                    wool.setType(Material.BLUE_WOOL);
                                     break;
                                 case "PurplePandas":
-                                    i.setType(Material.PURPLE_WOOL);
+                                    wool.setType(Material.PURPLE_WOOL);
                                     break;
                                 case "PinkPiglets":
-                                    i.setType(Material.PINK_WOOL);
+                                    wool.setType(Material.PINK_WOOL);
                                     break;
                                 default:
                                     p.player.sendMessage("Your not on a team");
                             }
                             ItemStack shears = new ItemStack(Material.SHEARS);
-                            p.player.getInventory().addItem(i);
-                            p.player.getInventory().addItem(shears);
+                            p.player.getInventory().addItem(wool);
+                            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                public void run() {
+                                    p.player.getInventory().addItem(shears);
+                                }
+                            }, 20);
                         }
                         else if (i.getType() == Material.ELYTRA) {
-                            p.player.getInventory().setChestplate(i);
+                            p.player.getInventory().setChestplate(new ItemStack(Material.ELYTRA));
                         }
                         else {
-                            p.player.getInventory().addItem(i);
+                            p.player.getInventory().addItem(new ItemStack(Material.OAK_BOAT));
                         }
 
                     }
@@ -173,7 +184,7 @@ public class TGTTOS {
                 for (Player p : players.players) {
                     int xCoord = random.nextInt(xupperBound) + coords[1];
                     int zCoord = random.nextInt(zupperBound) + coords[2];
-                    Location npcLoc = new Location(p.getWorld(), xCoord, yCoord, zCoord);
+                    Location npcLoc = new Location(world, xCoord, yCoord, zCoord);
                     npcManager.spawnNPC(p,npcLoc);
                 }
             }
@@ -181,7 +192,8 @@ public class TGTTOS {
     }
 
     public void nextRound() {
-        if (roundNum <= mapOrder.length) {
+        players.spectators.clear();
+        if (roundNum < mapOrder.length) {
             roundNum++;
             startRound(gameOrder[roundNum]);
         }

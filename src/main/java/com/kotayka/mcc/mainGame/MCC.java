@@ -7,16 +7,21 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.kotayka.mcc.TGTTOS.TGTTOS;
-import com.kotayka.mcc.TGTTOS.listeners.playerMove;
+import com.kotayka.mcc.TGTTOS.listeners.TGTTOSGameListener;
 import com.kotayka.mcc.TGTTOS.managers.NPCManager;
+import com.kotayka.mcc.mainGame.Listeners.chatUpdater;
+import com.kotayka.mcc.mainGame.commands.playerCommand;
 import com.kotayka.mcc.mainGame.commands.start;
 import com.kotayka.mcc.mainGame.commands.teamCommands;
+import com.kotayka.mcc.mainGame.commands.world;
 import com.kotayka.mcc.mainGame.manager.*;
 import com.kotayka.mcc.mainGame.manager.tabComplete.startCommand;
 import com.kotayka.mcc.mainGame.manager.tabComplete.tCommands;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.kotayka.mcc.mainGame.Listeners.playerJoinLeave;
 import com.kotayka.mcc.TGTTOS.listeners.playersAdded;
@@ -27,22 +32,23 @@ import java.util.*;
 public final class MCC extends JavaPlugin implements Listener {
 
 //  Scoreboard
-    public ScoreboardManager manager = Bukkit.getScoreboardManager();
+    public ScoreboardManager manager;
 
     public Map<String, Scoreboard> scoreboards = new HashMap<String, Scoreboard>();
+    public Map<String, Team[]> teams = new HashMap<String, Team[]>();
+
+    public Plugin plugin = this;
 
 //  Scoreboard Variables
-    String map = "";
-    Integer num = 0;
-    Integer timeLeft = 0;
-    Integer playersLeft = 0;
-
-
+    public Map<UUID, String> maps = new HashMap<UUID, String>();
+    public Map<UUID, Integer> roundNums = new HashMap<UUID, Integer>();
+    public Map<UUID, Integer> time = new HashMap<UUID, Integer>();
+    public Map<UUID, Integer[]> previousStandings = new HashMap<UUID, Integer[]>();
     public int gameRound = 0;
+
 //  Managers
     private final Players players = new Players(this);
     private final NPCManager npcManager = new NPCManager(this, players);
-    private final Spectators spectators = new Spectators(this);
     private teamManager teamManager;
 
 //  Games
@@ -54,22 +60,25 @@ public final class MCC extends JavaPlugin implements Listener {
 //  Scoreboard
     public Map roundScores = new HashMap();
     public Map teamRoundScores = new HashMap();
-    public Integer[] previousStandings = {0,0,0,0,0,0};
 
     @Override
     public void onEnable() {
-        createTeams();
+        manager = Bukkit.getScoreboardManager();
         scoreBoards();
+        loadTeams();
         players.getOnlinePlayers();
         loadMaps();
         Bukkit.getServer().getConsoleSender().sendMessage("MCC Plugin Loaded!");
         playerJoinLeave pManager = new playerJoinLeave(players);
         getServer().getPluginManager().registerEvents(pManager, this);
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new chatUpdater(players), this);
         getCommand("start").setExecutor(new start(game));
         getCommand("start").setTabCompleter(new startCommand());
-        getCommand("mccteam").setExecutor(new teamCommands(teamManager));
+        getCommand("mccteam").setExecutor(new teamCommands(teamManager, this));
         getCommand("mccteam").setTabCompleter(new tCommands());
+        getCommand("world").setExecutor(new world());
+        getCommand("spec").setExecutor(new playerCommand(players));
         TGTTOSGame();
 
     }
@@ -80,58 +89,78 @@ public final class MCC extends JavaPlugin implements Listener {
 
     public void TGTTOSGame() {
         playersAdded pAdded = new playersAdded(npcManager);
-        playerMove playerMove = new playerMove(tgttos, this);
+        TGTTOSGameListener TGTTOSGameListener = new TGTTOSGameListener(tgttos, this);
         getServer().getPluginManager().registerEvents(pAdded, this);
-        getServer().getPluginManager().registerEvents(playerMove, this);
+        getServer().getPluginManager().registerEvents(TGTTOSGameListener, this);
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
         manager.addPacketListener(new PacketAdapter(this, PacketType.Play.Client.USE_ENTITY) {
             @Override
             public void onPacketReceiving(PacketEvent event) {
-                PacketContainer packet = event.getPacket();
-                if (Objects.equals(game.stage, "TGTTOS")) {
-                    tgttos.playerAmount++;
-                    int entityId = packet.getIntegers().read(0);
-                    int npcID = npcManager.CheckIfValidID(entityId);
-                    if (npcID != -1) {
-                        npcManager.removeNPC(npcID);
-                        spectators.addSpectator(event.getPlayer());
-                        String place;
-                        switch (tgttos.playerAmount) {
-                            case 1:
-                                place = "1st";
-                                break;
-                            case 2:
-                                place = "2nd";
-                                break;
-                            case 3:
-                                place="3rd";
-                                break;
-                            default:
-                                place=String.valueOf(tgttos.playerAmount)+"th";
-                                break;
-                        }
-                        for (Participant p : players.partipants) {
-                            if (event.getPlayer().getName().equals(p.ign)) {
-                                p.roundCoins+=tgttos.playerPoints;
-                                teamManager.roundScores.put(p.fullName, ((int) teamManager.roundScores.get(p.fullName))+tgttos.playerPoints);
+                plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    public void run() {
+                        PacketContainer packet = event.getPacket();
+                        if (Objects.equals(game.stage, "TGTTOS")) {
+                            int entityId = packet.getIntegers().read(0);
+                            int npcID = npcManager.CheckIfValidID(entityId);
+                            if (npcID != -1 && !players.spectators.contains(event.getPlayer())) {
+                                tgttos.playerAmount++;
+                                npcManager.removeNPC(npcID);
+                                players.spectators.add(event.getPlayer());
+                                String place;
+                                switch (tgttos.playerAmount) {
+                                    case 1:
+                                        place = "1st";
+                                        break;
+                                    case 2:
+                                        place = "2nd";
+                                        break;
+                                    case 3:
+                                        place="3rd";
+                                        break;
+                                    default:
+                                        place=String.valueOf(tgttos.playerAmount)+"th";
+                                        break;
+                                }
+                                for (Participant p : players.partipants) {
+                                    if (event.getPlayer().getName().equals(p.ign)) {
+                                        p.roundCoins+=tgttos.playerPoints;
+                                        Bukkit.broadcastMessage(p.toString());
+                                        teamManager.roundScores.put(p.fullName, ((int) teamManager.roundScores.get(p.fullName))+tgttos.playerPoints);
+                                    }
+                                }
+                                Bukkit.broadcastMessage(ChatColor.GOLD+event.getPlayer().getName()+ChatColor.GRAY+ " finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
+                                event.getPlayer().sendMessage(ChatColor.WHITE+"[+"+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
+                                tgttos.playerPoints--;
+                                if (tgttos.playerPoints <= 0) {
+                                    tgttos.nextRound();
+                                }
+                                event.getPlayer().setGameMode(GameMode.SPECTATOR);
                             }
-                        }
-                        Bukkit.broadcastMessage(ChatColor.GOLD+event.getPlayer().getName()+ChatColor.GRAY+ " finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
-                        event.getPlayer().sendMessage(ChatColor.WHITE+"[+"+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
-                        tgttos.playerPoints--;
-                        if (tgttos.playerPoints <= 0) {
-                            tgttos.nextRound();
+
                         }
                     }
-
-                }
-
+                }, 0);
             }
         });
     }
     public void createScoreboard(Participant player) {
+        String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
         Scoreboard board = manager.getNewScoreboard();
-        Integer timeLeft=0;
+        Integer timeLeft=120;
+
+        Team red = board.registerNewTeam(teamNames[0]+player.ign);
+        Team yellow = board.registerNewTeam(teamNames[1]+player.ign);
+        Team green = board.registerNewTeam(teamNames[2]+player.ign);
+        Team blue = board.registerNewTeam(teamNames[3]+player.ign);
+        Team purple = board.registerNewTeam(teamNames[4]+player.ign);
+        Team pink = board.registerNewTeam(teamNames[5]+player.ign);
+
+        red.setColor(ChatColor.RED);
+        yellow.setColor(ChatColor.YELLOW);
+        green.setColor(ChatColor.GREEN);
+        blue.setColor(ChatColor.BLUE);
+        purple.setColor(ChatColor.DARK_PURPLE);
+        pink.setColor(ChatColor.LIGHT_PURPLE);
 
         //Lobby
         Objective lobby = board.registerNewObjective("lobby", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
@@ -232,25 +261,21 @@ public final class MCC extends JavaPlugin implements Listener {
                                 }
                             }
                             if (tgttos.timeLeft >= 0) {
-                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+((int) Math.floor(timeLeft/60))+":"+timeLeft%60);
-                                scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+((int) Math.floor(tgttos.timeLeft/60))+":"+tgttos.timeLeft%60).setScore(12);
-                                timeLeft = tgttos.timeLeft;
-                                tgttos.timeLeft--;
+                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+((int) Math.floor(time.get(p.player.getUniqueId())/60))+":"+time.get(p.player.getUniqueId())%60);
+                                 scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BOLD+""+ChatColor.RED +"Time left: "+ChatColor.WHITE+((int) Math.floor(tgttos.timeLeft/60))+":"+tgttos.timeLeft%60).setScore(12);
+                                time.put(p.player.getUniqueId(), tgttos.timeLeft);
                             }
-                            else {
-                                tgttos.nextRound();
-                            }
-                            if (num != tgttos.roundNum) {
-                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ChatColor.WHITE+(num+1)+"/7");
+                            if (roundNums.get(p.player.getUniqueId()) != tgttos.roundNum) {
+                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ChatColor.WHITE+(roundNums.get(p.player.getUniqueId())+1)+"/7");
                                 scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ChatColor.WHITE+(tgttos.roundNum+1)+"/7").setScore(13);
-                                num = tgttos.roundNum;
+                                roundNums.put(p.player.getUniqueId(), tgttos.roundNum);
                             }
-                            if (map != tgttos.mapOrder[tgttos.roundNum]) {
-                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+map);
+                            if (maps.get(p.player.getUniqueId()) != tgttos.mapOrder[tgttos.roundNum]) {
+                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+maps.get(p.player.getUniqueId()));
                                 scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+tgttos.mapOrder[tgttos.gameOrder[tgttos.roundNum]]).setScore(14);
-                                map = tgttos.mapOrder[tgttos.gameOrder[tgttos.roundNum]];
+                                maps.put(p.player.getUniqueId(), tgttos.mapOrder[tgttos.gameOrder[tgttos.roundNum]]);
                             }
-                            if (!(tempArray.equals(previousStandings))) {
+                            if (!(tempArray.equals(previousStandings.get(p.player.getUniqueId())))) {
                                 for (int i = 0; i < teamManager.teamNames.size(); i++) {
                                     int score = findIndexInNumberArr(tempArray, (Integer) teamManager.roundScores.get(teamList[i]));
                                     switch (teamManager.teamNames.get(i)) {
@@ -280,18 +305,19 @@ public final class MCC extends JavaPlugin implements Listener {
                                             break;
                                     }
                                 }
-                                for (String i : teamList) {
-                                    teamRoundScores.put(i, teamManager.roundScores.get(i));
-                                }
-
-                                previousStandings = tempArray;
+                                previousStandings.put(p.player.getUniqueId(), tempArray);
                             }
                             break;
                     }
                 }
-
-
-
+                switch (game.stage) {
+                    case "TGTTOS":
+                        tgttos.timeLeft--;
+                        break;
+                }
+                for (String i : teamList) {
+                    teamRoundScores.put(i, teamManager.roundScores.get(i));
+                }
             }
         }, 0, 20);
     }
@@ -305,7 +331,7 @@ public final class MCC extends JavaPlugin implements Listener {
         return 0;
     }
 
-    public void createTeams() {
+    public void loadTeams() {
         String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
         String[] teamNamesFull = {"Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets"};
 
@@ -313,7 +339,18 @@ public final class MCC extends JavaPlugin implements Listener {
             teamRoundScores.put(team, 0);
         }
 
-        Scoreboard board = manager.getNewScoreboard();
+        List<String> tn = new ArrayList<>(Arrays.asList(teamNames));
+        teamManager = new teamManager(players.partipants, tn, this);
+
+        for (String team : teamNamesFull) {
+            teamManager.roundScores.put(team, 0);
+        }
+    }
+
+    public void createTeams(Participant player) {
+        String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
+
+        Scoreboard board = scoreboards.get(player.ign);
 
         Team red = board.registerNewTeam(teamNames[0]);
         Team yellow = board.registerNewTeam(teamNames[1]);
@@ -329,15 +366,15 @@ public final class MCC extends JavaPlugin implements Listener {
         purple.setColor(ChatColor.DARK_PURPLE);
         pink.setColor(ChatColor.LIGHT_PURPLE);
 
-        Team[] teamsArray = {red, yellow,green,blue,purple,pink};
-        List<Team> teams = new ArrayList<>(Arrays.asList(teamsArray));
-        List<String> tn = new ArrayList<>(Arrays.asList(teamNames));
-        teamManager = new teamManager(players.partipants, teams, tn);
+        red.setPrefix("Ⓡ ");
+        yellow.setPrefix("Ⓨ ");
+        green.setPrefix("Ⓖ ");
+        blue.setPrefix("Ⓑ ");
+        purple.setPrefix("Ⓤ ");
+        pink.setPrefix("Ⓟ ");
 
-        for (String team : teamNamesFull) {
-            teamManager.roundScores.put(team, 0);
-        }
-
+        Team[] teamss = {red,yellow,green,blue,purple,pink};
+        teams.put(player.ign, teamss);
     }
 
     @Override
