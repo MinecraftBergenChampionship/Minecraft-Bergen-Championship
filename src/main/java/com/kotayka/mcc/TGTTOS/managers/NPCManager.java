@@ -31,6 +31,8 @@ import java.util.UUID;
 public class NPCManager {
 
     public final Plugin plugin;
+
+    public List<Integer> ids = new ArrayList<>();
     public List<EntityPlayer> npcs = new ArrayList<EntityPlayer>();
     public List<Location> npcsLocations = new ArrayList<Location>();
     public final Players players;
@@ -72,7 +74,8 @@ public class NPCManager {
 
         }
 
-        player.sendMessage(ChatColor.GREEN+"Spawned new NPC at "+npcLocation.getX()+", "+npcLocation.getY()+", "+npcLocation.getZ());
+        player.sendMessage(ChatColor.GREEN+"Spawned new NPC at "+npcLocation.getX()+", "+npcLocation.getY()+", "+npcLocation.getZ() + " With the ID of " + npcPlayer.getBukkitEntity().getEntityId());
+        ids.add(npcPlayer.getBukkitEntity().getEntityId());
         npcs.add(npcPlayer);
         npcsLocations.add(npcLocation);
     }
