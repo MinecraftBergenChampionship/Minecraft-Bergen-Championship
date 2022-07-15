@@ -1,7 +1,9 @@
 package com.kotayka.mcc.Skybattle;
 
+import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
+import com.kotayka.mcc.mainGame.manager.teamManager;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -10,11 +12,9 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scoreboard.Team;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 
 public class Skybattle {
     public final Players players;
@@ -30,6 +30,8 @@ public class Skybattle {
     public Map<Location, Block> skyMap;
     public Map<Location, ItemStack[]> chestContents;
     public World world = Bukkit.getWorld("Skybattle");
+    public MCC mcc;
+    public teamManager teams;
 
 
     public Skybattle(Players players, Plugin plugin) {
@@ -110,6 +112,9 @@ public class Skybattle {
         startRound(roundNum);
     }
 
+    /*
+     * This might work
+     */
     public void resetMap() {
         int x = 225;
         int y = -15;
@@ -142,14 +147,16 @@ public class Skybattle {
                 playerAmount = 0;
                 Location playerLoc = (Location) spawnPoints.get(gameRound);
 
-                // List<Location> tempSpawns = new ArrayList<>(spawnPoints);
-
-               /*
-                 for each team
-                    for each player in team
-                        random spawn
-                        reduce tempspawnsize
-                 */
+                // Randomly place each team at a different spawn
+                List<Location> tempSpawns = new ArrayList<>(spawnPoints);
+                List<Team[]> teamList = new ArrayList<>(mcc.teams.values());
+                for (String s : teams.teamNames) {
+                    int randomNum = (int) (Math.random() * (tempSpawns.size()));
+                    for (Participant participant : teams.players) {
+                        participant.player.teleport(tempSpawns.get(randomNum));
+                    }
+                    tempSpawns.remove(randomNum);
+                }
 
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.getInventory().clear();
