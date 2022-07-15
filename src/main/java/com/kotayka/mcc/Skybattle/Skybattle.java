@@ -1,6 +1,5 @@
 package com.kotayka.mcc.Skybattle;
 
-import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
 import com.kotayka.mcc.mainGame.manager.teamManager;
@@ -12,7 +11,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
@@ -30,7 +28,6 @@ public class Skybattle {
     public Map<Location, Block> skyMap;
     public Map<Location, ItemStack[]> chestContents;
     public World world = Bukkit.getWorld("Skybattle");
-    public MCC mcc;
     public teamManager teams;
 
 
@@ -76,6 +73,8 @@ public class Skybattle {
         Location spawnFive = new Location(world, -122, -9, -319);
         Location spawnSix = new Location(world, -188, -9, -319);
         // CENTER: -155, -7, -265
+
+        spawnPoints = Arrays.asList(spawnOne, spawnTwo, spawnThree, spawnFour, spawnFive, spawnSix);
 
         for (ItemStack i : spawnItems) {
             for (Participant p : players.participants) {
@@ -149,7 +148,6 @@ public class Skybattle {
 
                 // Randomly place each team at a different spawn
                 List<Location> tempSpawns = new ArrayList<>(spawnPoints);
-                List<Team[]> teamList = new ArrayList<>(mcc.teams.values());
                 for (String s : teams.teamNames) {
                     int randomNum = (int) (Math.random() * (tempSpawns.size()));
                     for (Participant participant : teams.players) {
