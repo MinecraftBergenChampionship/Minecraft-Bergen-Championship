@@ -1,5 +1,6 @@
 package com.kotayka.mcc.Skybattle;
 
+import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
 import com.kotayka.mcc.mainGame.manager.teamManager;
@@ -17,27 +18,34 @@ import java.util.*;
 public class Skybattle {
     public final Players players;
     public final Plugin plugin;
-    public boolean on = false;
-    public int roundNum;
-    public int playerAmount = 0;
-    public int playerPoints;
+    public boolean stage = false;
+    public int roundNum = 0;
     public int timeLeft;
 
     public List<Location> spawnPoints = new ArrayList<>();
     public List<ItemStack> spawnItems = new ArrayList<>();
-    public Map<Location, Block> skyMap;
-    public Map<Location, ItemStack[]> chestContents;
-    public World world = Bukkit.getWorld("Skybattle");
+    public Map<Location, Block> skyMap = new HashMap<>(350);
+    public Map<Location, ItemStack[]> chestContents = new HashMap<>(50);
+    public World world;
+    public MCC mcc;
     public teamManager teams;
 
 
-    public Skybattle(Players players, Plugin plugin) {
+    public Skybattle(Players players, Plugin plugin, MCC mcc) {
         this.players = players;
         this.plugin = plugin;
+        this.mcc = mcc;
     }
 
     public void copyMap() {
         // MAP COPY IS FROM 224, -16, 322 TO 363, 18, 440
+        if (Bukkit.getWorld("Skybattle") == null) {
+            world = Bukkit.getWorld("world");
+        }
+        else {
+            world = Bukkit.getWorld("Skybattle");
+        }
+
         for (int x = 225; x < 364; x++) {
             for (int y = -15; y < 19; y++) {
                 for (int z = 322; z < 441; z++) {
@@ -55,6 +63,13 @@ public class Skybattle {
     }
 
     public void loadMap() {
+        if (Bukkit.getWorld("Skybattle") == null) {
+            world = Bukkit.getWorld("world");
+        }
+        else {
+            world = Bukkit.getWorld("Skybattle");
+        }
+
         // Spawn items
         ItemStack pick = new ItemStack(Material.IRON_PICKAXE);
         pick.addEnchantment(Enchantment.DIG_SPEED, 2);
@@ -72,7 +87,8 @@ public class Skybattle {
         Location spawnFour = new Location(world, -92, -9, -265);
         Location spawnFive = new Location(world, -122, -9, -319);
         Location spawnSix = new Location(world, -188, -9, -319);
-        // CENTER: -155, -7, -265
+
+
 
         spawnPoints = Arrays.asList(spawnOne, spawnTwo, spawnThree, spawnFour, spawnFive, spawnSix);
 
@@ -102,19 +118,25 @@ public class Skybattle {
     }
 
     public void start() {
-        on = true;
-        roundNum = 0;
+        stage = true;
 
         loadMap();
         copyMap();
 
-        startRound(roundNum);
+        startRound();
     }
 
     /*
      * This might work
      */
     public void resetMap() {
+        if (Bukkit.getWorld("Skybattle") == null) {
+            world = Bukkit.getWorld("world");
+        }
+        else {
+            world = Bukkit.getWorld("Skybattle");
+        }
+
         int x = 225;
         int y = -15;
         int z = 322;
@@ -137,37 +159,38 @@ public class Skybattle {
         }
     }
 
-    public void startRound(int gameRound) {
+
+    public void nextRound() {
+        resetMap();
+        loadMap();
+        players.spectators.clear();
+        if (roundNum < 3) {
+            roundNum++;
+            startRound();
+        }
+    }
+    public void startRound() {
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             public void run() {
                 // countdown TODO
                 timeLeft = 240;
-                playerPoints=players.players.size();
-                playerAmount = 0;
-                Location playerLoc = (Location) spawnPoints.get(gameRound);
 
                 // Randomly place each team at a different spawn
                 List<Location> tempSpawns = new ArrayList<>(spawnPoints);
-                for (String s : teams.teamNames) {
+                for (String s : mcc.teamManager.teamNames) {
                     int randomNum = (int) (Math.random() * (tempSpawns.size()));
-                    for (Participant participant : teams.players) {
+                    for (Participant participant : mcc.teamManager.players) {
                         participant.player.teleport(tempSpawns.get(randomNum));
+                        participant.player.setGameMode(GameMode.SURVIVAL);
                     }
                     tempSpawns.remove(randomNum);
                 }
-
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.getInventory().clear();
-                    p.teleport(playerLoc);
-                    p.setGameMode(GameMode.SURVIVAL);
-                }
-
             }
         }, 0);
     }
 
     public boolean enabled() {
-        return on;
+        return stage;
     }
 
 }

@@ -39,7 +39,11 @@ public class SkybattleListener implements Listener {
             p.getWorld().spawn(p.getTargetBlock(null, 5).getLocation().add(0, 1, 0), TNTPrimed.class);
         } else if (e.getBlock().getType().toString().matches(".*CONCRETE$")) {
             String concrete = e.getBlock().getType().toString();
-            e.getPlayer().getInventory().addItem(new ItemStack(Material.getMaterial(concrete)));
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                public void run() {
+                    e.getPlayer().getInventory().addItem(new ItemStack(Material.getMaterial(concrete)));
+                }
+            }, 20);
         }
     }
 
@@ -48,6 +52,7 @@ public class SkybattleListener implements Listener {
      */
     @EventHandler
     public void playerDie(PlayerDeathEvent e) {
+
         Player p = e.getEntity();
         if (p.getKiller() != null) {
             p.getKiller().sendTitle("[X] " + p, null, 0, 60, 40);
