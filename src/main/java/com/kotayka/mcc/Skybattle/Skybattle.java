@@ -12,6 +12,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
@@ -22,44 +23,16 @@ public class Skybattle {
     public int roundNum = 0;
     public int timeLeft;
 
-    public List<Location> spawnPoints = new ArrayList<>();
-    public List<ItemStack> spawnItems = new ArrayList<>();
-    public Map<Location, Block> skyMap = new HashMap<>(350);
-    public Map<Location, ItemStack[]> chestContents = new HashMap<>(50);
+    public List<Location> spawnPoints = new ArrayList<>(6);
+    public List<ItemStack> spawnItems = new ArrayList<>(5);
     public World world;
     public MCC mcc;
-    public teamManager teams;
 
 
     public Skybattle(Players players, Plugin plugin, MCC mcc) {
         this.players = players;
         this.plugin = plugin;
         this.mcc = mcc;
-    }
-
-    public void copyMap() {
-        // MAP COPY IS FROM 224, -16, 322 TO 363, 18, 440
-        if (Bukkit.getWorld("Skybattle") == null) {
-            world = Bukkit.getWorld("world");
-        }
-        else {
-            world = Bukkit.getWorld("Skybattle");
-        }
-
-        for (int x = 225; x < 364; x++) {
-            for (int y = -15; y < 19; y++) {
-                for (int z = 322; z < 441; z++) {
-                    assert world != null;
-                    Block b = world.getBlockAt(x, y, z);
-                    if (b.getState() instanceof Chest) {
-                        Container container = (Chest) b.getState();
-                        ItemStack[] itemsForChest = container.getInventory().getContents();
-                        chestContents.put(new Location(world, x, y, z), itemsForChest);
-                    }
-                    skyMap.put(new Location(world, x, y, z), b);
-                }
-            }
-        }
     }
 
     public void loadMap() {
@@ -72,7 +45,7 @@ public class Skybattle {
 
         // Spawn items
         ItemStack pick = new ItemStack(Material.IRON_PICKAXE);
-        pick.addEnchantment(Enchantment.DIG_SPEED, 2);
+        pick.addEnchantment(Enchantment.DIG_SPEED, 3);
 
         spawnItems = Arrays.asList(
                 new ItemStack(Material.STONE_SWORD), pick,
@@ -88,9 +61,11 @@ public class Skybattle {
         Location spawnFive = new Location(world, -122, -9, -319);
         Location spawnSix = new Location(world, -188, -9, -319);
 
-
-
         spawnPoints = Arrays.asList(spawnOne, spawnTwo, spawnThree, spawnFour, spawnFive, spawnSix);
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.getInventory().clear();
+        }
 
         for (ItemStack i : spawnItems) {
             for (Participant p : players.participants) {
@@ -121,15 +96,15 @@ public class Skybattle {
         stage = true;
 
         loadMap();
-        copyMap();
 
         startRound();
     }
 
     /*
-     * This might work
+     * Reset Map
      */
     public void resetMap() {
+
         if (Bukkit.getWorld("Skybattle") == null) {
             world = Bukkit.getWorld("world");
         }
@@ -138,23 +113,29 @@ public class Skybattle {
         }
 
         int x = 225;
-        int y = -15;
+        int y = -16;
         int z = 322;
-        for (int mapX = -225; mapX < -85; mapX++) {
-            for (int mapY = -15; mapY < 17; mapY++) {
-                for (int mapZ = -325; mapZ < -206; mapZ++) {
-                    Block originalBlock = skyMap.get(new Location(world, x, y, z));
+        for (int mapX = -225; mapX <= -87; mapX++) {
+            for (int mapY = -17; mapY <= 16; mapY++) {
+                for (int mapZ = -325; mapZ <= -207; mapZ++) {
+                    assert world != null;
+                    Block originalBlock = world.getBlockAt(x, y, z);
                     Block possiblyChangedBlock = world.getBlockAt(mapX, mapY, mapZ);
-                    if (originalBlock != possiblyChangedBlock) {
+                    if (!(originalBlock.getType().name().equals(possiblyChangedBlock.getType().name()))) {
                         possiblyChangedBlock.setType(originalBlock.getType());
                     }
-                    if (world.getBlockAt(mapX, mapY, mapZ).getState() instanceof Chest) {
-                        ((Chest) possiblyChangedBlock.getState()).getInventory().setContents(chestContents.get(new Location(world, x, y, z)));
+                    if (possiblyChangedBlock.getState() instanceof Chest && originalBlock.getState() instanceof Chest) {
+                        Container container = (Chest) possiblyChangedBlock.getState();
+                        ItemStack[] itemsForChest = container.getInventory().getContents();
+                        ((Chest) possiblyChangedBlock.getState()).getInventory().setContents(itemsForChest);
                     }
                     z++;
                 }
+                z = 322;
                 y++;
             }
+            z = 322;
+            y = -16;
             x++;
         }
     }
@@ -174,17 +155,40 @@ public class Skybattle {
             public void run() {
                 // countdown TODO
                 timeLeft = 240;
-
+                String[] teamListFull = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
                 // Randomly place each team at a different spawn
+                // TODO
                 List<Location> tempSpawns = new ArrayList<>(spawnPoints);
+                //Map<Team, Location> spawns = new HashMap<>(6);
+
                 for (String s : mcc.teamManager.teamNames) {
                     int randomNum = (int) (Math.random() * (tempSpawns.size()));
                     for (Participant participant : mcc.teamManager.players) {
+                        participant.player.teleport(tempSpawns.get(randomNum));
+                    }
+                    tempSpawns.remove(randomNum);
+                }
+                /*
+                for (String s : mcc.teams.) {
+                    int randomNum = (int) (Math.random() * (tempSpawns.size()));
+                    for (Participant p : listOfTeams.get(i)) {
+                        mcc.teams.get(player.getName())[team.teamNames.indexOf(args[1])].addEntry(p.getName());
                         participant.player.teleport(tempSpawns.get(randomNum));
                         participant.player.setGameMode(GameMode.SURVIVAL);
                     }
                     tempSpawns.remove(randomNum);
                 }
+                 */
+
+
+                /*
+                for (int i = 0; i < teamManager.teamNames.size(); i++) {
+                    for (Participant p : mcc.teamManager.players) {
+                        Team t = mcc.teams.get(p.player.getName())[teamManager.teamNames.indexOf(teamListFull[i])];
+
+                    }
+                }
+                 */
             }
         }, 0);
     }
@@ -192,5 +196,4 @@ public class Skybattle {
     public boolean enabled() {
         return stage;
     }
-
 }

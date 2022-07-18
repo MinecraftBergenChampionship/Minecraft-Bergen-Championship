@@ -27,7 +27,6 @@ public class SkybattleListener implements Listener {
     /*
      * Auto Prime TNT
      * Infinite Blocks
-     * I have no idea if these work
      */
     @EventHandler
     public void blockPlace(BlockPlaceEvent e) {
@@ -36,14 +35,10 @@ public class SkybattleListener implements Listener {
         if (e.getBlock().getType().equals(Material.TNT)) {
             e.setCancelled(true);
             Player p = e.getPlayer();
-            p.getWorld().spawn(p.getTargetBlock(null, 5).getLocation().add(0, 1, 0), TNTPrimed.class);
+            p.getWorld().spawn(p.getTargetBlock(null, 5).getLocation().add(0, 0.5, 0), TNTPrimed.class);
         } else if (e.getBlock().getType().toString().matches(".*CONCRETE$")) {
             String concrete = e.getBlock().getType().toString();
-            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                public void run() {
-                    e.getPlayer().getInventory().addItem(new ItemStack(Material.getMaterial(concrete)));
-                }
-            }, 20);
+            e.getPlayer().getInventory().addItem(new ItemStack(Material.getMaterial(concrete)));
         }
     }
 
@@ -55,7 +50,7 @@ public class SkybattleListener implements Listener {
 
         Player p = e.getEntity();
         if (p.getKiller() != null) {
-            p.getKiller().sendTitle("[X] " + p, null, 0, 60, 40);
+            p.getKiller().sendTitle("[X] " + p.getName(), null, 0, 60, 40);
         }
         Firework fw = new Firework();
         fw.spawnFirework(p.getLocation());
