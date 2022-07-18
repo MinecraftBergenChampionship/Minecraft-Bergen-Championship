@@ -159,36 +159,22 @@ public class Skybattle {
                 // Randomly place each team at a different spawn
                 // TODO
                 List<Location> tempSpawns = new ArrayList<>(spawnPoints);
-                //Map<Team, Location> spawns = new HashMap<>(6);
+                List<Team[]> teamListPogU = new ArrayList<>(mcc.teams.values());
 
-                for (String s : mcc.teamManager.teamNames) {
-                    int randomNum = (int) (Math.random() * (tempSpawns.size()));
-                    for (Participant participant : mcc.teamManager.players) {
-                        participant.player.teleport(tempSpawns.get(randomNum));
+                int i = 0;
+                // this implementation looks super inefficient and wack but brain is too fried
+                for (Team t : teamListPogU.get(i)) {
+                    int randomNum = (int) (Math.random() * tempSpawns.size());
+                    for (String s : t.getEntries()) {
+                        for (Participant p : players.participants) {
+                            if (p.ign.equals(s)) {
+                                p.player.teleport(tempSpawns.get(randomNum));
+                            }
+                        }
                     }
                     tempSpawns.remove(randomNum);
+                    i++;
                 }
-                /*
-                for (String s : mcc.teams.) {
-                    int randomNum = (int) (Math.random() * (tempSpawns.size()));
-                    for (Participant p : listOfTeams.get(i)) {
-                        mcc.teams.get(player.getName())[team.teamNames.indexOf(args[1])].addEntry(p.getName());
-                        participant.player.teleport(tempSpawns.get(randomNum));
-                        participant.player.setGameMode(GameMode.SURVIVAL);
-                    }
-                    tempSpawns.remove(randomNum);
-                }
-                 */
-
-
-                /*
-                for (int i = 0; i < teamManager.teamNames.size(); i++) {
-                    for (Participant p : mcc.teamManager.players) {
-                        Team t = mcc.teams.get(p.player.getName())[teamManager.teamNames.indexOf(teamListFull[i])];
-
-                    }
-                }
-                 */
             }
         }, 0);
     }
