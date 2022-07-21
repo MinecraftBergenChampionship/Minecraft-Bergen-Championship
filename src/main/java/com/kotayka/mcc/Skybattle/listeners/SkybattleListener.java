@@ -2,9 +2,11 @@ package com.kotayka.mcc.Skybattle.listeners;
 
 import com.kotayka.mcc.Skybattle.Skybattle;
 import com.kotayka.mcc.TGTTOS.managers.Firework;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -34,7 +36,8 @@ public class SkybattleListener implements Listener {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
 
         if (e.getBlock().getType().equals(Material.TNT)) {
-            e.setCancelled(true);
+            Block b = e.getBlock();
+            b.setType(Material.AIR);
             Player p = e.getPlayer();
             p.getWorld().spawn(p.getTargetBlock(null, 5).getLocation().add(0, 0.5, 0), TNTPrimed.class);
         } else if (e.getBlock().getType().toString().matches(".*CONCRETE$")) {
@@ -52,7 +55,9 @@ public class SkybattleListener implements Listener {
 
         Player p = e.getEntity();
         if (p.getKiller() != null) {
-            p.getKiller().sendTitle("[X] " + p.getName(), null, 0, 60, 40);
+            p.getKiller().sendTitle(null, "[X] " + p.getName(), 0, 60, 40);
+            p.sendMessage(ChatColor.RED + "You were eliminated by " + p.getKiller() + "!");
+            p.getKiller().sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + p + "!");
         }
         Firework fw = new Firework();
         fw.spawnFirework(p.getLocation());

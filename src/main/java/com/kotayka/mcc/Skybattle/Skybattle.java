@@ -16,6 +16,8 @@ import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
+import static org.bukkit.GameMode.SURVIVAL;
+
 public class Skybattle {
     // (PLANNED) STATES: INACTIVE, PLAYING, PAUSED, STARTING, ENDING (?)
     private String state = "INACTIVE";
@@ -25,10 +27,10 @@ public class Skybattle {
     public boolean stage = false;
     public int roundNum = 0;
     public int timeLeft;
-
     public List<Location> spawnPoints = new ArrayList<>(6);
     public List<ItemStack> spawnItems = new ArrayList<>(5);
     public World world;
+    public WorldBorder border;
     public MCC mcc;
 
 
@@ -36,15 +38,20 @@ public class Skybattle {
         this.players = players;
         this.plugin = plugin;
         this.mcc = mcc;
-    }
 
-    public void loadMap() {
+
         if (Bukkit.getWorld("Skybattle") == null) {
             world = Bukkit.getWorld("world");
         }
         else {
             world = Bukkit.getWorld("Skybattle");
         }
+        assert world != null;
+        border = world.getWorldBorder();
+    }
+
+    public void loadMap() {
+        resetMap();
 
         // Spawn items
         ItemStack pick = new ItemStack(Material.IRON_PICKAXE);
@@ -53,21 +60,23 @@ public class Skybattle {
         spawnItems = Arrays.asList(
                 new ItemStack(Material.STONE_SWORD), pick,
                 new ItemStack(Material.WHITE_CONCRETE, 64),
-                new ItemStack(Material.COOKED_BEEF, 4),
+                new ItemStack(Material.COOKED_BEEF, 7),
                 new ItemStack(Material.IRON_CHESTPLATE)
         );
 
-        Location spawnOne = new Location(world, -218, -9, -265);
-        Location spawnTwo = new Location(world, -188, -9, -211);
-        Location spawnThree = new Location(world, -122, -9, -211);
-        Location spawnFour = new Location(world, -92, -9, -265);
-        Location spawnFive = new Location(world, -122, -9, -319);
-        Location spawnSix = new Location(world, -188, -9, -319);
+        Location spawnOne = new Location(world, -220, -9, -266);
+        Location spawnTwo = new Location(world, -190, -9, -212);
+        Location spawnThree = new Location(world, -124, -9, -212);
+        Location spawnFour = new Location(world, -94, -9, -266);
+        Location spawnFive = new Location(world, -124, -9, -320);
+        Location spawnSix = new Location(world, -190, -9, -320);
 
         spawnPoints = Arrays.asList(spawnOne, spawnTwo, spawnThree, spawnFour, spawnFive, spawnSix);
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.getInventory().clear();
+        for (Participant p : players.participants) {
+            p.player.getInventory().clear();
+            p.player.setGameMode(SURVIVAL);
+            p.player.setBedSpawnLocation(new Location(world, -155, -7, -265));
         }
 
         for (ItemStack i : spawnItems) {
@@ -93,6 +102,9 @@ public class Skybattle {
                 }
             }
         }
+
+        border.setCenter(-155, -265);
+        border.setSize(121);
     }
 
     public void start() {
@@ -107,14 +119,6 @@ public class Skybattle {
      * Reset Map
      */
     public void resetMap() {
-
-        if (Bukkit.getWorld("Skybattle") == null) {
-            world = Bukkit.getWorld("world");
-        }
-        else {
-            world = Bukkit.getWorld("Skybattle");
-        }
-
         int x = 225;
         int y = -16;
         int z = 322;
@@ -126,9 +130,10 @@ public class Skybattle {
                     Block possiblyChangedBlock = world.getBlockAt(mapX, mapY, mapZ);
                     if (!(originalBlock.getType().name().equals(possiblyChangedBlock.getType().name()))) {
                         possiblyChangedBlock.setType(originalBlock.getType());
+                        possiblyChangedBlock.setBlockData(originalBlock.getBlockData());
                     }
                     if (possiblyChangedBlock.getState() instanceof Chest && originalBlock.getState() instanceof Chest) {
-                        Container container = (Chest) possiblyChangedBlock.getState();
+                        Container container = (Chest) originalBlock.getState();
                         ItemStack[] itemsForChest = container.getInventory().getContents();
                         ((Chest) possiblyChangedBlock.getState()).getInventory().setContents(itemsForChest);
                     }
@@ -146,6 +151,7 @@ public class Skybattle {
 
     public void nextRound() {
         resetMap();
+        resetBorder();
         loadMap();
         players.spectators.clear();
         if (roundNum < 3) {
@@ -153,6 +159,7 @@ public class Skybattle {
             startRound();
         }
     }
+
     public void startRound() {
         // Scoreboard shenanigans will be handled in MCC.java although it would be nice to have a scoreboard manager for each game
         timeLeft = 10;
@@ -183,6 +190,11 @@ public class Skybattle {
         // both in MCC.java
     }
 
+    public void resetBorder() {
+        world.getWorldBorder().reset();
+    }
+
+    /*
     public void startingCountdown() {
 
         // not sure if smart to use another run here instead of doing it in MCC but it'd be neater if this works
@@ -194,6 +206,7 @@ public class Skybattle {
             }
         }, 20);
     }
+    */
 
     public void setState(String state) {
         this.state = state;

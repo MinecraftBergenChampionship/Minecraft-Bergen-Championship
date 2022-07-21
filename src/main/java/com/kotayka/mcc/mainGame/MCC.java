@@ -369,17 +369,30 @@ public final class MCC extends JavaPlugin implements Listener {
                                 scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + ((int) Math.floor(time.get(p.player.getUniqueId()) / 60)) + ":" + time.get(p.player.getUniqueId()) % 60);
                                 scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);
                                 time.put(p.player.getUniqueId(), skybattle.timeLeft);
+
+                                /*
+                                if (skybattle.timeLeft % 30 == 0 && skybattle.timeLeft != 240) {
+                                    skybattle.border.setSize()
+                                } else if ((skybattle.timeLeft + 10) % 30 == 0) {
+                                    p.player.sendTitle(null, ChatColor.RED+"Border shrinking in 10 seconds!", 0, 20, 10);
+                                }
+                                 */
                             } else if (skybattle.timeLeft > 0 && skybattle.getState().equals("STARTING")) {
                                 scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.RED + "Starting in: " + ChatColor.WHITE + ((int) Math.floor(time.get(p.player.getUniqueId()) / 60)) + ":" + time.get(p.player.getUniqueId()) % 60);
                                 scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Starting in: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);
                                 time.put(p.player.getUniqueId(), skybattle.timeLeft);
                                 p.player.sendTitle("Starting in:", "> " + skybattle.timeLeft + " <", 0, 20, 0);
-                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING")) {
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum <= 3) {
                                 skybattle.nextRound();
-                                // ending todo
+                                // round ending todo
                             } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("STARTING")) {
                                 skybattle.setState("PLAYING");
+                                //remove "starting in 0:1"
                                 skybattle.timeLeft = 240;
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum < 3) {
+                                skybattle.resetMap();
+                                skybattle.resetBorder();
+                                // ending todo
                             }
                             if (roundNums.get(p.player.getUniqueId()) != skybattle.roundNum) {
                                 scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.GREEN + "Round: " + ChatColor.WHITE + (roundNums.get(p.player.getUniqueId()) + 1) + "/3");
