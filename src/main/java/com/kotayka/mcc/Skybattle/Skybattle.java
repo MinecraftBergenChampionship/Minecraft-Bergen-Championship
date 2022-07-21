@@ -17,6 +17,9 @@ import org.bukkit.scoreboard.Team;
 import java.util.*;
 
 public class Skybattle {
+    // (PLANNED) STATES: INACTIVE, PLAYING, PAUSED, STARTING, ENDING (?)
+    private String state = "INACTIVE";
+
     public final Players players;
     public final Plugin plugin;
     public boolean stage = false;
@@ -151,34 +154,53 @@ public class Skybattle {
         }
     }
     public void startRound() {
-        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-            public void run() {
-                // countdown TODO
-                timeLeft = 240;
-                String[] teamListFull = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
-                // Randomly place each team at a different spawn
-                // TODO
-                List<Location> tempSpawns = new ArrayList<>(spawnPoints);
-                List<Team[]> teamListPogU = new ArrayList<>(mcc.teams.values());
+        // Scoreboard shenanigans will be handled in MCC.java although it would be nice to have a scoreboard manager for each game
+        timeLeft = 10;
+        setState("STARTING");
+        // countdown in MCC.java
 
-                int i = 0;
-                // this implementation looks super inefficient and wack but brain is too fried
-                for (Team t : teamListPogU.get(i)) {
-                    int randomNum = (int) (Math.random() * tempSpawns.size());
-                    for (String s : t.getEntries()) {
-                        for (Participant p : players.participants) {
-                            if (p.ign.equals(s)) {
-                                p.player.teleport(tempSpawns.get(randomNum));
-                            }
-                        }
+        // Randomly place each team at a different spawn
+        List<Location> tempSpawns = new ArrayList<>(spawnPoints);
+        List<Team[]> teamListPogU = new ArrayList<>(mcc.teams.values());
+
+        int i = 0;
+        // this implementation looks super inefficient and wack but brain is too fried
+        for (Team t : teamListPogU.get(i)) {
+            int randomNum = (int) (Math.random() * tempSpawns.size());
+            for (String s : t.getEntries()) {
+                for (Participant p : players.participants) {
+                    if (p.ign.equals(s)) {
+                        p.player.teleport(tempSpawns.get(randomNum));
                     }
-                    tempSpawns.remove(randomNum);
-                    i++;
                 }
             }
-        }, 0);
+            tempSpawns.remove(randomNum);
+            i++;
+        }
+
+        // SetState("PLAYING")
+        // timeLeft = 240
+        // both in MCC.java
     }
 
+    public void startingCountdown() {
+
+        // not sure if smart to use another run here instead of doing it in MCC but it'd be neater if this works
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            public void run() {
+                for (Participant p : players.participants) {
+                    p.player.sendTitle("Starting in: ", "> " + timeLeft + " <", 0, 20, 0);
+                }
+            }
+        }, 20);
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+    public String getState() {
+        return state;
+    }
     public boolean enabled() {
         return stage;
     }

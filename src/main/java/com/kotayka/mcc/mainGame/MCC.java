@@ -365,12 +365,21 @@ public final class MCC extends JavaPlugin implements Listener {
                                     roundScores.put(p.ign, p.roundCoins);
                                 }
                             }
-                            if (skybattle.timeLeft > 0) {
+                            if (skybattle.timeLeft > 0 && skybattle.getState().equals("PLAYING")) {
                                 scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + ((int) Math.floor(time.get(p.player.getUniqueId()) / 60)) + ":" + time.get(p.player.getUniqueId()) % 60);
                                 scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);
                                 time.put(p.player.getUniqueId(), skybattle.timeLeft);
-                            } else if (skybattle.timeLeft == 0) {
+                            } else if (skybattle.timeLeft > 0 && skybattle.getState().equals("STARTING")) {
+                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.RED + "Starting in: " + ChatColor.WHITE + ((int) Math.floor(time.get(p.player.getUniqueId()) / 60)) + ":" + time.get(p.player.getUniqueId()) % 60);
+                                scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Starting in: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);
+                                time.put(p.player.getUniqueId(), skybattle.timeLeft);
+                                p.player.sendTitle("Starting in:", "> " + skybattle.timeLeft + " <", 0, 20, 0);
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING")) {
                                 skybattle.nextRound();
+                                // ending todo
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("STARTING")) {
+                                skybattle.setState("PLAYING");
+                                skybattle.timeLeft = 240;
                             }
                             if (roundNums.get(p.player.getUniqueId()) != skybattle.roundNum) {
                                 scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.GREEN + "Round: " + ChatColor.WHITE + (roundNums.get(p.player.getUniqueId()) + 1) + "/3");

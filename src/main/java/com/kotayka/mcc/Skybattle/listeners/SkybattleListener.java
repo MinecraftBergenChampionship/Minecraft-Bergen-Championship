@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -30,7 +31,7 @@ public class SkybattleListener implements Listener {
      */
     @EventHandler
     public void blockPlace(BlockPlaceEvent e) {
-        if (!(skybattle.enabled())) return;
+        if (!(skybattle.getState().equals("PLAYING"))) { return; }
 
         if (e.getBlock().getType().equals(Material.TNT)) {
             e.setCancelled(true);
@@ -47,6 +48,7 @@ public class SkybattleListener implements Listener {
      */
     @EventHandler
     public void playerDie(PlayerDeathEvent e) {
+        if (!(skybattle.getState().equals("PLAYING"))) { return; }
 
         Player p = e.getEntity();
         if (p.getKiller() != null) {
@@ -55,7 +57,15 @@ public class SkybattleListener implements Listener {
         Firework fw = new Firework();
         fw.spawnFirework(p.getLocation());
         p.setGameMode(GameMode.SPECTATOR);
-        p.teleport(new Location(skybattle.world, -155, -7, -265));
+        //p.teleport(new Location(skybattle.world, -155, -7, -265));
         /* TODO: Set death message + scoring */
+    }
+
+    @EventHandler
+    public void playerMove(PlayerMoveEvent e) {
+        if (!(skybattle.getState().equals("STARTING"))) { return; }
+
+        e.setTo(e.getFrom());
+        e.setCancelled(true);
     }
 }
