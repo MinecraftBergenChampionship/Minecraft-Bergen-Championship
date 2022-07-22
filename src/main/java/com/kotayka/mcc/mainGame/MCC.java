@@ -370,13 +370,19 @@ public final class MCC extends JavaPlugin implements Listener {
                                 scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);
                                 time.put(p.player.getUniqueId(), skybattle.timeLeft);
 
-                                /*
-                                if (skybattle.timeLeft % 30 == 0 && skybattle.timeLeft != 240) {
-                                    skybattle.border.setSize()
-                                } else if ((skybattle.timeLeft + 10) % 30 == 0) {
-                                    p.player.sendTitle(null, ChatColor.RED+"Border shrinking in 10 seconds!", 0, 20, 10);
+                                if (skybattle.timeLeft % 40 == 0 && skybattle.timeLeft != 240 && skybattle.timeLeft >= 60) {
+                                    skybattle.border.setSize(skybattle.border.getSize() * 0.75, 15);
+                                    Bukkit.broadcastMessage(ChatColor.DARK_RED+"> Border is Shrinking!");
+                                } else if ((skybattle.timeLeft - 10) % 40 == 0) {
+                                    Bukkit.broadcastMessage(ChatColor.RED+"> Border shrinking in 10 seconds!");
+                                    p.player.sendTitle(ChatColor.RED+"Border shrinking in 10 seconds!", null, 0, 20, 10);
+                                } else if (skybattle.timeLeft == 60) {
+                                    skybattle.border.setSize(5, 60);
+                                    Bukkit.broadcastMessage(ChatColor.DARK_RED+"> Border will continue shrinking!");
+                                } else if (skybattle.timeLeft == 70) {
+                                    Bukkit.broadcastMessage(ChatColor.RED+"> Final shrink in 10 seconds!");
                                 }
-                                 */
+
                             } else if (skybattle.timeLeft > 0 && skybattle.getState().equals("STARTING")) {
                                 scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.RED + "Starting in: " + ChatColor.WHITE + ((int) Math.floor(time.get(p.player.getUniqueId()) / 60)) + ":" + time.get(p.player.getUniqueId()) % 60);
                                 scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Starting in: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);

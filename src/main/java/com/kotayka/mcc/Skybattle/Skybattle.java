@@ -6,12 +6,16 @@ import com.kotayka.mcc.mainGame.manager.Players;
 import com.kotayka.mcc.mainGame.manager.teamManager;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BrewingStand;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.bukkit.scoreboard.Team;
 
 import java.util.*;
@@ -38,19 +42,16 @@ public class Skybattle {
         this.players = players;
         this.plugin = plugin;
         this.mcc = mcc;
+    }
 
-
+    public void loadMap() {
         if (Bukkit.getWorld("Skybattle") == null) {
             world = Bukkit.getWorld("world");
         }
         else {
             world = Bukkit.getWorld("Skybattle");
         }
-        assert world != null;
-        border = world.getWorldBorder();
-    }
 
-    public void loadMap() {
         resetMap();
 
         // Spawn items
@@ -75,12 +76,12 @@ public class Skybattle {
 
         for (Participant p : players.participants) {
             p.player.getInventory().clear();
+            p.player.setHealth(20);
+            p.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 10, 4, false, false));
             p.player.setGameMode(SURVIVAL);
-            p.player.setBedSpawnLocation(new Location(world, -155, -7, -265));
-        }
+            p.player.setBedSpawnLocation(new Location(world, -157, -7, -266));
 
-        for (ItemStack i : spawnItems) {
-            for (Participant p : players.participants) {
+            for (ItemStack i : spawnItems) {
                 if (i.getType() == Material.WHITE_CONCRETE) {
                     i.setAmount(64);
                     switch (p.team) {
@@ -103,8 +104,14 @@ public class Skybattle {
             }
         }
 
-        border.setCenter(-155, -265);
-        border.setSize(121);
+        // Border
+        assert world != null;
+        border = world.getWorldBorder();
+        border.setCenter(-157, -266);
+        border.setSize(150);
+        border.setDamageAmount(0.5);
+        border.setDamageBuffer(0);
+        border.setWarningDistance(5);
     }
 
     public void start() {
@@ -136,6 +143,11 @@ public class Skybattle {
                         Container container = (Chest) originalBlock.getState();
                         ItemStack[] itemsForChest = container.getInventory().getContents();
                         ((Chest) possiblyChangedBlock.getState()).getInventory().setContents(itemsForChest);
+                    }
+                    if (possiblyChangedBlock.getState() instanceof BrewingStand && originalBlock.getState() instanceof BrewingStand) {
+                        Container container = (BrewingStand) originalBlock.getState();
+                        ItemStack[] potions = container.getInventory().getContents();
+                        ((BrewingStand) possiblyChangedBlock.getState()).getInventory().setContents(potions);
                     }
                     z++;
                 }

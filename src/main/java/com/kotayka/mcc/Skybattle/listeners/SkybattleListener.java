@@ -55,7 +55,7 @@ public class SkybattleListener implements Listener {
 
         Player p = e.getEntity();
         if (p.getKiller() != null) {
-            p.getKiller().sendTitle(null, "[X] " + p.getName(), 0, 60, 40);
+            p.getKiller().sendTitle("[X] " + p.getName(), null, 0, 60, 40);
             p.sendMessage(ChatColor.RED + "You were eliminated by " + p.getKiller() + "!");
             p.getKiller().sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + p + "!");
         }
