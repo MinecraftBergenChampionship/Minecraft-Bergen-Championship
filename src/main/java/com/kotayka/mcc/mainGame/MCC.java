@@ -12,16 +12,14 @@ import com.kotayka.mcc.TGTTOS.TGTTOS;
 import com.kotayka.mcc.TGTTOS.listeners.TGTTOSGameListener;
 import com.kotayka.mcc.TGTTOS.managers.NPCManager;
 import com.kotayka.mcc.mainGame.Listeners.chatUpdater;
-import com.kotayka.mcc.mainGame.commands.playerCommand;
-import com.kotayka.mcc.mainGame.commands.start;
-import com.kotayka.mcc.mainGame.commands.teamCommands;
-import com.kotayka.mcc.mainGame.commands.world;
+import com.kotayka.mcc.mainGame.commands.*;
 import com.kotayka.mcc.mainGame.manager.*;
 import com.kotayka.mcc.mainGame.manager.tabComplete.startCommand;
 import com.kotayka.mcc.mainGame.manager.tabComplete.tCommands;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Particle;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -83,6 +81,7 @@ public final class MCC extends JavaPlugin implements Listener {
         getCommand("mccteam").setTabCompleter(new tCommands());
         getCommand("world").setExecutor(new world());
         getCommand("spec").setExecutor(new playerCommand(players));
+        getCommand("ping").setExecutor(new ping());
         // temp
         /*
         loadMaps();
@@ -438,11 +437,19 @@ public final class MCC extends JavaPlugin implements Listener {
                             }
                     }
                 }
+
+                for (int mapX = -225; mapX <= -87; mapX++) {
+                    for (int mapZ = -325; mapZ <= -207; mapZ++) {
+                        skybattle.world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, mapX, skybattle.borderHeight, mapZ, 1);
+                    }
+                }
+
                 switch (game.stage) {
                     case "TGTTOS":
                         tgttos.timeLeft--;
                         break;
                     case "Skybattle":
+                        if (skybattle.timeLeft <= 75) { skybattle.borderHeight -= 0.226666667; }
                         skybattle.timeLeft--;
                         break;
                 }

@@ -30,6 +30,7 @@ public class Skybattle {
     public final Plugin plugin;
     public boolean stage = false;
     public int roundNum = 0;
+    public double borderHeight = 17.0;
     public int timeLeft;
     public List<Location> spawnPoints = new ArrayList<>(6);
     public List<ItemStack> spawnItems = new ArrayList<>(5);
@@ -130,7 +131,7 @@ public class Skybattle {
         int y = -16;
         int z = 322;
         for (int mapX = -225; mapX <= -87; mapX++) {
-            for (int mapY = -17; mapY <= 16; mapY++) {
+            for (int mapY = -17; mapY <= 17; mapY++) {
                 for (int mapZ = -325; mapZ <= -207; mapZ++) {
                     assert world != null;
                     Block originalBlock = world.getBlockAt(x, y, z);

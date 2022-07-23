@@ -16,6 +16,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 
 public class SkybattleListener implements Listener {
@@ -68,9 +70,22 @@ public class SkybattleListener implements Listener {
 
     @EventHandler
     public void playerMove(PlayerMoveEvent e) {
-        if (!(skybattle.getState().equals("STARTING"))) { return; }
+        if (!(skybattle.getState().equals("STARTING") || skybattle.getState().equals("PLAYING"))) { return; }
 
-        e.setTo(e.getFrom());
-        e.setCancelled(true);
+        // Prevent moving during countdown
+        if (skybattle.getState().equals("STARTING")) {
+            e.setTo(e.getFrom());
+            e.setCancelled(true);
+            return;
+        }
+
+        // Kill players immediately on void
+        // Damage players in border
+        Player p = e.getPlayer();
+        if (p.getLocation().getY() <= -35) {
+            p.setHealth(0);
+        } else if (p.getLocation().getY() >= skybattle.borderHeight) {
+            p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 1, 1, true, true));
+        }
     }
 }
