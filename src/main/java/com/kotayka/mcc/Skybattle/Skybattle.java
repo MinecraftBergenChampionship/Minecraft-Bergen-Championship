@@ -113,6 +113,8 @@ public class Skybattle {
         border.setDamageAmount(0.5);
         border.setDamageBuffer(0);
         border.setWarningDistance(5);
+
+        borderHeight = 17;
     }
 
     public void start() {
