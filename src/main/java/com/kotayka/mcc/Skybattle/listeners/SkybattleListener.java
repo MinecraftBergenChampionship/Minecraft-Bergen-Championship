@@ -2,6 +2,7 @@ package com.kotayka.mcc.Skybattle.listeners;
 
 import com.kotayka.mcc.Skybattle.Skybattle;
 import com.kotayka.mcc.TGTTOS.managers.Firework;
+import com.kotayka.mcc.mainGame.manager.Participant;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -57,15 +58,17 @@ public class SkybattleListener implements Listener {
 
         Player p = e.getEntity();
         if (p.getKiller() != null) {
-            p.getKiller().sendTitle("[X] " + p.getName(), null, 0, 60, 40);
-            p.sendMessage(ChatColor.RED + "You were eliminated by " + p.getKiller() + "!");
-            p.getKiller().sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + p + "!");
+            p.getKiller().sendTitle("\n", "[X] " + p.getName(), 0, 60, 40);
+            p.sendMessage(ChatColor.RED + "You were eliminated by " + p.getKiller().getName() + "!");
+            p.getKiller().sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + p.getName() + "!");
         }
         Firework fw = new Firework();
         fw.spawnFirework(p.getLocation());
         p.setGameMode(GameMode.SPECTATOR);
-        //p.teleport(new Location(skybattle.world, -155, -7, -265));
-        /* TODO: Set death message + scoring */
+        p.teleport(new Location(p.getWorld(), -155, 0, -265));
+
+
+
     }
 
     @EventHandler
@@ -82,10 +85,11 @@ public class SkybattleListener implements Listener {
         // Kill players immediately on void
         // Damage players in border
         Player p = e.getPlayer();
-        if (p.getLocation().getY() <= -35) {
+       /* if (p.getLocation().getY() <= -35) {
             p.setHealth(0);
-        } else if (p.getLocation().getY() >= skybattle.borderHeight) {
-            p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 1, 1, true, true));
+            p.teleport(new Location(p.getWorld(), -157, -7, -266));
+        } else */if (p.getLocation().getY() >= skybattle.borderHeight) {
+            p.damage(Math.abs(p.getLocation().getY() - skybattle.borderHeight));
         }
     }
 }

@@ -10,7 +10,10 @@ import org.bukkit.block.BrewingStand;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -80,19 +83,32 @@ public class Skybattle {
             p.player.setHealth(20);
             p.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 10, 4, false, false));
             p.player.setGameMode(SURVIVAL);
-            p.player.setBedSpawnLocation(new Location(world, -157, -7, -266));
 
             for (ItemStack i : spawnItems) {
                 if (i.getType() == Material.WHITE_CONCRETE) {
-                    i.setAmount(64);
+                    ItemStack concrete = new ItemStack(Material.WHITE_CONCRETE);
+                    concrete.setAmount(64);
                     switch (p.team) {
-                        case "RedRabbits" -> i.setType(Material.RED_CONCRETE);
-                        case "YellowYaks" -> i.setType(Material.YELLOW_CONCRETE);
-                        case "GreenGuardians" -> i.setType(Material.GREEN_CONCRETE);
-                        case "BlueBats" -> i.setType(Material.BLUE_CONCRETE);
-                        case "PurplePandas" -> i.setType(Material.PURPLE_CONCRETE);
-                        case "PinkPiglets" -> i.setType(Material.PINK_CONCRETE);
-                        default -> p.player.sendMessage("You're not on a team");
+                        case "RedRabbits":
+                            concrete.setType(Material.RED_CONCRETE);
+                            break;
+                        case "YellowYaks":
+                            concrete.setType(Material.YELLOW_CONCRETE);
+                            break;
+                        case "GreenGuardians":
+                            concrete.setType(Material.GREEN_CONCRETE);
+                            break;
+                        case "BlueBats":
+                            concrete.setType(Material.BLUE_CONCRETE);
+                            break;
+                        case "PurplePandas":
+                            concrete.setType(Material.PURPLE_CONCRETE);
+                            break;
+                        case "PinkPiglets":
+                            concrete.setType(Material.PINK_CONCRETE);
+                            break;
+                        default:
+                            p.player.sendMessage("You're not on a team");
                     }
                     p.player.getInventory().addItem(i);
                 }
@@ -103,6 +119,13 @@ public class Skybattle {
                     p.player.getInventory().addItem(i);
                 }
             }
+        }
+
+        for (Item item : world.getEntitiesByClass(Item.class)) {
+            item.remove();
+        }
+        for (Entity tnt : world.getEntitiesByClass(TNTPrimed.class)) {
+            tnt.remove();
         }
 
         // Border

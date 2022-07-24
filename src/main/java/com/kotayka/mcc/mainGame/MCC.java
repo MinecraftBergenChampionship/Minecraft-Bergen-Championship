@@ -81,14 +81,23 @@ public final class MCC extends JavaPlugin implements Listener {
         getCommand("mccteam").setTabCompleter(new tCommands());
         getCommand("world").setExecutor(new world());
         getCommand("spec").setExecutor(new playerCommand(players));
-        getCommand("ping").setExecutor(new ping());
+        //getCommand("ping").setExecutor(new ping());
         // temp
         /*
         loadMaps();
         TGTTOSGame();
          */
-        SkybattleGame();
 
+        if (Bukkit.getWorld("Skybattle") == null) {
+            skybattle.world = Bukkit.getWorld("world");
+        }
+        else {
+            skybattle.world = Bukkit.getWorld("Skybattle");
+        }
+
+        skybattle.resetBorder();
+
+        SkybattleGame();
     }
 
     public void loadMaps() {
@@ -356,6 +365,8 @@ public final class MCC extends JavaPlugin implements Listener {
                                 previousStandings.put(p.player.getUniqueId(), tempArray);
                             }
                             break;
+
+
                         case "Skybattle":
                             if (roundScores.get(p.ign) != null) {
                                 if (p.roundCoins != ((int) roundScores.get(p.ign))) {
@@ -371,15 +382,15 @@ public final class MCC extends JavaPlugin implements Listener {
 
                                 if (skybattle.timeLeft % 40 == 0 && skybattle.timeLeft != 240 && skybattle.timeLeft >= 60) {
                                     skybattle.border.setSize(skybattle.border.getSize() * 0.75, 15);
-                                    Bukkit.broadcastMessage(ChatColor.DARK_RED+"> Border is Shrinking!");
+                                    p.player.sendMessage(ChatColor.DARK_RED+"> Border is Shrinking!");
+                                    p.player.sendTitle(" ", ChatColor.RED+"Border shrinking!", 0, 20, 10);
                                 } else if ((skybattle.timeLeft - 10) % 40 == 0) {
-                                    Bukkit.broadcastMessage(ChatColor.RED+"> Border shrinking in 10 seconds!");
-                                    p.player.sendTitle(ChatColor.RED+"Border shrinking in 10 seconds!", null, 0, 20, 10);
+                                    p.player.sendMessage(ChatColor.RED+"> Border shrinking in 10 seconds!");
                                 } else if (skybattle.timeLeft == 60) {
                                     skybattle.border.setSize(5, 60);
-                                    Bukkit.broadcastMessage(ChatColor.DARK_RED+"> Border will continue shrinking!");
+                                    p.player.sendMessage(ChatColor.DARK_RED+"> Border will continue shrinking!");
                                 } else if (skybattle.timeLeft == 70) {
-                                    Bukkit.broadcastMessage(ChatColor.RED+"> Final shrink in 10 seconds!");
+                                    p.player.sendMessage(ChatColor.RED+"> Final shrink in 10 seconds!");
                                 }
 
                             } else if (skybattle.timeLeft > 0 && skybattle.getState().equals("STARTING")) {
@@ -387,18 +398,19 @@ public final class MCC extends JavaPlugin implements Listener {
                                 scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Starting in: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);
                                 time.put(p.player.getUniqueId(), skybattle.timeLeft);
                                 p.player.sendTitle("Starting in:", "> " + skybattle.timeLeft + " <", 0, 20, 0);
-                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum <= 3) {
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum < 3) {
                                 skybattle.nextRound();
                                 // round ending todo
                             } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("STARTING")) {
                                 skybattle.setState("PLAYING");
-                                //remove "starting in 0:1"
+                                //todo remove "starting in 0:1"
                                 skybattle.timeLeft = 240;
-                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum < 3) {
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum >= 3) {
                                 skybattle.resetMap();
                                 skybattle.resetBorder();
                                 // ending todo
                             }
+
                             if (roundNums.get(p.player.getUniqueId()) != skybattle.roundNum) {
                                 scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.GREEN + "Round: " + ChatColor.WHITE + (roundNums.get(p.player.getUniqueId()) + 1) + "/3");
                                 scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.GREEN + "Round: " + ChatColor.WHITE + (skybattle.roundNum + 1) + "/3").setScore(13);
@@ -435,12 +447,14 @@ public final class MCC extends JavaPlugin implements Listener {
                                     }
                                 }
                             }
-                    }
-                }
 
-                for (int mapX = -225; mapX <= -87; mapX++) {
-                    for (int mapZ = -325; mapZ <= -207; mapZ++) {
-                        skybattle.world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, mapX, skybattle.borderHeight, mapZ, 1);
+                            for (int mapX = -225; mapX <= -87; mapX++) {
+                                for (int mapZ = -325; mapZ <= -207; mapZ++) {
+                                    skybattle.world.spawnParticle(Particle.ASH , mapX, skybattle.borderHeight, mapZ, 1);
+                                }
+                            }
+                            break;
+                        //case "Game":
                     }
                 }
 
