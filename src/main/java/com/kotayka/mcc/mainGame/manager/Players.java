@@ -51,8 +51,11 @@ public class Players {
     public void loadScoreboardVars(UUID uuid) {
         mcc.maps.put(uuid, "Starting");
         mcc.roundNums.put(uuid, 0);
-        mcc.time.put(uuid, 120);
+        mcc.time.put(uuid, 0);
         mcc.previousStandings.put(uuid, new Integer[]{0, 0, 0, 0, 0, 0});
+        mcc.teamsAlive.put(uuid, 0);
+        mcc.playersAlive.put(uuid, 0);
+
     }
 
     public void removePlayer(Player p) {

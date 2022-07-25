@@ -14,13 +14,10 @@ public class teamManager {
     public final MCC mcc;
 
     public Map roundScores = new HashMap();
+    public Map totalScores = new HashMap();
     public teamManager(List<Participant> players, List<String> teamNames, MCC mcc) {
         this.players = players;
         this.teamNames = teamNames;
         this.mcc = mcc;
-    }
-
-    public void updateTeams() {
-
     }
 }

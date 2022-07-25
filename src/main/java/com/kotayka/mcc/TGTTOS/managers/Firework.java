@@ -18,4 +18,15 @@ public class Firework {
         fw.setFireworkMeta(fwm);
         fw.detonate();
     }
+
+    public void spawnFireworkWithColor(Location loc, Color color) {
+        org.bukkit.entity.Firework fw = (org.bukkit.entity.Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+        FireworkMeta fwm = fw.getFireworkMeta();
+
+        fwm.setPower(5);
+        fwm.addEffect(FireworkEffect.builder().withColor(color).build());
+
+        fw.setFireworkMeta(fwm);
+        fw.detonate();
+    }
 }

@@ -12,7 +12,7 @@ public class startCommand implements TabCompleter {
 
     public String[] games = {
             "TGTTOS",
-            "TEST"
+            "SG"
     };
     
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
