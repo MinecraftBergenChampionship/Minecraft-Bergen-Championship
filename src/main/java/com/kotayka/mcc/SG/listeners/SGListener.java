@@ -11,16 +11,20 @@ import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Objects;
 
@@ -50,8 +54,8 @@ public class SGListener implements Listener {
 
     @EventHandler
     public void playerKillEvent(PlayerDeathEvent event) {
-        sg.playersDeadList.add(event.getEntity().getUniqueId());
         if (sg.stage.equals("Game")) {
+            sg.playersDeadList.add(event.getEntity().getUniqueId());
             Player victim = event.getEntity();
             victim.setGameMode(GameMode.SPECTATOR);
             final Location deathLoc = victim.getLocation();
@@ -71,22 +75,17 @@ public class SGListener implements Listener {
             }
 
             victim.teleport(new Location(event.getEntity().getWorld(), 0, 6, 0));
-        }
-        sg.playersDead--;
-        for (Participant p : players.participants) {
-            if (Objects.equals(p.ign, event.getEntity().getName())) {
-                sg.teamsAlive.remove(p.team);
-                if (!sg.teamsAlive.contains(p.team)) {
-                    sg.teamsDead--;
+            sg.playersDead--;
+            for (Participant p : players.participants) {
+                if (Objects.equals(p.ign, event.getEntity().getName())) {
+                    sg.teamsAlive.remove(p.team);
+                    if (!sg.teamsAlive.contains(p.team)) {
+                        sg.teamsDead--;
+                    }
                 }
             }
+            sg.outLivePlayer();
         }
-        sg.outLivePlayer();
-    }
-
-    @EventHandler
-    public void testScoring(BlockPlaceEvent event) {
-        sg.outLivePlayer();
     }
 
     public boolean checkIfEmpty(Inventory inv) {
@@ -98,8 +97,16 @@ public class SGListener implements Listener {
     }
 
     @EventHandler
+    public void onRightClick(PlayerInteractEvent event) {
+        if (sg.stage.equals("Game") && (event.getAction() == Action.RIGHT_CLICK_BLOCK ||  event.getAction() == Action.RIGHT_CLICK_AIR) && event.getItem().getType() == Material.MUSHROOM_STEW) {
+            event.getPlayer().getInventory().getItemInHand().setAmount(0);
+            event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 100, 2, false, true));
+        }
+    }
+
+    @EventHandler
     public void inventoryClose(InventoryCloseEvent event) {
-        if (event.getInventory().getType() == InventoryType.SHULKER_BOX) {
+        if (event.getInventory().getType() == InventoryType.SHULKER_BOX && sg.stage == "Game") {
             if (checkIfEmpty(event.getInventory())) {
                 for (ShulkerBox box : sg.boxes) {
                     if (checkIfEmpty(box.getInventory())) {

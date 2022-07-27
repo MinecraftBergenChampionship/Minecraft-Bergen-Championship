@@ -35,6 +35,10 @@ public class Players {
         String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
         List<String> team = new ArrayList<>(Arrays.asList(teamNames));
 
+        for (Participant player : participants) {
+            mcc.teams.get(player.ign)[team.indexOf(player.team)].addEntry(p.getName());
+        }
+
         players.add(p);
         Participant x = new Participant(p);
         participants.add(x);
@@ -42,10 +46,6 @@ public class Players {
         mcc.roundScores.put(p.getName(), 0);
         loadScoreboardVars(p.getUniqueId());
         mcc.createTeams(x);
-
-        for (Participant player : participants) {
-            mcc.teams.get(player.ign)[team.indexOf(player.team)].addEntry(p.getName());
-        }
     }
 
     public void loadScoreboardVars(UUID uuid) {

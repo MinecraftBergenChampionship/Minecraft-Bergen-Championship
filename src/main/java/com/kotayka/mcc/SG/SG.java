@@ -122,7 +122,7 @@ public class SG {
             if (eventTimer > 660) {
                 eventName = "Grace Period Ends";
             }
-            else if (eventTimer > 600) {
+            else if (eventTimer > 600 && eventTimer < 659) {
                 eventName = "Supply Drop";
             }
             else if (eventTimer > 360 && eventTimer < 599) {
@@ -131,22 +131,22 @@ public class SG {
             else if (eventTimer > 240 && eventTimer < 359) {
                 eventName = "Supply Drop";
             }
-            else if (eventTimer < 240) {
-                eventName = "Deathmatch";
-            }
             else {
                 if (eventTimer == 660) {
                     relaventEventTimer=60;
                     Bukkit.broadcastMessage(ChatColor.RED+"Grace Period is Over");
                 }
-                if (eventTimer == 360) {
+                else if (eventTimer == 360) {
                     relaventEventTimer=120;
                     regenChest();
                     Bukkit.broadcastMessage(ChatColor.RED+"Chest are refilled");
                 }
-                if (eventTimer == 600 || eventTimer == 240) {
+                else if (eventTimer == 600 || eventTimer == 240) {
                     relaventEventTimer=240;
                     setSupplyDropItems();
+                }
+                else {
+                    eventName = "Deathmatch";
                 }
             }
         }
@@ -194,9 +194,9 @@ public class SG {
             @Override
             public void run() {
                 WorldBorder border = world.getWorldBorder();
-                border.setSize(30, 240);
+                border.setSize(30, 120);
             }
-        }, 280);
+        }, 12000);
 
         plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             public void run() {
