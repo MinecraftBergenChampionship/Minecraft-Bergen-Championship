@@ -88,6 +88,10 @@ public final class MCC extends JavaPlugin implements Listener {
         TGTTOSGame();
          */
 
+
+        // startEvent();
+
+        // Temp
         if (Bukkit.getWorld("Skybattle") == null) {
             skybattle.world = Bukkit.getWorld("world");
         }
@@ -100,6 +104,17 @@ public final class MCC extends JavaPlugin implements Listener {
         SkybattleGame();
     }
 
+    /*
+
+    public void startEvent() {
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            switch(game.stage) {
+                case "Skybattle":
+
+            }
+        }, 20, 20);
+    }
+     */
     public void loadMaps() {
         tgttos.loadMaps();
     }

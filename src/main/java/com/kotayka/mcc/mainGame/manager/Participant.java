@@ -15,4 +15,8 @@ public class Participant {
         this.player = player;
         this.ign = player.getName();
     }
+
+    public void setTeam(String teamName) {
+        team = teamName;
+    }
 }

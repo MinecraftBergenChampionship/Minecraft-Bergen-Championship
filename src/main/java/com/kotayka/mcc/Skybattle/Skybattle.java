@@ -10,10 +10,7 @@ import org.bukkit.block.BrewingStand;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -38,6 +35,7 @@ public class Skybattle {
     public List<Location> spawnPoints = new ArrayList<>(6);
     public List<ItemStack> spawnItems = new ArrayList<>(5);
     public World world;
+    public Map<Entity, Player> creepersAndSpawned = new HashMap<>(5);
     public WorldBorder border;
     public MCC mcc;
 
@@ -110,7 +108,7 @@ public class Skybattle {
                         default:
                             p.player.sendMessage("You're not on a team");
                     }
-                    p.player.getInventory().addItem(i);
+                    p.player.getInventory().addItem(concrete);
                 }
                 else if (i.getType() == Material.IRON_CHESTPLATE) {
                     p.player.getInventory().setChestplate(i);
@@ -121,11 +119,15 @@ public class Skybattle {
             }
         }
 
+        // Clear all floor items, primed tnt, and creepers
         for (Item item : world.getEntitiesByClass(Item.class)) {
             item.remove();
         }
         for (Entity tnt : world.getEntitiesByClass(TNTPrimed.class)) {
             tnt.remove();
+        }
+        for (Entity creeper : world.getEntitiesByClass(Creeper.class)) {
+            creeper.remove();
         }
 
         // Border
@@ -152,6 +154,8 @@ public class Skybattle {
      * Reset Map
      */
     public void resetMap() {
+        creepersAndSpawned.clear();
+
         int x = 225;
         int y = -16;
         int z = 322;

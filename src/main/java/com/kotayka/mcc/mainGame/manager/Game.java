@@ -28,11 +28,11 @@ public class Game {
         if (!(game.equals("Lobby"))) {
             mcc.gameRound++;
         }
-        if (game.equals("TGTTOS")) {
+        if (game.equals("TGTTOS") || game.equals("TGTTOSAWAP")) {
             Bukkit.broadcastMessage(ChatColor.YELLOW+"TGTTOS Game started");
             tgttos.start();
         }
-        if (game.equals("Skybattle")) {
+        if (game.equals("Skybattle") || game.equals("SkyBattle")) {
             Bukkit.broadcastMessage(ChatColor.YELLOW+"Skybattle Game started");
             skybattle.start();
         }
