@@ -97,7 +97,7 @@ public class SkybattleListener implements Listener {
 
         Player player = (Player) e.getEntity();
 
-
+        skybattle.playersShot.put(e.getEntity(), player);
     }
 
     /*
@@ -108,18 +108,16 @@ public class SkybattleListener implements Listener {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
 
         // Death messages
-        Player p = e.getEntity();
-        if (p.getKiller() != null) {
-            p.getKiller().sendTitle("\n", "[X] " + p.getName(), 0, 60, 40);
-            p.sendMessage(ChatColor.RED + "You were eliminated by " + p.getKiller().getName() + "!");
-            p.getKiller().sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + p.getName() + "!");
+        Participant p = new Participant(e.getEntity());
+        if (p.player.getKiller() != null) {
+            p.Die(p.player, p.player.getKiller());
         }
 
         // Death Firework + TP Spectator
         Firework fw = new Firework();
-        fw.spawnFirework(p.getLocation());
-        p.setGameMode(GameMode.SPECTATOR);
-        p.teleport(new Location(p.getWorld(), -155, 0, -265));
+        fw.spawnFirework(p.player.getLocation());
+        p.player.setGameMode(GameMode.SPECTATOR);
+        p.player.teleport(new Location(p.player.getWorld(), -155, 0, -265));
     }
 
     @EventHandler
@@ -136,8 +134,18 @@ public class SkybattleListener implements Listener {
         // Kill players immediately on void
         // Damage players in border
         Player p = e.getPlayer();
+        Participant participant = new Participant(p);
         if (p.getLocation().getY() <= -35 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
             p.setHealth(0);
+            if (p.getLastDamageCause() instanceof Creeper || p.getLastDamageCause() instanceof Arrow) {
+                if (skybattle.creepersAndSpawned.containsKey(p.getLastDamageCause().getEntity())) {
+                    participant.Die(p, skybattle.creepersAndSpawned.get(p.getLastDamageCause().getEntity()));
+                }
+
+                if (skybattle.playersShot.containsKey(p.getLastDamageCause().getEntity())) {
+                    participant.Die(p, skybattle.playersShot.get(p.getLastDamageCause().getEntity()));
+                }
+            }
         } else if (p.getLocation().getY() >= skybattle.borderHeight) {
             p.damage(1);
         }

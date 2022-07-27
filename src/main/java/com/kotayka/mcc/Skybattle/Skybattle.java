@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 import org.bukkit.scoreboard.Team;
 
 import java.util.*;
@@ -36,6 +35,7 @@ public class Skybattle {
     public List<ItemStack> spawnItems = new ArrayList<>(5);
     public World world;
     public Map<Entity, Player> creepersAndSpawned = new HashMap<>(5);
+    public Map<Entity, Player> playersShot = new HashMap<>(5);
     public WorldBorder border;
     public MCC mcc;
 
