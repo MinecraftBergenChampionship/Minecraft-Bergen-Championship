@@ -155,6 +155,7 @@ public class Skybattle {
      */
     public void resetMap() {
         creepersAndSpawned.clear();
+        playersShot.clear();
 
         int x = 225;
         int y = -16;

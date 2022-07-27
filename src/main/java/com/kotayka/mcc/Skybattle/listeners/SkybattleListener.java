@@ -18,9 +18,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class SkybattleListener implements Listener {
     public final Skybattle skybattle;
