@@ -1,5 +1,6 @@
 package com.kotayka.mcc.mainGame.manager;
 
+import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.Skybattle.Skybattle;
 import com.kotayka.mcc.TGTTOS.TGTTOS;
 import com.kotayka.mcc.mainGame.MCC;
@@ -12,14 +13,13 @@ public class Game {
     private TGTTOS tgttos;
     private Skybattle skybattle;
     private final MCC mcc;
+    private final SG sg;
 
-    public Game(Skybattle skybattle, MCC mcc) {
-        this.skybattle = skybattle;
-        this.mcc = mcc;
-    }
-    public Game(TGTTOS tgttos, MCC mcc) {
+    public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle) {
         this.tgttos = tgttos;
         this.mcc = mcc;
+        this.sg = sg;
+        this.skybattle = skybattle;
     }
 
     public void changeGame(String game) {
@@ -28,13 +28,19 @@ public class Game {
         if (!(game.equals("Lobby"))) {
             mcc.gameRound++;
         }
-        if (game.equals("TGTTOS") || game.equals("TGTTOSAWAP")) {
-            Bukkit.broadcastMessage(ChatColor.YELLOW+"TGTTOS Game started");
-            tgttos.start();
-        }
-        if (game.equals("Skybattle") || game.equals("SkyBattle")) {
-            Bukkit.broadcastMessage(ChatColor.YELLOW+"Skybattle Game started");
-            skybattle.start();
+        switch (game) {
+            case "TGTTOS":
+                Bukkit.broadcastMessage(ChatColor.YELLOW + "TGTTOS Game started");
+                tgttos.start();
+                break;
+            case "SG":
+                Bukkit.broadcastMessage(ChatColor.YELLOW + "SG Game started");
+                sg.start();
+                break;
+            case "Skybatle":
+                Bukkit.broadcastMessage(ChatColor.YELLOW + "Skybattle Game started");
+                skybattle.start();
+                break;
         }
     }
 }

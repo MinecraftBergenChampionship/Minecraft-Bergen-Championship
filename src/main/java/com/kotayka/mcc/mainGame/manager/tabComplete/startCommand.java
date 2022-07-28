@@ -12,6 +12,7 @@ public class startCommand implements TabCompleter {
 
     public String[] games = {
             "TGTTOS",
+            "SG",
             "TEST",
             "Skybattle"
     };
