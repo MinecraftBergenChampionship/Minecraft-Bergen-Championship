@@ -94,9 +94,8 @@ public final class MCC extends JavaPlugin implements Listener {
         sgGame();
 =======
          */
-
-
-        // startEvent();
+        TGTTOSGame();
+        sgGame();
 
         // Temp
         if (Bukkit.getWorld("Skybattle") == null) {
@@ -111,26 +110,12 @@ public final class MCC extends JavaPlugin implements Listener {
         SkybattleGame();
     }
 
-    /*
-
-    public void startEvent() {
-        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            switch(game.stage) {
-                case "Skybattle":
-
-            }
-        }, 20, 20);
-    }
-     */
-    public void loadMaps() {
-        tgttos.loadMaps();
-    }
-
     public void sgGame() {
         getServer().getPluginManager().registerEvents((Listener) new SGListener(sg, game, players,this), this);
     }
 
     public void TGTTOSGame() {
+        tgttos.loadMaps();
         playersAdded pAdded = new playersAdded(npcManager);
         TGTTOSGameListener TGTTOSGameListener = new TGTTOSGameListener(tgttos, this);
         getServer().getPluginManager().registerEvents(pAdded, this);
