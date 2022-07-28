@@ -335,6 +335,7 @@ public final class MCC extends JavaPlugin implements Listener {
                     break;
                 case "Skybattle":
                     scoreboards.get(p.ign).getObjective("Skybattle").setDisplaySlot(DisplaySlot.SIDEBAR);
+                    break;
             }
         }
     }
@@ -554,6 +555,7 @@ public final class MCC extends JavaPlugin implements Listener {
                                     skybattle.world.spawnParticle(Particle.ASH , mapX, skybattle.borderHeight, mapZ, 1);
                                 }
                             }
+
                             break;
                         //case "Game":
                     }

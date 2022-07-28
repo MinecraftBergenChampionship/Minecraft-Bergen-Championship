@@ -84,11 +84,6 @@ public class SGListener implements Listener {
         sg.outLivePlayer();
     }
 
-    @EventHandler
-    public void testScoring(BlockPlaceEvent event) {
-        sg.outLivePlayer();
-    }
-
     public boolean checkIfEmpty(Inventory inv) {
         for(ItemStack it : inv.getContents())
         {
