@@ -6,24 +6,20 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.kotayka.mcc.BSABM.BSABM;
-import com.kotayka.mcc.BSABM.listeners.BSABMListener;
-import com.kotayka.mcc.SG.SG;
-import com.kotayka.mcc.SG.listeners.SGListener;
+import com.kotayka.mcc.Skybattle.Skybattle;
+import com.kotayka.mcc.Skybattle.listeners.SkybattleListener;
 import com.kotayka.mcc.TGTTOS.TGTTOS;
 import com.kotayka.mcc.TGTTOS.listeners.TGTTOSGameListener;
 import com.kotayka.mcc.TGTTOS.managers.NPCManager;
 import com.kotayka.mcc.mainGame.Listeners.chatUpdater;
-import com.kotayka.mcc.mainGame.commands.playerCommand;
-import com.kotayka.mcc.mainGame.commands.start;
-import com.kotayka.mcc.mainGame.commands.teamCommands;
-import com.kotayka.mcc.mainGame.commands.world;
+import com.kotayka.mcc.mainGame.commands.*;
 import com.kotayka.mcc.mainGame.manager.*;
 import com.kotayka.mcc.mainGame.manager.tabComplete.startCommand;
 import com.kotayka.mcc.mainGame.manager.tabComplete.tCommands;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Particle;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -48,8 +44,6 @@ public final class MCC extends JavaPlugin implements Listener {
     public Map<UUID, Integer> roundNums = new HashMap<UUID, Integer>();
     public Map<UUID, Integer> time = new HashMap<UUID, Integer>();
     public Map<UUID, Integer[]> previousStandings = new HashMap<UUID, Integer[]>();
-    public Map<UUID, Integer> playersAlive = new HashMap<UUID, Integer>();
-    public Map<UUID, Integer> teamsAlive = new HashMap<UUID, Integer>();
     public int gameRound = 0;
 
 //  Managers
@@ -59,11 +53,12 @@ public final class MCC extends JavaPlugin implements Listener {
 
 //  Games
     private final TGTTOS tgttos = new TGTTOS(players, npcManager, this);
-    private final SG sg = new SG(players, this, this);
-    private final BSABM bsabm = new BSABM();
+    private final Skybattle skybattle = new Skybattle(players, plugin, this);
 
 //  Game Manager
-    private final Game game = new Game(tgttos, this, sg);
+    // temporarily commented out
+    // private final Game game = new Game(tgttos, this);
+    private final Game game = new Game(skybattle, this);
 
 //  Scoreboard
     public Map roundScores = new HashMap();
@@ -75,7 +70,6 @@ public final class MCC extends JavaPlugin implements Listener {
         scoreBoards();
         loadTeams();
         players.getOnlinePlayers();
-        loadMaps();
         Bukkit.getServer().getConsoleSender().sendMessage("MCC Plugin Loaded!");
         playerJoinLeave pManager = new playerJoinLeave(players);
         getServer().getPluginManager().registerEvents(pManager, this);
@@ -87,23 +81,42 @@ public final class MCC extends JavaPlugin implements Listener {
         getCommand("mccteam").setTabCompleter(new tCommands());
         getCommand("world").setExecutor(new world());
         getCommand("spec").setExecutor(new playerCommand(players));
+        //getCommand("ping").setExecutor(new ping());
+        // temp
+        /*
+        loadMaps();
         TGTTOSGame();
-        sgGame();
-        bsabmGame();
+         */
+
+
+        // startEvent();
+
+        // Temp
+        if (Bukkit.getWorld("Skybattle") == null) {
+            skybattle.world = Bukkit.getWorld("world");
+        }
+        else {
+            skybattle.world = Bukkit.getWorld("Skybattle");
+        }
+
+        skybattle.resetBorder();
+
+        SkybattleGame();
     }
 
+    /*
+
+    public void startEvent() {
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            switch(game.stage) {
+                case "Skybattle":
+
+            }
+        }, 20, 20);
+    }
+     */
     public void loadMaps() {
         tgttos.loadMaps();
-    }
-
-    public void sgGame() {
-        getServer().getPluginManager().registerEvents((Listener) new SGListener(sg, game, players,this), this);
-    }
-
-    public void bsabmGame() {
-        bsabm.loadWorld();
-        bsabm.loadMaps();
-        getServer().getPluginManager().registerEvents((Listener) new BSABMListener(bsabm, game, players,this), this);
     }
 
     public void TGTTOSGame() {
@@ -155,12 +168,18 @@ public final class MCC extends JavaPlugin implements Listener {
                                 }
                                 event.getPlayer().setGameMode(GameMode.SPECTATOR);
                             }
-
                         }
                     }
                 }, 0);
             }
         });
+    }
+
+    public void SkybattleGame() {
+        SkybattleListener skybattleListener = new SkybattleListener(skybattle, this);
+        getServer().getPluginManager().registerEvents(skybattleListener, this);
+
+
     }
     public void createScoreboard(Participant player) {
         String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
@@ -235,38 +254,37 @@ public final class MCC extends JavaPlugin implements Listener {
         Score tgttosCoins = tgttosScoreboard.getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0");
         tgttosCoins.setScore(2);
 
-        //TGTTOS
-        Objective sgScoreboard = board.registerNewObjective("sg", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
-        Score sgGameNum = sgScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game "+gameRound+"/8:"+ChatColor.WHITE+" Survival Games");
-        sgGameNum.setScore(15);
-        Score sgMap = sgScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"BCA");
-        sgMap.setScore(14);
-        Score sgEvent = sgScoreboard.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Next Event: ");
-        sgEvent.setScore(13);
-        Score sgEventName = sgScoreboard.getScore(ChatColor.LIGHT_PURPLE+"Starting: "+ChatColor.WHITE+getFormattedTime(60));
-        sgEventName.setScore(12);
-        Score sgSpace1 = sgScoreboard.getScore(ChatColor.RESET.toString());
-        sgSpace1.setScore(11);
-        Score sgGameCoins = sgScoreboard.getScore(ChatColor.AQUA+"Game Coins:");
-        sgGameCoins.setScore(10);
-        Score sgRed = sgScoreboard.getScore(ChatColor.RED+"Red Rabbits: "+ChatColor.WHITE+"0");
-        sgRed.setScore(9);
-        Score sgYellow = sgScoreboard.getScore(ChatColor.YELLOW+"Yellow Yaks: "+ChatColor.WHITE+"0");
-        sgYellow.setScore(8);
-        Score sgGreen = sgScoreboard.getScore(ChatColor.GREEN+"Green Guardians: "+ChatColor.WHITE+"0");
-        sgGreen.setScore(7);
-        Score sgBlue = sgScoreboard.getScore(ChatColor.BLUE+"Blue Bats: "+ChatColor.WHITE+"0");
-        sgBlue.setScore(6);
-        Score sgPurple = sgScoreboard.getScore(ChatColor.DARK_PURPLE+"Purple Pandas: "+ChatColor.WHITE+"0");
-        sgPurple.setScore(5);
-        Score sgPink = sgScoreboard.getScore(ChatColor.LIGHT_PURPLE+"Pink Piglets: "+ChatColor.WHITE+"0");
-        sgPink.setScore(4);
-        Score sgSpace2 = sgScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString());
-        sgSpace2.setScore(3);
-        Score sgPlayersAlive = sgScoreboard.getScore(ChatColor.GREEN+"Players Alive: "+ChatColor.WHITE+"0");
-        sgPlayersAlive.setScore(2);
-        Score sgTeamsAlive = sgScoreboard.getScore(ChatColor.GREEN+"Teams Alive: "+ChatColor.WHITE+"0");
-        sgTeamsAlive.setScore(1);
+        // Skybattle
+        Objective skybattleScoreboard = board.registerNewObjective("Skybattle", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+        Score skybattleGameNum = skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game "+gameRound+"/8:"+ChatColor.WHITE+" Skybattle");
+        skybattleGameNum.setScore(15);
+        Score skybattleMap = tgttosScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"Skybattle");
+        skybattleMap.setScore(14);
+        // TODO?
+        Score skybattleRound = tgttosScoreboard.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ChatColor.WHITE+(skybattle.roundNum+1)+"/3");
+        skybattleRound.setScore(13);
+        Score skybattleTimeLeft = tgttosScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+((int) Math.floor(timeLeft/60))+":"+timeLeft%60);
+        skybattleTimeLeft.setScore(12);
+        Score skybattleSpace = tgttosScoreboard.getScore(ChatColor.RESET.toString());
+        skybattleSpace.setScore(11);
+        Score skybattleGameCoins = tgttosScoreboard.getScore(ChatColor.AQUA+"Game Coins:");
+        skybattleGameCoins.setScore(10);
+        Score skybattleRed = tgttosScoreboard.getScore(ChatColor.RED+"Red Rabbits: "+ChatColor.WHITE+"0");
+        skybattleRed.setScore(9);
+        Score skybattleYellow = tgttosScoreboard.getScore(ChatColor.YELLOW+"Yellow Yaks: "+ChatColor.WHITE+"0");
+        skybattleYellow.setScore(8);
+        Score skybattleGreen = tgttosScoreboard.getScore(ChatColor.GREEN+"Green Guardians: "+ChatColor.WHITE+"0");
+        skybattleGreen.setScore(7);
+        Score skybattleBlue = tgttosScoreboard.getScore(ChatColor.BLUE+"Blue Bats: "+ChatColor.WHITE+"0");
+        skybattleBlue.setScore(6);
+        Score skybattlePurple = tgttosScoreboard.getScore(ChatColor.DARK_PURPLE+"Purple Pandas: "+ChatColor.WHITE+"0");
+        skybattlePurple.setScore(5);
+        Score skybattlePink = tgttosScoreboard.getScore(ChatColor.LIGHT_PURPLE+"Pink Piglets: "+ChatColor.WHITE+"0");
+        skybattlePink.setScore(4);
+        Score skybattleSpace2 = tgttosScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString());
+        skybattleSpace2.setScore(3);
+        Score skybattleCoins = tgttosScoreboard.getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0");
+        skybattleCoins.setScore(2);
 
         scoreboards.put(player.ign, board);
         lobby.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -275,7 +293,6 @@ public final class MCC extends JavaPlugin implements Listener {
 
     public void changeScoreboard(String scoreboardName) {
         for (Participant p : players.participants) {
-            players.loadScoreboardVars(p.player.getUniqueId());
             switch(scoreboardName) {
                 case "Lobby":
                     scoreboards.get(p.ign).getObjective("lobby").setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -283,15 +300,10 @@ public final class MCC extends JavaPlugin implements Listener {
                 case "TGTTOS":
                     scoreboards.get(p.ign).getObjective("tgttos").setDisplaySlot(DisplaySlot.SIDEBAR);
                     break;
-                case "SG":
-                    scoreboards.get(p.ign).getObjective("sg").setDisplaySlot(DisplaySlot.SIDEBAR);
-                    break;
+                case "Skybattle":
+                    scoreboards.get(p.ign).getObjective("Skybattle").setDisplaySlot(DisplaySlot.SIDEBAR);
             }
         }
-    }
-
-    public String getFormattedTime(int seconds) {
-        return seconds / 60 +":"+String.format("%02d", seconds%60);
     }
 
     public void scoreBoards() {
@@ -315,24 +327,24 @@ public final class MCC extends JavaPlugin implements Listener {
                         case "TGTTOS":
                             if (roundScores.get(p.ign) != null) {
                                 if (p.roundCoins != ((int) roundScores.get(p.ign))) {
-                                    scoreboards.get(p.ign).resetScores(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+roundScores.get(p.ign));
-                                    scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.roundCoins).setScore(2);
+                                    scoreboards.get(p.ign).resetScores(ChatColor.YELLOW + "Your Coins: " + ChatColor.WHITE + roundScores.get(p.ign));
+                                    scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.YELLOW + "Your Coins: " + ChatColor.WHITE + p.roundCoins).setScore(2);
                                     roundScores.put(p.ign, p.roundCoins);
                                 }
                             }
                             if (tgttos.timeLeft >= 0) {
-                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+((int) Math.floor(time.get(p.player.getUniqueId())/60))+":"+time.get(p.player.getUniqueId())%60);
-                                scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BOLD+""+ChatColor.RED +"Time left: "+ChatColor.WHITE+((int) Math.floor(tgttos.timeLeft/60))+":"+tgttos.timeLeft%60).setScore(12);
+                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + ((int) Math.floor(time.get(p.player.getUniqueId()) / 60)) + ":" + time.get(p.player.getUniqueId()) % 60);
+                                scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + ((int) Math.floor(tgttos.timeLeft / 60)) + ":" + tgttos.timeLeft % 60).setScore(12);
                                 time.put(p.player.getUniqueId(), tgttos.timeLeft);
                             }
                             if (roundNums.get(p.player.getUniqueId()) != tgttos.roundNum) {
-                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ChatColor.WHITE+(roundNums.get(p.player.getUniqueId())+1)+"/7");
-                                scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ChatColor.WHITE+(tgttos.roundNum+1)+"/7").setScore(13);
+                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.GREEN + "Round: " + ChatColor.WHITE + (roundNums.get(p.player.getUniqueId()) + 1) + "/7");
+                                scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BOLD + "" + ChatColor.GREEN + "Round: " + ChatColor.WHITE + (tgttos.roundNum + 1) + "/7").setScore(13);
                                 roundNums.put(p.player.getUniqueId(), tgttos.roundNum);
                             }
                             if (maps.get(p.player.getUniqueId()) != tgttos.mapOrder[tgttos.roundNum]) {
-                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+maps.get(p.player.getUniqueId()));
-                                scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+tgttos.mapOrder[tgttos.gameOrder[tgttos.roundNum]]).setScore(14);
+                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.AQUA + "Map: " + ChatColor.WHITE + maps.get(p.player.getUniqueId()));
+                                scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BOLD + "" + ChatColor.AQUA + "Map: " + ChatColor.WHITE + tgttos.mapOrder[tgttos.gameOrder[tgttos.roundNum]]).setScore(14);
                                 maps.put(p.player.getUniqueId(), tgttos.mapOrder[tgttos.gameOrder[tgttos.roundNum]]);
                             }
                             if (!(tempArray.equals(previousStandings.get(p.player.getUniqueId())))) {
@@ -340,92 +352,134 @@ public final class MCC extends JavaPlugin implements Listener {
                                     int score = findIndexInNumberArr(tempArray, (Integer) teamManager.roundScores.get(teamList[i]));
                                     switch (teamManager.teamNames.get(i)) {
                                         case "RedRabbits":
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.RED+"Red Rabbits: "+ChatColor.WHITE+teamRoundScores.get("Red Rabbits"));
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.RED+"Red Rabbits: "+ChatColor.WHITE+teamManager.roundScores.get("Red Rabbits")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.RED + "Red Rabbits: " + ChatColor.WHITE + teamRoundScores.get("Red Rabbits"));
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.RED + "Red Rabbits: " + ChatColor.WHITE + teamManager.roundScores.get("Red Rabbits")).setScore(9 - score);
                                             break;
                                         case "YellowYaks":
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.YELLOW+"Yellow Yaks: "+ChatColor.WHITE+teamRoundScores.get("Yellow Yaks"));
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.YELLOW+"Yellow Yaks: "+ChatColor.WHITE+teamManager.roundScores.get("Yellow Yaks")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.YELLOW + "Yellow Yaks: " + ChatColor.WHITE + teamRoundScores.get("Yellow Yaks"));
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.YELLOW + "Yellow Yaks: " + ChatColor.WHITE + teamManager.roundScores.get("Yellow Yaks")).setScore(9 - score);
                                             break;
                                         case "GreenGuardians":
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.GREEN+"Green Guardians: "+ChatColor.WHITE+teamRoundScores.get("Green Guardians"));
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.GREEN+"Green Guardians: "+ChatColor.WHITE+teamManager.roundScores.get("Green Guardians")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.GREEN + "Green Guardians: " + ChatColor.WHITE + teamRoundScores.get("Green Guardians"));
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.GREEN + "Green Guardians: " + ChatColor.WHITE + teamManager.roundScores.get("Green Guardians")).setScore(9 - score);
                                             break;
                                         case "BlueBats":
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.BLUE+"Blue Bats: "+ChatColor.WHITE+teamRoundScores.get("Blue Bats"));
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BLUE+"Blue Bats: "+ChatColor.WHITE+teamManager.roundScores.get("Blue Bats")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.BLUE + "Blue Bats: " + ChatColor.WHITE + teamRoundScores.get("Blue Bats"));
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.BLUE + "Blue Bats: " + ChatColor.WHITE + teamManager.roundScores.get("Blue Bats")).setScore(9 - score);
                                             break;
                                         case "PurplePandas":
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.DARK_PURPLE+"Purple Pandas: "+ChatColor.WHITE+teamRoundScores.get("Purple Pandas"));
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.DARK_PURPLE+"Purple Pandas: "+ChatColor.WHITE+teamManager.roundScores.get("Purple Pandas")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.DARK_PURPLE + "Purple Pandas: " + ChatColor.WHITE + teamRoundScores.get("Purple Pandas"));
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.DARK_PURPLE + "Purple Pandas: " + ChatColor.WHITE + teamManager.roundScores.get("Purple Pandas")).setScore(9 - score);
                                             break;
                                         case "PinkPiglets":
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.LIGHT_PURPLE+"Pink Piglets: "+ChatColor.WHITE+teamRoundScores.get("Pink Piglets"));
-                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.LIGHT_PURPLE+"Pink Piglets: "+ChatColor.WHITE+teamManager.roundScores.get("Pink Piglets")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScoreboard().resetScores(ChatColor.LIGHT_PURPLE + "Pink Piglets: " + ChatColor.WHITE + teamRoundScores.get("Pink Piglets"));
+                                            scoreboards.get(p.ign).getObjective("tgttos").getScore(ChatColor.LIGHT_PURPLE + "Pink Piglets: " + ChatColor.WHITE + teamManager.roundScores.get("Pink Piglets")).setScore(9 - score);
                                             break;
                                     }
                                 }
                                 previousStandings.put(p.player.getUniqueId(), tempArray);
                             }
                             break;
-                        case "SG":
-                            if (!Objects.equals(maps.get(p.player.getUniqueId()), sg.eventName) || time.get(p.player.getUniqueId()) != sg.relaventEventTimer) {
-                                scoreboards.get(p.ign).resetScores(ChatColor.LIGHT_PURPLE+maps.get(p.player.getUniqueId())+": "+ChatColor.WHITE+getFormattedTime(time.get(p.player.getUniqueId())));
-                                scoreboards.get(p.ign).getObjective("sg").getScore(ChatColor.LIGHT_PURPLE+sg.eventName+": "+ChatColor.WHITE+getFormattedTime(sg.relaventEventTimer)).setScore(12);
-                                maps.put(p.player.getUniqueId(), sg.eventName);
-                                time.put(p.player.getUniqueId(), sg.relaventEventTimer);
+
+
+                        case "Skybattle":
+                            if (roundScores.get(p.ign) != null) {
+                                if (p.roundCoins != ((int) roundScores.get(p.ign))) {
+                                    scoreboards.get(p.ign).resetScores(ChatColor.YELLOW + "Your Coins: " + ChatColor.WHITE + roundScores.get(p.ign));
+                                    scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.YELLOW + "Your Coins: " + ChatColor.WHITE + p.roundCoins).setScore(2);
+                                    roundScores.put(p.ign, p.roundCoins);
+                                }
                             }
-                            if (teamsAlive.get(p.player.getUniqueId()) != sg.teamsDead) {
-                                scoreboards.get(p.ign).resetScores(ChatColor.GREEN+"Teams Alive: "+ChatColor.WHITE+teamsAlive.get(p.player.getUniqueId()));
-                                scoreboards.get(p.ign).getObjective("sg").getScore(ChatColor.GREEN+"Teams Alive: "+ChatColor.WHITE+sg.teamsDead).setScore(1);
-                                teamsAlive.put(p.player.getUniqueId(), sg.teamsDead);
+                            if (skybattle.timeLeft > 0 && skybattle.getState().equals("PLAYING")) {
+                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + ((int) Math.floor(time.get(p.player.getUniqueId()) / 60)) + ":" + time.get(p.player.getUniqueId()) % 60);
+                                scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);
+                                time.put(p.player.getUniqueId(), skybattle.timeLeft);
+
+                                if (skybattle.timeLeft % 40 == 0 && skybattle.timeLeft != 240 && skybattle.timeLeft >= 60) {
+                                    skybattle.border.setSize(skybattle.border.getSize() * 0.75, 15);
+                                    p.player.sendMessage(ChatColor.DARK_RED+"> Border is Shrinking!");
+                                    p.player.sendTitle(" ", ChatColor.RED+"Border shrinking!", 0, 20, 10);
+                                } else if ((skybattle.timeLeft - 10) % 40 == 0) {
+                                    p.player.sendMessage(ChatColor.RED+"> Border shrinking in 10 seconds!");
+                                } else if (skybattle.timeLeft == 60) {
+                                    skybattle.border.setSize(5, 60);
+                                    p.player.sendMessage(ChatColor.DARK_RED+"> Border will continue shrinking!");
+                                } else if (skybattle.timeLeft == 70) {
+                                    p.player.sendMessage(ChatColor.RED+"> Final shrink in 10 seconds!");
+                                }
+
+                            } else if (skybattle.timeLeft > 0 && skybattle.getState().equals("STARTING")) {
+                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.RED + "Starting in: " + ChatColor.WHITE + ((int) Math.floor(time.get(p.player.getUniqueId()) / 60)) + ":" + time.get(p.player.getUniqueId()) % 60);
+                                scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Starting in: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);
+                                time.put(p.player.getUniqueId(), skybattle.timeLeft);
+                                p.player.sendTitle("Starting in:", "> " + skybattle.timeLeft + " <", 0, 20, 0);
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum < 3) {
+                                skybattle.nextRound();
+                                // round ending todo
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("STARTING")) {
+                                skybattle.setState("PLAYING");
+                                //todo remove "starting in 0:1"
+                                skybattle.timeLeft = 240;
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum >= 3) {
+                                skybattle.resetMap();
+                                skybattle.resetBorder();
+                                // ending todo
                             }
-                            if (playersAlive.get(p.player.getUniqueId()) != sg.playersDead) {
-                                scoreboards.get(p.ign).resetScores(ChatColor.GREEN+"Players Alive: "+ChatColor.WHITE+playersAlive.get(p.player.getUniqueId()));
-                                scoreboards.get(p.ign).getObjective("sg").getScore(ChatColor.GREEN+"Players Alive: "+ChatColor.WHITE+sg.playersDead).setScore(2);
-                                playersAlive.put(p.player.getUniqueId(), sg.teamsDead);
+
+                            if (roundNums.get(p.player.getUniqueId()) != skybattle.roundNum) {
+                                scoreboards.get(p.ign).resetScores(ChatColor.BOLD + "" + ChatColor.GREEN + "Round: " + ChatColor.WHITE + (roundNums.get(p.player.getUniqueId()) + 1) + "/3");
+                                scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.GREEN + "Round: " + ChatColor.WHITE + (skybattle.roundNum + 1) + "/3").setScore(13);
+                                roundNums.put(p.player.getUniqueId(), skybattle.roundNum);
                             }
                             if (!(tempArray.equals(previousStandings.get(p.player.getUniqueId())))) {
                                 for (int i = 0; i < teamManager.teamNames.size(); i++) {
                                     int score = findIndexInNumberArr(tempArray, (Integer) teamManager.roundScores.get(teamList[i]));
                                     switch (teamManager.teamNames.get(i)) {
                                         case "RedRabbits":
-                                            scoreboards.get(p.ign).getObjective("sg").getScoreboard().resetScores(ChatColor.RED+"Red Rabbits: "+ChatColor.WHITE+teamRoundScores.get("Red Rabbits"));
-                                            scoreboards.get(p.ign).getObjective("sg").getScore(ChatColor.RED+"Red Rabbits: "+ChatColor.WHITE+teamManager.roundScores.get("Red Rabbits")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScoreboard().resetScores(ChatColor.RED + "Red Rabbits: " + ChatColor.WHITE + teamRoundScores.get("Red Rabbits"));
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.RED + "Red Rabbits: " + ChatColor.WHITE + teamManager.roundScores.get("Red Rabbits")).setScore(9 - score);
                                             break;
                                         case "YellowYaks":
-                                            scoreboards.get(p.ign).getObjective("sg").getScoreboard().resetScores(ChatColor.YELLOW+"Yellow Yaks: "+ChatColor.WHITE+teamRoundScores.get("Yellow Yaks"));
-                                            scoreboards.get(p.ign).getObjective("sg").getScore(ChatColor.YELLOW+"Yellow Yaks: "+ChatColor.WHITE+teamManager.roundScores.get("Yellow Yaks")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScoreboard().resetScores(ChatColor.YELLOW + "Yellow Yaks: " + ChatColor.WHITE + teamRoundScores.get("Yellow Yaks"));
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.YELLOW + "Yellow Yaks: " + ChatColor.WHITE + teamManager.roundScores.get("Yellow Yaks")).setScore(9 - score);
                                             break;
                                         case "GreenGuardians":
-                                            scoreboards.get(p.ign).getObjective("sg").getScoreboard().resetScores(ChatColor.GREEN+"Green Guardians: "+ChatColor.WHITE+teamRoundScores.get("Green Guardians"));
-                                            scoreboards.get(p.ign).getObjective("sg").getScore(ChatColor.GREEN+"Green Guardians: "+ChatColor.WHITE+teamManager.roundScores.get("Green Guardians")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScoreboard().resetScores(ChatColor.GREEN + "Green Guardians: " + ChatColor.WHITE + teamRoundScores.get("Green Guardians"));
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.GREEN + "Green Guardians: " + ChatColor.WHITE + teamManager.roundScores.get("Green Guardians")).setScore(9 - score);
                                             break;
                                         case "BlueBats":
-                                            scoreboards.get(p.ign).getObjective("sg").getScoreboard().resetScores(ChatColor.BLUE+"Blue Bats: "+ChatColor.WHITE+teamRoundScores.get("Blue Bats"));
-                                            scoreboards.get(p.ign).getObjective("sg").getScore(ChatColor.BLUE+"Blue Bats: "+ChatColor.WHITE+teamManager.roundScores.get("Blue Bats")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScoreboard().resetScores(ChatColor.BLUE + "Blue Bats: " + ChatColor.WHITE + teamRoundScores.get("Blue Bats"));
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BLUE + "Blue Bats: " + ChatColor.WHITE + teamManager.roundScores.get("Blue Bats")).setScore(9 - score);
                                             break;
                                         case "PurplePandas":
-                                            scoreboards.get(p.ign).getObjective("sg").getScoreboard().resetScores(ChatColor.DARK_PURPLE+"Purple Pandas: "+ChatColor.WHITE+teamRoundScores.get("Purple Pandas"));
-                                            scoreboards.get(p.ign).getObjective("sg").getScore(ChatColor.DARK_PURPLE+"Purple Pandas: "+ChatColor.WHITE+teamManager.roundScores.get("Purple Pandas")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScoreboard().resetScores(ChatColor.DARK_PURPLE + "Purple Pandas: " + ChatColor.WHITE + teamRoundScores.get("Purple Pandas"));
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.DARK_PURPLE + "Purple Pandas: " + ChatColor.WHITE + teamManager.roundScores.get("Purple Pandas")).setScore(9 - score);
                                             break;
                                         case "PinkPiglets":
-                                            scoreboards.get(p.ign).getObjective("sg").getScoreboard().resetScores(ChatColor.LIGHT_PURPLE+"Pink Piglets: "+ChatColor.WHITE+teamRoundScores.get("Pink Piglets"));
-                                            scoreboards.get(p.ign).getObjective("sg").getScore(ChatColor.LIGHT_PURPLE+"Pink Piglets: "+ChatColor.WHITE+teamManager.roundScores.get("Pink Piglets")).setScore(9-score);
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScoreboard().resetScores(ChatColor.LIGHT_PURPLE + "Pink Piglets: " + ChatColor.WHITE + teamRoundScores.get("Pink Piglets"));
+                                            scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.LIGHT_PURPLE + "Pink Piglets: " + ChatColor.WHITE + teamManager.roundScores.get("Pink Piglets")).setScore(9 - score);
                                             break;
                                     }
                                 }
-                                previousStandings.put(p.player.getUniqueId(), tempArray);
+                            }
+
+                            for (int mapX = -225; mapX <= -87; mapX++) {
+                                for (int mapZ = -325; mapZ <= -207; mapZ++) {
+                                    skybattle.world.spawnParticle(Particle.ASH , mapX, skybattle.borderHeight, mapZ, 1);
+                                }
                             }
                             break;
+                        //case "Game":
                     }
                 }
+
                 switch (game.stage) {
                     case "TGTTOS":
                         tgttos.timeLeft--;
                         break;
-                    case "SG":
-                        sg.updateEventTimer();
+                    case "Skybattle":
+                        if (skybattle.timeLeft <= 75) { skybattle.borderHeight -= 0.226666667; }
+                        skybattle.timeLeft--;
                         break;
                 }
                 for (String i : teamList) {
@@ -479,12 +533,12 @@ public final class MCC extends JavaPlugin implements Listener {
         purple.setColor(ChatColor.DARK_PURPLE);
         pink.setColor(ChatColor.LIGHT_PURPLE);
 
-        red.setPrefix(ChatColor.WHITE+"Ⓡ ");
-        yellow.setPrefix(ChatColor.WHITE+"Ⓨ ");
-        green.setPrefix(ChatColor.WHITE+"Ⓖ ");
-        blue.setPrefix(ChatColor.WHITE+"Ⓑ ");
-        purple.setPrefix(ChatColor.WHITE+"Ⓤ ");
-        pink.setPrefix(ChatColor.WHITE+"Ⓟ ");
+        red.setPrefix("Ⓡ ");
+        yellow.setPrefix("Ⓨ ");
+        green.setPrefix("Ⓖ ");
+        blue.setPrefix("Ⓑ ");
+        purple.setPrefix("Ⓤ ");
+        pink.setPrefix("Ⓟ ");
 
         Team[] teamss = {red,yellow,green,blue,purple,pink};
         teams.put(player.ign, teamss);
