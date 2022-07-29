@@ -37,7 +37,7 @@ public class Game {
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "SG Game started");
                 sg.start();
                 break;
-            case "Skybatle":
+            case "Skybattle":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "Skybattle Game started");
                 skybattle.start();
                 break;

@@ -193,8 +193,6 @@ public class Skybattle {
 
 
     public void nextRound() {
-        resetMap();
-        resetBorder();
         loadMap();
         players.spectators.clear();
         if (roundNum < 3) {
