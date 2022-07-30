@@ -18,10 +18,7 @@ import com.kotayka.mcc.mainGame.commands.*;
 import com.kotayka.mcc.mainGame.manager.*;
 import com.kotayka.mcc.mainGame.manager.tabComplete.startCommand;
 import com.kotayka.mcc.mainGame.manager.tabComplete.tCommands;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -501,6 +498,7 @@ public final class MCC extends JavaPlugin implements Listener {
                                 time.put(p.player.getUniqueId(), skybattle.timeLeft);
                                 p.player.sendTitle("Starting in:", "> " + skybattle.timeLeft + " <", 0, 20, 0);
                             } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum < 3) {
+                                p.player.stopSound(Sound.MUSIC_DISC_STAL);
                                 skybattle.nextRound();
                                 // round ending todo
                             } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("STARTING")) {
