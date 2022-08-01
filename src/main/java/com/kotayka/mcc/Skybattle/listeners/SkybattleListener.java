@@ -119,7 +119,9 @@ public class SkybattleListener implements Listener {
         // Death messages
         Participant p = new Participant(e.getEntity());
         if (p.player.getKiller() != null) {
-            p.Die(p.player, p.player.getKiller());
+            Participant killer = Participant.findParticipantFromPlayer(p.player.getKiller());
+            assert killer != null;
+            p.Die(p, killer);
         }
 
         // Death Firework + TP Spectator

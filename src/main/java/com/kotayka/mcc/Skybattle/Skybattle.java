@@ -81,7 +81,7 @@ public class Skybattle {
 
         spawnPoints = Arrays.asList(spawnOne, spawnTwo, spawnThree, spawnFour, spawnFive, spawnSix);
 
-        for (Participant p : players.participants) {
+        for (Participant p : Participant.participantsOnATeam) {
             p.player.getInventory().clear();
             p.player.setHealth(20);
             p.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 10, 4, false, false));
@@ -221,7 +221,7 @@ public class Skybattle {
         for (Team t : teamListPogU.get(i)) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
             for (String s : t.getEntries()) {
-                for (Participant p : players.participants) {
+                for (Participant p : Participant.participantsOnATeam) {
                     if (p.ign.equals(s)) {
                         p.player.teleport(tempSpawns.get(randomNum));
                     }

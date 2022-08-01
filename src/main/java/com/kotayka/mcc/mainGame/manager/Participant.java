@@ -1,8 +1,13 @@
 package com.kotayka.mcc.mainGame.manager;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Participant {
     public int totalCoins;
@@ -10,6 +15,7 @@ public class Participant {
     public String team = "Spectator";
     public Color color = Color.WHITE;
     public ChatColor chatColor = ChatColor.GRAY;
+    public static List<Participant> participantsOnATeam = new ArrayList<>();
     public String teamPrefix = "";
     public String fullName;
 
@@ -25,6 +31,17 @@ public class Participant {
         killer.player.sendTitle("\n", "[X] " + victim.teamPrefix + victim.chatColor+victim.player.getName(), 0, 60, 40);
         victim.player.sendMessage(ChatColor.RED + "You were eliminated by " + killer.player.getName() + "!");
         killer.player.sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + victim.player.getName() + "!");
+    }
+
+    public void Die(Player victim, Player killer) {
+        Participant died = Participant.findParticipantFromPlayer(victim);
+        Participant killedThem = Participant.findParticipantFromPlayer(killer);
+        assert died != null;
+        assert killedThem != null;
+        killedThem.player.sendTitle("\n", "[X] " + died.teamPrefix + died.chatColor+died.player.getName(), 0, 60, 40);
+        died.player.sendMessage(ChatColor.RED + "You were eliminated by " + killedThem.player.getName() + "!");
+        killedThem.player.sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + died.player.getName() + "!");
+
     }
 
     public void setTeam(String teamName) {
@@ -62,5 +79,13 @@ public class Participant {
                 teamPrefix = ChatColor.WHITE+"Ⓟ ";
                 break;
         }
+    }
+
+    public static Participant findParticipantFromPlayer(Player player) {
+        for (Participant p : participantsOnATeam) {
+            if (p.ign.equals(player.getName())) return p;
+        }
+        Bukkit.broadcastMessage("That player is not on a team!");
+        return null;
     }
 }

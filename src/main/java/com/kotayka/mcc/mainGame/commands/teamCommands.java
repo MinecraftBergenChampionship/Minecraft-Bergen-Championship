@@ -56,6 +56,7 @@ public class teamCommands implements CommandExecutor {
                                     break;
                             }
                             participant.setTeam(args[1]);
+                            Participant.participantsOnATeam.add(participant);
                             Bukkit.broadcastMessage(participant.fullName);
                         }
                     }
