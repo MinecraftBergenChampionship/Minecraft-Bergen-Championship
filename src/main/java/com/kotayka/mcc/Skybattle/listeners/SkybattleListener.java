@@ -123,26 +123,8 @@ public class SkybattleListener implements Listener {
         }
 
         // Death Firework + TP Spectator
-        Color color = Color.RED;
-        switch (p.team) {
-            case "YellowYaks":
-                color = Color.YELLOW;
-                break;
-            case "BlueBats":
-                color = Color.BLUE;
-                break;
-            case "GreenGuardians":
-                color = Color.GREEN;
-                break;
-            case "PurplePandas":
-                color = Color.PURPLE;
-                break;
-            case "PinkPiglets":
-                color = Color.fromRGB(255, 0, 164);
-                break;
-        }
         Firework firework = new Firework();
-        firework.spawnFireworkWithColor(p.player.getLocation(), color);
+        firework.spawnFireworkWithColor(p.player.getLocation(), p.color);
 
         p.player.setGameMode(GameMode.SPECTATOR);
         p.player.teleport(skybattle.getCenter());

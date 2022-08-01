@@ -24,29 +24,10 @@ public class chatUpdater implements Listener {
         ChatColor color = ChatColor.GRAY;
         for (Participant p : players.participants) {
             if (event.getPlayer() == p.player) {
-                switch (p.team) {
-                    case "RedRabbits":
-                        color = ChatColor.RED;
-                        break;
-                    case "YellowYaks":
-                        color = ChatColor.YELLOW;
-                        break;
-                    case "GreenGuardians":
-                        color = ChatColor.GREEN;
-                        break;
-                    case "BlueBats":
-                        color = ChatColor.BLUE;
-                        break;
-                    case "PurplePandas":
-                        color = ChatColor.DARK_PURPLE;
-                        break;
-                    case "PinkPiglets":
-                        color = ChatColor.LIGHT_PURPLE;
-                        break;
-                }
+                color = p.chatColor;
             }
         }
 
-        event.setFormat(ChatColor.BOLD+""+color+player.getDisplayName() + ChatColor.WHITE +" "+ message);
+        event.setFormat(ChatColor.BOLD+""+color+player.getDisplayName() + ChatColor.WHITE +": "+ message);
     }
 }
