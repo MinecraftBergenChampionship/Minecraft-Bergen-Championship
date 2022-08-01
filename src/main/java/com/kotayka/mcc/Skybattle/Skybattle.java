@@ -28,15 +28,18 @@ public class Skybattle {
     public final Players players;
     public final Plugin plugin;
     public boolean stage = false;
+    public int playersAlive;
+    public List<String> teamsAlive = new ArrayList<>();
+    public Map<Entity, Player> creepersAndSpawned = new HashMap<>(5);
+    public Map<Entity, Player> playersShot = new HashMap<>(5);
     public int roundNum = 0;
     public double borderHeight = 17.0;
     public int timeLeft;
     public List<Location> spawnPoints = new ArrayList<>(6);
     public List<ItemStack> spawnItems = new ArrayList<>(5);
     public World world;
-    public Map<Entity, Player> creepersAndSpawned = new HashMap<>(5);
-    public Map<Entity, Player> playersShot = new HashMap<>(5);
     public WorldBorder border;
+    private final Location CENTER;
     public MCC mcc;
 
 
@@ -44,9 +47,7 @@ public class Skybattle {
         this.players = players;
         this.plugin = plugin;
         this.mcc = mcc;
-    }
 
-    public void loadMap() {
         if (Bukkit.getWorld("Skybattle") == null) {
             world = Bukkit.getWorld("world");
         }
@@ -54,6 +55,10 @@ public class Skybattle {
             world = Bukkit.getWorld("Skybattle");
         }
 
+        CENTER = new Location(world, -157, 0, -266);
+    }
+
+    public void loadMap() {
         resetMap();
 
         // Spawn items
@@ -120,21 +125,10 @@ public class Skybattle {
             }
         }
 
-        // Clear all floor items, primed tnt, and creepers
-        for (Item item : world.getEntitiesByClass(Item.class)) {
-            item.remove();
-        }
-        for (Entity tnt : world.getEntitiesByClass(TNTPrimed.class)) {
-            tnt.remove();
-        }
-        for (Entity creeper : world.getEntitiesByClass(Creeper.class)) {
-            creeper.remove();
-        }
-
         // Border
         assert world != null;
         border = world.getWorldBorder();
-        border.setCenter(-157, -266);
+        border.setCenter(CENTER);
         border.setSize(150);
         border.setDamageAmount(0.5);
         border.setDamageBuffer(0);
@@ -190,8 +184,18 @@ public class Skybattle {
             y = -16;
             x++;
         }
-    }
 
+        // Clear all floor items, primed tnt, and creepers
+        for (Item item : world.getEntitiesByClass(Item.class)) {
+            item.remove();
+        }
+        for (Entity tnt : world.getEntitiesByClass(TNTPrimed.class)) {
+            tnt.remove();
+        }
+        for (Entity creeper : world.getEntitiesByClass(Creeper.class)) {
+            creeper.remove();
+        }
+    }
 
     public void nextRound() {
         loadMap();
@@ -236,19 +240,7 @@ public class Skybattle {
         world.getWorldBorder().reset();
     }
 
-    /*
-    public void startingCountdown() {
-
-        // not sure if smart to use another run here instead of doing it in MCC but it'd be neater if this works
-        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-            public void run() {
-                for (Participant p : players.participants) {
-                    p.player.sendTitle("Starting in: ", "> " + timeLeft + " <", 0, 20, 0);
-                }
-            }
-        }, 20);
-    }
-    */
+    public Location getCenter() { return CENTER; }
 
     public void setState(String state) {
         this.state = state;

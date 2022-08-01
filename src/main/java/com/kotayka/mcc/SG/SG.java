@@ -268,7 +268,7 @@ public class SG {
                 color = Color.PURPLE;
                 break;
             case "PinkPiglets":
-                color = Color.fromBGR(255, 0, 164);
+                color = Color.fromRGB(255, 0, 164);
                 break;
         }
         Firework firework = new Firework();

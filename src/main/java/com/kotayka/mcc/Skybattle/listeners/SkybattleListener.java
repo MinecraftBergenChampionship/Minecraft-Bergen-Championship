@@ -138,14 +138,16 @@ public class SkybattleListener implements Listener {
                 color = Color.PURPLE;
                 break;
             case "PinkPiglets":
-                color = Color.fromBGR(255, 0, 164);
+                color = Color.fromRGB(255, 0, 164);
                 break;
         }
         Firework firework = new Firework();
         firework.spawnFireworkWithColor(p.player.getLocation(), color);
 
         p.player.setGameMode(GameMode.SPECTATOR);
-        p.player.teleport(new Location(skybattle.world, -155, 0, -265));
+        p.player.teleport(skybattle.getCenter());
+
+        skybattle.playersAlive--;
     }
 
     @EventHandler

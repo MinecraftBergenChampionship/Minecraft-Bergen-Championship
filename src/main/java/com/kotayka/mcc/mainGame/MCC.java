@@ -83,14 +83,7 @@ public final class MCC extends JavaPlugin implements Listener {
         getCommand("world").setExecutor(new world());
         getCommand("spec").setExecutor(new playerCommand(players));
         //getCommand("ping").setExecutor(new ping());
-        // temp
-        /*
-        loadMaps();
-        TGTTOSGame();
-<<<<<<< HEAD
-        sgGame();
-=======
-         */
+
         TGTTOSGame();
         sgGame();
 
