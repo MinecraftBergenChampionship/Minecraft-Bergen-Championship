@@ -99,17 +99,6 @@ public class SkybattleListener implements Listener {
             // Remove player from hashmaps if didn't die (only contain when last damaged)
             skybattle.creepersAndSpawned.remove(player);
             skybattle.playersShot.remove(player);
-            return;
-        }
-
-        // If player died, check who spawned creeper
-        if (e.getFinalDamage() >= player.getHealth() && e.getDamager() instanceof Creeper) {
-            if (skybattle.creepersAndSpawned.containsKey(e.getDamager())) {
-                // todo scorin
-                Participant p = new Participant(player);
-                p.Die(player, skybattle.creepersAndSpawned.get(e.getDamager()));
-                skybattle.creepersAndSpawned.remove(e.getDamager());
-            }
         }
     }
 
@@ -145,16 +134,16 @@ public class SkybattleListener implements Listener {
         if (p.player.getKiller() != null) {
             Participant killer = Participant.findParticipantFromPlayer(p.player.getKiller());
             assert killer != null;
-            p.Die(p, killer);
+            p.Die(p, killer, e);
             e.setDeathMessage(p.teamPrefix + p.chatColor + p.ign + " was slain by " + killer.teamPrefix + killer.chatColor + killer.ign);
         }
 
         if (skybattle.creepersAndSpawned.containsKey(Objects.requireNonNull(player.getLastDamageCause()).getEntity())) {
-            p.Die(player, skybattle.creepersAndSpawned.get(player.getLastDamageCause().getEntity()));
+            p.Die(player, skybattle.creepersAndSpawned.get(player.getLastDamageCause().getEntity()), e);
             skybattle.creepersAndSpawned.remove(player);
         }
         if (skybattle.playersShot.containsKey(player.getLastDamageCause().getEntity())) {
-            p.Die(player, skybattle.playersShot.get(player.getLastDamageCause().getEntity()));
+            p.Die(player, skybattle.playersShot.get(player.getLastDamageCause().getEntity()), e);
             skybattle.playersShot.remove(player);
         }
 

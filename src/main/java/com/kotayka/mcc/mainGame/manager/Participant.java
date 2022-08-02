@@ -5,6 +5,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,20 +29,48 @@ public class Participant {
         this.ign = player.getName();
     }
 
-    public void Die(Participant victim, Participant killer) {
-        killer.player.sendTitle("\n", "[X] " + victim.teamPrefix + victim.chatColor+victim.player.getName(), 0, 60, 40);
-        victim.player.sendMessage(ChatColor.RED + "You were eliminated by " + killer.player.getName() + "!");
-        killer.player.sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + victim.player.getName() + "!");
+    public void Die(Participant victim, Participant killer, PlayerDeathEvent e) {
+        String victimName = victim.teamPrefix + victim.chatColor + victim.ign;
+        String killerName = killer.teamPrefix + killer.chatColor + killer.ign;
+        killer.player.sendTitle("\n", "[X] " + victimName, 0, 60, 40);
+        victim.player.sendMessage(ChatColor.RED + "You were eliminated by " + killer.ign + "!");
+        killer.player.sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + victim.ign + "!");
+
+        String oldDeathMessage = e.getDeathMessage();
+        String newDeathMessage = "";
+        if (e.getDeathMessage().contains(victim.ign)) {
+            assert oldDeathMessage != null;
+            newDeathMessage = oldDeathMessage.replace(victim.ign, victimName);
+        }
+        if (e.getDeathMessage().contains(killer.ign)) {
+            assert oldDeathMessage != null;
+            newDeathMessage = oldDeathMessage.replace(killer.ign, killerName);
+        }
+        e.setDeathMessage(newDeathMessage);
     }
 
-    public void Die(Player victim, Player killer) {
+    public void Die(Player victim, Player killer, PlayerDeathEvent e) {
         Participant died = Participant.findParticipantFromPlayer(victim);
         Participant killedThem = Participant.findParticipantFromPlayer(killer);
         assert died != null;
         assert killedThem != null;
-        killedThem.player.sendTitle("\n", "[X] " + died.teamPrefix + died.chatColor+died.player.getName(), 0, 60, 40);
+        String victimName = died.teamPrefix + died.chatColor + died.ign;
+        String killerName = killedThem.teamPrefix + killedThem.chatColor + killedThem.ign;
+        killedThem.player.sendTitle("\n", "[X] " + victimName, 0, 60, 40);
         died.player.sendMessage(ChatColor.RED + "You were eliminated by " + killedThem.player.getName() + "!");
         killedThem.player.sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + died.player.getName() + "!");
+
+        String oldDeathMessage = e.getDeathMessage();
+        String newDeathMessage = "";
+        if (e.getDeathMessage().contains(died.ign)) {
+            assert oldDeathMessage != null;
+            newDeathMessage = oldDeathMessage.replace(died.ign, victimName);
+        }
+        if (e.getDeathMessage().contains(killedThem.ign)) {
+            assert oldDeathMessage != null;
+            newDeathMessage = oldDeathMessage.replace(killedThem.ign, killerName);
+        }
+        e.setDeathMessage(newDeathMessage);
     }
 
     public void setTeam(String teamName) {
