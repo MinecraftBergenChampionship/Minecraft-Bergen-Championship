@@ -9,12 +9,14 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -49,6 +51,16 @@ public class SkybattleListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void blockBreak(BlockBreakEvent e) {
+        if (!(skybattle.getState().equals("PLAYING"))) { return; }
+
+        if (e.getBlock().getType().toString().endsWith("CONCRETE")) {
+            e.setCancelled(true);
+            e.getBlock().setType(Material.AIR);
+        }
+    }
+
     // Track when players spawn creepers
     @EventHandler
     public void onPlayerSpawnCreeper(PlayerInteractEvent e) {
@@ -58,6 +70,17 @@ public class SkybattleListener implements Listener {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getMaterial() == Material.CREEPER_SPAWN_EGG) {
             e.setCancelled(true);
             Player p = e.getPlayer();
+            for(int i = 0; i < p.getInventory().getSize(); i++){
+                ItemStack itm = p.getInventory().getItem(i);
+                if(itm != null && itm.getType().equals(Material.CREEPER_SPAWN_EGG)) {
+                    int amt = itm.getAmount() - 1;
+                    itm.setAmount(amt);
+                    p.getInventory().setItem(i, amt > 0 ? itm : null);
+                    p.updateInventory();
+                    break;
+                }
+            }
+            // testing
             Location spawn = p.getTargetBlock(null, 5).getLocation().add(0, 1, 0);
             skybattle.creepersAndSpawned.put(p.getWorld().spawn(spawn, Creeper.class), p);
         }
@@ -118,6 +141,7 @@ public class SkybattleListener implements Listener {
 
         // Death messages
         Participant p = new Participant(e.getEntity());
+        Player player = e.getEntity();
         if (p.player.getKiller() != null) {
             Participant killer = Participant.findParticipantFromPlayer(p.player.getKiller());
             assert killer != null;
@@ -125,14 +149,27 @@ public class SkybattleListener implements Listener {
             e.setDeathMessage(p.teamPrefix + p.chatColor + p.ign + " was slain by " + killer.teamPrefix + killer.chatColor + killer.ign);
         }
 
+        if (skybattle.creepersAndSpawned.containsKey(Objects.requireNonNull(player.getLastDamageCause()).getEntity())) {
+            p.Die(player, skybattle.creepersAndSpawned.get(player.getLastDamageCause().getEntity()));
+            skybattle.creepersAndSpawned.remove(player);
+        }
+        if (skybattle.playersShot.containsKey(player.getLastDamageCause().getEntity())) {
+            p.Die(player, skybattle.playersShot.get(player.getLastDamageCause().getEntity()));
+            skybattle.playersShot.remove(player);
+        }
+
         // Death Firework + TP Spectator
         Firework firework = new Firework();
         firework.spawnFireworkWithColor(p.player.getLocation(), p.color);
 
         p.player.setGameMode(GameMode.SPECTATOR);
-        p.player.teleport(skybattle.getCenter());
 
         //skybattle.playersAlive--;
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent e) {
+        e.setRespawnLocation(skybattle.getCenter());
     }
 
     @EventHandler
@@ -151,12 +188,6 @@ public class SkybattleListener implements Listener {
         Player p = e.getPlayer();
         Participant participant = new Participant(p);
         if (p.getLocation().getY() <= -55 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
-            if (skybattle.creepersAndSpawned.containsKey(Objects.requireNonNull(p.getLastDamageCause()).getEntity())) {
-                participant.Die(p, skybattle.creepersAndSpawned.get(p.getLastDamageCause().getEntity()));
-            }
-            if (skybattle.playersShot.containsKey(p.getLastDamageCause().getEntity())) {
-                participant.Die(p, skybattle.playersShot.get(p.getLastDamageCause().getEntity()));
-            }
             p.setHealth(0);
         } else if (p.getLocation().getY() >= skybattle.borderHeight) {
             p.damage(1);

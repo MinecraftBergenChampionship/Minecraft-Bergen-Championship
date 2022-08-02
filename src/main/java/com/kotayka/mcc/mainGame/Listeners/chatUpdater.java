@@ -20,14 +20,16 @@ public class chatUpdater implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent event)
     {
         Player player = event.getPlayer();
+        String prefix = "";
         String message = event.getMessage();
         ChatColor color = ChatColor.GRAY;
         for (Participant p : players.participants) {
             if (event.getPlayer() == p.player) {
                 color = p.chatColor;
+                prefix = p.teamPrefix;
             }
         }
 
-        event.setFormat(ChatColor.BOLD+""+color+player.getDisplayName() + ChatColor.WHITE +": "+ message);
+        event.setFormat(prefix + ChatColor.BOLD+""+color+player.getDisplayName() + ChatColor.WHITE +": "+ message);
     }
 }

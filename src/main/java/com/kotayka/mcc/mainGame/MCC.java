@@ -165,7 +165,7 @@ public final class MCC extends JavaPlugin implements Listener {
         SkybattleListener skybattleListener = new SkybattleListener(skybattle, this);
         getServer().getPluginManager().registerEvents(skybattleListener, this);
     }
-    
+
     public void createScoreboard(Participant player) {
         String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
         Scoreboard board = manager.getNewScoreboard();
@@ -489,20 +489,20 @@ public final class MCC extends JavaPlugin implements Listener {
                                 scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Starting in: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);
                                 time.put(p.player.getUniqueId(), skybattle.timeLeft);
                                 p.player.sendTitle("Starting in:", "> " + skybattle.timeLeft + " <", 0, 20, 0);
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum >= 3) {
+                                skybattle.resetMap();
+                                skybattle.resetBorder();
+                                //p.player.stopSound(Sound.MUSIC_DISC_STAL);
+                                // ending todo
                             } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum < 3) {
-                                p.player.stopSound(Sound.MUSIC_DISC_STAL);
+                                //p.player.stopSound(Sound.MUSIC_DISC_STAL);
                                 skybattle.nextRound();
                                 // round ending todo
                             } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("STARTING")) {
                                 skybattle.setState("PLAYING");
-                                p.player.playSound(p.player.getLocation(), Sound.MUSIC_DISC_STAL, 1, 1);
+                                //p.player.playSound(p.player.getLocation(), Sound.MUSIC_DISC_STAL, 1, 1);
                                 //todo remove "starting in 0:1"
                                 skybattle.timeLeft = 240;
-                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum >= 3) {
-                                skybattle.resetMap();
-                                skybattle.resetBorder();
-                                p.player.stopSound(Sound.MUSIC_DISC_STAL);
-                                // ending todo
                             }
 
                             if (roundNums.get(p.player.getUniqueId()) != skybattle.roundNum) {
@@ -541,7 +541,7 @@ public final class MCC extends JavaPlugin implements Listener {
                                     }
                                 }
                             }
-
+                            // possible efficiency boost: spawn particles at border only
                             for (int mapX = -225; mapX <= -87; mapX++) {
                                 for (int mapZ = -325; mapZ <= -207; mapZ++) {
                                     skybattle.world.spawnParticle(Particle.ASH , mapX, skybattle.borderHeight, mapZ, 1);
