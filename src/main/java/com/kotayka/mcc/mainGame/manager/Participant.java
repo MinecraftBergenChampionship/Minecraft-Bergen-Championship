@@ -41,7 +41,6 @@ public class Participant {
         killedThem.player.sendTitle("\n", "[X] " + died.teamPrefix + died.chatColor+died.player.getName(), 0, 60, 40);
         died.player.sendMessage(ChatColor.RED + "You were eliminated by " + killedThem.player.getName() + "!");
         killedThem.player.sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + died.player.getName() + "!");
-
     }
 
     public void setTeam(String teamName) {
@@ -60,7 +59,7 @@ public class Participant {
                 break;
             case "GreenGuardians":
                 color = Color.GREEN;
-                chatColor = ChatColor.YELLOW;
+                chatColor = ChatColor.GREEN;
                 teamPrefix = ChatColor.WHITE+"Ⓖ ";
                 break;
             case "BlueBats":

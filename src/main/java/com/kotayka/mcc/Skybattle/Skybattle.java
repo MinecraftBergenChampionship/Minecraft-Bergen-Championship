@@ -28,8 +28,8 @@ public class Skybattle {
     public final Players players;
     public final Plugin plugin;
     public boolean stage = false;
-    public int playersAlive;
-    public List<String> teamsAlive = new ArrayList<>();
+    //public int playersAlive;
+    //public int teamsAlive;
     public Map<Entity, Player> creepersAndSpawned = new HashMap<>(5);
     public Map<Entity, Player> playersShot = new HashMap<>(5);
     public int roundNum = 0;
@@ -86,7 +86,6 @@ public class Skybattle {
             p.player.setHealth(20);
             p.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 10, 4, false, false));
             p.player.setGameMode(SURVIVAL);
-            p.player.playSound(p.player.getLocation(), Sound.MUSIC_DISC_STAL, 1, 1);
 
             for (ItemStack i : spawnItems) {
                 if (i.getType() == Material.WHITE_CONCRETE) {

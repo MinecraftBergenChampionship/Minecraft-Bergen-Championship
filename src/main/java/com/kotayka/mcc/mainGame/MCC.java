@@ -164,9 +164,8 @@ public final class MCC extends JavaPlugin implements Listener {
     public void SkybattleGame() {
         SkybattleListener skybattleListener = new SkybattleListener(skybattle, this);
         getServer().getPluginManager().registerEvents(skybattleListener, this);
-
-
     }
+    
     public void createScoreboard(Participant player) {
         String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
         Scoreboard board = manager.getNewScoreboard();
@@ -496,11 +495,13 @@ public final class MCC extends JavaPlugin implements Listener {
                                 // round ending todo
                             } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("STARTING")) {
                                 skybattle.setState("PLAYING");
+                                p.player.playSound(p.player.getLocation(), Sound.MUSIC_DISC_STAL, 1, 1);
                                 //todo remove "starting in 0:1"
                                 skybattle.timeLeft = 240;
                             } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum >= 3) {
                                 skybattle.resetMap();
                                 skybattle.resetBorder();
+                                p.player.stopSound(Sound.MUSIC_DISC_STAL);
                                 // ending todo
                             }
 

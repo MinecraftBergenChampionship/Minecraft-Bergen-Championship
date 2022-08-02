@@ -122,6 +122,7 @@ public class SkybattleListener implements Listener {
             Participant killer = Participant.findParticipantFromPlayer(p.player.getKiller());
             assert killer != null;
             p.Die(p, killer);
+            e.setDeathMessage(p.teamPrefix + p.chatColor + p.ign + " was slain by " + killer.teamPrefix + killer.chatColor + killer.ign);
         }
 
         // Death Firework + TP Spectator
@@ -131,7 +132,7 @@ public class SkybattleListener implements Listener {
         p.player.setGameMode(GameMode.SPECTATOR);
         p.player.teleport(skybattle.getCenter());
 
-        skybattle.playersAlive--;
+        //skybattle.playersAlive--;
     }
 
     @EventHandler
@@ -149,7 +150,7 @@ public class SkybattleListener implements Listener {
         // Damage players in border
         Player p = e.getPlayer();
         Participant participant = new Participant(p);
-        if (p.getLocation().getY() <= -35 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
+        if (p.getLocation().getY() <= -55 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
             if (skybattle.creepersAndSpawned.containsKey(Objects.requireNonNull(p.getLastDamageCause()).getEntity())) {
                 participant.Die(p, skybattle.creepersAndSpawned.get(p.getLastDamageCause().getEntity()));
             }
