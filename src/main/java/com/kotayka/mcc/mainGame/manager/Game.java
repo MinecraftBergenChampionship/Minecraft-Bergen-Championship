@@ -1,5 +1,6 @@
 package com.kotayka.mcc.mainGame.manager;
 
+import com.kotayka.mcc.BSABM.BSABM;
 import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.Skybattle.Skybattle;
 import com.kotayka.mcc.TGTTOS.TGTTOS;
@@ -14,12 +15,14 @@ public class Game {
     private Skybattle skybattle;
     private final MCC mcc;
     private final SG sg;
+    private final BSABM bsabm;
 
-    public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle) {
+    public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm) {
         this.tgttos = tgttos;
         this.mcc = mcc;
         this.sg = sg;
         this.skybattle = skybattle;
+        this.bsabm = bsabm;
     }
 
     public void changeGame(String game) {
@@ -40,6 +43,10 @@ public class Game {
             case "Skybattle":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "Skybattle Game started");
                 skybattle.start();
+                break;
+            case "BSABM":
+                Bukkit.broadcastMessage(ChatColor.YELLOW + "BSABM Game started");
+                bsabm.start();
                 break;
         }
     }

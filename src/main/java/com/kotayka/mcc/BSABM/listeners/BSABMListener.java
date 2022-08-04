@@ -1,6 +1,7 @@
 package com.kotayka.mcc.BSABM.listeners;
 
 import com.kotayka.mcc.BSABM.BSABM;
+import com.kotayka.mcc.BSABM.managers.BlockBreakManager;
 import com.kotayka.mcc.mainGame.manager.Game;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
@@ -11,13 +12,19 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.FlowerPot;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -26,11 +33,11 @@ public class BSABMListener implements Listener {
     private final BSABM bsabm;
     private final Game game;
     private final Players players;
+    private final BlockBreakManager blockBreakManager = new BlockBreakManager();
     private final Plugin plugin;
 
     Map<UUID, Material> hotbarSelector = new HashMap<UUID, Material>();
-    public int portalLoc = 0;
-    public int[] teamPortalLoc = {14, 16, 18, 20, 22, 24};
+    public int[] teamPortalLoc = {88, 50, 10, -29, -68, -107};
 
     public BSABMListener(BSABM bsabm, Game game, Players players, Plugin plugin) {
         this.bsabm = bsabm;
@@ -52,17 +59,26 @@ public class BSABMListener implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-        if (game.stage == "BSABM") {
-            if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.ORANGE_WOOL) {
-                e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(24));
-                e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 3, e.getPlayer().getVelocity().getZ()));
+        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.WAXED_WEATHERED_CUT_COPPER) {
+            e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(4));
+            e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.65, e.getPlayer().getVelocity().getZ()));
+        }
+        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.WAXED_EXPOSED_CUT_COPPER) {
+            e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(2));
+            e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
+        }
+        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.WAXED_WEATHERED_COPPER) {
+            e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
+        }
+        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.OBSERVER) {
+            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
+        }
+        if (game.stage.equals("BSABM")) {
+            if (e.getPlayer().getLocation().getBlock().getType().equals(Material.NETHER_PORTAL)) {
+                netherPortalTeleporter(e.getPlayer(), e.getPlayer().getLocation());
             }
-            if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.RED_WOOL) {
-                e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(6));
-                e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.5, e.getPlayer().getVelocity().getZ()));
-            }
-            if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.BLACK_WOOL) {
-                e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 4, e.getPlayer().getVelocity().getZ()));
+            if (Math.sqrt(Math.pow((e.getPlayer().getLocation().getX()+3),2)+(Math.pow(e.getPlayer().getLocation().getZ(),2))) <= 8 && e.getPlayer().getLocation().getY() < 120) {
+                e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
             }
             if (hotbarSelector.containsKey(e.getPlayer().getUniqueId())) {
                 if (e.getPlayer().getTargetBlock(null, 5).getType() != hotbarSelector.get(e.getPlayer().getUniqueId())) {
@@ -84,60 +100,137 @@ public class BSABMListener implements Listener {
 
     @EventHandler
     public void blockPlaceEvent(BlockPlaceEvent event) {
-        if (game.stage == "BSABM") {
-            if (event.getBlock().getType() == Material.BEDROCK) {
-                bsabm.start();
-            }
-            else {
+        if (game.stage.equals("BSABM")) {
+            event.setCancelled(true);
+            if (checkZ((int) event.getBlock().getLocation().getZ()) && (event.getBlock().getLocation().getY() >= 2 && event.getBlock().getLocation().getY() <= 6) && checkX((int) event.getBlock().getLocation().getX())) {
                 bsabm.mapUpdate(event.getBlock().getLocation());
+                event.setCancelled(false);
             }
         }
+    }
+
+    public boolean checkZ(int zcoord) {
+        if (zcoord <= 164 && zcoord >= 158) {
+            return true;
+        }
+        if (zcoord <= 153 && zcoord >= 147) {
+            return true;
+        }
+        if (zcoord <= 142 && zcoord >= 136) {
+            return true;
+        }
+        return false;
+    }
+    public boolean checkX(int xcoord) {
+        for (int x : bsabm.teamsCoordsBuilding) {
+            if (xcoord >= x && xcoord<=x+6) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @EventHandler
     public void blockBreakEvent(BlockBreakEvent event) {
-        if (game.stage == "BSABM") {
-            bsabm.mapUpdate(event.getBlock().getLocation());
+        if (game.stage.equals("BSABM")) {
+            event.setCancelled(true);
+            if (checkZ((int) event.getBlock().getLocation().getZ()) && (event.getBlock().getLocation().getY() >= 2 && event.getBlock().getLocation().getY() <= 6) && checkX((int) event.getBlock().getLocation().getX())) {
+                bsabm.mapUpdate(event.getBlock().getLocation());
+                event.setCancelled(false);
+            }
+            else {
+                if (event.getBlock().getType().toString().endsWith("CORAL") || event.getBlock().getType().toString().endsWith("FAN")) {
+                    ItemStack itemStack = new ItemStack(event.getBlock().getType());
+                    event.getPlayer().getInventory().addItem(itemStack);
+                }
+                else if (event.getBlock().getType().toString().startsWith("POTTED")) {
+                    ItemStack itemStack = new ItemStack(Material.AIR);
+                    switch (event.getBlock().getType()) {
+                        case POTTED_LILY_OF_THE_VALLEY:
+                            itemStack.setType(Material.LILY_OF_THE_VALLEY);
+                            break;
+                        case POTTED_ALLIUM:
+                            itemStack.setType(Material.ALLIUM);
+                            break;
+                        case POTTED_CORNFLOWER:
+                            itemStack.setType(Material.CORNFLOWER);
+                            break;
+                        case POTTED_ORANGE_TULIP:
+                            itemStack.setType(Material.ORANGE_TULIP);
+                            break;
+                        case POTTED_DANDELION:
+                            itemStack.setType(Material.DANDELION);
+                            break;
+                        case POTTED_PINK_TULIP:
+                            itemStack.setType(Material.PINK_TULIP);
+                            break;
+                        case POTTED_RED_TULIP:
+                            itemStack.setType(Material.RED_TULIP);
+                            break;
+                        case POTTED_OXEYE_DAISY:
+                            itemStack.setType(Material.OXEYE_DAISY);
+                            break;
+                        case POTTED_BLUE_ORCHID:
+                            itemStack.setType(Material.BLUE_ORCHID);
+                            break;
+                        case POTTED_WHITE_TULIP:
+                            itemStack.setType(Material.WHITE_TULIP);
+                            break;
+                    }
+                    event.getPlayer().getInventory().addItem(itemStack);
+                }
+                else if (blockBreakManager.checkMaterial(event.getBlock().getType(), event.getBlock().getLocation())) {
+                    event.setCancelled(false);
+                }
+            }
         }
     }
 
     @EventHandler
-    public void onNetherPortalEnter(PlayerPortalEvent event) {
-        if (game.stage == "BSABM") {
-            if (event.getPlayer().getLocation().getX() < 2 && event.getPlayer().getLocation().getX() > -2) {
-                int targetX = 0;
-                for (Participant p : players.participants) {
-                    if (event.getPlayer().getUniqueId() == p.player.getUniqueId()) {
-                        switch (p.team) {
-                            case "RedRabbits":
-                                targetX = teamPortalLoc[0];
-                                break;
-                            case "YellowYaks":
-                                targetX = teamPortalLoc[1];
-                                break;
-                            case "BlueBats":
-                                targetX = teamPortalLoc[2];
-                                break;
-                            case "GreenGuardians":
-                                targetX = teamPortalLoc[3];
-                                break;
-                            case "PurplePandas":
-                                targetX = teamPortalLoc[4];
-                                break;
-                            case "PinkPiglets":
-                                targetX = teamPortalLoc[5];
-                                break;
-                        }
-                        Location targetLoc = new Location(bsabm.world, targetX, 2, 71, event.getPlayer().getLocation().getYaw(), event.getPlayer().getLocation().getPitch());
-                        event.getPlayer().teleport(targetLoc);
-                    }
-                }
-            }
-            else {
-                Location targetLoc = new Location(bsabm.world, 0, 2, 71, event.getPlayer().getLocation().getYaw(), event.getPlayer().getLocation().getPitch());
-                event.getPlayer().teleport(targetLoc);
-            }
+    public void CoralDespawn(BlockFadeEvent event) {
+        if (event.getBlock().getType().toString().endsWith("FAN") || event.getBlock().getType().toString().endsWith("CORAL")) {
             event.setCancelled(true);
         }
+    }
+
+    public void netherPortalTeleporter(Player player, Location playerLoc) {
+            if (playerLoc.getX() > 12 && playerLoc.getX() < 16) {
+                int targetX = 0;
+                for (Participant p : players.participants) {
+                if (player.getUniqueId() == p.player.getUniqueId()) {
+                    switch (p.team) {
+                        case "RedRabbits":
+                            targetX = teamPortalLoc[0];
+                            break;
+                        case "YellowYaks":
+                            targetX = teamPortalLoc[1];
+                            break;
+                        case "BlueBats":
+                            targetX = teamPortalLoc[2];
+                            break;
+                        case "GreenGuardians":
+                            targetX = teamPortalLoc[3];
+                            break;
+                        case "PurplePandas":
+                            targetX = teamPortalLoc[4];
+                            break;
+                        case "PinkPiglets":
+                            targetX = teamPortalLoc[5];
+                            break;
+                    }
+                    Location targetLoc = new Location(bsabm.world, targetX, 1, 150, playerLoc.getYaw(), playerLoc.getPitch());
+                    player.teleport(targetLoc);
+                }
+            }
+        }
+        else {
+            Location targetLoc = new Location(bsabm.world, 13, 1, 0, playerLoc.getYaw(), playerLoc.getPitch());
+            player.teleport(targetLoc);
+        }
+    }
+
+    @EventHandler
+    public void netherPortalEnter(PlayerPortalEvent event) {
+        event.setCancelled(true);
     }
 }

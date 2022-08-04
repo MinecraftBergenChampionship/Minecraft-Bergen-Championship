@@ -1,20 +1,24 @@
 package com.kotayka.mcc.BSABM;
 
+import com.kotayka.mcc.TGTTOS.managers.Firework;
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class BSABM {
 
     public World world;
     public List<List<Material>> maps = new ArrayList<>();
+    public List<String> names = new ArrayList<>();
+    public List<Integer> mapFinishes = new ArrayList<>();
     public int[] teamsProgress = {0,0,0,0,0,0};
-    public int[][] teamFields = {{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3}};
-    public int[] teamsCoords = {77,68,59,50,41,32};
-    public int[] teamsCoordsBuilding = {95,104,113,122,131,140};
+    public int[][] teamFields = {{0,1,2},{0,1,2},{0,1,2},{0,1,2},{0,1,2},{0,1,2}};
+    public int[] teamsCoords = {-91,-52,-13,26,65,104};
+    public int[] teamsCoordsBuilding = {-102,-63,-24,15,54,93};
+
+
 
     public void loadWorld() {
         if (Bukkit.getWorld("BSABM") == null) {
@@ -25,42 +29,64 @@ public class BSABM {
         }
     }
     public void loadMaps() {
-        maps = new ArrayList<>();
-        Location map = new Location(world, 57, 8, 35);
+        World mapWorld;
+        if (Bukkit.getWorld("bsabmMaps") == null) {
+            mapWorld = Bukkit.getWorld("world");
+        }
+        else {
+            mapWorld = Bukkit.getWorld("bsabmMaps");
+        }
+        List<List<Material>> tempMaps = new ArrayList<>();
+        List<String> tempNames = new ArrayList<>();
+        Location map = new Location(mapWorld, -3, 186, 5);
         int numOfMaps = 0;
         Bukkit.broadcastMessage(ChatColor.RED+"Loading Maps");
-        while (world.getBlockAt((int) (map.getX()+3), (int) (map.getY()-1), (int) (map.getZ()+3)).getType() == Material.DIAMOND_BLOCK) {
+        while (mapWorld.getBlockAt((int) (map.getX()-3), (int) (map.getY()-1), (int) (map.getZ()-3)).getType() == Material.DIAMOND_BLOCK) {
             Bukkit.broadcastMessage(ChatColor.GREEN+"Map#" +numOfMaps+" Loaded");
             Location genMap = map.clone();
             List<Material> blocks = new ArrayList<>();
             for (int y = (int) genMap.getY(); y <= genMap.getY()+5; y++) {
-                for (int x = (int) genMap.getX(); x <= genMap.getX()+6; x++) {
-                    for (int z = (int) genMap.getZ(); z <= genMap.getZ()+6; z++) {
-                        blocks.add(world.getBlockAt(x,y,z).getType());
+                for (int x = (int) genMap.getX(); x >= genMap.getX()-6; x--) {
+                    for (int z = (int) genMap.getZ(); z >= genMap.getZ()-6; z--) {
+                        blocks.add(mapWorld.getBlockAt(x,y,z).getType());
                     }
                 }
             }
             numOfMaps++;
-            map.setX(map.getX()+8);
-            maps.add(blocks);
+            Block b = mapWorld.getBlockAt((int) (map.getX()-3), (int) (map.getY()+1), (int) (map.getZ()-10));
+            Sign sign = (Sign) b.getState();
+            tempNames.add(sign.getLine(0));
+            map.setX(map.getX()-9);
+            tempMaps.add(blocks);
         }
-        Collections.shuffle(maps);
+        List<Integer> nums = new ArrayList<>();
+        for (int i = 0; i < tempMaps.size(); i++) {
+            nums.add(i);
+        }
+        mapFinishes = new ArrayList<>(nums);
+        Random rand = new Random();
+        for (int i = 0; i < tempMaps.size(); i++) {
+            int num = rand.nextInt(nums.size());
+            maps.add(tempMaps.get(num));
+            names.add(tempNames.get(num));
+            nums.remove(num);
+        }
     }
 
     public Location getCoords(int teamNum, int fieldNum) {
-        int spaceBetweenBoards = 1;
-        int yCoord = 8;
+        int spaceBetweenBoards = 4;
+        int yCoord = 1;
         int xCoord = teamsCoords[teamNum];
-        int z = 109;
+        int z = 136;
         int zCoord = (z+7*fieldNum)+(spaceBetweenBoards*fieldNum);
         return new Location(world, xCoord, yCoord, zCoord);
     }
 
     public Location getCoordsForMap(int teamNum, int fieldNum) {
-        int spaceBetweenBoards = 1;
-        int yCoord = 8;
+        int spaceBetweenBoards = 4;
+        int yCoord = 1;
         int xCoord = teamsCoordsBuilding[teamNum];
-        int z = 109;
+        int z = 136;
         int zCoord = (z+7*fieldNum)+(spaceBetweenBoards*fieldNum);
         return new Location(world, xCoord, yCoord, zCoord);
     }
@@ -112,25 +138,55 @@ public class BSABM {
     }
 
     public void mapUpdate(Location location) {
-
-        int startX = 95;
-        int betweenTeams = 2;
+        int startX = -102;
+        int betweenTeams = 31;
         int teamNum =  ((int) (location.getX()-startX)/(7+betweenTeams));
 
-        int startZ = 109;
-        int betweenFields = 1;
+        int startZ = 136;
+        int betweenFields = 4;
         int fieldNum =  ((int) (location.getZ()-startZ)/(7+betweenFields));
 
         if (checkIfCompleted(teamNum, fieldNum)) {
-            Bukkit.broadcastMessage("Done");
-            teamFields[teamNum][fieldNum] = teamsProgress[teamNum];
-            placeMap(teamNum, fieldNum);
+            completeBuild(teamNum,fieldNum);
         }
     }
 
+    public void completeBuild(int teamNum, int fieldNum) {
+        Location fireworkLoc = getCoordsForMap(teamNum,fieldNum);
+        fireworkLoc.setX(fireworkLoc.getX()+3);
+        fireworkLoc.setY(fireworkLoc.getY()+3);
+        fireworkLoc.setZ(fireworkLoc.getZ()+3);
+        Firework firework = new Firework();
+        firework.spawnFirework(fireworkLoc);
+        mapFinishes.set(teamFields[teamNum][fieldNum], mapFinishes.get(teamFields[teamNum][fieldNum])+1);
+        switch (teamNum) {
+            case 0:
+                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.RED+"Red Rabbits"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place#"+ChatColor.GOLD+(6-mapFinishes.get(teamFields[teamNum][fieldNum])));
+                break;
+            case 1:
+                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.YELLOW+"Yellow Yaks"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place#"+ChatColor.GOLD+(6-mapFinishes.get(teamFields[teamNum][fieldNum])));
+                break;
+            case 2:
+                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.GREEN+"Green Guardians"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+"in place#"+ChatColor.GOLD+(6-mapFinishes.get(teamFields[teamNum][fieldNum])));
+                break;
+            case 3:
+                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.BLUE+"Blue Bats"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place#"+ChatColor.GOLD+(6-mapFinishes.get(teamFields[teamNum][fieldNum])));
+                break;
+            case 4:
+                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.DARK_PURPLE+"Purple Pandas"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place#"+ChatColor.GOLD+(6-mapFinishes.get(teamFields[teamNum][fieldNum])));
+                break;
+            case 5:
+                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.LIGHT_PURPLE+"Pink Piglets"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place#"+ChatColor.GOLD+(6-mapFinishes.get(teamFields[teamNum][fieldNum])));
+                break;
+        }
+        teamFields[teamNum][fieldNum] = teamsProgress[teamNum];
+        placeMap(teamNum, fieldNum);
+    }
+
     public void start() {
+        loadMaps();
         for (int i = 0; i < 6; i++) {
-            for (int x = 0; x < 4; x++) {
+            for (int x = 0; x < 3; x++) {
                 placeMap(i, x);
             }
         }

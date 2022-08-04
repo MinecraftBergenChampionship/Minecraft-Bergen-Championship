@@ -6,6 +6,8 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.kotayka.mcc.BSABM.BSABM;
+import com.kotayka.mcc.BSABM.listeners.BSABMListener;
 import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.SG.listeners.SGListener;
 import com.kotayka.mcc.Skybattle.Skybattle;
@@ -60,9 +62,10 @@ public final class MCC extends JavaPlugin implements Listener {
     private final Skybattle skybattle = new Skybattle(players, plugin, this);
 
     private final SG sg = new SG(players, this, this);
+    private final BSABM bsabm = new BSABM();
 
 //  Game Manager
-    private final Game game = new Game(this, tgttos, sg, skybattle);
+    private final Game game = new Game(this, tgttos, sg, skybattle, bsabm);
 
 //  Scoreboard
     public Map roundScores = new HashMap();
@@ -105,9 +108,15 @@ public final class MCC extends JavaPlugin implements Listener {
             skybattle.world = Bukkit.getWorld("Skybattle");
         }
 
-        skybattle.resetBorder();
+//        skybattle.resetBorder();
 
         SkybattleGame();
+        BSABM();
+    }
+
+    public void BSABM() {
+        bsabm.loadWorld();
+        getServer().getPluginManager().registerEvents(new BSABMListener(bsabm, game, players, this), this);
     }
 
     public void sgGame() {
