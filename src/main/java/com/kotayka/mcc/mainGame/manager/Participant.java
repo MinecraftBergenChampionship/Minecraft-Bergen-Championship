@@ -1,9 +1,11 @@
 package com.kotayka.mcc.mainGame.manager;
 
+import com.kotayka.mcc.TGTTOS.managers.Firework;
 import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -47,6 +49,11 @@ public class Participant {
             newDeathMessage = oldDeathMessage.replace(killer.ign, killerName);
         }
         e.setDeathMessage(newDeathMessage);
+
+        Firework firework = new Firework();
+        firework.spawnFireworkWithColor(victim.player.getLocation(), victim.color);
+
+        victim.player.setGameMode(GameMode.SPECTATOR);
     }
 
     public void Die(Player victim, Player killer, PlayerDeathEvent e) {
@@ -71,6 +78,11 @@ public class Participant {
             newDeathMessage = oldDeathMessage.replace(killedThem.ign, killerName);
         }
         e.setDeathMessage(newDeathMessage);
+
+        Firework firework = new Firework();
+        firework.spawnFireworkWithColor(victim.getLocation(), died.color);
+
+        victim.setGameMode(GameMode.SPECTATOR);
     }
 
     public void setTeam(String teamName) {

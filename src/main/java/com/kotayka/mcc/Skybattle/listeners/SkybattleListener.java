@@ -19,9 +19,24 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
 
 import java.util.Objects;
 
+/*
+Map of each player and what last damaged them AND map of creeper spawns
+
+onSpawnCreeper --> Put (creeper, spawner)
+lastDamaged --> Put(Entity, player)
+onDamage:
+    if damagedPlayer was damaged by creeper (but they lived), remove THAT CREEPER from creeper map
+
+    REMOVE that player from the lastDamaged, and then PUT the last thing that damaged them instead
+
+on Death:
+    if playerDied lastDamage is creeper, get the creeper from the creeperMap
+    else, give credit to whatever is on the map
+ */
 
 public class SkybattleListener implements Listener {
     public final Skybattle skybattle;
@@ -40,8 +55,8 @@ public class SkybattleListener implements Listener {
     public void blockPlace(BlockPlaceEvent e) {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
 
+        Block b = e.getBlock();
         if (e.getBlock().getType().equals(Material.TNT)) {
-            Block b = e.getBlock();
             b.setType(Material.AIR);
             Player p = e.getPlayer();
             p.getWorld().spawn(p.getTargetBlock(null, 5).getLocation().add(0, 1, 0), TNTPrimed.class);
@@ -66,7 +81,6 @@ public class SkybattleListener implements Listener {
     public void onPlayerSpawnCreeper(PlayerInteractEvent e) {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
 
-        // Add each creeper spawned to a map, use to check kill credit
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getMaterial() == Material.CREEPER_SPAWN_EGG) {
             e.setCancelled(true);
             Player p = e.getPlayer();
@@ -80,26 +94,40 @@ public class SkybattleListener implements Listener {
                     break;
                 }
             }
-            // testing
+
+            // Add each creeper spawned to a map, use to check kill credit
             Location spawn = p.getTargetBlock(null, 5).getLocation().add(0, 1, 0);
             skybattle.creepersAndSpawned.put(p.getWorld().spawn(spawn, Creeper.class), p);
         }
     }
 
-    // Player hit by creeper
+    // Damage by Entity
     @EventHandler
-    public void onPlayerDamageByCreeper(EntityDamageByEntityEvent e) {
+    public void onEntityDamageEntity(EntityDamageByEntityEvent e) {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
-
         if (!(e.getEntity() instanceof Player)) return;
 
         Player player = (Player) e.getEntity();
 
-        if (!(e.getDamager() instanceof Creeper)) {
-            // Remove player from hashmaps if didn't die (only contain when last damaged)
-            skybattle.creepersAndSpawned.remove(player);
-            skybattle.playersShot.remove(player);
+        // If player lived
+        if (e.getFinalDamage() < player.getHealth() && e.getDamager() instanceof Creeper) {
+
+            /*
+             * If creeper hurt player, remove that creeper from creeper map, put spawner on last damaged map
+             */
+            if (skybattle.creepersAndSpawned.containsKey(e.getDamager())) {
+                skybattle.lastDamage.put(player, skybattle.creepersAndSpawned.get(e.getDamager()));
+            }
+            skybattle.creepersAndSpawned.remove(e.getDamager());
         }
+
+        if (skybattle.lastDamage.containsValue(player)) {
+            skybattle.lastDamage.remove(player);
+            skybattle.lastDamage.put((Player) e.getDamager(), player);
+        }
+
+        Bukkit.broadcastMessage("After another Damage: " + skybattle.creepersAndSpawned);
+        Bukkit.broadcastMessage("After another Damage: " + skybattle.lastDamage);
     }
 
     // TODO: Arrow knocks into void (or border?) --> Kill AND Creeper Knocks into void --> Kill
@@ -115,10 +143,21 @@ public class SkybattleListener implements Listener {
 
         if (e.getEntityType() == EntityType.SNOWBALL) {
             assert playerGotShot != null;
-            playerGotShot.damage(1);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, (Runnable) new Runnable() {
+                @Override
+                public void run() {
+                    final Vector plrV = playerGotShot.getVelocity();
+                    final Vector velocity = new Vector(plrV.getX() * 1.25, plrV.getY() * 1.5, plrV.getZ() * 1.25);
+                    playerGotShot.setVelocity(velocity);
+                }
+            }, 0L);
         }
 
-        skybattle.playersShot.put(e.getEntity(), shooter);
+        if (skybattle.lastDamage.containsKey(playerGotShot)) {
+            skybattle.lastDamage.remove(playerGotShot);
+            skybattle.lastDamage.put(playerGotShot, shooter);
+        }
+        Bukkit.broadcastMessage("After shot: " + skybattle.lastDamage);
     }
 
     /*
@@ -127,43 +166,40 @@ public class SkybattleListener implements Listener {
     @EventHandler
     public void playerDie(PlayerDeathEvent e) {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
+        Bukkit.broadcastMessage("After death (C): " + skybattle.creepersAndSpawned);
+        Bukkit.broadcastMessage("After death (D): " + skybattle.lastDamage);
 
-        // Death messages
         Participant p = new Participant(e.getEntity());
         Player player = e.getEntity();
+
+        // If player dies to direct combat
         if (p.player.getKiller() != null) {
             Participant killer = Participant.findParticipantFromPlayer(p.player.getKiller());
             assert killer != null;
             p.Die(p, killer, e);
-            e.setDeathMessage(p.teamPrefix + p.chatColor + p.ign + " was slain by " + killer.teamPrefix + killer.chatColor + killer.ign);
+            return;
         }
 
-        if (skybattle.creepersAndSpawned.containsKey(Objects.requireNonNull(player.getLastDamageCause()).getEntity())) {
-            p.Die(player, skybattle.creepersAndSpawned.get(player.getLastDamageCause().getEntity()), e);
-            skybattle.creepersAndSpawned.remove(player);
+        // Give kill credit to last player hit
+        if (skybattle.lastDamage.containsKey(player)) {
+            p.Die(player, skybattle.lastDamage.get(player), e);
+            skybattle.lastDamage.remove(player);
         }
-        if (skybattle.playersShot.containsKey(player.getLastDamageCause().getEntity())) {
-            p.Die(player, skybattle.playersShot.get(player.getLastDamageCause().getEntity()), e);
-            skybattle.playersShot.remove(player);
-        }
-
-        // Death Firework + TP Spectator
-        Firework firework = new Firework();
-        firework.spawnFireworkWithColor(p.player.getLocation(), p.color);
-
-        p.player.setGameMode(GameMode.SPECTATOR);
 
         //skybattle.playersAlive--;
     }
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
+        if (!(e.getPlayer().getWorld().equals(skybattle.world))) return;
+
         e.setRespawnLocation(skybattle.getCenter());
     }
 
     @EventHandler
     public void playerMove(PlayerMoveEvent e) {
         if (!(skybattle.getState().equals("STARTING") || skybattle.getState().equals("PLAYING"))) { return; }
+        if (!(e.getPlayer().getWorld().equals(skybattle.world))) return;
 
         // Prevent moving during countdown
         if (skybattle.getState().equals("STARTING")) {

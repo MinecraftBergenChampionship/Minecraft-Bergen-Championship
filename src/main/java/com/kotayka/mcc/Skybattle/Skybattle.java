@@ -30,8 +30,9 @@ public class Skybattle {
     public boolean stage = false;
     //public int playersAlive;
     //public int teamsAlive;
-    public Map<Entity, Player> creepersAndSpawned = new HashMap<>(5);
-    public Map<Entity, Player> playersShot = new HashMap<>(5);
+
+    public Map<Player, Player> lastDamage; // <Player, Damager>
+    public Map<Entity, Player> creepersAndSpawned = new HashMap<>(5); // <Creeper, Spawner>
     public int roundNum = 0;
     public double borderHeight = 17.0;
     public int timeLeft;
@@ -47,6 +48,8 @@ public class Skybattle {
         this.players = players;
         this.plugin = plugin;
         this.mcc = mcc;
+
+        lastDamage = new HashMap<>(players.players.size());
 
         if (Bukkit.getWorld("Skybattle") == null) {
             world = Bukkit.getWorld("world");
@@ -86,6 +89,8 @@ public class Skybattle {
             p.player.setHealth(20);
             p.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 10, 4, false, false));
             p.player.setGameMode(SURVIVAL);
+
+            lastDamage.put(p.player, null);
 
             for (ItemStack i : spawnItems) {
                 if (i.getType() == Material.WHITE_CONCRETE) {
@@ -148,8 +153,8 @@ public class Skybattle {
      * Reset Map
      */
     public void resetMap() {
+        lastDamage.clear();
         creepersAndSpawned.clear();
-        playersShot.clear();
 
         int x = 225;
         int y = -16;

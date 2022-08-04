@@ -71,17 +71,18 @@ public class SGListener implements Listener {
             }
 
             victim.teleport(new Location(event.getEntity().getWorld(), 0, 6, 0));
-        }
-        sg.playersDead--;
-        for (Participant p : players.participants) {
-            if (Objects.equals(p.ign, event.getEntity().getName())) {
-                sg.teamsAlive.remove(p.team);
-                if (!sg.teamsAlive.contains(p.team)) {
-                    sg.teamsDead--;
+
+            sg.playersDead--;
+            for (Participant p : Participant.participantsOnATeam) {
+                if (Objects.equals(p.ign, event.getEntity().getName())) {
+                    sg.teamsAlive.remove(p.team);
+                    if (!sg.teamsAlive.contains(p.team)) {
+                        sg.teamsDead--;
+                    }
                 }
             }
+            sg.outLivePlayer();
         }
-        sg.outLivePlayer();
     }
 
     public boolean checkIfEmpty(Inventory inv) {
