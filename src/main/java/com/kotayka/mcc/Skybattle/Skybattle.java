@@ -28,11 +28,14 @@ public class Skybattle {
     public final Players players;
     public final Plugin plugin;
     public boolean stage = false;
+    public boolean finalShrink = false;
     //public int playersAlive;
     //public int teamsAlive;
 
     public Map<Player, Player> lastDamage; // <Player, Damager>
     public Map<Entity, Player> creepersAndSpawned = new HashMap<>(5); // <Creeper, Spawner>
+    public Map<Entity, Player> whoPlacedThatTNT = new HashMap<>(5);
+    public Map<Entity, Player> whoThrewThatPotion = new HashMap<>(5);
     public int roundNum = 0;
     public double borderHeight = 17.0;
     public int timeLeft;
@@ -202,6 +205,9 @@ public class Skybattle {
     }
 
     public void nextRound() {
+        if (roundNum == 3) return;
+
+        finalShrink = false;
         loadMap();
         players.spectators.clear();
         if (roundNum < 3) {

@@ -53,13 +53,19 @@ public class SkybattleListener implements Listener {
      */
     @EventHandler
     public void blockPlace(BlockPlaceEvent e) {
-        if (!(skybattle.getState().equals("PLAYING"))) { return; }
+        if (!(skybattle.getState().equals("PLAYING")) && !(skybattle.getState().equals("STARTING"))) { return; }
+
+        if (skybattle.getState().equals("STARTING")) {
+            e.setCancelled(true);
+            return;
+        }
 
         Block b = e.getBlock();
+        Player p = e.getPlayer();
         if (e.getBlock().getType().equals(Material.TNT)) {
             b.setType(Material.AIR);
-            Player p = e.getPlayer();
-            p.getWorld().spawn(p.getTargetBlock(null, 5).getLocation().add(0, 1, 0), TNTPrimed.class);
+            Location loc = p.getTargetBlock(null, 5).getLocation().add(0, 1, 0);
+            skybattle.whoPlacedThatTNT.put(p.getWorld().spawn(loc, TNTPrimed.class), p);
         } else if (e.getBlock().getType().toString().matches(".*CONCRETE$")) {
             String concrete = e.getBlock().getType().toString();
             e.getPlayer().getInventory().addItem(new ItemStack(Material.getMaterial(concrete)));
@@ -68,7 +74,12 @@ public class SkybattleListener implements Listener {
 
     @EventHandler
     public void blockBreak(BlockBreakEvent e) {
-        if (!(skybattle.getState().equals("PLAYING"))) { return; }
+        if (!(skybattle.getState().equals("PLAYING")) && !(skybattle.getState().equals("STARTING"))) { return; }
+
+        if (skybattle.getState().equals("STARTING")) {
+            e.setCancelled(true);
+            return;
+        }
 
         if (e.getBlock().getType().toString().endsWith("CONCRETE")) {
             e.setCancelled(true);
@@ -107,21 +118,34 @@ public class SkybattleListener implements Listener {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
         if (!(e.getEntity() instanceof Player)) return;
 
+        Bukkit.broadcastMessage("Before Death: " + skybattle.lastDamage);
+        Bukkit.broadcastMessage("Before Death (C): " + skybattle.creepersAndSpawned);
+        Bukkit.broadcastMessage("e.getDamager() == " + e.getDamager());
+        Bukkit.broadcastMessage("skybattle.creepersAndSpawned.get(e.getDamager()) == " + skybattle.creepersAndSpawned.get(e.getDamager()));
+
         Player player = (Player) e.getEntity();
 
-        // If player lived
-        if (e.getFinalDamage() < player.getHealth() && e.getDamager() instanceof Creeper) {
-
-            /*
-             * If creeper hurt player, remove that creeper from creeper map, put spawner on last damaged map
-             */
-            if (skybattle.creepersAndSpawned.containsKey(e.getDamager())) {
-                skybattle.lastDamage.put(player, skybattle.creepersAndSpawned.get(e.getDamager()));
-            }
+        // Place appropriate damager in map
+        /*
+         * If creeper hurt player, remove that creeper from creeper map, put spawner on last damaged map
+         */
+        if (skybattle.creepersAndSpawned.containsKey(e.getDamager())) {
+            skybattle.lastDamage.put(player, skybattle.creepersAndSpawned.get(e.getDamager()));
             skybattle.creepersAndSpawned.remove(e.getDamager());
+            return;
         }
 
-        if (skybattle.lastDamage.containsValue(player) && (!(e.getDamager() instanceof Arrow) || !(e.getDamager() instanceof Snowball))) {
+        /*
+         * If TNT hurt player, remove from TNT map, put spawner on last damaged map
+         */
+        if (skybattle.whoPlacedThatTNT.containsKey(e.getDamager())) {
+            skybattle.lastDamage.put(player, skybattle.whoPlacedThatTNT.get(e.getDamager()));
+            skybattle.whoPlacedThatTNT.remove(e.getDamager());
+            return;
+        }
+
+        // If last damager was not a projectile
+        if (skybattle.lastDamage.containsValue(player) && (!(e.getDamager() instanceof Arrow) && !(e.getDamager() instanceof Snowball))) {
             skybattle.lastDamage.remove(player);
             skybattle.lastDamage.put((Player) e.getDamager(), player);
         }
@@ -143,8 +167,9 @@ public class SkybattleListener implements Listener {
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, (Runnable) new Runnable() {
                 @Override
                 public void run() {
+                    playerGotShot.damage(0.1);
                     final Vector plrV = playerGotShot.getVelocity();
-                    final Vector velocity = new Vector(plrV.getX() * 1.25, plrV.getY() * 1.5, plrV.getZ() * 1.25);
+                    final Vector velocity = new Vector(plrV.getX() * 4, plrV.getY() * 5, plrV.getZ() * 3);
                     playerGotShot.setVelocity(velocity);
                 }
             }, 0L);
@@ -179,6 +204,9 @@ public class SkybattleListener implements Listener {
             skybattle.lastDamage.remove(player);
         }
 
+        Bukkit.broadcastMessage("After Death: " + skybattle.lastDamage);
+        Bukkit.broadcastMessage("After Death (C): " + skybattle.creepersAndSpawned);
+
         //skybattle.playersAlive--;
     }
 
@@ -186,6 +214,7 @@ public class SkybattleListener implements Listener {
     public void onRespawn(PlayerRespawnEvent e) {
         if (!(e.getPlayer().getWorld().equals(skybattle.world))) return;
 
+        e.getPlayer().setGameMode(GameMode.SPECTATOR);
         e.setRespawnLocation(skybattle.getCenter());
     }
 
@@ -197,9 +226,8 @@ public class SkybattleListener implements Listener {
         // Kill players immediately on void
         // Damage players in border
         Player p = e.getPlayer();
-        Participant participant = new Participant(p);
-        if (p.getLocation().getY() <= -55 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
-            p.setHealth(0);
+        if (p.getLocation().getY() <= -60 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
+            p.setHealth(1);
         } else if (p.getLocation().getY() >= skybattle.borderHeight) {
             p.damage(1);
         }

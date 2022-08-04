@@ -471,15 +471,16 @@ public final class MCC extends JavaPlugin implements Listener {
                                 scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);
                                 time.put(p.player.getUniqueId(), skybattle.timeLeft);
 
-                                if (skybattle.timeLeft % 40 == 0 && skybattle.timeLeft != 240 && skybattle.timeLeft >= 60) {
+                                if (skybattle.timeLeft % 40 == 0 && skybattle.timeLeft != 240 && skybattle.timeLeft >= 60 && !skybattle.finalShrink) {
                                     skybattle.border.setSize(skybattle.border.getSize() * 0.75, 15);
                                     p.player.sendMessage(ChatColor.DARK_RED+"> Border is Shrinking!");
                                     p.player.sendTitle(" ", ChatColor.RED+"Border shrinking!", 0, 20, 10);
-                                } else if ((skybattle.timeLeft - 10) % 40 == 0) {
+                                } else if ((skybattle.timeLeft - 10) % 40 == 0 && !skybattle.finalShrink) {
                                     p.player.sendMessage(ChatColor.RED+"> Border shrinking in 10 seconds!");
                                 } else if (skybattle.timeLeft == 60) {
                                     skybattle.border.setSize(5, 60);
                                     p.player.sendMessage(ChatColor.DARK_RED+"> Border will continue shrinking!");
+                                    skybattle.finalShrink = true;
                                 } else if (skybattle.timeLeft == 70) {
                                     p.player.sendMessage(ChatColor.RED+"> Final shrink in 10 seconds!");
                                 }
@@ -489,14 +490,17 @@ public final class MCC extends JavaPlugin implements Listener {
                                 scoreboards.get(p.ign).getObjective("Skybattle").getScore(ChatColor.BOLD + "" + ChatColor.RED + "Starting in: " + ChatColor.WHITE + ((int) Math.floor(skybattle.timeLeft / 60)) + ":" + skybattle.timeLeft % 60).setScore(12);
                                 time.put(p.player.getUniqueId(), skybattle.timeLeft);
                                 p.player.sendTitle("Starting in:", "> " + skybattle.timeLeft + " <", 0, 20, 0);
-                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum >= 3) {
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum >= 2) {
                                 skybattle.resetMap();
                                 skybattle.resetBorder();
+                                skybattle.setState("INACTIVE");
+                                skybattle.finalShrink = false;
                                 //p.player.stopSound(Sound.MUSIC_DISC_STAL);
                                 // ending todo
-                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum < 3) {
+                            } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("PLAYING") && skybattle.roundNum < 2) {
                                 //p.player.stopSound(Sound.MUSIC_DISC_STAL);
                                 skybattle.nextRound();
+                                Bukkit.broadcastMessage("RoundNum: " + skybattle.roundNum);
                                 // round ending todo
                             } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("STARTING")) {
                                 skybattle.removeBarriers();
@@ -562,7 +566,7 @@ public final class MCC extends JavaPlugin implements Listener {
                         sg.updateEventTimer();
                         break;
                     case "Skybattle":
-                        if (skybattle.timeLeft <= 75) { skybattle.borderHeight -= 0.226666667; }
+                        if (skybattle.timeLeft <= 75 && skybattle.borderHeight > -1) { skybattle.borderHeight -= 0.226666667; }
                         skybattle.timeLeft--;
                         break;
                 }
