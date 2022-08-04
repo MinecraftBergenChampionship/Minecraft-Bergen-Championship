@@ -240,6 +240,18 @@ public class Skybattle {
         // both in MCC.java
     }
 
+    public void removeBarriers() {
+        for (int x = -222; x <= -92; x++) {
+            for (int y = -9; y <= -7; y++) {
+                for (int z = -322; z <= -210; z++) {
+                    if (world.getBlockAt(x, y, z).getType().equals(Material.BARRIER)) {
+                        world.getBlockAt(x, y, z).setType(Material.AIR);
+                    }
+                }
+            }
+        }
+    }
+
     public void resetBorder() {
         world.getWorldBorder().reset();
     }

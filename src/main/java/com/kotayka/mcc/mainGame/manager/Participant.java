@@ -32,8 +32,8 @@ public class Participant {
     }
 
     public void Die(Participant victim, Participant killer, PlayerDeathEvent e) {
-        String victimName = victim.teamPrefix + victim.chatColor + victim.ign;
-        String killerName = killer.teamPrefix + killer.chatColor + killer.ign;
+        String victimName = victim.teamPrefix + victim.chatColor + victim.ign + ChatColor.GRAY;
+        String killerName = killer.teamPrefix + killer.chatColor + killer.ign + ChatColor.GRAY;
         killer.player.sendTitle("\n", "[X] " + victimName, 0, 60, 40);
         victim.player.sendMessage(ChatColor.RED + "You were eliminated by " + killer.ign + "!");
         killer.player.sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + victim.ign + "!");
@@ -61,8 +61,8 @@ public class Participant {
         Participant killedThem = Participant.findParticipantFromPlayer(killer);
         assert died != null;
         assert killedThem != null;
-        String victimName = died.teamPrefix + died.chatColor + died.ign;
-        String killerName = killedThem.teamPrefix + killedThem.chatColor + killedThem.ign;
+        String victimName = died.teamPrefix + died.chatColor + died.ign + ChatColor.GRAY;
+        String killerName = killedThem.teamPrefix + killedThem.chatColor + killedThem.ign + ChatColor.GRAY;
         killedThem.player.sendTitle("\n", "[X] " + victimName, 0, 60, 40);
         died.player.sendMessage(ChatColor.RED + "You were eliminated by " + killedThem.player.getName() + "!");
         killedThem.player.sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + died.player.getName() + "!");

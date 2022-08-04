@@ -499,6 +499,7 @@ public final class MCC extends JavaPlugin implements Listener {
                                 skybattle.nextRound();
                                 // round ending todo
                             } else if (skybattle.timeLeft == 0 && skybattle.getState().equals("STARTING")) {
+                                skybattle.removeBarriers();
                                 skybattle.setState("PLAYING");
                                 //p.player.playSound(p.player.getLocation(), Sound.MUSIC_DISC_STAL, 1, 1);
                                 //todo remove "starting in 0:1"

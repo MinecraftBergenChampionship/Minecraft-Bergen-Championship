@@ -121,13 +121,10 @@ public class SkybattleListener implements Listener {
             skybattle.creepersAndSpawned.remove(e.getDamager());
         }
 
-        if (skybattle.lastDamage.containsValue(player)) {
+        if (skybattle.lastDamage.containsValue(player) && (!(e.getDamager() instanceof Arrow) || !(e.getDamager() instanceof Snowball))) {
             skybattle.lastDamage.remove(player);
             skybattle.lastDamage.put((Player) e.getDamager(), player);
         }
-
-        Bukkit.broadcastMessage("After another Damage: " + skybattle.creepersAndSpawned);
-        Bukkit.broadcastMessage("After another Damage: " + skybattle.lastDamage);
     }
 
     // TODO: Arrow knocks into void (or border?) --> Kill AND Creeper Knocks into void --> Kill
@@ -157,7 +154,6 @@ public class SkybattleListener implements Listener {
             skybattle.lastDamage.remove(playerGotShot);
             skybattle.lastDamage.put(playerGotShot, shooter);
         }
-        Bukkit.broadcastMessage("After shot: " + skybattle.lastDamage);
     }
 
     /*
@@ -166,9 +162,6 @@ public class SkybattleListener implements Listener {
     @EventHandler
     public void playerDie(PlayerDeathEvent e) {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
-        Bukkit.broadcastMessage("After death (C): " + skybattle.creepersAndSpawned);
-        Bukkit.broadcastMessage("After death (D): " + skybattle.lastDamage);
-
         Participant p = new Participant(e.getEntity());
         Player player = e.getEntity();
 
@@ -198,15 +191,8 @@ public class SkybattleListener implements Listener {
 
     @EventHandler
     public void playerMove(PlayerMoveEvent e) {
-        if (!(skybattle.getState().equals("STARTING") || skybattle.getState().equals("PLAYING"))) { return; }
+        if (!(skybattle.getState().equals("PLAYING"))) { return; }
         if (!(e.getPlayer().getWorld().equals(skybattle.world))) return;
-
-        // Prevent moving during countdown
-        if (skybattle.getState().equals("STARTING")) {
-            e.setTo(e.getFrom());
-            e.setCancelled(true);
-            return;
-        }
 
         // Kill players immediately on void
         // Damage players in border
