@@ -253,25 +253,7 @@ public class SG {
     }
 
     public void spawnFirework(Participant victim) {
-        Color color = Color.RED;
-        switch (victim.team) {
-            case "YellowYaks":
-                color = Color.YELLOW;
-                break;
-            case "BlueBats":
-                color = Color.BLUE;
-                break;
-            case "GreenGuardians":
-                color = Color.GREEN;
-                break;
-            case "PurplePandas":
-                color = Color.PURPLE;
-                break;
-            case "PinkPiglets":
-                color = Color.fromBGR(255, 0, 164);
-                break;
-        }
         Firework firework = new Firework();
-        firework.spawnFireworkWithColor(victim.player.getLocation(), color);
+        firework.spawnFireworkWithColor(victim.player.getLocation(), victim.color);
     }
 }

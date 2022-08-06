@@ -56,6 +56,8 @@ public class teamCommands implements CommandExecutor {
                                     Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.LIGHT_PURPLE+"Pink Piglets");
                                     break;
                             }
+                            participant.setTeam(args[1]);
+                            Participant.participantsOnATeam.add(participant);
                             Bukkit.broadcastMessage(participant.fullName);
                         }
                     }
