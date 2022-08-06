@@ -118,11 +118,6 @@ public class SkybattleListener implements Listener {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
         if (!(e.getEntity() instanceof Player)) return;
 
-        Bukkit.broadcastMessage("Before Death: " + skybattle.lastDamage);
-        Bukkit.broadcastMessage("Before Death (C): " + skybattle.creepersAndSpawned);
-        Bukkit.broadcastMessage("e.getDamager() == " + e.getDamager());
-        Bukkit.broadcastMessage("skybattle.creepersAndSpawned.get(e.getDamager()) == " + skybattle.creepersAndSpawned.get(e.getDamager()));
-
         Player player = (Player) e.getEntity();
 
         // Place appropriate damager in map
@@ -203,9 +198,6 @@ public class SkybattleListener implements Listener {
             p.Die(player, skybattle.lastDamage.get(player), e);
             skybattle.lastDamage.remove(player);
         }
-
-        Bukkit.broadcastMessage("After Death: " + skybattle.lastDamage);
-        Bukkit.broadcastMessage("After Death (C): " + skybattle.creepersAndSpawned);
 
         //skybattle.playersAlive--;
     }
