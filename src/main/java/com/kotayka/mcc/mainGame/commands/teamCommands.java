@@ -1,5 +1,6 @@
 package com.kotayka.mcc.mainGame.commands;
 
+import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.teamManager;
@@ -58,13 +59,8 @@ public class teamCommands implements CommandExecutor {
                             Bukkit.broadcastMessage(participant.fullName);
                         }
                     }
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        mcc.teams.get(player.getName())[team.teamNames.indexOf(args[1])].addEntry(p.getName());
-                    }
-                }
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (mcc.scoreboards.containsKey(player.getName())) {
-                        mcc.scoreboards.get(player.getName());
+                    for (ScoreboardPlayer player : mcc.scoreboardManager.playerList) {
+                        player.teams[team.teamNames.indexOf(args[1])].addEntry(p.getName());
                     }
                 }
             }

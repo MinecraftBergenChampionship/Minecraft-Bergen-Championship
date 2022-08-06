@@ -24,10 +24,6 @@ public class Players {
             players.add(p);
             Participant x = new Participant(p);
             participants.add(x);
-            mcc.createScoreboard(x);
-            mcc.roundScores.put(p.getName(), 0);
-            loadScoreboardVars(p.getUniqueId());
-            mcc.createTeams(x);
         }
     }
 
@@ -42,20 +38,7 @@ public class Players {
         players.add(p);
         Participant x = new Participant(p);
         participants.add(x);
-        mcc.createScoreboard(x);
         mcc.roundScores.put(p.getName(), 0);
-        loadScoreboardVars(p.getUniqueId());
-        mcc.createTeams(x);
-    }
-
-    public void loadScoreboardVars(UUID uuid) {
-        mcc.maps.put(uuid, "Starting");
-        mcc.roundNums.put(uuid, 0);
-        mcc.time.put(uuid, 0);
-        mcc.previousStandings.put(uuid, new Integer[]{0, 0, 0, 0, 0, 0});
-        mcc.teamsAlive.put(uuid, 0);
-        mcc.playersAlive.put(uuid, 0);
-
     }
 
     public void removePlayer(Player p) {

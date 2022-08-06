@@ -22,6 +22,7 @@ public class chatUpdater implements Listener {
         Player player = event.getPlayer();
         String message = event.getMessage();
         ChatColor color = ChatColor.GRAY;
+        String icon = "";
         for (Participant p : players.participants) {
             if (event.getPlayer() == p.player) {
                 switch (p.team) {

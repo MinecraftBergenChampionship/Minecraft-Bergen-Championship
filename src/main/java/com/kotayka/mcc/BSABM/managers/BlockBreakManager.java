@@ -16,13 +16,13 @@ public class BlockBreakManager {
     int[][] brickIslands = {{-38, 73, 71}, {-50, 73, 71}, {-62, 73, 71}, {-62, 73, 59}, {-62, 73, 47}};
 
     //Ores (Emerald, Gold, Diamond, Quartz, Coal, Redstone, Iron) - 7x7x7 grid
-    int[][] oreIslands = {{78, 81, 38}, {78, 81, 46}, {78, 81, 54}, {66, 81, 53}, {67, 81, 65}, {59, 81, 65}, {51, 81, 65}};
+    int[][] oreIslands = {{78, 81, 32}, {78, 81, 40}, {78, 81, 48}, {66, 81, 47}, {67, 81, 59}, {59, 81, 59}, {51, 81, 59}};
 
     //Sands (Red Sand, Sand, Red Sandstone, Sandstone) - 11x11x7 grid
     int[][] sandIslands = {{-86, 74, -36},{-98, 74,-36},{-98, 85,-46},{-74,85,-46}};
 
     //Stones (Granite, Stone, Diorite, Andestie) - 11x11x7 grid
-    int[][] stoneIslands = {{-30,74,-74},{-30,74,-90},{-8,74,-74},{-8,74,-90}};
+    int[][] stoneIslands = {{-30,74,-84},{-8,74,-100},{-8,74,-84},{-30,74,-100}};
 
     //Logs (Oak, Birch, Spruce, Acacia, Jungle) - 9x9x20
     int[][] logsIsland = {{-71,89,32},{-83,89,32},{-97,89,18},{-83,89,4},{-71,89,4}};
@@ -184,7 +184,7 @@ public class BlockBreakManager {
                     }
                 }
                 break;
-            case MOSSY_STONE_BRICKS:
+            case MOSSY_COBBLESTONE:
                 if (brickIslands[4][0] <= loc.getX() && brickIslands[4][0]+10 >= loc.getX()) {
                     if (brickIslands[4][1]-8 <= loc.getY() && brickIslands[4][1] >= loc.getY()) {
                         if (brickIslands[4][2] <= loc.getZ() && brickIslands[4][2]+10 >= loc.getZ()) {

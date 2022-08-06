@@ -2,6 +2,7 @@ package com.kotayka.mcc.mainGame.manager;
 
 import com.kotayka.mcc.BSABM.BSABM;
 import com.kotayka.mcc.SG.SG;
+import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.Skybattle.Skybattle;
 import com.kotayka.mcc.TGTTOS.TGTTOS;
 import com.kotayka.mcc.mainGame.MCC;
@@ -26,8 +27,8 @@ public class Game {
     }
 
     public void changeGame(String game) {
+        mcc.scoreboardManager.startScoreboard();
         stage=game;
-        mcc.changeScoreboard(game);
         if (!(game.equals("Lobby"))) {
             mcc.gameRound++;
         }
@@ -35,6 +36,9 @@ public class Game {
             case "TGTTOS":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "TGTTOS Game started");
                 tgttos.start();
+                for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
+                    mcc.scoreboardManager.createTGTTOSBoard(p);
+                }
                 break;
             case "SG":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "SG Game started");

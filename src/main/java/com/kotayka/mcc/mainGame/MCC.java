@@ -58,11 +58,11 @@ public final class MCC extends JavaPlugin implements Listener {
     public teamManager teamManager;
 
 //  Games
-    private final TGTTOS tgttos = new TGTTOS(players, npcManager, this);
-    private final Skybattle skybattle = new Skybattle(players, plugin, this);
+    public final TGTTOS tgttos = new TGTTOS(players, npcManager, this, this);
+    public final Skybattle skybattle = new Skybattle(players, plugin, this);
 
-    private final SG sg = new SG(players, this, this);
-    private final BSABM bsabm = new BSABM();
+    public final SG sg = new SG(players, this, this);
+    public final BSABM bsabm = new BSABM(players);
 
 //  Game Manager
     private final Game game = new Game(this, tgttos, sg, skybattle, bsabm);
@@ -70,11 +70,11 @@ public final class MCC extends JavaPlugin implements Listener {
 //  Scoreboard
     public Map roundScores = new HashMap();
     public Map teamRoundScores = new HashMap();
+    public final com.kotayka.mcc.Scoreboards.ScoreboardManager scoreboardManager = new com.kotayka.mcc.Scoreboards.ScoreboardManager(players, plugin, this);
 
     @Override
     public void onEnable() {
         manager = Bukkit.getScoreboardManager();
-        scoreBoards();
         loadTeams();
         players.getOnlinePlayers();
         Bukkit.getServer().getConsoleSender().sendMessage("MCC Plugin Loaded!");
@@ -88,15 +88,6 @@ public final class MCC extends JavaPlugin implements Listener {
         getCommand("mccteam").setTabCompleter(new tCommands());
         getCommand("world").setExecutor(new world());
         getCommand("spec").setExecutor(new playerCommand(players));
-        //getCommand("ping").setExecutor(new ping());
-        // temp
-        /*
-        loadMaps();
-        TGTTOSGame();
-<<<<<<< HEAD
-        sgGame();
-=======
-         */
         TGTTOSGame();
         sgGame();
 
@@ -116,7 +107,7 @@ public final class MCC extends JavaPlugin implements Listener {
 
     public void BSABM() {
         bsabm.loadWorld();
-        getServer().getPluginManager().registerEvents(new BSABMListener(bsabm, game, players, this), this);
+        getServer().getPluginManager().registerEvents(new BSABMListener(bsabm, game, players, this, plugin), this);
     }
 
     public void sgGame() {
@@ -140,6 +131,9 @@ public final class MCC extends JavaPlugin implements Listener {
                             int entityId = packet.getIntegers().read(0);
                             int npcID = npcManager.CheckIfValidID(entityId);
                             if (npcID != -1 && !players.spectators.contains(event.getPlayer())) {
+                                scoreboardManager.addScore(scoreboardManager.players.get(event.getPlayer().getUniqueId()), 1);
+                                scoreboardManager.placementPoints(scoreboardManager.players.get(event.getPlayer().getUniqueId()), 1, tgttos.playerAmount);
+                                scoreboardManager.teamFinish(scoreboardManager.players.get(event.getPlayer().getUniqueId()), 5);
                                 tgttos.playerAmount++;
                                 npcManager.removeNPC(npcID);
                                 players.spectators.add(event.getPlayer());
@@ -158,17 +152,10 @@ public final class MCC extends JavaPlugin implements Listener {
                                         place=String.valueOf(tgttos.playerAmount)+"th";
                                         break;
                                 }
-                                for (Participant p : players.participants) {
-                                    if (event.getPlayer().getName().equals(p.ign)) {
-                                        p.roundCoins+=tgttos.playerPoints;
-                                        Bukkit.broadcastMessage(p.toString());
-                                        teamManager.roundScores.put(p.fullName, ((int) teamManager.roundScores.get(p.fullName))+tgttos.playerPoints);
-                                    }
-                                }
                                 Bukkit.broadcastMessage(ChatColor.GOLD+event.getPlayer().getName()+ChatColor.GRAY+ " finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
                                 event.getPlayer().sendMessage(ChatColor.WHITE+"[+"+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
                                 tgttos.playerPoints--;
-                                if (tgttos.playerPoints <= 0) {
+                                if (scoreboardManager.playerList.size() >= tgttos.playerAmount) {
                                     tgttos.nextRound();
                                 }
                                 event.getPlayer().setGameMode(GameMode.SPECTATOR);
@@ -204,60 +191,6 @@ public final class MCC extends JavaPlugin implements Listener {
         blue.setColor(ChatColor.BLUE);
         purple.setColor(ChatColor.DARK_PURPLE);
         pink.setColor(ChatColor.LIGHT_PURPLE);
-
-        //Lobby
-        Objective lobby = board.registerNewObjective("lobby", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
-        Score lobbyEventBegins = lobby.getScore(ChatColor.BOLD+""+ChatColor.RED + "Event begins in:");
-        lobbyEventBegins.setScore(9);
-        Score lobbyTimer = lobby.getScore(ChatColor.WHITE + "Waiting...");
-        lobbyTimer.setScore(8);
-        Score lobbySpace1 = lobby.getScore(ChatColor.RESET.toString());
-        lobbySpace1.setScore(7);
-        Score lobbyPlayers = lobby.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Players: " + ChatColor.WHITE +String.format("%d/16",Bukkit.getOnlinePlayers().size()));
-        lobbyPlayers.setScore(6);
-        Score lobbySpace2 = lobby.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString());
-        lobbySpace2.setScore(5);
-        Score lobbyTeamTitle = lobby.getScore(ChatColor.BOLD+""+ChatColor.WHITE + "Your Team:");
-        lobbyTeamTitle.setScore(4);
-        Score lobbyTeam = lobby.getScore(ChatColor.AQUA + "none");
-        lobbyTeam.setScore(3);
-        Score lobbySpace3 = lobby.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString());
-        lobbySpace3.setScore(2);
-        Score lobbyEventCoins = lobby.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Event Coins: " + ChatColor.WHITE+"0");
-        lobbyEventCoins.setScore(1);
-        Score lobbyTeamCoins = lobby.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE+"0");
-        lobbyTeamCoins.setScore(0);
-
-        //TGTTOS
-        Objective tgttosScoreboard = board.registerNewObjective("tgttos", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
-        Score tgttosGameNum = tgttosScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game "+gameRound+"/8:"+ChatColor.WHITE+" TGTTOSAWAF");
-        tgttosGameNum.setScore(15);
-        Score tgttosMap = tgttosScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+tgttos.mapOrder[tgttos.gameOrder[tgttos.roundNum]]);
-        tgttosMap.setScore(14);
-        Score tgttosRoundNum = tgttosScoreboard.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ChatColor.WHITE+(tgttos.roundNum+1)+"/7");
-        tgttosRoundNum.setScore(13);
-        Score tgttosTimeLeft = tgttosScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+((int) Math.floor(timeLeft/60))+":"+timeLeft%60);
-        tgttosTimeLeft.setScore(12);
-        Score tgttosSpace1 = tgttosScoreboard.getScore(ChatColor.RESET.toString());
-        tgttosSpace1.setScore(11);
-        Score tgttosGameCoins = tgttosScoreboard.getScore(ChatColor.AQUA+"Game Coins:");
-        tgttosGameCoins.setScore(10);
-        Score tgttosRed = tgttosScoreboard.getScore(ChatColor.RED+"Red Rabbits: "+ChatColor.WHITE+"0");
-        tgttosRed.setScore(9);
-        Score tgttosYellow = tgttosScoreboard.getScore(ChatColor.YELLOW+"Yellow Yaks: "+ChatColor.WHITE+"0");
-        tgttosYellow.setScore(8);
-        Score tgttosGreen = tgttosScoreboard.getScore(ChatColor.GREEN+"Green Guardians: "+ChatColor.WHITE+"0");
-        tgttosGreen.setScore(7);
-        Score tgttosBlue = tgttosScoreboard.getScore(ChatColor.BLUE+"Blue Bats: "+ChatColor.WHITE+"0");
-        tgttosBlue.setScore(6);
-        Score tgttosPurple = tgttosScoreboard.getScore(ChatColor.DARK_PURPLE+"Purple Pandas: "+ChatColor.WHITE+"0");
-        tgttosPurple.setScore(5);
-        Score tgttosPink = tgttosScoreboard.getScore(ChatColor.LIGHT_PURPLE+"Pink Piglets: "+ChatColor.WHITE+"0");
-        tgttosPink.setScore(4);
-        Score tgttosSpace2 = tgttosScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString());
-        tgttosSpace2.setScore(3);
-        Score tgttosCoins = tgttosScoreboard.getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0");
-        tgttosCoins.setScore(2);
 
         //TGTTOS
         Objective sgScoreboard = board.registerNewObjective("sg", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
@@ -323,37 +256,13 @@ public final class MCC extends JavaPlugin implements Listener {
         skybattleSpace2.setScore(3);
         Score skybattleCoins = skybattleScoreboard.getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0");
         skybattleCoins.setScore(2);
-
-        scoreboards.put(player.ign, board);
-        lobby.setDisplaySlot(DisplaySlot.SIDEBAR);
-        player.player.setScoreboard(board);
-    }
-
-    public void changeScoreboard(String scoreboardName) {
-        for (Participant p : players.participants) {
-            players.loadScoreboardVars(p.player.getUniqueId());
-            switch(scoreboardName) {
-                case "Lobby":
-                    scoreboards.get(p.ign).getObjective("lobby").setDisplaySlot(DisplaySlot.SIDEBAR);
-                    break;
-                case "TGTTOS":
-                    scoreboards.get(p.ign).getObjective("tgttos").setDisplaySlot(DisplaySlot.SIDEBAR);
-                    break;
-                case "SG":
-                    scoreboards.get(p.ign).getObjective("sg").setDisplaySlot(DisplaySlot.SIDEBAR);
-                    break;
-                case "Skybattle":
-                    scoreboards.get(p.ign).getObjective("Skybattle").setDisplaySlot(DisplaySlot.SIDEBAR);
-                    break;
-            }
-        }
     }
 
     public String getFormattedTime(int seconds) {
         return seconds / 60 +":"+String.format("%02d", seconds%60);
     }
 
-    public void scoreBoards() {
+    public void scoreBoardss() {
         String[] teamList = {"Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets"};
         for (String game : teamList) {
             teamRoundScores.put(game, 0);
@@ -600,48 +509,9 @@ public final class MCC extends JavaPlugin implements Listener {
 
     public void loadTeams() {
         String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
-        String[] teamNamesFull = {"Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets"};
-
-        for (String team : teamNamesFull) {
-            teamRoundScores.put(team, 0);
-        }
 
         List<String> tn = new ArrayList<>(Arrays.asList(teamNames));
         teamManager = new teamManager(players.participants, tn, this);
-
-        for (String team : teamNamesFull) {
-            teamManager.roundScores.put(team, 0);
-        }
-    }
-
-    public void createTeams(Participant player) {
-        String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
-
-        Scoreboard board = scoreboards.get(player.ign);
-
-        Team red = board.registerNewTeam(teamNames[0]);
-        Team yellow = board.registerNewTeam(teamNames[1]);
-        Team green = board.registerNewTeam(teamNames[2]);
-        Team blue = board.registerNewTeam(teamNames[3]);
-        Team purple = board.registerNewTeam(teamNames[4]);
-        Team pink = board.registerNewTeam(teamNames[5]);
-
-        red.setColor(ChatColor.RED);
-        yellow.setColor(ChatColor.YELLOW);
-        green.setColor(ChatColor.GREEN);
-        blue.setColor(ChatColor.BLUE);
-        purple.setColor(ChatColor.DARK_PURPLE);
-        pink.setColor(ChatColor.LIGHT_PURPLE);
-
-        red.setPrefix(ChatColor.WHITE+"Ⓡ ");
-        yellow.setPrefix(ChatColor.WHITE+"Ⓨ ");
-        green.setPrefix(ChatColor.WHITE+"Ⓖ ");
-        blue.setPrefix(ChatColor.WHITE+"Ⓑ ");
-        purple.setPrefix(ChatColor.WHITE+"Ⓤ ");
-        pink.setPrefix(ChatColor.WHITE+"Ⓟ ");
-
-        Team[] teamss = {red,yellow,green,blue,purple,pink};
-        teams.put(player.ign, teamss);
     }
 
     @Override

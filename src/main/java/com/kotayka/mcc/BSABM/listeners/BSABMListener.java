@@ -2,12 +2,12 @@ package com.kotayka.mcc.BSABM.listeners;
 
 import com.kotayka.mcc.BSABM.BSABM;
 import com.kotayka.mcc.BSABM.managers.BlockBreakManager;
+import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Game;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,7 +21,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.FlowerPot;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -34,15 +33,18 @@ public class BSABMListener implements Listener {
     private final Game game;
     private final Players players;
     private final BlockBreakManager blockBreakManager = new BlockBreakManager();
+    private final MCC mcc;
+
     private final Plugin plugin;
 
     Map<UUID, Material> hotbarSelector = new HashMap<UUID, Material>();
     public int[] teamPortalLoc = {88, 50, 10, -29, -68, -107};
 
-    public BSABMListener(BSABM bsabm, Game game, Players players, Plugin plugin) {
+    public BSABMListener(BSABM bsabm, Game game, Players players, MCC mcc, Plugin plugin) {
         this.bsabm = bsabm;
         this.game = game;
         this.players = players;
+        this.mcc = mcc;
         this.plugin = plugin;
     }
 
@@ -74,12 +76,24 @@ public class BSABMListener implements Listener {
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
         }
         if (game.stage.equals("BSABM")) {
+            if (e.getPlayer().getLocation().getY() <= -33) {
+                e.getPlayer().teleport(new Location(bsabm.world, 11, 1, 0));
+            }
             if (e.getPlayer().getLocation().getBlock().getType().equals(Material.NETHER_PORTAL)) {
                 netherPortalTeleporter(e.getPlayer(), e.getPlayer().getLocation());
             }
-            if (Math.sqrt(Math.pow((e.getPlayer().getLocation().getX()+3),2)+(Math.pow(e.getPlayer().getLocation().getZ(),2))) <= 8 && e.getPlayer().getLocation().getY() < 120) {
-                e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
+            if (Math.sqrt(Math.pow((e.getPlayer().getLocation().getX()+3),2)+(Math.pow(e.getPlayer().getLocation().getZ(),2))) <= 8 && e.getPlayer().getLocation().getY() < 10) {
+                e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1000, e.getPlayer().getVelocity().getZ()));
+                plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 5, e.getPlayer().getVelocity().getZ()));
+                    }
+                });
             }
+//            if (Math.sqrt(Math.pow((e.getPlayer().getLocation().getX()+3),2)+(Math.pow(e.getPlayer().getLocation().getZ(),2))) <= 8 && e.getPlayer().getLocation().getY() < 120) {
+//                e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
+//            }
             if (hotbarSelector.containsKey(e.getPlayer().getUniqueId())) {
                 if (e.getPlayer().getTargetBlock(null, 5).getType() != hotbarSelector.get(e.getPlayer().getUniqueId())) {
                     hotbarSelector.put(e.getPlayer().getUniqueId(), e.getPlayer().getTargetBlock(null, 5).getType());

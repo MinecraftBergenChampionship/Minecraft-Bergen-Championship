@@ -1,9 +1,15 @@
 package com.kotayka.mcc.BSABM;
 
 import com.kotayka.mcc.TGTTOS.managers.Firework;
+import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
@@ -18,7 +24,11 @@ public class BSABM {
     public int[] teamsCoords = {-91,-52,-13,26,65,104};
     public int[] teamsCoordsBuilding = {-102,-63,-24,15,54,93};
 
+    private final Players players;
 
+    public BSABM(Players players) {
+        this.players = players;
+    }
 
     public void loadWorld() {
         if (Bukkit.getWorld("BSABM") == null) {
@@ -53,9 +63,15 @@ public class BSABM {
                 }
             }
             numOfMaps++;
-            Block b = mapWorld.getBlockAt((int) (map.getX()-3), (int) (map.getY()+1), (int) (map.getZ()-10));
-            Sign sign = (Sign) b.getState();
-            tempNames.add(sign.getLine(0));
+            Block b = mapWorld.getBlockAt((int) (map.getX()-3), (int) (map.getY()+1), (int) (map.getZ()-8));
+            if (b.getType().equals(Material.OAK_WALL_SIGN)) {
+                Sign sign = (Sign) b.getState();
+                tempNames.add(sign.getLine(0));
+            }
+            else {
+                Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE+"X: "+b.getLocation().getX()+", Y: "+b.getLocation().getY()+", Z: "+b.getLocation().getZ());
+                tempNames.add("Undefined");
+            }
             map.setX(map.getX()-9);
             tempMaps.add(blocks);
         }
@@ -104,7 +120,6 @@ public class BSABM {
             }
         }
         i=0;
-        teamsProgress[teamNum]++;
         for (int y = (int) buildMap.getY(); y <= buildMap.getY()+5; y++) {
             for (int x = (int) buildMap.getX(); x <= buildMap.getX()+6; x++) {
                 for (int z = (int) buildMap.getZ(); z <= buildMap.getZ()+6; z++) {
@@ -118,6 +133,7 @@ public class BSABM {
                 }
             }
         }
+        teamsProgress[teamNum]++;
     }
 
     public Boolean checkIfCompleted(int teamNum, int fieldNum) {
@@ -189,6 +205,35 @@ public class BSABM {
             for (int x = 0; x < 3; x++) {
                 placeMap(i, x);
             }
+        }
+        for (Player player : players.players) {
+            ItemStack silkPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
+            silkPickaxe.addEnchantment(Enchantment.SILK_TOUCH, 1);
+            silkPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
+
+            ItemStack regPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
+            regPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
+
+            ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
+            axe.addEnchantment(Enchantment.DURABILITY, 3);
+
+            ItemStack shovel = new ItemStack(Material.DIAMOND_SHOVEL);
+            shovel.addEnchantment(Enchantment.DURABILITY, 3);
+
+            ItemStack elytra = new ItemStack(Material.ELYTRA);
+            elytra.addEnchantment(Enchantment.DURABILITY, 3);
+
+            player.getInventory().addItem(silkPickaxe);
+            player.getInventory().addItem(regPickaxe);
+            player.getInventory().addItem(axe);
+            player.getInventory().addItem(shovel);
+            player.getInventory().setChestplate(elytra);
+
+            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000000, 255, false, false));
+
+            player.teleport(new Location(world, 11, 1, 0));
+
+            player.setGameMode(GameMode.SURVIVAL);
         }
     }
 }

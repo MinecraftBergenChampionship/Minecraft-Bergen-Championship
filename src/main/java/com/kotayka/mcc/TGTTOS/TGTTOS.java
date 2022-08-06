@@ -1,6 +1,8 @@
 package com.kotayka.mcc.TGTTOS;
 
+import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.TGTTOS.managers.NPCManager;
+import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
@@ -32,10 +34,13 @@ public class TGTTOS {
 
     public World world;
 
-    public TGTTOS(Players players, NPCManager npcManager, Plugin plugin) {
+    private final MCC mcc;
+
+    public TGTTOS(Players players, NPCManager npcManager, Plugin plugin, MCC mcc) {
         this.players = players;
         this.npcManager = npcManager;
         this.plugin = plugin;
+        this.mcc = mcc;
 
         List<Integer> randomizer = Arrays.asList(gameOrder);
         Collections.shuffle(randomizer);
@@ -109,9 +114,13 @@ public class TGTTOS {
     }
 
     public void startRound(int gameRound) {
+        mcc.scoreboardManager.startTimerForGame(120, "TGTTOS");
+        String rvalue = ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ChatColor.WHITE+(roundNum+1)+"/7";
+        String mvalue = ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+mapOrder[gameOrder[roundNum]];
+        mcc.scoreboardManager.changeLine(22, mvalue);
+        mcc.scoreboardManager.changeLine(21, rvalue);
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             public void run() {
-                timeLeft = 120;
                 npcManager.removeAllNPC();
                 Random random = new Random();
                 playerPoints=players.players.size();
@@ -189,6 +198,7 @@ public class TGTTOS {
 
     public void nextRound() {
         players.spectators.clear();
+        mcc.scoreboardManager.resetVars();
         if (roundNum < mapOrder.length) {
             roundNum++;
             startRound(gameOrder[roundNum]);
