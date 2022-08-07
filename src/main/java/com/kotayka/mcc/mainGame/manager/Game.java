@@ -1,6 +1,7 @@
 package com.kotayka.mcc.mainGame.manager;
 
 import com.kotayka.mcc.BSABM.BSABM;
+import com.kotayka.mcc.DecisionDome.DecisionDome;
 import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.Skybattle.Skybattle;
@@ -10,26 +11,27 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 public class Game {
-    public String stage = "Lobby";
+    public String stage = "Waiting";
 
     private TGTTOS tgttos;
     private Skybattle skybattle;
     private final MCC mcc;
     private final SG sg;
     private final BSABM bsabm;
+    private final DecisionDome decisionDome;
 
-    public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm) {
+    public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm, DecisionDome decisionDome1) {
         this.tgttos = tgttos;
         this.mcc = mcc;
         this.sg = sg;
         this.skybattle = skybattle;
         this.bsabm = bsabm;
+        this.decisionDome = decisionDome1;
     }
 
     public void changeGame(String game) {
-        mcc.scoreboardManager.startScoreboard();
         stage=game;
-        if (!(game.equals("Lobby"))) {
+        if (!(game.equals("Lobby") || game.equals("DD"))) {
             mcc.gameRound++;
         }
         switch (game) {
@@ -52,6 +54,16 @@ public class Game {
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "BSABM Game started");
                 bsabm.start();
                 break;
+            case "DD":
+                Bukkit.broadcastMessage(ChatColor.YELLOW + "DD Game started");
+                decisionDome.start();
+                break;
         }
+    }
+
+    public void start() {
+        stage="Starting";
+        mcc.scoreboardManager.clearTeams();
+        mcc.scoreboardManager.startTimerForGame(30, "Lobby");
     }
 }

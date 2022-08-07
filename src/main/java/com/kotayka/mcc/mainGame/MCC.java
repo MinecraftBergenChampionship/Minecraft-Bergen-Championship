@@ -9,6 +9,8 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.kotayka.mcc.BSABM.BSABM;
 import com.kotayka.mcc.BSABM.commands.checkBuild;
 import com.kotayka.mcc.BSABM.listeners.BSABMListener;
+import com.kotayka.mcc.DecisionDome.DecisionDome;
+import com.kotayka.mcc.DecisionDome.listeners.DecisionDomeListener;
 import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.SG.listeners.SGListener;
 import com.kotayka.mcc.Skybattle.Skybattle;
@@ -35,6 +37,9 @@ import org.bukkit.scoreboard.*;
 import java.util.*;
 
 public final class MCC extends JavaPlugin implements Listener {
+
+//  Starting
+    public startGame startGame = new startGame();
 
 //  Scoreboard
     public ScoreboardManager manager = Bukkit.getScoreboardManager();
@@ -65,8 +70,10 @@ public final class MCC extends JavaPlugin implements Listener {
     public final SG sg = new SG(players, this, this);
     public final BSABM bsabm = new BSABM(players, this);
 
+    public final DecisionDome decisionDome = new DecisionDome(this);
+
 //  Game Manager
-    public final Game game = new Game(this, tgttos, sg, skybattle, bsabm);
+    public final Game game = new Game(this, tgttos, sg, skybattle, bsabm, decisionDome);
 
 //  Scoreboard
     public Map roundScores = new HashMap();
@@ -88,6 +95,8 @@ public final class MCC extends JavaPlugin implements Listener {
         getCommand("mccteam").setTabCompleter(new tCommands());
         getCommand("world").setExecutor(new world());
         getCommand("checkbuild").setExecutor(new checkBuild(this));
+        getCommand("ready").setExecutor(new ready(players, this));
+        getCommand("eventstart").setExecutor(new eventstart(this));
         TGTTOSGame();
         sgGame();
 
@@ -103,8 +112,14 @@ public final class MCC extends JavaPlugin implements Listener {
 
         SkybattleGame();
         BSABM();
+        DecisionDome();
+        scoreboardManager.start();
     }
 
+    public void DecisionDome() {
+        decisionDome.loadWorld();
+        getServer().getPluginManager().registerEvents(new DecisionDomeListener(decisionDome), this);
+    }
     public void BSABM() {
         bsabm.loadWorld();
         getServer().getPluginManager().registerEvents(new BSABMListener(bsabm, game, players, this, plugin), this);
