@@ -181,6 +181,41 @@ public class ScoreboardManager {
         lobby.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
+    public void createSkybattleBoard(ScoreboardPlayer player) {
+        if (player.currentObj != null) {
+            player.currentObj.unregister();
+        }
+
+        Objective skybattleScoreboard = player.board.registerNewObjective("Skybattle", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+        player.objectiveMap.put("Skybattle", skybattleScoreboard);
+        Map<Integer, String> lines = new HashMap<>();
+        player.lines.put(skybattleScoreboard, lines);
+
+        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" Skybattle").setScore(23);
+        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"Skybattle").setScore(22);
+        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+"0/3").setScore(21);
+        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        skybattleScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(19);
+        skybattleScoreboard.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
+        skybattleScoreboard.getScore(ChatColor.RESET.toString()).setScore(4);
+        skybattleScoreboard.getScore(ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0").setScore(2);
+        skybattleScoreboard.getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0").setScore(1);
+
+        GenerateTeamsRound(skybattleScoreboard, player);
+
+        player.lines.get(skybattleScoreboard).put(23, ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" Skybattle");
+        player.lines.get(skybattleScoreboard).put(22, ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"Skybattle");
+        player.lines.get(skybattleScoreboard).put(21, ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+"0/3");
+        player.lines.get(skybattleScoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(skybattleScoreboard).put(15, ChatColor.GREEN+"Game Scores");
+        player.lines.get(skybattleScoreboard).put(4, ChatColor.RESET.toString());
+        player.lines.get(skybattleScoreboard).put(2, ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0");
+        player.lines.get(skybattleScoreboard).put(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0");
+
+        player.currentObj = skybattleScoreboard;
+        skybattleScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
+
     public void createTGTTOSBoard(ScoreboardPlayer player) {
         if (player.currentObj != null) {
             player.currentObj.unregister();
@@ -397,6 +432,9 @@ public class ScoreboardManager {
             case "SG":
                 mcc.sg.events();
                 break;
+            case "Skybattle":
+                mcc.skybattle.timeEndEvents();
+                break;
         }
     }
 
@@ -408,7 +446,7 @@ public class ScoreboardManager {
         taskId[0] = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             @Override
             public void run() {
-                if (timer >= 0) {
+                if (timer > 0) {
                     for (ScoreboardPlayer p : playerList) {
                         Objective obj = p.currentObj;
                         if (p.lines.get(obj).containsKey(20)) {
@@ -417,9 +455,14 @@ public class ScoreboardManager {
                         String value = ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+getFormattedTime(timer);
                         obj.getScore(value).setScore(20);
                         p.lines.get(obj).put(20, value);
+
+                        // Special Cases:
+                        if (mcc.game.stage.equals("Skybattle")) {
+                            mcc.skybattle.timedEventsHandler(timer, p);
+                        }
                     }
                 }
-                else if (timer == -1) {
+                else {
                     for (ScoreboardPlayer p : playerList) {
                         Objective obj = p.currentObj;
                         if (p.lines.get(obj).containsKey(20)) {

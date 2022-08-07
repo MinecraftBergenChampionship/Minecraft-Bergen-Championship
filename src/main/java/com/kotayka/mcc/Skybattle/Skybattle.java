@@ -1,5 +1,6 @@
 package com.kotayka.mcc.Skybattle;
 
+import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
@@ -33,7 +34,7 @@ public class Skybattle {
     //public int teamsAlive;
 
     public Map<Player, Player> lastDamage; // <Player, Damager>
-    public Map<Entity, Player> creepersAndSpawned = new HashMap<>(5); // <Creeper, Spawner>
+    public Map<Entity, Player> creepersAndSpawned = new HashMap<>(16); // <Creeper, Spawner>
     public Map<Entity, Player> whoPlacedThatTNT = new HashMap<>(5);
     public Map<Entity, Player> whoThrewThatPotion = new HashMap<>(5);
     public int roundNum = 0;
@@ -147,6 +148,10 @@ public class Skybattle {
     public void start() {
         stage = true;
 
+        for (ScoreboardPlayer player : mcc.scoreboardManager.playerList) {
+            mcc.scoreboardManager.createSkybattleBoard(player);
+        }
+
         loadMap();
 
         startRound();
@@ -217,33 +222,19 @@ public class Skybattle {
     }
 
     public void startRound() {
-        // Scoreboard shenanigans will be handled in MCC.java although it would be nice to have a scoreboard manager for each game
-        timeLeft = 10;
+        mcc.scoreboardManager.startTimerForGame(10, "Skybattle");
         setState("STARTING");
-        // countdown in MCC.java
 
         // Randomly place each team at a different spawn
         List<Location> tempSpawns = new ArrayList<>(spawnPoints);
-        List<Team[]> teamListPogU = new ArrayList<>(mcc.teams.values());
 
-        int i = 0;
-        // this implementation looks super inefficient and wack but brain is too fried
-        for (Team t : teamListPogU.get(i)) {
+        for (int i = 0; i < mcc.teamList.size(); i++) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
-            for (String s : t.getEntries()) {
-                for (Participant p : Participant.participantsOnATeam) {
-                    if (p.ign.equals(s)) {
-                        p.player.teleport(tempSpawns.get(randomNum));
-                    }
-                }
+            for (int j = 0; j < mcc.teamList.get(i).size(); j++) {
+                mcc.teamList.get(i).get(j).player.teleport(tempSpawns.get(randomNum));
             }
             tempSpawns.remove(randomNum);
-            i++;
         }
-
-        // SetState("PLAYING")
-        // timeLeft = 240
-        // both in MCC.java
     }
 
     public void removeBarriers() {
@@ -255,6 +246,46 @@ public class Skybattle {
                     }
                 }
             }
+        }
+    }
+
+    public void timeEndEvents() {
+        if (mcc.skybattle.getState().equals("STARTING")) {
+            mcc.skybattle.setState("PLAYING");
+            mcc.scoreboardManager.startTimerForGame(240, "Skybattle");
+            mcc.skybattle.removeBarriers();
+        } else if (mcc.skybattle.getState().equals("PLAYING")) {
+            if (mcc.skybattle.roundNum < 3) {
+                mcc.skybattle.nextRound();
+                mcc.skybattle.setState("STARTING");
+            }
+            else {
+                mcc.skybattle.resetMap();
+                mcc.skybattle.resetBorder();
+                mcc.skybattle.setState("INACTIVE");
+            }
+        }
+    }
+
+    public void timedEventsHandler(int time, ScoreboardPlayer p) {
+        // WHILE GAME IS PLAYING
+        if (this.getState().equals("PLAYING")) {
+            if (time % 40 == 0 && time != 240 && time >= 60) {
+                mcc.skybattle.border.setSize(mcc.skybattle.border.getSize() * 0.75, 15);
+                p.player.player.sendMessage(ChatColor.DARK_RED + "> Border is Shrinking!");
+                p.player.player.sendTitle(" ", ChatColor.RED + "Border shrinking!", 0, 20, 10);
+            } else if (((time - 10)) % 40 == 0) {
+                p.player.player.sendMessage(ChatColor.RED + "> Border shrinking in 10 seconds!");
+            } else if (time == 60) {
+                mcc.skybattle.border.setSize(5, 60);
+                p.player.player.sendMessage(ChatColor.DARK_RED+"> Border will continue shrinking!");
+            } else if (time == 70) {
+                p.player.player.sendMessage(ChatColor.RED+"> Final shrink in 10 seconds!");
+            }
+        }
+        // DURING STARTING
+        else if (this.getState().equals("STARTING")) {
+            p.player.player.sendTitle("Starting in:", "> " + time + " <", 0, 20, 0);
         }
     }
 
