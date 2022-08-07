@@ -4,6 +4,7 @@ import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class playerJoinLeave implements Listener {
@@ -24,4 +25,9 @@ public class playerJoinLeave implements Listener {
         players.removePlayer(event.getPlayer());
     }
 
+    @EventHandler
+    public void onKick(PlayerKickEvent e) {
+        if (e.getReason().equalsIgnoreCase("Flying is not enabled on this server"))
+            e.setCancelled(true);
+    }
 }

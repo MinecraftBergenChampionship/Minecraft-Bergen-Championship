@@ -149,7 +149,13 @@ public class BSABMListener implements Listener {
         if (game.stage.equals("BSABM")) {
             event.setCancelled(true);
             if (checkZ((int) event.getBlock().getLocation().getZ()) && (event.getBlock().getLocation().getY() >= 2 && event.getBlock().getLocation().getY() <= 6) && checkX((int) event.getBlock().getLocation().getX())) {
-                bsabm.mapUpdate(event.getBlock().getLocation());
+
+                plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        bsabm.mapUpdate(event.getBlock().getLocation());
+                    }
+                },5);
                 event.setCancelled(false);
             }
             else {
@@ -234,12 +240,14 @@ public class BSABMListener implements Listener {
                     }
                     Location targetLoc = new Location(bsabm.world, targetX, 1, 150, playerLoc.getYaw(), playerLoc.getPitch());
                     player.teleport(targetLoc);
+                    player.setAllowFlight(true);
                 }
             }
         }
         else {
             Location targetLoc = new Location(bsabm.world, 13, 1, 0, playerLoc.getYaw(), playerLoc.getPitch());
             player.teleport(targetLoc);
+            player.setAllowFlight(false);
         }
     }
 

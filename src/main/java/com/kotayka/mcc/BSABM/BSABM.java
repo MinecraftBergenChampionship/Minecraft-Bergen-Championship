@@ -6,10 +6,7 @@ import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -158,7 +155,7 @@ public class BSABM {
             for (int x = (int) map.getX(); x <= map.getX()+6; x++) {
                 for (int z = (int) map.getZ(); z <= map.getZ()+6; z++) {
                     if (world.getBlockAt(x,y,z).getType() != maps.get(teamFields[teamNum][fieldNum]).get(i).getType()) {
-//                        Bukkit.broadcastMessage("X: "+x+"Y: "+y+"Z: "+z+": Block Type: "+world.getBlockAt(x,y,z).getType()+"!= Block Type: "+maps.get(teamFields[teamNum][fieldNum]).get(i)+", Map: "+teamFields[teamNum][fieldNum]);
+//                        Bukkit.broadcastMessage("X: "+x+"Y: "+y+"Z: "+z+": Block Type: "+world.getBlockAt(x,y,z).getType()+"!= Block Type: "+maps.get(teamFields[teamNum][fieldNum]).get(i).getType()+", Map: "+teamFields[teamNum][fieldNum]);
                         return false;
                     }
                     i++;
@@ -178,6 +175,37 @@ public class BSABM {
         int fieldNum =  ((int) (location.getZ()-startZ)/(7+betweenFields));
 
         if (checkIfCompleted(teamNum, fieldNum)) {
+            completeBuild(teamNum,fieldNum);
+        }
+    }
+
+    public Boolean checkIfCompletedForCommand(int teamNum, int fieldNum, Player player) {
+        Location map = getCoordsForMap(teamNum, fieldNum);
+        int i=0;
+        for (int y = (int) map.getY(); y <= map.getY()+5; y++) {
+            for (int x = (int) map.getX(); x <= map.getX()+6; x++) {
+                for (int z = (int) map.getZ(); z <= map.getZ()+6; z++) {
+                    if (world.getBlockAt(x,y,z).getType() != maps.get(teamFields[teamNum][fieldNum]).get(i).getType()) {
+                        player.sendMessage("X: "+x+"Y: "+y+"Z: "+z+": Block Type: "+world.getBlockAt(x,y,z).getType()+"!= Block Type: "+maps.get(teamFields[teamNum][fieldNum]).get(i).getType()+", Map: "+teamFields[teamNum][fieldNum]);
+                        return false;
+                    }
+                    i++;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void mapUpdateForCommand(Location location, Player player) {
+        int startX = -102;
+        int betweenTeams = 31;
+        int teamNum =  ((int) (location.getX()-startX)/(7+betweenTeams));
+
+        int startZ = 136;
+        int betweenFields = 4;
+        int fieldNum =  ((int) (location.getZ()-startZ)/(7+betweenFields));
+
+        if (checkIfCompletedForCommand(teamNum, fieldNum, player)) {
             completeBuild(teamNum,fieldNum);
         }
     }

@@ -14,5 +14,19 @@ commands:
     description: Teams
   world:
     description: prints out world
-  spec:
-    description: toggles spectator mode
+  checkbuild:
+    description: Checks the build for BSABM
+permissions:
+  npc:
+    description: Spawn NPC at location
+    default: op;
+  start:
+    description: Start a game
+    default: op;
+  mccteam:
+    description: Teams
+  world:
+    description: prints out world
+    default: op;
+  checkbuild:
+    description: Checks the build for BSABM

@@ -7,6 +7,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.kotayka.mcc.BSABM.BSABM;
+import com.kotayka.mcc.BSABM.commands.checkBuild;
 import com.kotayka.mcc.BSABM.listeners.BSABMListener;
 import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.SG.listeners.SGListener;
@@ -36,7 +37,7 @@ import java.util.*;
 public final class MCC extends JavaPlugin implements Listener {
 
 //  Scoreboard
-    public ScoreboardManager manager;
+    public ScoreboardManager manager = Bukkit.getScoreboardManager();
 
     public Map<String, Scoreboard> scoreboards = new HashMap<String, Scoreboard>();
     public Map<String, Team[]> teams = new HashMap<String, Team[]>();
@@ -65,7 +66,7 @@ public final class MCC extends JavaPlugin implements Listener {
     public final BSABM bsabm = new BSABM(players, this);
 
 //  Game Manager
-    private final Game game = new Game(this, tgttos, sg, skybattle, bsabm);
+    public final Game game = new Game(this, tgttos, sg, skybattle, bsabm);
 
 //  Scoreboard
     public Map roundScores = new HashMap();
@@ -74,7 +75,6 @@ public final class MCC extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        manager = Bukkit.getScoreboardManager();
         loadTeams();
         players.getOnlinePlayers();
         Bukkit.getServer().getConsoleSender().sendMessage("MCC Plugin Loaded!");
@@ -87,7 +87,7 @@ public final class MCC extends JavaPlugin implements Listener {
         getCommand("mccteam").setExecutor(new teamCommands(teamManager, this));
         getCommand("mccteam").setTabCompleter(new tCommands());
         getCommand("world").setExecutor(new world());
-        getCommand("spec").setExecutor(new playerCommand(players));
+        getCommand("checkbuild").setExecutor(new checkBuild(this));
         TGTTOSGame();
         sgGame();
 
