@@ -62,6 +62,9 @@ public class BSABMListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.WAXED_WEATHERED_CUT_COPPER) {
+            if (mcc.game.stage.equals("AceRace")) {
+                mcc.aceRace.nextCheckpoint(e.getPlayer());
+            }
             e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(4));
             e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.65, e.getPlayer().getVelocity().getZ()));
         }

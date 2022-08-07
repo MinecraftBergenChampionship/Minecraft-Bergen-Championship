@@ -6,6 +6,8 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.kotayka.mcc.AceRace.AceRace;
+import com.kotayka.mcc.AceRace.listeners.AceRaceListener;
 import com.kotayka.mcc.BSABM.BSABM;
 import com.kotayka.mcc.BSABM.listeners.BSABMListener;
 import com.kotayka.mcc.SG.SG;
@@ -63,9 +65,10 @@ public final class MCC extends JavaPlugin implements Listener {
 
     public final SG sg = new SG(players, this, this);
     public final BSABM bsabm = new BSABM(players);
+    public final AceRace aceRace = new AceRace(this);
 
 //  Game Manager
-    private final Game game = new Game(this, tgttos, sg, skybattle, bsabm);
+    public final Game game = new Game(this, tgttos, sg, skybattle, bsabm, aceRace);
 
 //  Scoreboard
     public Map roundScores = new HashMap();
@@ -103,6 +106,12 @@ public final class MCC extends JavaPlugin implements Listener {
 
         SkybattleGame();
         BSABM();
+        aceRace();
+    }
+
+    public void aceRace() {
+        aceRace.loadWorld();
+        getServer().getPluginManager().registerEvents(new AceRaceListener(aceRace), this);
     }
 
     public void BSABM() {

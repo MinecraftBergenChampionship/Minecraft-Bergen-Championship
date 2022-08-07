@@ -1,5 +1,6 @@
 package com.kotayka.mcc.mainGame.manager;
 
+import com.kotayka.mcc.AceRace.AceRace;
 import com.kotayka.mcc.BSABM.BSABM;
 import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
@@ -17,13 +18,15 @@ public class Game {
     private final MCC mcc;
     private final SG sg;
     private final BSABM bsabm;
+    private final AceRace aceRace;
 
-    public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm) {
+    public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm, AceRace aceRace) {
         this.tgttos = tgttos;
         this.mcc = mcc;
         this.sg = sg;
         this.skybattle = skybattle;
         this.bsabm = bsabm;
+        this.aceRace = aceRace;
     }
 
     public void changeGame(String game) {
@@ -51,6 +54,10 @@ public class Game {
             case "BSABM":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "BSABM Game started");
                 bsabm.start();
+                break;
+            case "AceRace":
+                Bukkit.broadcastMessage(ChatColor.YELLOW + "AceRace Game started");
+                aceRace.start();
                 break;
         }
     }

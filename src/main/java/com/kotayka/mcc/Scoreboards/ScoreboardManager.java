@@ -212,6 +212,38 @@ public class ScoreboardManager {
         tgttosScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
+    public void createAceRaceBoard(ScoreboardPlayer player) {
+        if (player.currentObj != null) {
+            player.currentObj.unregister();
+        }
+        Objective aceRacesScoreboard = player.board.registerNewObjective("aceRace", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+        player.objectiveMap.put("aceRace",aceRacesScoreboard);
+        Map<Integer, String> lines = new HashMap<>();
+        player.lines.put(aceRacesScoreboard, lines);
+
+        aceRacesScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" TGTTOSAWAF").setScore(23);
+        aceRacesScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        aceRacesScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(19);
+        aceRacesScoreboard.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
+        aceRacesScoreboard.getScore(ChatColor.RESET.toString()).setScore(4);
+        aceRacesScoreboard.getScore(ChatColor.LIGHT_PURPLE+"Lompleted Maps: "+ChatColor.WHITE+"0").setScore(3);
+        aceRacesScoreboard.getScore(ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0").setScore(2);
+        aceRacesScoreboard.getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0").setScore(1);
+
+        GenerateTeamsRound(aceRacesScoreboard, player);
+
+        player.lines.get(aceRacesScoreboard).put(23, ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" TGTTOSAWAF");
+        player.lines.get(aceRacesScoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(aceRacesScoreboard).put(15, ChatColor.GREEN+"Game Scores");
+        player.lines.get(aceRacesScoreboard).put(4, ChatColor.RESET.toString());
+        player.lines.get(aceRacesScoreboard).put(3, ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+"0");
+        player.lines.get(aceRacesScoreboard).put(2, ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0");
+        player.lines.get(aceRacesScoreboard).put(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0");
+
+        player.currentObj = aceRacesScoreboard;
+        aceRacesScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
+
     public void createTeams(ScoreboardPlayer player) {
         String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
 
