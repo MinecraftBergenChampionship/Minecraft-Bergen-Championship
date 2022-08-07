@@ -1,5 +1,6 @@
 package com.kotayka.mcc.SG;
 
+import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.TGTTOS.managers.Firework;
 import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
@@ -33,6 +34,7 @@ public class SG {
     public int relaventEventTimer = 60;
     public String eventName = "Starting";
     public int playersDead = 0;
+    int eventID = 0;
     public List<String> teamsAlive = new ArrayList<>();
     public int teamsDead = 0;
 
@@ -152,6 +154,45 @@ public class SG {
         }
     }
 
+    public void events() {
+        String value = ChatColor.BOLD+""+ChatColor.GREEN + "Next Event: "+ChatColor.LIGHT_PURPLE;
+        int eventTime = 0;
+        switch (eventID) {
+            case 0:
+                eventName="Starting";
+                eventTime=10;
+                break;
+            case 1:
+                eventName="Grace Period Ends";
+                eventTime=60;
+                break;
+            case 2:
+                Bukkit.broadcastMessage(ChatColor.RED+"Grace Period is Over");
+                eventName="Supply Drop";
+                eventTime=240;
+                break;
+            case 3:
+                setSupplyDropItems();
+                eventName="Chest Refill";
+                eventTime=240;
+                break;
+            case 4:
+                regenChest();
+                Bukkit.broadcastMessage(ChatColor.RED+"Chest are refilled");
+                eventName="Supply Drop";
+                eventTime=240;
+                break;
+            case 5:
+                setSupplyDropItems();
+                eventName="Deathmatch";
+                eventTime=240;
+                break;
+        }
+        eventID++;
+        mcc.scoreboardManager.changeLine(21, value+eventName);
+        mcc.scoreboardManager.startTimerForGame(eventTime, "SG");
+    }
+
 
     public void startWorldBorder() {
         WorldBorder border = world.getWorldBorder();
@@ -188,8 +229,12 @@ public class SG {
         loadWorld();
         regenChest();
         stage="Starting";
+        for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
+            mcc.scoreboardManager.createSGBoard(p);
+        }
         spawnPlayers();
         startWorldBorder();
+        events();
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             @Override
             public void run() {
@@ -241,19 +286,25 @@ public class SG {
     public void outLivePlayer() {
         for (Participant p : players.participants) {
             if (!playersDeadList.contains(p.player.getUniqueId())) {
-                p.roundCoins+=3;
-                mcc.teamManager.roundScores.put(p.fullName, ((int) mcc.teamManager.roundScores.get(p.fullName))+3);
+                mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 3);
             }
         }
     }
 
     public void kill(Participant killer) {
-        killer.roundCoins+=45;
-        mcc.teamManager.roundScores.put(killer.fullName, ((int) mcc.teamManager.roundScores.get(killer.fullName))+45);
+        mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(killer.player.getUniqueId()), 45);
+    }
+
+    public void checkIfGameEnds(Participant p) {
+        mcc.scoreboardManager.lastOneStanding(mcc.scoreboardManager.players.get(p.player.getUniqueId()), "SG");
     }
 
     public void spawnFirework(Participant victim) {
         Firework firework = new Firework();
         firework.spawnFireworkWithColor(victim.player.getLocation(), victim.color);
+    }
+
+    public void endGame() {
+
     }
 }

@@ -16,6 +16,7 @@ public class ScoreboardPlayer {
     public Team[] teams;
     public Map<Objective, Map<Integer, String>> lines = new HashMap();
     public Objective currentObj = null;
+    public Object[][] teamLines = new Object[][]{{"RedRabbits",-1},{"YellowYaks",-1},{"GreenGuardians",-1},{"BlueBats",-1},{"PurplePandas",-1},{"PinkPiglets",-1}};
     public final Scoreboard board;
     public final Participant player;
 

@@ -38,7 +38,7 @@ public class BSABMListener implements Listener {
     private final Plugin plugin;
 
     Map<UUID, Material> hotbarSelector = new HashMap<UUID, Material>();
-    public int[] teamPortalLoc = {88, 50, 10, -29, -68, -107};
+    public int[] teamPortalLoc = {-107, -68, -29, 10, 50, 88};
 
     public BSABMListener(BSABM bsabm, Game game, Players players, MCC mcc, Plugin plugin) {
         this.bsabm = bsabm;
@@ -87,9 +87,9 @@ public class BSABMListener implements Listener {
                 plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                     @Override
                     public void run() {
-                        e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 5, e.getPlayer().getVelocity().getZ()));
+                        e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 3, e.getPlayer().getVelocity().getZ()));
                     }
-                });
+                }, 17);
             }
 //            if (Math.sqrt(Math.pow((e.getPlayer().getLocation().getX()+3),2)+(Math.pow(e.getPlayer().getLocation().getZ(),2))) <= 8 && e.getPlayer().getLocation().getY() < 120) {
 //                e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));

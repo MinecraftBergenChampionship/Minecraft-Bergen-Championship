@@ -58,7 +58,7 @@ public class TGTTOS {
 
 
         Location cliffSpawn = new Location(world, -148, 1, -284);
-        Location meatballSpawn = new Location(world, 657, -10, 130);
+        Location meatballSpawn = new Location(world, 615, -28, 133);
         Location skydiveSpawn = new Location(world, 757, 53, 442);
         Location glideSpawn = new Location(world, -176, 1, 174);
         Location boatsSpawn = new Location(world, 175, 1, -96);
@@ -66,7 +66,7 @@ public class TGTTOS {
         Location wallsSpawn = new Location(world, 215, -24, 341);
 
         int[] cliffNPC = {5, -262, -274, -256, -269};
-        int[] meatballNPC = {64, 655,128, 659, 132};
+        int[] meatballNPC = {48, 607,134, 611, 138};
         int[] skydiveNPC = {-17, 656, 438, 665, 447};
         int[] glideNPC = {18, -255, 169, -249, 179};
         int[] boatsNPC = {-4, 335, -69, 347, -54};

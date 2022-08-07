@@ -200,45 +200,45 @@ public class BlockBreakManager {
     public boolean Logs(Material x, Location loc) {
         switch(x) {
             case OAK_LOG:
-                if (logsIsland[0][0] <= loc.getX() && logsIsland[0][0]+8 >= loc.getX()) {
+                if (logsIsland[0][0]-8 <= loc.getX() && logsIsland[0][0] >= loc.getX()) {
                     if (logsIsland[0][1]-20 <= loc.getY() && logsIsland[0][1] >= loc.getY()) {
-                        if (logsIsland[0][2] <= loc.getZ() && logsIsland[0][2]+8 >= loc.getZ()) {
+                        if (logsIsland[0][2]-8 <= loc.getZ() && logsIsland[0][2] >= loc.getZ()) {
                             return true;
                         }
                     }
                 }
                 break;
             case BIRCH_LOG:
-                if (logsIsland[1][0] <= loc.getX() && logsIsland[1][0]+8 >= loc.getX()) {
+                if (logsIsland[1][0]-8 <= loc.getX() && logsIsland[1][0] >= loc.getX()) {
                     if (logsIsland[1][1]-20 <= loc.getY() && logsIsland[1][1] >= loc.getY()) {
-                        if (logsIsland[1][2] <= loc.getZ() && logsIsland[1][2]+8 >= loc.getZ()) {
+                        if (logsIsland[1][2]-8 <= loc.getZ() && logsIsland[1][2] >= loc.getZ()) {
                             return true;
                         }
                     }
                 }
                 break;
             case SPRUCE_LOG:
-                if (logsIsland[2][0] <= loc.getX() && logsIsland[2][0]+8 >= loc.getX()) {
+                if (logsIsland[2][0]-8 <= loc.getX() && logsIsland[2][0] >= loc.getX()) {
                     if (logsIsland[2][1]-20 <= loc.getY() && logsIsland[2][1] >= loc.getY()) {
-                        if (logsIsland[2][2] <= loc.getZ() && logsIsland[2][2]+8 >= loc.getZ()) {
+                        if (logsIsland[2][2]-8 <= loc.getZ() && logsIsland[2][2] >= loc.getZ()) {
                             return true;
                         }
                     }
                 }
                 break;
             case ACACIA_LOG:
-                if (logsIsland[3][0] <= loc.getX() && logsIsland[3][0]+8 >= loc.getX()) {
+                if (logsIsland[3][0]-8 <= loc.getX() && logsIsland[3][0] >= loc.getX()) {
                     if (logsIsland[3][1]-20 <= loc.getY() && logsIsland[3][1] >= loc.getY()) {
-                        if (logsIsland[3][2] <= loc.getZ() && logsIsland[3][2]+8 >= loc.getZ()) {
+                        if (logsIsland[3][2]-8 <= loc.getZ() && logsIsland[3][2] >= loc.getZ()) {
                             return true;
                         }
                     }
                 }
                 break;
             case JUNGLE_LOG:
-                if (logsIsland[4][0] <= loc.getX() && logsIsland[4][0]+8 >= loc.getX()) {
+                if (logsIsland[4][0]-8 <= loc.getX() && logsIsland[4][0] >= loc.getX()) {
                     if (logsIsland[4][1]-20 <= loc.getY() && logsIsland[4][1] >= loc.getY()) {
-                        if (logsIsland[4][2] <= loc.getZ() && logsIsland[4][2]+8 >= loc.getZ()) {
+                        if (logsIsland[4][2]-8 <= loc.getZ() && logsIsland[4][2] >= loc.getZ()) {
                             return true;
                         }
                     }
@@ -402,9 +402,11 @@ public class BlockBreakManager {
     }
 
     public Boolean ConcreteAndGlass(Material x, Location loc) {
-        List<String> orderOfColors  = new ArrayList<>(Arrays.asList("BLA", "LIG", "BLU", "PUR", "PIN", "WHI", "RED", "ORA", "YEL", "LIM"));
-
+        List<String> orderOfColors  = new ArrayList<>(Arrays.asList("BLA", "LIG", "BLU", "PUR", "PIN", "WHI", "RED", "ORA", "YEL", "LIG"));
         int index = orderOfColors.indexOf(x.toString().substring(0, 3));
+        if (index == -1) {
+            return false;
+        }
         if (x.toString().endsWith("GLASS")) {
             if (glassIslands[index][0] <= loc.getX() && glassIslands[index][0] + 8 >= loc.getX()) {
                 if (glassIslands[index][1] - 20 <= loc.getY() && glassIslands[index][1] >= loc.getY()) {

@@ -14,7 +14,8 @@ import java.util.*;
 public class ScoreboardManager {
     private final Players playersObject;
 
-    List<String> teamList = new ArrayList<>();
+    List<String> teamFullList = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"));
+    public List<String> teamList = new ArrayList<>();
     Map<String, String> teamNameFull = new HashMap<>();
     Map<ScoreboardPlayer, ScoreboardTeam> playerTeams = new HashMap<>();
     Map<String, String> teamIcons = new HashMap<>();
@@ -104,9 +105,9 @@ public class ScoreboardManager {
     }
 
     public void GenerateTeamsRound(Objective obj, ScoreboardPlayer p) {
-        for (int i = 14; i >= 9; i--) {
-            if (p.lines.get(obj).containsKey(i)) {
-                obj.getScoreboard().resetScores(p.lines.get(obj).get(i));
+        for (Object[] objects : p.teamLines) {
+            if ((int) objects[1] != -1) {
+                obj.getScoreboard().resetScores((String) objects[0]);
             }
         }
 
@@ -120,7 +121,9 @@ public class ScoreboardManager {
             for (ScoreboardTeam team : scoreboardTeamList) {
                 if (team.roundScore==teamScores.get(i) && t.contains(team.teamName)) {
                     obj.getScore(teamIcons.get(team.teamName)+teamColors.get(team.teamName)+" "+teamNameFull.get(team.teamName)+ChatColor.WHITE+": "+teamScores.get(i)).setScore(14-i);
-                    p.lines.get(obj).put(14-i, teamIcons.get(team.teamName)+teamColors.get(team.teamName)+" "+teamNameFull.get(team.teamName)+ChatColor.WHITE+": "+teamScores.get(i));
+                    int index = teamFullList.indexOf(team.teamName);
+                    p.teamLines[index][0] = teamIcons.get(team.teamName)+teamColors.get(team.teamName)+" "+teamNameFull.get(team.teamName)+ChatColor.WHITE+": "+teamScores.get(i);
+                    p.teamLines[index][1] = 14-i;
                     t.remove(team.teamName);
                 }
             }
@@ -212,6 +215,72 @@ public class ScoreboardManager {
         tgttosScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
+    public void createSGBoard(ScoreboardPlayer player) {
+        if (player.currentObj != null) {
+            player.currentObj.unregister();
+        }
+        Objective sgScoreboard = player.board.registerNewObjective("SG", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+        player.objectiveMap.put("SG",sgScoreboard);
+        Map<Integer, String> lines = new HashMap<>();
+        player.lines.put(sgScoreboard, lines);
+
+        sgScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game: 0/8:"+ChatColor.WHITE+" TGTTOSAWAF").setScore(23);
+        sgScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"BCA").setScore(22);
+        sgScoreboard.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Next Event: "+ChatColor.LIGHT_PURPLE+"Starting").setScore(21);
+        sgScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        sgScoreboard.getScore(ChatColor.RESET.toString()).setScore(19);
+        sgScoreboard.getScore(ChatColor.AQUA+"Game Coins:").setScore(15);
+        sgScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(3);
+        sgScoreboard.getScore(ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0").setScore(2);
+        sgScoreboard.getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0").setScore(1);
+
+        GenerateTeamsRound(sgScoreboard, player);
+
+        player.lines.get(sgScoreboard).put(23, ChatColor.BOLD+""+ChatColor.AQUA + "Game: 0/8:"+ChatColor.WHITE+" TGTTOSAWAF");
+        player.lines.get(sgScoreboard).put(22, ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"BCA");
+        player.lines.get(sgScoreboard).put(21, ChatColor.BOLD+""+ChatColor.GREEN + "Next Event: "+ChatColor.LIGHT_PURPLE+"Starting");
+        player.lines.get(sgScoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(sgScoreboard).put(19, ChatColor.RESET.toString());
+        player.lines.get(sgScoreboard).put(15, ChatColor.AQUA+"Game Coins:");
+        player.lines.get(sgScoreboard).put(3, ChatColor.RESET.toString()+ChatColor.RESET.toString());
+        player.lines.get(sgScoreboard).put(2, ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0");
+        player.lines.get(sgScoreboard).put(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0");
+
+        player.currentObj = sgScoreboard;
+        sgScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
+
+    public void createBSABMScoreboard(ScoreboardPlayer player) {
+        if (player.currentObj != null) {
+            player.currentObj.unregister();
+        }
+        Objective scoreboard = player.board.registerNewObjective("BSABM", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+        player.objectiveMap.put("BSABM",scoreboard);
+        Map<Integer, String> lines = new HashMap<>();
+        player.lines.put(scoreboard, lines);
+
+        scoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game: 0/8:"+ChatColor.WHITE+" BSABM").setScore(23);
+        scoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        scoreboard.getScore(ChatColor.RESET.toString()).setScore(19);
+        scoreboard.getScore(ChatColor.AQUA+"Game Coins:").setScore(15);
+        scoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(3);
+        scoreboard.getScore(ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0").setScore(2);
+        scoreboard.getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0").setScore(1);
+
+        GenerateTeamsRound(scoreboard, player);
+
+        player.lines.get(scoreboard).put(23, ChatColor.BOLD+""+ChatColor.AQUA + "Game: 0/8:"+ChatColor.WHITE+" BSABM");
+        player.lines.get(scoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(scoreboard).put(19, ChatColor.RESET.toString());
+        player.lines.get(scoreboard).put(15, ChatColor.AQUA+"Game Coins:");
+        player.lines.get(scoreboard).put(3, ChatColor.RESET.toString()+ChatColor.RESET.toString());
+        player.lines.get(scoreboard).put(2, ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0");
+        player.lines.get(scoreboard).put(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0");
+
+        player.currentObj = scoreboard;
+        scoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
+
     public void createTeams(ScoreboardPlayer player) {
         String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
 
@@ -251,6 +320,22 @@ public class ScoreboardManager {
         }
     }
 
+    public void addTeamScore(String team, int amount) {
+        for (ScoreboardPlayer p : playerList) {
+            if (playerTeams.get(p).teamName.equals(team)) {
+                p.roundScore = p.roundScore+amount;
+                playerTeams.get(p).roundScore+=amount;
+
+                resetPlayerRounds(p.currentObj, p);
+
+                }
+            }
+        for (ScoreboardPlayer p : playerList) {
+            GenerateTeamsRound(p.currentObj, p);
+        }
+    }
+
+
     public void placementPoints(ScoreboardPlayer player, int amount, int playersFinished) {
         addScore(player, (playerList.size()-playersFinished)*amount);
     }
@@ -268,6 +353,22 @@ public class ScoreboardManager {
                     }
                     Bukkit.broadcastMessage(teamColors.get(t)+teamNameFull.get(t)+ChatColor.WHITE+" finished first");
                 }
+            }
+        }
+    }
+
+    public void lastOneStanding(ScoreboardPlayer player, String game) {
+        teamAmountFinished.put(player.player.team, teamAmountFinished.get(player.player.team)+1);
+        int teamsDead = 0;
+        for (String t : teamList) {
+            if (teamAmountFinished.get(t) == teamAmount.get(t)) {
+                teamsDead++;
+            }
+        }
+        if (teamsDead >= teamList.size()-1) {
+            switch (game) {
+                case "SG":
+                    mcc.sg.endGame();
             }
         }
     }
@@ -292,6 +393,9 @@ public class ScoreboardManager {
         switch (game) {
             case "TGTTOS":
                 mcc.tgttos.nextRound();
+                break;
+            case "SG":
+                mcc.sg.events();
                 break;
         }
     }

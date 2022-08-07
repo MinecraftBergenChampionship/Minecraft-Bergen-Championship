@@ -67,6 +67,7 @@ public class SGListener implements Listener {
                 }
                 if (event.getEntity().getKiller() != null && p.player.getUniqueId() == event.getEntity().getKiller().getUniqueId()) {
                     sg.kill(p);
+                    sg.checkIfGameEnds(p);
                 }
             }
 

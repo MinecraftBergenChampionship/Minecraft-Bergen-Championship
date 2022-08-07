@@ -62,7 +62,7 @@ public final class MCC extends JavaPlugin implements Listener {
     public final Skybattle skybattle = new Skybattle(players, plugin, this);
 
     public final SG sg = new SG(players, this, this);
-    public final BSABM bsabm = new BSABM(players);
+    public final BSABM bsabm = new BSABM(players, this);
 
 //  Game Manager
     private final Game game = new Game(this, tgttos, sg, skybattle, bsabm);
@@ -155,7 +155,7 @@ public final class MCC extends JavaPlugin implements Listener {
                                 Bukkit.broadcastMessage(ChatColor.GOLD+event.getPlayer().getName()+ChatColor.GRAY+ " finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
                                 event.getPlayer().sendMessage(ChatColor.WHITE+"[+"+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
                                 tgttos.playerPoints--;
-                                if (scoreboardManager.playerList.size() >= tgttos.playerAmount) {
+                                if (tgttos.playerAmount >= scoreboardManager.playerList.size()) {
                                     tgttos.nextRound();
                                 }
                                 event.getPlayer().setGameMode(GameMode.SPECTATOR);
