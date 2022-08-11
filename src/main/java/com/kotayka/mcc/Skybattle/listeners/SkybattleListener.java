@@ -1,7 +1,9 @@
 package com.kotayka.mcc.Skybattle.listeners;
 
+import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.Skybattle.Skybattle;
 import com.kotayka.mcc.TGTTOS.managers.Firework;
+import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -13,30 +15,19 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.Objects;
-
-/*
-Map of each player and what last damaged them AND map of creeper spawns
-
-onSpawnCreeper --> Put (creeper, spawner)
-lastDamaged --> Put(Entity, player)
-onDamage:
-    if damagedPlayer was damaged by creeper (but they lived), remove THAT CREEPER from creeper map
-
-    REMOVE that player from the lastDamaged, and then PUT the last thing that damaged them instead
-
-on Death:
-    if playerDied lastDamage is creeper, get the creeper from the creeperMap
-    else, give credit to whatever is on the map
- */
 
 public class SkybattleListener implements Listener {
     public final Skybattle skybattle;
@@ -176,30 +167,65 @@ public class SkybattleListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onSplashEvent(PotionSplashEvent e) {
+        if (!(skybattle.getState().equals("PLAYING"))) { return; }
+        if (!(e.getPotion().getShooter() instanceof Player) && !(e.getHitEntity() instanceof Player)) return;
+
+        ThrownPotion potion = e.getPotion();
+
+        Collection<PotionEffect> effects = potion.getEffects();
+        for (PotionEffect effect : effects) {
+            PotionEffectType potionType = effect.getType();
+            if (!potionType.equals(PotionEffectType.HARM)) return;
+        }
+
+        Player potionedPlayer = (Player) e.getHitEntity();
+
+        if (skybattle.lastDamage.containsKey(potionedPlayer)) {
+            skybattle.lastDamage.remove(potionedPlayer);
+            skybattle.lastDamage.put(potionedPlayer, (Player) potion.getShooter());
+        }
+    }
+
     /*
      * Spawn firework on death
      */
     @EventHandler
     public void playerDie(PlayerDeathEvent e) {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
-        Participant p = new Participant(e.getEntity());
         Player player = e.getEntity();
+        Participant p = Participant.findParticipantFromPlayer(e.getEntity());
+
+        skybattle.playersDeadList.add(player.getUniqueId());
+
+        //temp
+        if (skybattle.playersDeadList.size() < Participant.participantsOnATeam.size())
+            skybattle.outLivePlayer();
+
+        // also temp
+        if (skybattle.playersDeadList.size() >= 1)
+            skybattle.mcc.scoreboardManager.timer = 5;
 
         // If player dies to direct combat
         if (p.player.getKiller() != null) {
             Participant killer = Participant.findParticipantFromPlayer(p.player.getKiller());
             assert killer != null;
             p.Die(p, killer, e);
+            if (!Participant.checkTeams(p, killer))
+                skybattle.kill(killer);
             return;
         }
 
         // Give kill credit to last player hit
         if (skybattle.lastDamage.containsKey(player)) {
-            p.Die(player, skybattle.lastDamage.get(player), e);
+            Player potentialKiller = skybattle.lastDamage.get(player);
+            p.Die(player, potentialKiller, e);
+            if (potentialKiller != null && !Participant.checkTeams(potentialKiller, player)) {
+                skybattle.kill(skybattle.lastDamage.get(player));
+            }
             skybattle.lastDamage.remove(player);
         }
-
-        //skybattle.playersAlive--;
     }
 
     @EventHandler

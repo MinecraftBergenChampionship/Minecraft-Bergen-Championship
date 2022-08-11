@@ -284,7 +284,7 @@ public class SG {
     }
 
     public void outLivePlayer() {
-        for (Participant p : players.participants) {
+        for (Participant p : Participant.participantsOnATeam) {
             if (!playersDeadList.contains(p.player.getUniqueId())) {
                 mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 3);
             }

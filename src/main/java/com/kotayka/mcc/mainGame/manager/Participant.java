@@ -35,7 +35,6 @@ public class Participant {
 
     public void Die(Participant victim, Participant killer, PlayerDeathEvent e) {
         String victimName = victim.teamPrefix + victim.chatColor + victim.ign + ChatColor.GRAY;
-        Bukkit.broadcastMessage("victimName = " + victimName);
         String oldDeathMessage = e.getDeathMessage();
         String newDeathMessage = "";
 
@@ -46,7 +45,7 @@ public class Participant {
             killer.player.sendTitle("\n", "[X] " + victimName, 0, 60, 40);
             victim.player.sendMessage(ChatColor.RED + "You were eliminated by " + killer.ign + "!");
             victim.player.sendTitle(ChatColor.RED + "You died!", null, 0, 60, 40);
-            killer.player.sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + victim.ign + "!");
+            killer.player.sendMessage(ChatColor.GREEN + "You eliminated " + victim.ign + "!");
 
             victim.player.setGameMode(GameMode.SPECTATOR);
             Firework firework = new Firework();
@@ -79,14 +78,15 @@ public class Participant {
             assert killedThem != null;
             killedThem.player.sendTitle("\n", "[X] " + victimName, 0, 60, 40);
             died.player.sendMessage(ChatColor.RED + "You were eliminated by " + killedThem.player.getName() + "!");
-            killedThem.player.sendMessage("[+0] " + ChatColor.GREEN + "You eliminated " + died.player.getName() + "!");
+            killedThem.player.sendMessage(ChatColor.GREEN + "You eliminated " + died.player.getName() + "!");
             died.player.sendTitle(ChatColor.RED + "You died!", null, 0, 60, 40);
             victim.setGameMode(GameMode.SPECTATOR);
             Firework firework = new Firework();
             firework.spawnFireworkWithColor(victim.getLocation(), died.color);
 
-            String killerName = killedThem.teamPrefix + killedThem.chatColor + killedThem.ign + ChatColor.GRAY;
-            e.setDeathMessage(newDeathMessage.replace(killedThem.ign, killerName));
+            e.setDeathMessage(!(killedThem.ign.equals(died.ign))
+                    ? newDeathMessage.replace(killedThem.ign, killedThem.teamPrefix + killedThem.chatColor + killedThem.ign + ChatColor.GRAY)
+                    : newDeathMessage);
             return;
         }
 
@@ -99,6 +99,23 @@ public class Participant {
         e.setDeathMessage(newDeathMessage);
     }
 
+    // RETURNS TRUE IF TEAMS ARE THE SAME
+    public static boolean checkTeams(Participant one, Participant two) {
+        return (one.team).equals(two.team);
+    }
+
+    public static boolean checkTeams(Player one, Player two) {
+        Participant newOne = findParticipantFromPlayer(one);
+        Participant newTwo = findParticipantFromPlayer(two);
+
+        assert newOne != null;
+        assert newTwo != null;
+        if (newOne.team == null || newTwo.team == null) {
+            Bukkit.broadcastMessage("Either " + newOne.ign + " or " + newTwo.ign + " is not on a team! I sure hope this message never gets sent!");
+        }
+        return (newOne.team).equals(newTwo.team);
+    }
+
     public void setTeam(String teamName) {
         team = teamName;
 
@@ -107,7 +124,6 @@ public class Participant {
                 color = Color.RED;
                 chatColor = ChatColor.RED;
                 teamPrefix = ChatColor.WHITE+"Ⓡ ";
-
                 break;
             case "YellowYaks":
                 color = Color.YELLOW;
@@ -129,7 +145,7 @@ public class Participant {
                 chatColor = ChatColor.DARK_PURPLE;
                 teamPrefix = ChatColor.WHITE+"Ⓤ ";
                 break;
-            case "PinkParrots":
+            case "PinkPiglets":
                 color = Color.fromRGB(255, 0, 164);
                 chatColor = ChatColor.LIGHT_PURPLE;
                 teamPrefix = ChatColor.WHITE+"Ⓟ ";

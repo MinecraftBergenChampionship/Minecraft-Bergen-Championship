@@ -30,16 +30,13 @@ public class Skybattle {
     public final Plugin plugin;
     public boolean stage = false;
     public boolean finalShrink = false;
-    //public int playersAlive;
-    //public int teamsAlive;
+    public List<UUID> playersDeadList = new ArrayList<UUID>();
 
     public Map<Player, Player> lastDamage; // <Player, Damager>
     public Map<Entity, Player> creepersAndSpawned = new HashMap<>(16); // <Creeper, Spawner>
     public Map<Entity, Player> whoPlacedThatTNT = new HashMap<>(5);
-    public Map<Entity, Player> whoThrewThatPotion = new HashMap<>(5);
-    public int roundNum = 0;
+    public int roundNum = 1;
     public double borderHeight = 17.0;
-    public int timeLeft;
     public List<Location> spawnPoints = new ArrayList<>(6);
     public List<ItemStack> spawnItems = new ArrayList<>(5);
     public World world;
@@ -163,6 +160,7 @@ public class Skybattle {
     public void resetMap() {
         lastDamage.clear();
         creepersAndSpawned.clear();
+        whoPlacedThatTNT.clear();
 
         int x = 225;
         int y = -16;
@@ -209,10 +207,17 @@ public class Skybattle {
         }
     }
 
+    public void spawnParticles() {
+        for (int mapX = -225; mapX <= -87; mapX++) {
+            for (int mapZ = -325; mapZ <= -207; mapZ++) {
+                world.spawnParticle(Particle.ASH , mapX, borderHeight, mapZ, 1);
+            }
+        }
+    }
+
     public void nextRound() {
         if (roundNum == 3) return;
 
-        finalShrink = false;
         loadMap();
         players.spectators.clear();
         if (roundNum < 3) {
@@ -222,6 +227,7 @@ public class Skybattle {
     }
 
     public void startRound() {
+        playersDeadList.clear();
         mcc.scoreboardManager.startTimerForGame(10, "Skybattle");
         setState("STARTING");
 
@@ -265,27 +271,50 @@ public class Skybattle {
                 mcc.skybattle.setState("INACTIVE");
             }
         }
+        finalShrink = false;
+        // return to lobby
     }
 
     public void timedEventsHandler(int time, ScoreboardPlayer p) {
         // WHILE GAME IS PLAYING
         if (this.getState().equals("PLAYING")) {
-            if (time % 40 == 0 && time != 240 && time >= 60) {
+            spawnParticles();
+            if (time % 40 == 0 && time != 240 && time >= 60 && !finalShrink) {
                 mcc.skybattle.border.setSize(mcc.skybattle.border.getSize() * 0.75, 15);
                 p.player.player.sendMessage(ChatColor.DARK_RED + "> Border is Shrinking!");
                 p.player.player.sendTitle(" ", ChatColor.RED + "Border shrinking!", 0, 20, 10);
-            } else if (((time - 10)) % 40 == 0) {
+            } else if (((time - 10)) % 40 == 0 && !finalShrink) {
                 p.player.player.sendMessage(ChatColor.RED + "> Border shrinking in 10 seconds!");
             } else if (time == 60) {
                 mcc.skybattle.border.setSize(5, 60);
                 p.player.player.sendMessage(ChatColor.DARK_RED+"> Border will continue shrinking!");
+                finalShrink = true;
             } else if (time == 70) {
                 p.player.player.sendMessage(ChatColor.RED+"> Final shrink in 10 seconds!");
+            }
+            if (time <= 75) {
+                borderHeight -= 0.226666667;
             }
         }
         // DURING STARTING
         else if (this.getState().equals("STARTING")) {
             p.player.player.sendTitle("Starting in:", "> " + time + " <", 0, 20, 0);
+        }
+    }
+
+    public void kill(Participant p) {
+        mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 15);
+    }
+
+    public void kill(Player p) {
+        mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.getUniqueId()), 15);
+    }
+
+    public void outLivePlayer() {
+        for (Participant p : Participant.participantsOnATeam) {
+            if (!playersDeadList.contains(p.player.getUniqueId())) {
+                mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 1);
+            }
         }
     }
 
