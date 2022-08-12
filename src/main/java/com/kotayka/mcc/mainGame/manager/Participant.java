@@ -48,15 +48,15 @@ public class Participant {
             killer.player.sendMessage(ChatColor.GREEN + "You eliminated " + victim.ign + "!");
 
             victim.player.setGameMode(GameMode.SPECTATOR);
-            Firework firework = new Firework();
-            firework.spawnFireworkWithColor(victim.player.getLocation(), victim.color);
+            MCC.spawnFirework(victim);
 
-            e.setDeathMessage(newDeathMessage.replace(victim.ign, victimName));
+            e.setDeathMessage(!(killer.ign.equals(victim.ign))
+                    ? newDeathMessage.replace(killer.ign, killer.teamPrefix + killer.chatColor + killer.ign + ChatColor.GRAY)
+                    : newDeathMessage);
             return;
         }
 
-        Firework firework = new Firework();
-        firework.spawnFireworkWithColor(victim.player.getLocation(), victim.color);
+        MCC.spawnFirework(victim);
         victim.player.setGameMode(GameMode.SPECTATOR);
         victim.player.sendTitle(ChatColor.RED + "You died!", null, 0, 60, 40);
         victim.player.sendMessage(ChatColor.RED + "You eliminated yourself!");
@@ -81,8 +81,7 @@ public class Participant {
             killedThem.player.sendMessage(ChatColor.GREEN + "You eliminated " + died.player.getName() + "!");
             died.player.sendTitle(ChatColor.RED + "You died!", null, 0, 60, 40);
             victim.setGameMode(GameMode.SPECTATOR);
-            Firework firework = new Firework();
-            firework.spawnFireworkWithColor(victim.getLocation(), died.color);
+            MCC.spawnFirework(died);
 
             e.setDeathMessage(!(killedThem.ign.equals(died.ign))
                     ? newDeathMessage.replace(killedThem.ign, killedThem.teamPrefix + killedThem.chatColor + killedThem.ign + ChatColor.GRAY)
@@ -92,8 +91,7 @@ public class Participant {
 
         victim.setGameMode(GameMode.SPECTATOR);
         died.player.sendTitle(ChatColor.RED + "You died!", null, 0, 60, 40);
-        Firework firework = new Firework();
-        firework.spawnFireworkWithColor(victim.getLocation(), died.color);
+        MCC.spawnFirework(died);
 
         died.player.sendMessage(ChatColor.RED + "You eliminated yourself!");
         e.setDeathMessage(newDeathMessage);

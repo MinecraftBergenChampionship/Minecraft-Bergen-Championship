@@ -7,6 +7,7 @@ import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftFirework;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -109,6 +110,11 @@ public class SkybattleListener implements Listener {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
         if (!(e.getEntity() instanceof Player)) return;
 
+        if (e.getDamager() instanceof CraftFirework) {
+            e.setCancelled(true);
+            return;
+        }
+
         Player player = (Player) e.getEntity();
 
         // Place appropriate damager in map
@@ -133,7 +139,7 @@ public class SkybattleListener implements Listener {
         // If last damager was not a projectile
         if (skybattle.lastDamage.containsValue(player) && (!(e.getDamager() instanceof Arrow) && !(e.getDamager() instanceof Snowball))) {
             skybattle.lastDamage.remove(player);
-            skybattle.lastDamage.put((Player) e.getDamager(), player);
+            skybattle.lastDamage.put(e.getDamager(), player);
         }
     }
 
@@ -143,7 +149,8 @@ public class SkybattleListener implements Listener {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
 
         if(e.getEntityType() != EntityType.ARROW && e.getEntityType() != EntityType.SNOWBALL) return;
-        if(!(e.getEntity().getShooter() instanceof Player) && !(e.getHitEntity() instanceof Player)) return;
+        if(!(e.getEntity().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
+        if (e.getHitEntity() == null) return;
 
         Player shooter = (Player) e.getEntity().getShooter();
         Player playerGotShot = (Player) e.getHitEntity();
@@ -153,9 +160,9 @@ public class SkybattleListener implements Listener {
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, (Runnable) new Runnable() {
                 @Override
                 public void run() {
-                    playerGotShot.damage(0.1);
-                    final Vector plrV = playerGotShot.getVelocity();
-                    final Vector velocity = new Vector(plrV.getX() * 4, plrV.getY() * 5, plrV.getZ() * 3);
+                    playerGotShot.damage(0.01);
+                    // final Vector plrV = playerGotShot.getVelocity();
+                    final Vector velocity = new Vector(0.05, 0.01, 0.05);
                     playerGotShot.setVelocity(velocity);
                 }
             }, 0L);
@@ -196,16 +203,21 @@ public class SkybattleListener implements Listener {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
         Player player = e.getEntity();
         Participant p = Participant.findParticipantFromPlayer(e.getEntity());
+        assert p != null;
 
         skybattle.playersDeadList.add(player.getUniqueId());
 
-        //temp
-        if (skybattle.playersDeadList.size() < Participant.participantsOnATeam.size())
-            skybattle.outLivePlayer();
+        skybattle.outLivePlayer();
 
-        // also temp
+        // DEBUG MODE (ONE PLAYER)
+        /*
         if (skybattle.playersDeadList.size() >= 1)
-            skybattle.mcc.scoreboardManager.timer = 5;
+            skybattle.mcc.scoreboardManager.timer = 0;
+
+         */
+
+        // TODO: end game if only one team is left
+        skybattle.mcc.scoreboardManager.lastOneStanding(skybattle.mcc.scoreboardManager.players.get(p.player.getUniqueId()), "Skybattle");
 
         // If player dies to direct combat
         if (p.player.getKiller() != null) {

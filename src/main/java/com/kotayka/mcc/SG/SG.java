@@ -299,11 +299,6 @@ public class SG {
         mcc.scoreboardManager.lastOneStanding(mcc.scoreboardManager.players.get(p.player.getUniqueId()), "SG");
     }
 
-    public void spawnFirework(Participant victim) {
-        Firework firework = new Firework();
-        firework.spawnFireworkWithColor(victim.player.getLocation(), victim.color);
-    }
-
     public void endGame() {
 
     }

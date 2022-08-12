@@ -24,7 +24,7 @@ public class ScoreboardManager {
     public List<ScoreboardPlayer> playerList = new ArrayList<>();
     public int timer;
     Map<String, ScoreboardTeam> teams = new HashMap<>();
-    Map<String, Integer> teamAmount = new HashMap<>();
+    public Map<String, Integer> teamAmount = new HashMap<>();
     Map<String, ChatColor> teamColors = new HashMap<>();
     org.bukkit.scoreboard.ScoreboardManager manager =  Bukkit.getScoreboardManager();
 
@@ -400,10 +400,16 @@ public class ScoreboardManager {
                 teamsDead++;
             }
         }
+        Bukkit.broadcastMessage("teamsDead == " + teamsDead);
+        Bukkit.broadcastMessage("teamList.size()-1 == " + (teamList.size()-1));
         if (teamsDead >= teamList.size()-1) {
             switch (game) {
                 case "SG":
                     mcc.sg.endGame();
+                    break;
+                case "Skybattle":
+                    timer = 0;
+                    break;
             }
         }
     }
@@ -461,8 +467,12 @@ public class ScoreboardManager {
                             mcc.skybattle.timedEventsHandler(timer, p);
                         }
                     }
+                    // Events that shouldn't loop for each player
+                    if (mcc.game.stage.equals("Skybattle")) {
+                        mcc.skybattle.specialEvents(timer);
+                    }
                 }
-                else {
+                else if (timer == 0) {
                     for (ScoreboardPlayer p : playerList) {
                         Objective obj = p.currentObj;
                         if (p.lines.get(obj).containsKey(20)) {
@@ -473,6 +483,11 @@ public class ScoreboardManager {
                         p.lines.get(obj).put(20, value);
                     }
                     gameTimerEnded(game);
+                    // teleport back to spawn if game is over
+                    if (mcc.gameIsOver) {
+                        mcc.returnToSpawn();
+                        timer = -1;
+                    }
                 }
                 timer--;
             }
@@ -488,7 +503,7 @@ public class ScoreboardManager {
         teamAmountFinished.put("BlueBats",0);
         teamAmountFinished.put("PurplePandas",0);
         teamAmountFinished.put("PinkPiglets",0);
-        timer = -1;
+        timer = 0;
         teamBonus = true;
     }
 }

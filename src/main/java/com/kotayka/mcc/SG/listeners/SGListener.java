@@ -1,6 +1,7 @@
 package com.kotayka.mcc.SG.listeners;
 
 import com.kotayka.mcc.SG.SG;
+import com.kotayka.mcc.TGTTOS.managers.Firework;
 import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Game;
 import com.kotayka.mcc.mainGame.manager.Participant;
@@ -61,12 +62,10 @@ public class SGListener implements Listener {
                     victim.teleport(deathLoc);
                 }
             }, 30);
-            for (Participant p : players.participants) {
-                if (p.player.getUniqueId() == victim.getUniqueId()) {
-                    sg.spawnFirework(p);
-                }
+            for (Participant p : Participant.participantsOnATeam) {
                 if (event.getEntity().getKiller() != null && p.player.getUniqueId() == event.getEntity().getKiller().getUniqueId()) {
                     sg.kill(p);
+                    p.Die(p.player, event.getEntity().getKiller(), event);
                     sg.checkIfGameEnds(p);
                 }
             }

@@ -32,7 +32,7 @@ public class Skybattle {
     public boolean finalShrink = false;
     public List<UUID> playersDeadList = new ArrayList<UUID>();
 
-    public Map<Player, Player> lastDamage; // <Player, Damager>
+    public Map<Entity, Player> lastDamage; // <Player, Damager>
     public Map<Entity, Player> creepersAndSpawned = new HashMap<>(16); // <Creeper, Spawner>
     public Map<Entity, Player> whoPlacedThatTNT = new HashMap<>(5);
     public int roundNum = 1;
@@ -43,6 +43,8 @@ public class Skybattle {
     public WorldBorder border;
     private final Location CENTER;
     public MCC mcc;
+
+    // for events that don't repeat for each player
 
 
     public Skybattle(Players players, Plugin plugin, MCC mcc) {
@@ -90,6 +92,9 @@ public class Skybattle {
             p.player.setHealth(20);
             p.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 10, 4, false, false));
             p.player.setGameMode(SURVIVAL);
+            p.player.setAllowFlight(false);
+            p.player.setFlying(false);
+            p.player.setInvulnerable(false);
 
             lastDamage.put(p.player, null);
 
@@ -208,8 +213,8 @@ public class Skybattle {
     }
 
     public void spawnParticles() {
-        for (int mapX = -225; mapX <= -87; mapX++) {
-            for (int mapZ = -325; mapZ <= -207; mapZ++) {
+        for (int mapX = -172; mapX <= -143; mapX++) {
+            for (int mapZ = -281; mapZ <= -253; mapZ++) {
                 world.spawnParticle(Particle.ASH , mapX, borderHeight, mapZ, 1);
             }
         }
@@ -256,49 +261,77 @@ public class Skybattle {
     }
 
     public void timeEndEvents() {
-        if (mcc.skybattle.getState().equals("STARTING")) {
-            mcc.skybattle.setState("PLAYING");
-            mcc.scoreboardManager.startTimerForGame(240, "Skybattle");
-            mcc.skybattle.removeBarriers();
-        } else if (mcc.skybattle.getState().equals("PLAYING")) {
-            if (mcc.skybattle.roundNum < 3) {
-                mcc.skybattle.nextRound();
-                mcc.skybattle.setState("STARTING");
-            }
-            else {
-                mcc.skybattle.resetMap();
-                mcc.skybattle.resetBorder();
-                mcc.skybattle.setState("INACTIVE");
-            }
+        switch (mcc.skybattle.getState()) {
+            case "STARTING":
+                mcc.skybattle.setState("PLAYING");
+                mcc.scoreboardManager.startTimerForGame(240, "Skybattle");
+                mcc.skybattle.removeBarriers();
+                break;
+            case "PLAYING":
+                mcc.skybattle.setState("END_ROUND");
+                mcc.scoreboardManager.startTimerForGame(10, "Skybattle");
+                break;
+            case "END_ROUND":
+                if (mcc.skybattle.roundNum < 3) {
+                    mcc.skybattle.nextRound();
+                } else {
+                    mcc.skybattle.resetMap();
+                    mcc.skybattle.resetBorder();
+                    mcc.skybattle.setState("INACTIVE");
+                    mcc.setGameOver(true);
+                }
+                break;
         }
+        Bukkit.broadcastMessage("Skybattle State: " + getState());
         finalShrink = false;
         // return to lobby
     }
 
     public void timedEventsHandler(int time, ScoreboardPlayer p) {
         // WHILE GAME IS PLAYING
-        if (this.getState().equals("PLAYING")) {
-            spawnParticles();
-            if (time % 40 == 0 && time != 240 && time >= 60 && !finalShrink) {
-                mcc.skybattle.border.setSize(mcc.skybattle.border.getSize() * 0.75, 15);
-                p.player.player.sendMessage(ChatColor.DARK_RED + "> Border is Shrinking!");
-                p.player.player.sendTitle(" ", ChatColor.RED + "Border shrinking!", 0, 20, 10);
-            } else if (((time - 10)) % 40 == 0 && !finalShrink) {
-                p.player.player.sendMessage(ChatColor.RED + "> Border shrinking in 10 seconds!");
-            } else if (time == 60) {
-                mcc.skybattle.border.setSize(5, 60);
-                p.player.player.sendMessage(ChatColor.DARK_RED+"> Border will continue shrinking!");
-                finalShrink = true;
-            } else if (time == 70) {
-                p.player.player.sendMessage(ChatColor.RED+"> Final shrink in 10 seconds!");
-            }
-            if (time <= 75) {
-                borderHeight -= 0.226666667;
-            }
+        switch (this.getState()) {
+            case "PLAYING":
+                if (time % 40 == 0 && time != 240 && time >= 60 && !finalShrink) {
+                    mcc.skybattle.border.setSize(mcc.skybattle.border.getSize() * 0.75, 15);
+                    p.player.player.sendMessage(ChatColor.DARK_RED + "> Border is Shrinking!");
+                    p.player.player.sendTitle(" ", ChatColor.RED + "Border shrinking!", 0, 20, 10);
+                } else if (((time - 10)) % 40 == 0 && !finalShrink) {
+                    p.player.player.sendMessage(ChatColor.RED + "> Border shrinking in 10 seconds!");
+                } else if (time == 60) {
+                    mcc.skybattle.border.setSize(5, 60);
+                    p.player.player.sendMessage(ChatColor.DARK_RED + "> Border will continue shrinking!");
+                    finalShrink = true;
+                } else if (time == 70) {
+                    p.player.player.sendMessage(ChatColor.RED + "> Final shrink in 10 seconds!");
+                }
+                break;
+            // DURING STARTING
+            case "STARTING":
+                p.player.player.sendTitle("Starting in:", "> " + time + " <", 0, 20, 0);
+                break;
+            // DURING ROUND END
+            case "END_ROUND":
+                if (time == 9) {
+                    p.player.player.sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!", null, 0, 20, 0);
+                    p.player.player.sendMessage(ChatColor.BOLD+""+ChatColor.RED+"Round Over!");
+                }
+                break;
         }
-        // DURING STARTING
-        else if (this.getState().equals("STARTING")) {
-            p.player.player.sendTitle("Starting in:", "> " + time + " <", 0, 20, 0);
+    }
+
+    public void specialEvents(int time) {
+        switch (this.getState()) {
+            case "PLAYING":
+                if (time <= 75) {
+                    spawnParticles();
+                    if (borderHeight >= 0)
+                        borderHeight -= 0.22666667;
+                }
+                break;
+            case "END_ROUND":
+                if (time == 10)
+                    rewardLastPlayers();
+                break;
         }
     }
 
@@ -314,6 +347,18 @@ public class Skybattle {
         for (Participant p : Participant.participantsOnATeam) {
             if (!playersDeadList.contains(p.player.getUniqueId())) {
                 mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 1);
+            }
+        }
+    }
+
+    public void rewardLastPlayers() {
+        for (Participant p : Participant.participantsOnATeam) {
+            if (!playersDeadList.contains(p.player.getUniqueId())) {
+                mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 15);
+                p.player.setAllowFlight(true);
+                p.player.sendMessage(ChatColor.GREEN+"You survived the round!");
+                p.player.setFlying(true);
+                p.player.setInvulnerable(true);
             }
         }
     }

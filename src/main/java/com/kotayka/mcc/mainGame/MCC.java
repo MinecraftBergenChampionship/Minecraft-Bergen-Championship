@@ -15,16 +15,14 @@ import com.kotayka.mcc.Skybattle.Skybattle;
 import com.kotayka.mcc.Skybattle.listeners.SkybattleListener;
 import com.kotayka.mcc.TGTTOS.TGTTOS;
 import com.kotayka.mcc.TGTTOS.listeners.TGTTOSGameListener;
+import com.kotayka.mcc.TGTTOS.managers.Firework;
 import com.kotayka.mcc.TGTTOS.managers.NPCManager;
 import com.kotayka.mcc.mainGame.Listeners.chatUpdater;
 import com.kotayka.mcc.mainGame.commands.*;
 import com.kotayka.mcc.mainGame.manager.*;
 import com.kotayka.mcc.mainGame.manager.tabComplete.startCommand;
 import com.kotayka.mcc.mainGame.manager.tabComplete.tCommands;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -70,6 +68,12 @@ public final class MCC extends JavaPlugin implements Listener {
 
 //  Game Manager
     public final Game game = new Game(this, tgttos, sg, skybattle, bsabm);
+    public boolean gameIsOver = false;
+
+
+// Location
+    public World spawnWorld;
+    public Location SPAWN;
 
 //  Scoreboard
     public Map roundScores = new HashMap();
@@ -105,6 +109,12 @@ public final class MCC extends JavaPlugin implements Listener {
         teamList.add(blueBats);
         teamList.add(purplePandas);
         teamList.add(pinkParrots);
+
+        if (Bukkit.getWorld("world") != null) {
+            spawnWorld = Bukkit.getWorld("world");
+        }
+
+        SPAWN = new Location(spawnWorld, 0, 2, 0);
 
         TGTTOSGame();
         sgGame();
@@ -184,6 +194,21 @@ public final class MCC extends JavaPlugin implements Listener {
         else {
             skybattle.world = Bukkit.getWorld("Skybattle");
         }
+    }
+
+    public static void spawnFirework(Participant victim) {
+        Firework firework = new Firework();
+        firework.spawnFireworkWithColor(victim.player.getLocation(), victim.color);
+    }
+
+    public void returnToSpawn() {
+        for (Participant participanto : Participant.participantsOnATeam) {
+            participanto.player.teleport(SPAWN);
+        }
+    }
+
+    public void setGameOver(boolean b) {
+        gameIsOver = b;
     }
 
     public void loadTeams() {
