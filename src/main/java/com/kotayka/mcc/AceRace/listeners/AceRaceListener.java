@@ -24,6 +24,10 @@ public class AceRaceListener implements Listener {
             if (event.getPlayer().getLocation().getY() < 0) {
                 event.getPlayer().teleport(aceRace.respawnPoints.get(aceRace.playerProgress.get(event.getPlayer().getUniqueId())));
             }
+            if ((event.getPlayer().getLocation().getBlock().getType() == Material.LAVA)) {
+                event.getPlayer().teleport(aceRace.respawnPoints.get(aceRace.playerProgress.get(event.getPlayer().getUniqueId())));
+                event.getPlayer().setFireTicks(0);
+            }
         }
     }
 }

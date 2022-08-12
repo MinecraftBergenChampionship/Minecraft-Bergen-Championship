@@ -6,6 +6,7 @@ import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -37,7 +38,7 @@ public class AceRace {
     }
 
     public void loadCheckpoints() {
-        respawnPoints.put("Forest", new Location(world, 45, 26, 145));
+        respawnPoints.put("Forest", new Location(world, 95, 25, 119));
         respawnPoints.put("Desert", new Location(world, -59, 26, 140));
         respawnPoints.put("Snow", new Location(world, -119, 27, 77));
         respawnPoints.put("Jungle", new Location(world, -138, 26, -58));
@@ -99,11 +100,15 @@ public class AceRace {
         loadCheckpoints();
         ItemStack trident = new ItemStack(Material.TRIDENT);
         trident.addEnchantment(Enchantment.RIPTIDE, 1);
+        trident.addEnchantment(Enchantment.DURABILITY, 3);
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             playerProgress.put(p.player.player.getUniqueId(), "Forest");
+            playerLaps.put(p.player.player.getUniqueId(), 0);
+            playerFinish.put(p.player.player.getUniqueId(), false);
             p.player.player.getInventory().clear();
             p.player.player.getInventory().addItem(trident);
             p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
+            p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.player.player.teleport(new Location(world, 1, 26, 150));
             mcc.scoreboardManager.createAceRaceBoard(p);
         }
