@@ -234,6 +234,8 @@ public class Skybattle {
     public void startRound() {
         playersDeadList.clear();
         mcc.scoreboardManager.startTimerForGame(10, "Skybattle");
+        String roundValue = ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+ roundNum + "/3";
+        mcc.scoreboardManager.changeLine(22, roundValue);
         setState("STARTING");
 
         // Randomly place each team at a different spawn

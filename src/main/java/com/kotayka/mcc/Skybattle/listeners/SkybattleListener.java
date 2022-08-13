@@ -18,6 +18,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -195,8 +196,22 @@ public class SkybattleListener implements Listener {
         }
     }
 
+    // Kill credit for fishing rod
+    @EventHandler
+    public void onPlayerFish(PlayerFishEvent e) {
+        if (!(skybattle.getState().equals("PLAYING"))) { return; }
+        if (!(e.getCaught() instanceof Player)) { return; }
+
+        Player hooked = (Player) e.getCaught();
+
+        if (skybattle.lastDamage.containsKey(hooked)) {
+            skybattle.lastDamage.remove(hooked);
+            skybattle.lastDamage.put(hooked, e.getPlayer());
+        }
+    }
+
     /*
-     * Spawn firework on death
+     * Give kill credit to lastDamager
      */
     @EventHandler
     public void playerDie(PlayerDeathEvent e) {

@@ -193,7 +193,7 @@ public class ScoreboardManager {
 
         skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" Skybattle").setScore(23);
         skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"Skybattle").setScore(22);
-        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+mcc.skybattle.roundNum+"/3").setScore(21);
+        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+ "0/3").setScore(21);
         skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
         skybattleScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(19);
         skybattleScoreboard.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
@@ -205,7 +205,7 @@ public class ScoreboardManager {
 
         player.lines.get(skybattleScoreboard).put(23, ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" Skybattle");
         player.lines.get(skybattleScoreboard).put(22, ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"Skybattle");
-        player.lines.get(skybattleScoreboard).put(21, ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+mcc.skybattle.roundNum+"/3");
+        player.lines.get(skybattleScoreboard).put(21, ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+"0/3");
         player.lines.get(skybattleScoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
         player.lines.get(skybattleScoreboard).put(15, ChatColor.GREEN+"Game Scores");
         player.lines.get(skybattleScoreboard).put(4, ChatColor.RESET.toString());
