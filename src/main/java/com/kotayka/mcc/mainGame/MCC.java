@@ -6,6 +6,8 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.kotayka.mcc.AceRace.AceRace;
+import com.kotayka.mcc.AceRace.listener.AceRaceListener;
 import com.kotayka.mcc.BSABM.BSABM;
 import com.kotayka.mcc.BSABM.commands.checkBuild;
 import com.kotayka.mcc.BSABM.listeners.BSABMListener;
@@ -62,12 +64,12 @@ public final class MCC extends JavaPlugin implements Listener {
 //  Games
     public final TGTTOS tgttos = new TGTTOS(players, npcManager, this, this);
     public final Skybattle skybattle = new Skybattle(players, plugin, this);
-
+    private final AceRace aceRace = new AceRace(this);
     public final SG sg = new SG(players, this, this);
     public final BSABM bsabm = new BSABM(players, this);
 
 //  Game Manager
-    public final Game game = new Game(this, tgttos, sg, skybattle, bsabm);
+    public final Game game = new Game(this, tgttos, sg, skybattle, bsabm, aceRace);
     public boolean gameIsOver = false;
 
 
@@ -120,6 +122,12 @@ public final class MCC extends JavaPlugin implements Listener {
         sgGame();
         SkybattleGame();
         BSABM();
+        AceRaceGame();
+    }
+
+    public void AceRaceGame() {
+        aceRace.loadWorld();
+        getServer().getPluginManager().registerEvents(new AceRaceListener(aceRace), this);
     }
 
     public void BSABM() {
