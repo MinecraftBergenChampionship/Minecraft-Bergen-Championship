@@ -34,7 +34,7 @@ public class Participant {
     }
 
     public void Die(Participant victim, Participant killer, PlayerDeathEvent e) {
-        String victimName = victim.teamPrefix + victim.chatColor + victim.ign + ChatColor.GRAY;
+        String victimName = victim.teamPrefix + victim.chatColor + victim.ign + ChatColor.WHITE;
         String oldDeathMessage = e.getDeathMessage();
         String newDeathMessage = "";
 
@@ -51,7 +51,7 @@ public class Participant {
             MCC.spawnFirework(victim);
 
             e.setDeathMessage(!(killer.ign.equals(victim.ign))
-                    ? newDeathMessage.replace(killer.ign, killer.teamPrefix + killer.chatColor + killer.ign + ChatColor.GRAY)
+                    ? newDeathMessage.replace(killer.ign, killer.teamPrefix + killer.chatColor + killer.ign + ChatColor.WHITE)
                     : newDeathMessage);
             return;
         }
@@ -66,7 +66,7 @@ public class Participant {
     public void Die(Player victim, Player killer, PlayerDeathEvent e) {
         Participant died = Participant.findParticipantFromPlayer(victim);
         assert died != null;
-        String victimName = died.teamPrefix + died.chatColor + died.ign + ChatColor.GRAY;
+        String victimName = died.teamPrefix + died.chatColor + died.ign + ChatColor.WHITE;
         String oldDeathMessage = e.getDeathMessage();
         String newDeathMessage = "";
 
@@ -84,7 +84,7 @@ public class Participant {
             MCC.spawnFirework(died);
 
             e.setDeathMessage(!(killedThem.ign.equals(died.ign))
-                    ? newDeathMessage.replace(killedThem.ign, killedThem.teamPrefix + killedThem.chatColor + killedThem.ign + ChatColor.GRAY)
+                    ? newDeathMessage.replace(killedThem.ign, killedThem.teamPrefix + killedThem.chatColor + killedThem.ign + ChatColor.WHITE)
                     : newDeathMessage);
             return;
         }
