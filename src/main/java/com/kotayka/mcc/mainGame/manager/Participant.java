@@ -27,6 +27,7 @@ public class Participant {
 
     public final Player player;
     public String ign;
+    public int paintballCooldown = 0;
 
     public Participant(Player player) {
         this.player = player;
@@ -157,5 +158,12 @@ public class Participant {
         }
         Bukkit.broadcastMessage("That player is not on a team!");
         return null;
+    }
+
+    public void setCooldown(int n) {
+        paintballCooldown = n;
+    }
+    public int getCooldown() {
+        return paintballCooldown;
     }
 }

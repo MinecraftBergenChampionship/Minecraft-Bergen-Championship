@@ -9,6 +9,8 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.kotayka.mcc.BSABM.BSABM;
 import com.kotayka.mcc.BSABM.commands.checkBuild;
 import com.kotayka.mcc.BSABM.listeners.BSABMListener;
+import com.kotayka.mcc.Paintdown.Listener.PaintdownListener;
+import com.kotayka.mcc.Paintdown.Paintdown;
 import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.SG.listeners.SGListener;
 import com.kotayka.mcc.Skybattle.Skybattle;
@@ -65,9 +67,10 @@ public final class MCC extends JavaPlugin implements Listener {
 
     public final SG sg = new SG(players, this, this);
     public final BSABM bsabm = new BSABM(players, this);
+    public final Paintdown paintdown = new Paintdown(players, this);
 
 //  Game Manager
-    public final Game game = new Game(this, tgttos, sg, skybattle, bsabm);
+    public final Game game = new Game(this, tgttos, sg, skybattle, bsabm, paintdown);
     public boolean gameIsOver = false;
 
 
@@ -120,6 +123,7 @@ public final class MCC extends JavaPlugin implements Listener {
         sgGame();
         SkybattleGame();
         BSABM();
+        paintdownGame();
     }
 
     public void BSABM() {
@@ -129,6 +133,10 @@ public final class MCC extends JavaPlugin implements Listener {
 
     public void sgGame() {
         getServer().getPluginManager().registerEvents((Listener) new SGListener(sg, game, players,this), this);
+    }
+
+    public void paintdownGame() {
+        getServer().getPluginManager().registerEvents((Listener) new PaintdownListener(paintdown, this), this);
     }
 
     public void TGTTOSGame() {

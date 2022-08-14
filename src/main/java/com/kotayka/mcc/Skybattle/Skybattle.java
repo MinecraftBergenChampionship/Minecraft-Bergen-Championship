@@ -54,12 +54,8 @@ public class Skybattle {
 
         lastDamage = new HashMap<>(players.players.size());
 
-        if (Bukkit.getWorld("Skybattle") == null) {
-            world = Bukkit.getWorld("world");
-        }
-        else {
-            world = Bukkit.getWorld("Skybattle");
-        }
+        // world = Bukkit.getWorld("Skybattle") unless null
+        world = Bukkit.getWorld("Skybattle") == null ? Bukkit.getWorld("world") : Bukkit.getWorld("Skybattle");
 
         CENTER = new Location(world, -157, 0, -266);
     }
