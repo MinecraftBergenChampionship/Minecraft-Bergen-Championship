@@ -89,11 +89,15 @@ public class AceRace {
     public void playerFinishLap(Player p) {
         if (playerFinish.get(p.getUniqueId())) {
             if (playerLaps.get(p.getUniqueId()) < 2) {
+                playerFinish.put(p.getUniqueId(), false);
                 playerLaps.put(p.getUniqueId(), playerLaps.get(p.getUniqueId())+1);
+                mcc.scoreboardManager.changeLine(3, ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+playerLaps.get(p.getUniqueId())+"/3");
             }
             else {
+                mcc.scoreboardManager.changeLine(3, ChatColor.LIGHT_PURPLE+"Finished");
                 playerFinish(p);
             }
+
         }
     }
 
@@ -111,7 +115,7 @@ public class AceRace {
             p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
             p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.player.player.teleport(new Location(world, 1, 26, 150));
-            // mcc.scoreboardManager.createAceRaceBoard(p);
+             mcc.scoreboardManager.createAceRaceBoard(p);
         }
     }
 }

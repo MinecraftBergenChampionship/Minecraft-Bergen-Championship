@@ -64,7 +64,7 @@ public final class MCC extends JavaPlugin implements Listener {
 //  Games
     public final TGTTOS tgttos = new TGTTOS(players, npcManager, this, this);
     public final Skybattle skybattle = new Skybattle(players, plugin, this);
-    private final AceRace aceRace = new AceRace(this);
+    public final AceRace aceRace = new AceRace(this);
     public final SG sg = new SG(players, this, this);
     public final BSABM bsabm = new BSABM(players, this);
 

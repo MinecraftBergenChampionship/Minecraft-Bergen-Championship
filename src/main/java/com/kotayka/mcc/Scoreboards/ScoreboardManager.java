@@ -264,7 +264,7 @@ public class ScoreboardManager {
         aceRacesScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(19);
         aceRacesScoreboard.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
         aceRacesScoreboard.getScore(ChatColor.RESET.toString()).setScore(4);
-        aceRacesScoreboard.getScore(ChatColor.LIGHT_PURPLE+"Lompleted Maps: "+ChatColor.WHITE+"0").setScore(3);
+        aceRacesScoreboard.getScore(ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+"0/3").setScore(3);
         aceRacesScoreboard.getScore(ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0").setScore(2);
         aceRacesScoreboard.getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0").setScore(1);
 
@@ -274,7 +274,7 @@ public class ScoreboardManager {
         player.lines.get(aceRacesScoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
         player.lines.get(aceRacesScoreboard).put(15, ChatColor.GREEN+"Game Scores");
         player.lines.get(aceRacesScoreboard).put(4, ChatColor.RESET.toString());
-        player.lines.get(aceRacesScoreboard).put(3, ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+"0");
+        player.lines.get(aceRacesScoreboard).put(3, ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+"0/3");
         player.lines.get(aceRacesScoreboard).put(2, ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0");
         player.lines.get(aceRacesScoreboard).put(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0");
 
