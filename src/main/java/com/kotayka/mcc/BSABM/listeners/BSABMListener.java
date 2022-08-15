@@ -80,6 +80,7 @@ public class BSABMListener implements Listener {
         }
         if (game.stage.equals("BSABM")) {
             if (e.getPlayer().getLocation().getY() <= -33) {
+                bsabm.givePlayerItems(e.getPlayer());
                 e.getPlayer().teleport(new Location(bsabm.world, 11, 1, 0));
             }
             if (e.getPlayer().getLocation().getBlock().getType().equals(Material.NETHER_PORTAL)) {

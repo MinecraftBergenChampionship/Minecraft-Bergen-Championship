@@ -8,6 +8,9 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -219,6 +222,7 @@ public class BSABM {
         Firework firework = new Firework();
         firework.spawnFirework(fireworkLoc);
         mapFinishes.set(teamFields[teamNum][fieldNum], mapFinishes.get(teamFields[teamNum][fieldNum])+1);
+        Bukkit.broadcastMessage("Score: "+(3+(3*(mcc.scoreboardManager.teamList.size()-mapFinishes.get(teamFields[teamNum][fieldNum]))))+", Map Finishes: "+mapFinishes.get(teamFields[teamNum][fieldNum]));
         mcc.scoreboardManager.addTeamScore(teams[teamNum], 3+(3*(mcc.scoreboardManager.teamList.size()-mapFinishes.get(teamFields[teamNum][fieldNum]))));
         switch (teamNum) {
             case 0:
@@ -255,35 +259,47 @@ public class BSABM {
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             mcc.scoreboardManager.createBSABMScoreboard(p);
         }
+        List<Entity> entList = world.getEntities();
+        for(Entity current : entList){
+            if (current.getType() == EntityType.DROPPED_ITEM){
+                current.remove();
+            }
+        }
         for (Player player : players.players) {
-            player.getInventory().clear();
-            ItemStack silkPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
-            silkPickaxe.addEnchantment(Enchantment.SILK_TOUCH, 1);
-            silkPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
 
-            ItemStack regPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
-            regPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
-
-            ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
-            axe.addEnchantment(Enchantment.DURABILITY, 3);
-
-            ItemStack shovel = new ItemStack(Material.DIAMOND_SHOVEL);
-            shovel.addEnchantment(Enchantment.DURABILITY, 3);
-
-            ItemStack elytra = new ItemStack(Material.ELYTRA);
-            elytra.addEnchantment(Enchantment.DURABILITY, 3);
-
-            player.getInventory().addItem(silkPickaxe);
-            player.getInventory().addItem(regPickaxe);
-            player.getInventory().addItem(axe);
-            player.getInventory().addItem(shovel);
-            player.getInventory().setChestplate(elytra);
+            givePlayerItems(player);
 
             player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000000, 255, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000000, 255, false, false));
 
             player.teleport(new Location(world, 11, 1, 0));
 
             player.setGameMode(GameMode.SURVIVAL);
         }
+    }
+
+    public void givePlayerItems(Player player) {
+        player.getInventory().clear();
+        ItemStack silkPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
+        silkPickaxe.addEnchantment(Enchantment.SILK_TOUCH, 1);
+        silkPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
+
+        ItemStack regPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
+        regPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
+
+        ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
+        axe.addEnchantment(Enchantment.DURABILITY, 3);
+
+        ItemStack shovel = new ItemStack(Material.DIAMOND_SHOVEL);
+        shovel.addEnchantment(Enchantment.DURABILITY, 3);
+
+        ItemStack elytra = new ItemStack(Material.ELYTRA);
+        elytra.addEnchantment(Enchantment.DURABILITY, 3);
+
+        player.getInventory().addItem(silkPickaxe);
+        player.getInventory().addItem(regPickaxe);
+        player.getInventory().addItem(axe);
+        player.getInventory().addItem(shovel);
+        player.getInventory().setChestplate(elytra);
     }
 }

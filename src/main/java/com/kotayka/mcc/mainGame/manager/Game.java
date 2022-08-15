@@ -29,8 +29,11 @@ public class Game {
         this.aceRace = aceRace;
     }
 
-    public void changeGame(String game) {
+    public void startGame() {
         mcc.scoreboardManager.startScoreboard();
+    }
+
+    public void changeGame(String game) {
         stage=game;
         if (!(game.equals("Lobby"))) {
             mcc.gameRound++;

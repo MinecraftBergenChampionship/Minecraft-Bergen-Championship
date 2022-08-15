@@ -137,6 +137,41 @@ public class ScoreboardManager {
         p.lines.get(obj).put(2, ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+p.roundScore);
     }
 
+    public void GenerateTeamsGame(Objective obj, ScoreboardPlayer p) {
+        for (Object[] objects : p.teamLines) {
+            if ((int) objects[1] != -1) {
+                obj.getScoreboard().resetScores((String) objects[0]);
+            }
+        }
+
+        List<Integer> teamScores = new ArrayList<>();
+        for (ScoreboardTeam team : scoreboardTeamList) {
+            teamScores.add(team.gameScore);
+        }
+        Collections.sort(teamScores, Collections.reverseOrder());
+        List<String> t = new ArrayList<>(teamList);
+        for (int i = 0; i < teamScores.size(); i++) {
+            for (ScoreboardTeam team : scoreboardTeamList) {
+                if (team.gameScore==teamScores.get(i) && t.contains(team.teamName)) {
+                    obj.getScore(teamIcons.get(team.teamName)+teamColors.get(team.teamName)+" "+teamNameFull.get(team.teamName)+ChatColor.WHITE+": "+teamScores.get(i)).setScore(14-i);
+                    int index = teamFullList.indexOf(team.teamName);
+                    p.teamLines[index][0] = teamIcons.get(team.teamName)+teamColors.get(team.teamName)+" "+teamNameFull.get(team.teamName)+ChatColor.WHITE+": "+teamScores.get(i);
+                    p.teamLines[index][1] = 14-i;
+                    t.remove(team.teamName);
+
+                    if (team.teamName == p.player.team) {
+                        if (p.lines.get(obj).containsKey(2)) {
+                            obj.getScoreboard().resetScores(p.lines.get(obj).get(2));
+                        }
+
+                        obj.getScore(ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+p.gameScore).setScore(2);
+                        p.lines.get(obj).put(2, ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+p.roundScore);
+                    }
+                }
+            }
+        }
+    }
+
     public void resetPlayerRounds(Objective obj, ScoreboardPlayer p) {
         if (p.lines.get(obj).containsKey(1)) {
             obj.getScoreboard().resetScores(p.lines.get(obj).get(1));
@@ -165,7 +200,7 @@ public class ScoreboardManager {
         lobby.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(2);
         lobby.getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"0").setScore(1);
 
-        GenerateTeamsRound(lobby, player);
+        GenerateTeamsGame(lobby, player);
 
         player.lines.get(lobby).put(21, ChatColor.BOLD+""+ChatColor.RED + "Event begins in:");
         player.lines.get(lobby).put(20, ChatColor.WHITE + "Waiting...");
@@ -259,7 +294,7 @@ public class ScoreboardManager {
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(aceRacesScoreboard, lines);
 
-        aceRacesScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" TGTTOSAWAF").setScore(23);
+        aceRacesScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" Ace Race").setScore(23);
         aceRacesScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
         aceRacesScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(19);
         aceRacesScoreboard.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
@@ -280,6 +315,18 @@ public class ScoreboardManager {
 
         player.currentObj = aceRacesScoreboard;
         aceRacesScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
+
+    public void endGame() {
+        for (String t : teamList) {
+            teams.get(t).gameScore+=teams.get(t).roundScore;
+            teams.get(t).roundScore=0;
+        }
+        for (ScoreboardPlayer p : playerList) {
+            p.gameScore+=p.roundScore;
+            p.roundScore=0;
+        }
+        resetVars();
     }
 
     public void createSGBoard(ScoreboardPlayer player) {
@@ -458,6 +505,16 @@ public class ScoreboardManager {
         }
     }
 
+    public void changePlayerLine(int line, String value, ScoreboardPlayer p) {
+        Objective obj = p.currentObj;
+        if (p.lines.get(obj).containsKey(line)) {
+            obj.getScoreboard().resetScores(p.lines.get(obj).get(line));
+        }
+
+        obj.getScore(value).setScore(line);
+        p.lines.get(obj).put(line, value);
+    }
+
     public String getFormattedTime(int seconds) {
         return String.format("%02d", seconds/60) +":"+String.format("%02d", seconds%60);
     }
@@ -472,6 +529,9 @@ public class ScoreboardManager {
                 break;
             case "Skybattle":
                 mcc.skybattle.timeEndEvents();
+                break;
+            case "AceRace":
+                mcc.aceRace.endGame();
                 break;
         }
     }

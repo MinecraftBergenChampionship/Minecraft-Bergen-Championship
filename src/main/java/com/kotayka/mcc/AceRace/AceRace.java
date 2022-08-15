@@ -15,6 +15,7 @@ import java.util.*;
 public class AceRace {
     public List<String> mapOrder = new ArrayList<>(Arrays.asList("Forest", "Desert", "Snow", "Jungle", "Underwater", "Nether", "End", "Small"));
     public Map<String, Location> respawnPoints = new HashMap<>();
+    Map<Integer, Integer> playerLapPlacement = new HashMap<>();
     public Map<String, Location> bouncerPoints = new HashMap<>();
     public Map<UUID, String> playerProgress = new HashMap<>();
     public Map<UUID, Integer> playerLaps= new HashMap<>();
@@ -88,16 +89,38 @@ public class AceRace {
 
     public void playerFinishLap(Player p) {
         if (playerFinish.get(p.getUniqueId())) {
+            Bukkit.broadcastMessage(ChatColor.GOLD+p.getDisplayName()+ChatColor.WHITE+" finished Lap #"+(playerLaps.get(p.getUniqueId())+1));
+            mcc.scoreboardManager.placementPoints(mcc.scoreboardManager.players.get(p.getUniqueId()), 2, playerLapPlacement.get(playerLaps.get(p.getUniqueId())));
+            playerLapPlacement.put(playerLaps.get(p.getUniqueId()), playerLapPlacement.get(playerLaps.get(p.getUniqueId()))+1);
             if (playerLaps.get(p.getUniqueId()) < 2) {
                 playerFinish.put(p.getUniqueId(), false);
                 playerLaps.put(p.getUniqueId(), playerLaps.get(p.getUniqueId())+1);
-                mcc.scoreboardManager.changeLine(3, ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+playerLaps.get(p.getUniqueId())+"/3");
+                mcc.scoreboardManager.changePlayerLine(3, ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+playerLaps.get(p.getUniqueId())+"/3", mcc.scoreboardManager.players.get(p.getUniqueId()));
             }
             else {
-                mcc.scoreboardManager.changeLine(3, ChatColor.LIGHT_PURPLE+"Finished");
+                Bukkit.broadcastMessage(ChatColor.GOLD+p.getDisplayName()+ChatColor.WHITE+" finished the course in place #"+(playerLapPlacement.get(playerLaps.get(p.getUniqueId()))));
+                playerFinish.put(p.getUniqueId(), false);
+                if (playerLapPlacement.get(playerLaps.get(p.getUniqueId())) == 1) {
+                    mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.getUniqueId()), 25);
+                }
+                else if (playerLapPlacement.get(playerLaps.get(p.getUniqueId())) == 2) {
+                    mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.getUniqueId()), 15);
+                }
+                else if (playerLapPlacement.get(playerLaps.get(p.getUniqueId())) == 3) {
+                    mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.getUniqueId()), 10);
+                }
+                mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.getUniqueId()), 10);
+                mcc.scoreboardManager.changePlayerLine(3, ChatColor.LIGHT_PURPLE+"Finished Course", mcc.scoreboardManager.players.get(p.getUniqueId()));
                 playerFinish(p);
+                mcc.scoreboardManager.teamFinish(mcc.scoreboardManager.players.get(p.getUniqueId()), 20);
             }
+        }
+    }
 
+    public void endGame() {
+        Bukkit.broadcastMessage(ChatColor.RED+"Game has ended");
+        for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
+            p.player.player.setGameMode(GameMode.SPECTATOR);
         }
     }
 
@@ -106,6 +129,10 @@ public class AceRace {
         ItemStack trident = new ItemStack(Material.TRIDENT);
         trident.addEnchantment(Enchantment.RIPTIDE, 1);
         trident.addEnchantment(Enchantment.DURABILITY, 3);
+        mcc.scoreboardManager.startTimerForGame(600, "AceRace");
+        for (int i = 0; i < 5; i++) {
+            playerLapPlacement.put(i, 0);
+        }
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             playerProgress.put(p.player.player.getUniqueId(), "Forest");
             playerLaps.put(p.player.player.getUniqueId(), 0);
