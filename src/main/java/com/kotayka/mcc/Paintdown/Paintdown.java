@@ -8,6 +8,7 @@ import net.bytebuddy.ClassFileVersion;
 import net.minecraft.core.particles.ParticleParam;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -49,7 +50,11 @@ public class Paintdown {
         // Spawn Items (for now, just iron horse armor and potions)
         spawnItems = Arrays.asList(
                 new ItemStack(Material.IRON_HORSE_ARMOR),
-                new ItemStack(Material.SPLASH_POTION, 3)
+                new ItemStack(Material.SPLASH_POTION, 3),
+                new ItemStack(Material.LEATHER_BOOTS),
+                new ItemStack(Material.LEATHER_CHESTPLATE),
+                new ItemStack(Material.LEATHER_HELMET),
+                new ItemStack(Material.LEATHER_LEGGINGS)
         );
 
         Location spawnOne = new Location(world, -39, 0, -17);
@@ -97,7 +102,17 @@ public class Paintdown {
             p.player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 10000, 2, false, false));
 
             for (ItemStack i : spawnItems) {
-                p.player.getInventory().addItem(i);
+                if (i.getType().toString().startsWith("LEATHER")) {
+                    ItemStack newArmor = p.getColoredLeatherArmor(i);
+                    switch (newArmor.getType()) {
+                        case LEATHER_HELMET -> p.player.getInventory().setHelmet(newArmor);
+                        case LEATHER_CHESTPLATE -> p.player.getInventory().setChestplate(newArmor);
+                        case LEATHER_LEGGINGS -> p.player.getInventory().setLeggings(newArmor);
+                        default -> p.player.getInventory().setBoots(newArmor);
+                    }
+                } else {
+                    p.player.getInventory().addItem(i);
+                }
             }
         }
     }
