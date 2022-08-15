@@ -41,7 +41,7 @@ public class PaintdownListener implements Listener {
 
         if (player.getInventory().getItemInMainHand().getType().equals(Material.IRON_HORSE_ARMOR)) {
             long timeLeft = System.currentTimeMillis() - p.getCooldown();
-            if (TimeUnit.MILLISECONDS.toSeconds(timeLeft) >= 1) {
+            if (TimeUnit.MILLISECONDS.toSeconds(timeLeft) >= 0.5) {
                 Snowball projectile = player.launchProjectile(Snowball.class);
                 projectile.setShooter(player); // Not sure if this is necessary
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 2);
@@ -61,25 +61,10 @@ public class PaintdownListener implements Listener {
         Player hitPlayer = (Player) e.getHitEntity();
         assert e.getEntity().getShooter() instanceof Player;
         Player shooter = (Player) e.getEntity().getShooter();
-
+        Vector snowballVelocity = e.getEntity().getVelocity();
         hitPlayer.damage(5);
-
-        // Cool iDrg math: snowball send in correct direction
-        // Bug: pulls players when they are facing perfectly straight in Z direction against one another
-        double shooterX = shooter.getLocation().getX();
-        double hitPlayerX = hitPlayer.getLocation().getX();
-        double shooterZ = shooter.getLocation().getZ();
-        double hitPlayerZ = hitPlayer.getLocation().getZ();
-        double angle = Math.atan((hitPlayerZ - shooterZ)/(hitPlayerX - shooterX));
-
-        Vector velocity;
-        if (hitPlayerX > shooterX) {
-            velocity = new Vector(0.15 * Math.cos(angle), 0.05, 0.15 * Math.sin(angle));
-        } else {
-            velocity = new Vector(0.15 * Math.cos(angle + Math.PI), 0.05, 0.15 * Math.sin(angle+Math.PI));
-        }
-
-        hitPlayer.setVelocity(velocity);
+        shooter.playSound(shooter.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 5);
+        hitPlayer.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
     }
 
     @EventHandler
