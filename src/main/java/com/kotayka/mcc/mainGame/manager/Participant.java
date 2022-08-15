@@ -146,7 +146,7 @@ public class Participant {
                 teamPrefix = ChatColor.WHITE+"Ⓤ ";
                 break;
             case "PinkPiglets":
-                color = Color.fromRGB(255, 0, 164);
+                color = Color.fromRGB(243, 139, 170);
                 chatColor = ChatColor.LIGHT_PURPLE;
                 teamPrefix = ChatColor.WHITE+"Ⓟ ";
                 break;

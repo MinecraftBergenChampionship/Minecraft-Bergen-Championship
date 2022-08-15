@@ -158,18 +158,9 @@ public class SkybattleListener implements Listener {
 
         if (e.getEntityType() == EntityType.SNOWBALL) {
             assert playerGotShot != null;
-            // Cool iDrg math: snowball send in correct direction
-            // Bug: pulls players when they are facing perfectly straight in Z direction against one another
-            double shooterX = shooter.getLocation().getX();
-            double hitPlayerX = playerGotShot.getLocation().getX();
-            double shooterZ = shooter.getLocation().getZ();
-            double hitPlayerZ = playerGotShot.getLocation().getZ();
-            double angle = Math.atan((hitPlayerZ - shooterZ)/(hitPlayerX - shooterX));
-
-            Vector velocity = hitPlayerX > shooterX ?  new Vector(0.15 * Math.cos(angle), 0.05, 0.15 * Math.sin(angle))
-                    : new Vector(0.15 * Math.cos(angle + Math.PI), 0.05, 0.15 * Math.sin(angle+Math.PI));
-
-            playerGotShot.setVelocity(velocity);
+            Vector snowballVelocity = e.getEntity().getVelocity();
+            playerGotShot.damage(0.01);
+            playerGotShot.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
         }
 
         if (skybattle.lastDamage.containsKey(playerGotShot)) {
