@@ -2,6 +2,7 @@ package com.kotayka.mcc.mainGame.manager;
 
 import com.kotayka.mcc.AceRace.AceRace;
 import com.kotayka.mcc.BSABM.BSABM;
+import com.kotayka.mcc.DecisionDome.DecisionDome;
 import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.Skybattle.Skybattle;
@@ -11,7 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 public class Game {
-    public String stage = "Lobby";
+    public String stage = "Waiting";
 
     private TGTTOS tgttos;
     private Skybattle skybattle;
@@ -19,23 +20,21 @@ public class Game {
     private final SG sg;
     private final BSABM bsabm;
     private final AceRace aceRace;
+    private final DecisionDome decisionDome;
 
-    public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm, AceRace aceRace) {
+    public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm, AceRace aceRace, DecisionDome decisionDome) {
         this.tgttos = tgttos;
         this.mcc = mcc;
         this.sg = sg;
         this.skybattle = skybattle;
         this.bsabm = bsabm;
         this.aceRace = aceRace;
-    }
-
-    public void startGame() {
-        mcc.scoreboardManager.startScoreboard();
+        this.decisionDome = decisionDome;
     }
 
     public void changeGame(String game) {
         stage=game;
-        if (!(game.equals("Lobby"))) {
+        if (!(game.equals("Lobby") || game.equals("DD"))) {
             mcc.gameRound++;
         }
         switch (game) {
@@ -61,7 +60,16 @@ public class Game {
             case "AceRace":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "Ace Race Game started");
                 aceRace.start();
+            case "DD":
+                Bukkit.broadcastMessage(ChatColor.YELLOW + "DD Game started");
+                decisionDome.start();
                 break;
         }
+    }
+
+    public void start() {
+        stage="Starting";
+        mcc.scoreboardManager.clearTeams();
+        mcc.scoreboardManager.startTimerForGame(30, "Lobby");
     }
 }
