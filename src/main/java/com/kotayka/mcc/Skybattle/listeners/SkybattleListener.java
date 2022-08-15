@@ -158,15 +158,18 @@ public class SkybattleListener implements Listener {
 
         if (e.getEntityType() == EntityType.SNOWBALL) {
             assert playerGotShot != null;
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, (Runnable) new Runnable() {
-                @Override
-                public void run() {
-                    playerGotShot.damage(0.01);
-                    // final Vector plrV = playerGotShot.getVelocity();
-                    final Vector velocity = new Vector(0.05, 0.01, 0.05);
-                    playerGotShot.setVelocity(velocity);
-                }
-            }, 0L);
+            // Cool iDrg math: snowball send in correct direction
+            // Bug: pulls players when they are facing perfectly straight in Z direction against one another
+            double shooterX = shooter.getLocation().getX();
+            double hitPlayerX = playerGotShot.getLocation().getX();
+            double shooterZ = shooter.getLocation().getZ();
+            double hitPlayerZ = playerGotShot.getLocation().getZ();
+            double angle = Math.atan((hitPlayerZ - shooterZ)/(hitPlayerX - shooterX));
+
+            Vector velocity = hitPlayerX > shooterX ?  new Vector(0.15 * Math.cos(angle), 0.05, 0.15 * Math.sin(angle))
+                    : new Vector(0.15 * Math.cos(angle + Math.PI), 0.05, 0.15 * Math.sin(angle+Math.PI));
+
+            playerGotShot.setVelocity(velocity);
         }
 
         if (skybattle.lastDamage.containsKey(playerGotShot)) {
