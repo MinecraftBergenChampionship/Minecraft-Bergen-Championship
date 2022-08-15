@@ -27,7 +27,7 @@ public class Participant {
 
     public final Player player;
     public String ign;
-    public int paintballCooldown = 0;
+    public long paintballCooldown = System.currentTimeMillis();
 
     public Participant(Player player) {
         this.player = player;
@@ -160,10 +160,10 @@ public class Participant {
         return null;
     }
 
-    public void setCooldown(int n) {
+    public void setCooldown(long n) {
         paintballCooldown = n;
     }
-    public int getCooldown() {
+    public long getCooldown() {
         return paintballCooldown;
     }
 }

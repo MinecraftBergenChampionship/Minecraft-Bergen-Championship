@@ -19,6 +19,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.concurrent.TimeUnit;
+
 public class PaintdownListener implements Listener {
     public final Paintdown paintdown;
     public final Plugin plugin;
@@ -34,12 +36,19 @@ public class PaintdownListener implements Listener {
         if (!(e.getAction() == Action.RIGHT_CLICK_BLOCK) && !(e.getAction() == Action.RIGHT_CLICK_AIR)) return;
 
         Player player = e.getPlayer();
+        Participant p = Participant.findParticipantFromPlayer(player);
+        assert p != null;
 
         if (player.getInventory().getItemInMainHand().getType().equals(Material.IRON_HORSE_ARMOR)) {
-            Snowball projectile = player.launchProjectile(Snowball.class);
-            projectile.setShooter(player); // Not sure if this is necessary
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 2);
-            player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 1, 2);
+            long timeLeft = System.currentTimeMillis() - p.getCooldown();
+            if (TimeUnit.MILLISECONDS.toSeconds(timeLeft) >= 1) {
+                Snowball projectile = player.launchProjectile(Snowball.class);
+                projectile.setShooter(player); // Not sure if this is necessary
+                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 2);
+                p.setCooldown(System.currentTimeMillis());
+            } else {
+                player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 1, 2);
+            }
         }
     }
 
