@@ -331,7 +331,7 @@ public class Skybattle {
                 }
                 break;
             case "END_ROUND":
-                if (time == 10)
+                if (time == 9)
                     rewardLastPlayers();
                 break;
         }

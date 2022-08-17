@@ -159,7 +159,7 @@ public class SkybattleListener implements Listener {
         if (e.getEntityType() == EntityType.SNOWBALL) {
             assert playerGotShot != null;
             Vector snowballVelocity = e.getEntity().getVelocity();
-            playerGotShot.damage(0.01);
+            playerGotShot.damage(0.1);
             playerGotShot.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
         }
 
@@ -262,11 +262,12 @@ public class SkybattleListener implements Listener {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
         if (!(e.getPlayer().getWorld().equals(skybattle.world))) return;
 
-        // Kill players immediately on void
+        // Kill players immediately in void
         // Damage players in border
         Player p = e.getPlayer();
-        if (p.getLocation().getY() <= -60 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
+        if (p.getLocation().getY() <= -40 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
             p.setHealth(1);
+            p.teleport(new Location(p.getWorld(), p.getLocation().getX(), -64, p.getLocation().getY()));
         } else if (p.getLocation().getY() >= skybattle.borderHeight) {
             p.damage(1);
         }
