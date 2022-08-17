@@ -13,12 +13,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -31,11 +31,14 @@ public class SGListener implements Listener {
     private final Players players;
     private final Plugin plugin;
 
-    public SGListener(SG sg, Game game, Players players, Plugin plugin) {
+    private final MCC mcc;
+
+    public SGListener(SG sg, Game game, Players players, Plugin plugin, MCC mcc) {
         this.sg = sg;
         this.game = game;
         this.players = players;
         this.plugin = plugin;
+        this.mcc = mcc;
     }
 
     @EventHandler
@@ -50,37 +53,54 @@ public class SGListener implements Listener {
     }
 
     @EventHandler
-    public void playerKillEvent(PlayerDeathEvent event) {
-        if (sg.stage.equals("Game")) {
-            sg.playersDeadList.add(event.getEntity().getUniqueId());
-            Player victim = event.getEntity();
-            victim.setGameMode(GameMode.SPECTATOR);
-            final Location deathLoc = victim.getLocation();
-            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    victim.teleport(deathLoc);
-                }
-            }, 30);
+    public void playerKillEvent(EntityDamageByEntityEvent event) {
+        if (sg.stage.equals("Game") && event.getEntity() instanceof Player && event.getDamager() instanceof Player && ((Player) event.getEntity()).getHealth()-event.getDamage() < 1) {
             for (Participant p : Participant.participantsOnATeam) {
-                if (event.getEntity().getKiller() != null && p.player.getUniqueId() == event.getEntity().getKiller().getUniqueId()) {
+                if (p.player.getUniqueId() == event.getDamager().getUniqueId()) {
                     sg.kill(p);
-                    p.Die(p.player, event.getEntity().getKiller(), event);
                     sg.checkIfGameEnds(p);
                 }
             }
-
-            victim.teleport(new Location(event.getEntity().getWorld(), 0, 6, 0));
             sg.playersDead--;
-            for (Participant p : players.participants) {
-                if (Objects.equals(p.ign, event.getEntity().getName())) {
-                    sg.teamsAlive.remove(p.team);
-                    if (!sg.teamsAlive.contains(p.team)) {
-                        sg.teamsDead--;
+            Bukkit.broadcastMessage(mcc.scoreboardManager.teamColors.get(mcc.scoreboardManager.playerTeams.get(mcc.scoreboardManager.players.get(event.getEntity().getUniqueId())).teamName)+event.getEntity().getName()+ChatColor.WHITE+" was killed by "+mcc.scoreboardManager.teamColors.get(mcc.scoreboardManager.playerTeams.get(mcc.scoreboardManager.players.get(event.getDamager().getUniqueId())).teamName));
+        }
+    }
+
+    @EventHandler
+    public void EntityDameEvent(EntityDamageEvent event) {
+        if (sg.stage.equals("Game")) {
+            if (event.getEntity() instanceof Player) {
+                if (((Player) event.getEntity()).getHealth()-event.getDamage()<1) {
+                    for (ItemStack itemStack : ((Player) event.getEntity()).getInventory()) {
+                        Bukkit.broadcastMessage(itemStack.getType().toString());
+                        ((Player) event.getEntity()).getWorld().dropItemNaturally(((Player) event.getEntity()).getLocation(), itemStack);
+                        ((Player) event.getEntity()).getInventory().removeItem(itemStack);
+                    }
+                    sg.names.remove(((Player) event.getEntity()).getName());
+                    sg.playersDeadList.add(event.getEntity().getUniqueId());
+                    Player victim = (Player) event.getEntity();
+                    victim.setGameMode(GameMode.SPECTATOR);
+                    sg.playersDead--;
+                    for (Participant p : players.participants) {
+                        if (Objects.equals(p.ign, event.getEntity().getName())) {
+                            sg.teamsAlive.remove(p.team);
+                            if (!sg.teamsAlive.contains(p.team)) {
+                                sg.teamsDead--;
+                            }
+                        }
+                    }
+                    sg.outLivePlayer();
+                    sg.PlayerDied((Player) event.getEntity());
+
+                    event.setCancelled(true);
+                    Firework fw = new Firework();
+                    fw.spawnFireworkWithColor(event.getEntity().getLocation(), Color.RED);
+                    ((Player) event.getEntity()).setGameMode(GameMode.SPECTATOR);
+                    if (!event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
+                        Bukkit.broadcastMessage(mcc.scoreboardManager.teamColors.get(mcc.scoreboardManager.playerTeams.get(mcc.scoreboardManager.players.get(event.getEntity().getUniqueId())).teamName)+event.getEntity().getName()+ChatColor.WHITE+" was killed by "+ChatColor.GOLD+event.getCause());
                     }
                 }
             }
-            sg.outLivePlayer();
         }
     }
 
@@ -112,6 +132,8 @@ public class SGListener implements Listener {
             }
         }
     }
+
+
 
     @EventHandler
     public void blockBreakEvent(BlockBreakEvent event) {

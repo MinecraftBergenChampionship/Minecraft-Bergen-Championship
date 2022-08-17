@@ -27,8 +27,8 @@ public class teamCommands implements CommandExecutor {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.getName().equals(args[0])) {
                 if (team.teamNames.contains(args[1])) {
-                    for (Participant participant : team.players) {
-                        if (participant.ign == p.getName()) {
+                    for (Participant participant : mcc.players.participants) {
+                        if (participant.ign.equals(p.getName())) {
                             participant.team = args[1];
                             switch (args[1]) {
                                 case "RedRabbits":
@@ -65,6 +65,8 @@ public class teamCommands implements CommandExecutor {
                             participant.setTeam(args[1]);
                             Participant.participantsOnATeam.add(participant);
                             mcc.scoreboardManager.addPlayer(participant);
+
+                            return true;
                         }
                     }
                     if (!mcc.startGame.teamReadyMap.containsKey(args[1])) {

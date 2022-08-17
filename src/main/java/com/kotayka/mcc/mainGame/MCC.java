@@ -1,11 +1,5 @@
 package com.kotayka.mcc.mainGame;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
 import com.kotayka.mcc.AceRace.AceRace;
 import com.kotayka.mcc.AceRace.listener.AceRaceListener;
 import com.kotayka.mcc.BSABM.BSABM;
@@ -62,7 +56,7 @@ public final class MCC extends JavaPlugin implements Listener {
     public List<List<Participant>> teamList = new ArrayList<List<Participant>>(6);
 
 //  Managers
-    private final Players players = new Players(this);
+    public final Players players = new Players(this);
     private final NPCManager npcManager = new NPCManager(this, players);
     public teamManager teamManager;
 
@@ -79,7 +73,6 @@ public final class MCC extends JavaPlugin implements Listener {
     public final Game game = new Game(this, tgttos, sg, skybattle, bsabm, aceRace, decisionDome);
     public boolean gameIsOver = false;
 
-
 // Location
     public World spawnWorld;
     public Location SPAWN;
@@ -88,6 +81,9 @@ public final class MCC extends JavaPlugin implements Listener {
     public Map roundScores = new HashMap();
     public Map teamRoundScores = new HashMap();
     public final com.kotayka.mcc.Scoreboards.ScoreboardManager scoreboardManager = new com.kotayka.mcc.Scoreboards.ScoreboardManager(players, plugin, this);
+
+//  Stat
+    public Stats stats = new Stats(this, scoreboardManager);
 
     @Override
     public void onEnable() {
@@ -151,7 +147,7 @@ public final class MCC extends JavaPlugin implements Listener {
     }
 
     public void sgGame() {
-        getServer().getPluginManager().registerEvents((Listener) new SGListener(sg, game, players,this), this);
+        getServer().getPluginManager().registerEvents((Listener) new SGListener(sg, game, players,this, this), this);
     }
 
     public void TGTTOSGame() {
@@ -160,51 +156,6 @@ public final class MCC extends JavaPlugin implements Listener {
         TGTTOSGameListener TGTTOSGameListener = new TGTTOSGameListener(tgttos, this);
         getServer().getPluginManager().registerEvents(pAdded, this);
         getServer().getPluginManager().registerEvents(TGTTOSGameListener, this);
-        ProtocolManager manager = ProtocolLibrary.getProtocolManager();
-        manager.addPacketListener(new PacketAdapter(this, PacketType.Play.Client.USE_ENTITY) {
-            @Override
-            public void onPacketReceiving(PacketEvent event) {
-                plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                    public void run() {
-                        PacketContainer packet = event.getPacket();
-                        if (Objects.equals(game.stage, "TGTTOS")) {
-                            int entityId = packet.getIntegers().read(0);
-                            int npcID = npcManager.CheckIfValidID(entityId);
-                            if (npcID != -1 && !players.spectators.contains(event.getPlayer())) {
-                                scoreboardManager.addScore(scoreboardManager.players.get(event.getPlayer().getUniqueId()), 1);
-                                scoreboardManager.placementPoints(scoreboardManager.players.get(event.getPlayer().getUniqueId()), 1, tgttos.playerAmount);
-                                scoreboardManager.teamFinish(scoreboardManager.players.get(event.getPlayer().getUniqueId()), 5);
-                                tgttos.playerAmount++;
-                                npcManager.removeNPC(npcID);
-                                players.spectators.add(event.getPlayer());
-                                String place;
-                                switch (tgttos.playerAmount) {
-                                    case 1:
-                                        place = "1st";
-                                        break;
-                                    case 2:
-                                        place = "2nd";
-                                        break;
-                                    case 3:
-                                        place="3rd";
-                                        break;
-                                    default:
-                                        place=String.valueOf(tgttos.playerAmount)+"th";
-                                        break;
-                                }
-                                Bukkit.broadcastMessage(ChatColor.GOLD+event.getPlayer().getName()+ChatColor.GRAY+ " finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
-                                event.getPlayer().sendMessage(ChatColor.WHITE+"[+"+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
-                                tgttos.playerPoints--;
-                                if (tgttos.playerAmount >= scoreboardManager.playerList.size()) {
-                                    tgttos.nextRound();
-                                }
-                                event.getPlayer().setGameMode(GameMode.SPECTATOR);
-                            }
-                        }
-                    }
-                }, 0);
-            }
-        });
     }
 
     public void SkybattleGame() {

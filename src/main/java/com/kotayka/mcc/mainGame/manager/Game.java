@@ -10,6 +10,8 @@ import com.kotayka.mcc.TGTTOS.TGTTOS;
 import com.kotayka.mcc.mainGame.MCC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.potion.PotionEffect;
 
 public class Game {
     public String stage = "Waiting";
@@ -21,6 +23,7 @@ public class Game {
     private final BSABM bsabm;
     private final AceRace aceRace;
     private final DecisionDome decisionDome;
+    private Stats stats;
 
     public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm, AceRace aceRace, DecisionDome decisionDome) {
         this.tgttos = tgttos;
@@ -33,10 +36,8 @@ public class Game {
     }
 
     public void changeGame(String game) {
+        stats=mcc.stats;
         stage=game;
-        if (!(game.equals("Lobby") || game.equals("DD"))) {
-            mcc.gameRound++;
-        }
         switch (game) {
             case "TGTTOS":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "TGTTOS Game started");
@@ -60,6 +61,7 @@ public class Game {
             case "AceRace":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "Ace Race Game started");
                 aceRace.start();
+                break;
             case "DD":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "DD Game started");
                 decisionDome.start();
@@ -68,8 +70,27 @@ public class Game {
     }
 
     public void start() {
+        stats=mcc.stats;
         stage="Starting";
         mcc.scoreboardManager.clearTeams();
-        mcc.scoreboardManager.startTimerForGame(30, "Lobby");
+        mcc.scoreboardManager.startTimerForGame(10, "Lobby");
+        stats.initVars();
+    }
+
+    public void endGame() {
+        stats.teamScoresRound();
+        mcc.scoreboardManager.endGame();
+        for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
+            mcc.scoreboardManager.createMidLobbyBoard(p);
+            p.player.player.teleport(new Location(Bukkit.getWorld("world"), 0, 0, 0));
+            for(PotionEffect effect : p.player.player.getActivePotionEffects())
+            {
+                p.player.player.removePotionEffect(effect.getType());
+            }
+            p.player.player.getInventory().clear();
+        }
+        mcc.gameRound++;
+        stage="Starting";
+        mcc.scoreboardManager.startTimerForGame(60, "Lobby");
     }
 }

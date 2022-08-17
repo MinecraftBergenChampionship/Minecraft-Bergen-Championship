@@ -2,13 +2,13 @@ package com.kotayka.mcc.DecisionDome;
 
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.mainGame.MCC;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
@@ -18,9 +18,19 @@ public class DecisionDome {
 
     List<Material> quadrantMats = new ArrayList<>(Arrays.asList(Material.WHITE_CONCRETE, Material.ORANGE_CONCRETE, Material.MAGENTA_CONCRETE, Material.LIGHT_BLUE_CONCRETE, Material.YELLOW_CONCRETE, Material.LIME_CONCRETE, Material.PINK_CONCRETE, Material.GREEN_CONCRETE));
 
-    List<String> games = new ArrayList<>(Arrays.asList("SG", "TGTTOS", "BSABM"));
+    List<String> games = new ArrayList<>(Arrays.asList("SG", "TGTTOS", "BSABM","AceRace"));
     public List<List<Block>> quadrants = new ArrayList<>();
     public Map<Material, List<Block>> quadMap = new HashMap<>();
+
+    int[] currMax = new int[]{0, 0};
+
+    public int[][] coordsForBorder = {
+            {0,1},{0,2},{0,3},{0,4},{0,5},{0,6},{0,7},{0,-1},{0,-2},{0,-3},{0,-4},{0,-5},{0,-6},{0,-7},
+            {1,0},{2,0},{3,0},{4,0},{5,0},{6,0},{7,0},{-1,0},{-2,0},{-3,0},{-4,0},{-5,0},{-6,0},{-7,0},
+            {1,1},{2,2},{3,3},{4,4},{5,5},{1,-1},{2,-2},{3,-3},{4,-4},{5,-5},{-1,1},{-2,2},{-3,3},{-4,4},
+            {-5,5},{-1,-1},{-2,-2},{-3,-3},{-4,-4},{-5,-5}
+    };
+
     public List<Integer> removedQuads = new ArrayList<>();
     public final MCC mcc;
 
@@ -83,11 +93,11 @@ public class DecisionDome {
                 world.getBlockAt(x.getX(), x.getY()+1, x.getZ()).setType(Material.WHITE_CONCRETE);
             }
         }
-        removedQuads.add(3);
         removedQuads.add(4);
         removedQuads.add(5);
         removedQuads.add(6);
         removedQuads.add(7);
+
         for (Integer removedQuad : removedQuads) {
             for (Block x : quadMap.get(quadrantMats.get(removedQuad))) {
                 world.getBlockAt(x.getX(), x.getY()+1, x.getZ()).setType(Material.RED_CONCRETE);
@@ -111,7 +121,20 @@ public class DecisionDome {
         return new int[]{0,0};
     }
 
-    public void timerEnds() {
+    public void nextGame() {
+        mcc.game.changeGame(games.get(currMax[1]));
+    }
+
+    public void addLevatioin() {
+        for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
+            p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 80, 1, false, false));
+        }
+
+        mcc.scoreboardManager.changeLine(21, ChatColor.GREEN+"Event: "+ChatColor.LIGHT_PURPLE+"Launching Game");
+        mcc.scoreboardManager.startTimerForGame(4, "DDThree");
+    }
+
+    public void voteCounterEnds() {
         int[] scores = {0,0,0,0,0,0,0,0};
 
         for (Entity chick : chickens) {
@@ -121,7 +144,7 @@ public class DecisionDome {
             Bukkit.broadcastMessage(world.getBlockAt((int) chick.getLocation().getX(), (int) (chick.getLocation().getY()-2), (int) chick.getLocation().getZ()).getType().toString());
         }
 
-        int[] currMax = getValidFirst();
+        currMax = getValidFirst();
 
         for (int i = 0; i < 8; i++) {
             if (scores[i] > currMax[0] && !removedQuads.contains(i)) {
@@ -129,11 +152,62 @@ public class DecisionDome {
                 currMax[1] = i;
             }
         }
-        mcc.game.changeGame(games.get(currMax[1]));
+        removedQuads.add(currMax[1]);
+
+        for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
+            p.player.player.sendTitle(ChatColor.WHITE+games.get(currMax[1]),ChatColor.GOLD+"Teleporting soon...",20,80,20);
+        }
+
+        mcc.scoreboardManager.changeLine(21, ChatColor.GREEN+"Event: "+ChatColor.LIGHT_PURPLE+"Starting Game Loading");
+        mcc.scoreboardManager.startTimerForGame(6, "DDTwo");
+    }
+
+    public void timerEnds() {
+        for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
+            p.player.player.getInventory().clear();
+        }
+        int slabY = -34;
+        int ironBarY = -35;
+        int baseY = -36;
+
+        for (int[] coord : coordsForBorder) {
+            world.getBlockAt(coord[0], slabY, coord[1]).setType(Material.BLACKSTONE_SLAB);
+        }
+        for (int[] coord : coordsForBorder) {
+            world.getBlockAt(coord[0], ironBarY, coord[1]).setType(Material.BLACK_STAINED_GLASS);
+        }
+        for (int[] coord : coordsForBorder) {
+            world.getBlockAt(coord[0], baseY, coord[1]).setType(Material.BLACK_CONCRETE);
+        }
+
+        mcc.scoreboardManager.startTimerForGame(10, "DDOne");
+        mcc.scoreboardManager.changeLine(21, ChatColor.GREEN+"Event: "+ChatColor.LIGHT_PURPLE+"Game Choosing");
     }
 
     public void start() {
+        int slabY = -35;
+        int ironBarY = -36;
+        int baseY = -37;
+        int airY = -34;
+        for (int[] coord : coordsForBorder) {
+            world.getBlockAt(coord[0], airY, coord[1]).setType(Material.AIR);
+        }
+        for (int[] coord : coordsForBorder) {
+            world.getBlockAt(coord[0], slabY, coord[1]).setType(Material.BLACKSTONE_SLAB);
+        }
+        for (int[] coord : coordsForBorder) {
+            world.getBlockAt(coord[0], ironBarY, coord[1]).setType(Material.BLACK_STAINED_GLASS);
+        }
+        for (int[] coord : coordsForBorder) {
+            world.getBlockAt(coord[0], baseY, coord[1]).setType(Material.BLACK_CONCRETE);
+        }
         loadQuadrants();
+        List<Entity> entList = world.getEntities();
+        for(Entity current : entList){
+            if (current.getType() == EntityType.CHICKEN){
+                current.remove();
+            }
+        }
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             mcc.scoreboardManager.createDecisionDome(p);
             p.player.player.sendMessage(mcc.scoreboardManager.playerTeams.get(p).teamName);
@@ -159,7 +233,6 @@ public class DecisionDome {
             }
             p.player.player.getInventory().addItem(new ItemStack(Material.EGG));
         }
-
         mcc.scoreboardManager.startTimerForGame(30, "DD");
     }
 }

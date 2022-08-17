@@ -30,11 +30,6 @@ public class Players {
     public void addPlayer(Player p) {
         String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
         List<String> team = new ArrayList<>(Arrays.asList(teamNames));
-
-        for (Participant player : participants) {
-            mcc.teams.get(player.ign)[team.indexOf(player.team)].addEntry(p.getName());
-        }
-
         players.add(p);
         Participant x = new Participant(p);
         participants.add(x);

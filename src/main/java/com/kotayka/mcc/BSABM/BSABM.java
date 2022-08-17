@@ -6,6 +6,7 @@ import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -214,7 +215,7 @@ public class BSABM {
     }
 
     public void completeBuild(int teamNum, int fieldNum) {
-        String[] teams={"RedRabbits","YellowYaks","GreenGuardians","BlueBats","PurplePandas","PinkParrots"};
+        String[] teams={"RedRabbits","YellowYaks","BlueBats","GreenGuardians","PurplePandas","PinkPiglets"};
         Location fireworkLoc = getCoordsForMap(teamNum,fieldNum);
         fireworkLoc.setX(fireworkLoc.getX()+3);
         fireworkLoc.setY(fireworkLoc.getY()+3);
@@ -231,10 +232,10 @@ public class BSABM {
             case 1:
                 Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.YELLOW+"Yellow Yaks"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
                 break;
-            case 2:
+            case 3:
                 Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.GREEN+"Green Guardians"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
                 break;
-            case 3:
+            case 2:
                 Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.BLUE+"Blue Bats"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
                 break;
             case 4:
@@ -271,10 +272,25 @@ public class BSABM {
 
             player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000000, 255, false, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000000, 255, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000000, 255, false, false));
 
             player.teleport(new Location(world, 11, 1, 0));
 
             player.setGameMode(GameMode.SURVIVAL);
+        }
+        clearChest();
+    }
+
+    public void clearChest() {
+        Chunk[] c = world.getLoadedChunks();
+        Random rand = new Random();
+        for(int i=0;i<c.length;i++){//loop through loaded chunks
+            for(int x=0;x<c[i].getTileEntities().length;x++){//loop through tile entities within loaded chunks
+                if(c[i].getTileEntities()[x] instanceof Chest){
+                    Chest c1 = (Chest) c[i].getTileEntities()[x];
+                    c1.getInventory().clear();
+                }
+            }
         }
     }
 
@@ -283,15 +299,23 @@ public class BSABM {
         ItemStack silkPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
         silkPickaxe.addEnchantment(Enchantment.SILK_TOUCH, 1);
         silkPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
+        silkPickaxe.addEnchantment(Enchantment.DIG_SPEED, 2);
 
         ItemStack regPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
         regPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
+        regPickaxe.addEnchantment(Enchantment.DIG_SPEED, 2);
 
         ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
         axe.addEnchantment(Enchantment.DURABILITY, 3);
+        axe.addEnchantment(Enchantment.DIG_SPEED, 2);
 
         ItemStack shovel = new ItemStack(Material.DIAMOND_SHOVEL);
         shovel.addEnchantment(Enchantment.DURABILITY, 3);
+        shovel.addEnchantment(Enchantment.DIG_SPEED, 2);
+
+        ItemStack hoe = new ItemStack(Material.NETHERITE_HOE);
+        hoe.addEnchantment(Enchantment.DURABILITY, 3);
+        hoe.addEnchantment(Enchantment.DIG_SPEED, 2);
 
         ItemStack elytra = new ItemStack(Material.ELYTRA);
         elytra.addEnchantment(Enchantment.DURABILITY, 3);
@@ -300,6 +324,7 @@ public class BSABM {
         player.getInventory().addItem(regPickaxe);
         player.getInventory().addItem(axe);
         player.getInventory().addItem(shovel);
+        player.getInventory().addItem(hoe);
         player.getInventory().setChestplate(elytra);
     }
 }

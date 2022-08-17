@@ -18,7 +18,6 @@ public class start implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
-            game.startGame();
             sender.sendMessage(ChatColor.RED+args[0]+ChatColor.GREEN+" Started");
             game.changeGame(args[0]);
         }
