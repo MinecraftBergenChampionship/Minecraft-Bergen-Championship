@@ -127,7 +127,7 @@ public class DecisionDome {
 
     public void addLevatioin() {
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
-            p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 80, 1, false, false));
+            p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 90, 1, false, false));
         }
 
         mcc.scoreboardManager.changeLine(21, ChatColor.GREEN+"Event: "+ChatColor.LIGHT_PURPLE+"Launching Game");
