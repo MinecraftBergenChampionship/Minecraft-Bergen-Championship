@@ -54,7 +54,7 @@ public class TGTTOS {
 
     public void loadMaps() {
 
-        if (Bukkit.getWorld("TGTTOSAWAP") == null) {
+        if (Bukkit.getWorld("TGTTOS") == null) {
             world = Bukkit.getWorld("world");
         }
         else {
