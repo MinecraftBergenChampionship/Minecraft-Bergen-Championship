@@ -273,6 +273,7 @@ public class BSABM {
             player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000000, 255, false, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000000, 255, false, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000000, 255, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000000, 255, false, false));
 
             player.teleport(new Location(world, 11, 1, 0));
 
