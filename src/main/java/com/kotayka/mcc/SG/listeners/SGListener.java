@@ -81,13 +81,10 @@ public class SGListener implements Listener {
             sg.kill(killer);
             sg.checkIfGameEnds(killer);
         }
-        for (Participant p2 : Participant.participantsOnATeam) {
-            if (Objects.equals(p2.ign, e.getEntity().getName())) {
-                sg.teamsAlive.remove(p2.team);
-                if (!sg.teamsAlive.contains(p2.team)) {
-                    sg.teamsDead--;
-                }
-            }
+        sg.PlayerDied(e.getEntity());
+        sg.teamsAlive.remove(p.team);
+        if (!sg.teamsAlive.contains(p.team)) {
+            sg.teamsDead--;
         }
     }
 /*
