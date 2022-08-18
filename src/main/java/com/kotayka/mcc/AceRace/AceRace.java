@@ -2,6 +2,7 @@ package com.kotayka.mcc.AceRace;
 
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.mainGame.MCC;
+import com.kotayka.mcc.mainGame.manager.Participant;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;

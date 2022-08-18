@@ -424,7 +424,7 @@ public class ScoreboardManager {
         player.lines.put(sgScoreboard, lines);
 
         sgScoreboard.getScore(ChatColor.AQUA+""+ChatColor.BOLD + "Game: 0/8:"+ChatColor.WHITE+" Survival Games").setScore(23);
-        sgScoreboard.getScore(ChatColor.AQUA +""++ ChatColor.BOLD"Map: "+ChatColor.WHITE+"BCA").setScore(22);
+        sgScoreboard.getScore(ChatColor.AQUA +""+ ChatColor.BOLD+ "Map: "+ChatColor.WHITE+"BCA").setScore(22);
         sgScoreboard.getScore(ChatColor.GREEN+""+ChatColor.BOLD + "Next Event: "+ChatColor.LIGHT_PURPLE+"Starting").setScore(21);
         sgScoreboard.getScore(ChatColor.RED +""+ChatColor.BOLD+ "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
         sgScoreboard.getScore(ChatColor.RESET.toString()).setScore(19);
