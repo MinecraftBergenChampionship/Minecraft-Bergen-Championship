@@ -52,20 +52,6 @@ public class SGListener implements Listener {
             }
         }
     }
-/*
-    @EventHandler
-    public void playerKillEvent(EntityDamageByEntityEvent event) {
-        if (sg.stage.equals("Game") && event.getEntity() instanceof Player && event.getDamager() instanceof Player && ((Player) event.getEntity()).getHealth()-event.getDamage() < 1) {
-            for (Participant p : Participant.participantsOnATeam) {
-                if (p.player.getUniqueId() == event.getDamager().getUniqueId()) {
-                    sg.kill(p);
-                    sg.checkIfGameEnds(p);
-                }
-            }
-            sg.playersDead--;
-            Bukkit.broadcastMessage(mcc.scoreboardManager.teamColors.get(mcc.scoreboardManager.playerTeams.get(mcc.scoreboardManager.players.get(event.getEntity().getUniqueId())).teamName)+event.getEntity().getName()+ChatColor.WHITE+" was killed by "+mcc.scoreboardManager.teamColors.get(mcc.scoreboardManager.playerTeams.get(mcc.scoreboardManager.players.get(event.getDamager().getUniqueId())).teamName));
-        }
-    } */
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
@@ -81,54 +67,12 @@ public class SGListener implements Listener {
             sg.kill(killer);
             sg.checkIfGameEnds(killer);
         }
-        for (Participant p2 : Participant.participantsOnATeam) {
-            if (Objects.equals(p2.ign, e.getEntity().getName())) {
-                sg.teamsAlive.remove(p2.team);
-                if (!sg.teamsAlive.contains(p2.team)) {
-                    sg.teamsDead--;
-                }
-            }
+        sg.PlayerDied(e.getEntity());
+        sg.teamsAlive.remove(p.team);
+        if (!sg.teamsAlive.contains(p.team)) {
+            sg.teamsDead--;
         }
     }
-/*
-    @EventHandler
-    public void EntityDameEvent(EntityDamageEvent event) {
-        if (sg.stage.equals("Game")) {
-            if (event.getEntity() instanceof Player) {
-                if (((Player) event.getEntity()).getHealth()-event.getDamage()<1) {
-                    for (ItemStack itemStack : ((Player) event.getEntity()).getInventory()) {
-                        if (itemStack != null) {
-                            ((Player) event.getEntity()).getWorld().dropItemNaturally(((Player) event.getEntity()).getLocation(), itemStack);
-                            ((Player) event.getEntity()).getInventory().removeItem(itemStack);
-                        }
-                    }
-                    sg.names.remove(((Player) event.getEntity()).getName());
-                    sg.playersDeadList.add(event.getEntity().getUniqueId());
-                    Player victim = (Player) event.getEntity();
-                    victim.setGameMode(GameMode.SPECTATOR);
-                    sg.playersDead--;
-                    for (Participant p : players.participants) {
-                        if (Objects.equals(p.ign, event.getEntity().getName())) {
-                            sg.teamsAlive.remove(p.team);
-                            if (!sg.teamsAlive.contains(p.team)) {
-                                sg.teamsDead--;
-                            }
-                        }
-                    }
-                    sg.outLivePlayer();
-                    sg.PlayerDied((Player) event.getEntity());
-
-                    event.setCancelled(true);
-                    Firework fw = new Firework();
-                    fw.spawnFireworkWithColor(event.getEntity().getLocation(), Color.RED);
-                    ((Player) event.getEntity()).setGameMode(GameMode.SPECTATOR);
-                    if (!event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
-                        Bukkit.broadcastMessage(mcc.scoreboardManager.teamColors.get(mcc.scoreboardManager.playerTeams.get(mcc.scoreboardManager.players.get(event.getEntity().getUniqueId())).teamName)+event.getEntity().getName()+ChatColor.WHITE+" was killed by "+ChatColor.GOLD+event.getCause());
-                    }
-                }
-            }
-        }
-    } */
 
     public boolean checkIfEmpty(Inventory inv) {
         for(ItemStack it : inv.getContents())
