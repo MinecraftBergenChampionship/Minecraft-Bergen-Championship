@@ -52,7 +52,7 @@ public class SGListener implements Listener {
             }
         }
     }
-
+/*
     @EventHandler
     public void playerKillEvent(EntityDamageByEntityEvent event) {
         if (sg.stage.equals("Game") && event.getEntity() instanceof Player && event.getDamager() instanceof Player && ((Player) event.getEntity()).getHealth()-event.getDamage() < 1) {
@@ -65,8 +65,32 @@ public class SGListener implements Listener {
             sg.playersDead--;
             Bukkit.broadcastMessage(mcc.scoreboardManager.teamColors.get(mcc.scoreboardManager.playerTeams.get(mcc.scoreboardManager.players.get(event.getEntity().getUniqueId())).teamName)+event.getEntity().getName()+ChatColor.WHITE+" was killed by "+mcc.scoreboardManager.teamColors.get(mcc.scoreboardManager.playerTeams.get(mcc.scoreboardManager.players.get(event.getDamager().getUniqueId())).teamName));
         }
-    }
+    } */
 
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        if (!sg.stage.equals("Game")) return;
+
+        Participant p = Participant.findParticipantFromPlayer(e.getEntity());
+        assert p != null;
+        Participant killer = Participant.findParticipantFromPlayer(p.player.getKiller());
+        p.Die(e.getEntity(), p.player.getKiller(), e);
+        sg.playersDead--;
+        sg.outLivePlayer();
+        if (killer != null) {
+            sg.kill(killer);
+            sg.checkIfGameEnds(killer);
+        }
+        for (Participant p2 : Participant.participantsOnATeam) {
+            if (Objects.equals(p2.ign, e.getEntity().getName())) {
+                sg.teamsAlive.remove(p2.team);
+                if (!sg.teamsAlive.contains(p2.team)) {
+                    sg.teamsDead--;
+                }
+            }
+        }
+    }
+/*
     @EventHandler
     public void EntityDameEvent(EntityDamageEvent event) {
         if (sg.stage.equals("Game")) {
@@ -104,7 +128,7 @@ public class SGListener implements Listener {
                 }
             }
         }
-    }
+    } */
 
     public boolean checkIfEmpty(Inventory inv) {
         for(ItemStack it : inv.getContents())
