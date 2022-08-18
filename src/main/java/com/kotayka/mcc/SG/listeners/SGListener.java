@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -72,9 +73,10 @@ public class SGListener implements Listener {
             if (event.getEntity() instanceof Player) {
                 if (((Player) event.getEntity()).getHealth()-event.getDamage()<1) {
                     for (ItemStack itemStack : ((Player) event.getEntity()).getInventory()) {
-                        Bukkit.broadcastMessage(itemStack.getType().toString());
-                        ((Player) event.getEntity()).getWorld().dropItemNaturally(((Player) event.getEntity()).getLocation(), itemStack);
-                        ((Player) event.getEntity()).getInventory().removeItem(itemStack);
+                        if (itemStack != null) {
+                            ((Player) event.getEntity()).getWorld().dropItemNaturally(((Player) event.getEntity()).getLocation(), itemStack);
+                            ((Player) event.getEntity()).getInventory().removeItem(itemStack);
+                        }
                     }
                     sg.names.remove(((Player) event.getEntity()).getName());
                     sg.playersDeadList.add(event.getEntity().getUniqueId());
@@ -133,11 +135,16 @@ public class SGListener implements Listener {
         }
     }
 
-
+    @EventHandler
+    public void blockPlace(BlockPlaceEvent event) {
+        if (event.getBlock().getType().equals(Material.STRING)) {
+            event.setCancelled(true);
+        }
+    }
 
     @EventHandler
     public void blockBreakEvent(BlockBreakEvent event) {
-        if (sg.stage.equals("Starting")) {
+        if (mcc.game.stage.equals("SG")) {
             if (!(event.getBlock().getType() == Material.COBWEB || String.valueOf(event.getBlock().getType()).endsWith("PANE"))) {
                 event.setCancelled(true);
             }
