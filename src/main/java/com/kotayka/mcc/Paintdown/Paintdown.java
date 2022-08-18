@@ -6,8 +6,11 @@ import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +19,7 @@ import java.util.List;
 public class Paintdown {
 //  Game State
     private final Players players;
-    private final MCC mcc;
+    public final MCC mcc;
     private String state = "INACTIVE";
     public int roundNum = 0;
 
@@ -43,11 +46,14 @@ public class Paintdown {
      * Prepare map for use
      */
     public void loadMap() {
+        ItemStack potion = new ItemStack(Material.SPLASH_POTION, 3);
+        PotionMeta meta = (PotionMeta)potion.getItemMeta();
+        assert meta != null;
+        meta.setColor(Color.BLUE);
 
         // Spawn Items (for now, just iron horse armor and potions)
         spawnItems = Arrays.asList(
-                new ItemStack(Material.IRON_HORSE_ARMOR),
-                new ItemStack(Material.SPLASH_POTION, 3),
+                new ItemStack(Material.IRON_HORSE_ARMOR), potion,
                 new ItemStack(Material.LEATHER_BOOTS),
                 new ItemStack(Material.LEATHER_CHESTPLATE),
                 new ItemStack(Material.LEATHER_HELMET),

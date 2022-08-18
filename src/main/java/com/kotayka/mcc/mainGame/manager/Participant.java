@@ -30,6 +30,7 @@ public class Participant {
     public final Player player;
     public String ign;
     public long paintballCooldown = System.currentTimeMillis();
+    public boolean isPainted = false;
 
     public Participant(Player player) {
         this.player = player;
@@ -179,7 +180,7 @@ public class Participant {
     public void setCooldown(long n) {
         paintballCooldown = n;
     }
-    public long getCooldown() {
-        return paintballCooldown;
-    }
+    public long getCooldown() { return paintballCooldown; }
+    public void setIsPainted(boolean b) { isPainted = b; }
+    public boolean getIsPainted() { return isPainted; }
 }

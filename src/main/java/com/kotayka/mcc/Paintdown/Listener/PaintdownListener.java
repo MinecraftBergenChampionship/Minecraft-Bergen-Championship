@@ -6,19 +6,26 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class PaintdownListener implements Listener {
@@ -62,11 +69,75 @@ public class PaintdownListener implements Listener {
         assert e.getEntity().getShooter() instanceof Player;
         Player shooter = (Player) e.getEntity().getShooter();
         Vector snowballVelocity = e.getEntity().getVelocity();
-        hitPlayer.damage(5);
+        hitPlayer.damage(10);
         shooter.playSound(shooter.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 5);
         hitPlayer.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
     }
 
+    @EventHandler
+    public void onEntityDamageEntity(EntityDamageByEntityEvent e) {
+        if (!(paintdown.getState().equals("PLAYING"))) { return; }
+        if (!(e.getEntity() instanceof Player) && !(e.getDamager() instanceof Snowball)) return;
+
+        Player player = (Player) e.getEntity();
+        Participant participant = Participant.findParticipantFromPlayer(player);
+        assert participant != null;
+
+        // If they died
+        if((player.getHealth()-e.getDamage()) <= 0) {
+            participant.setIsPainted(true);
+
+            // Check if whole team died
+            int deadTeammates = 0;
+            for (List<Participant> l : paintdown.mcc.teamList) {
+                if (l.contains(participant)) {
+                    for (int i = 0; i < l.size(); i++) {
+                        if (l.get(i).getIsPainted()) {
+                            deadTeammates++;
+                        }
+                        if (deadTeammates == l.size()) {
+                            Bukkit.broadcastMessage(participant.chatColor + "ALL OF " + participant.team + " HAS BEEN PAINTED!");
+                            // kill all team
+                            return;
+                        }
+                    }
+                }
+            }
+            // Died but teammates are alive
+            e.setCancelled(true);
+            player.setHealth(20);
+        }
+    }
+
+    @EventHandler
+    public void onPotionSplash(PotionSplashEvent e) {
+        if (!(paintdown.getState().equals("PLAYING"))) { return; }
+
+        Collection<LivingEntity> affected = e.getAffectedEntities();
+
+        for (LivingEntity ent : affected) {
+            if (ent instanceof Player) {
+                Participant p = Participant.findParticipantFromPlayer((Player) ent);
+                assert p != null;
+
+                if (p.getIsPainted()) p.setIsPainted(false);
+                else p.player.setHealth(20);
+            }
+        }
+    }
+
+
+    // Prevent moving when painted
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e) {
+        if (!(paintdown.getState().equals("PLAYING"))) { return; }
+        if (!(Participant.findParticipantFromPlayer(e.getPlayer()).getIsPainted())) return;
+
+        e.setCancelled(true);
+        e.setTo(e.getPlayer().getLocation());
+    }
+
+    // Temporary
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
         if (!(e.getPlayer().getWorld().equals(paintdown.world))) return;
