@@ -34,32 +34,32 @@ public class teamCommands implements CommandExecutor {
                                 case "RedRabbits":
                                     participant.fullName = "Red Rabbits";
                                     mcc.teamList.get(0).add(participant);
-                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.RED+"Red Rabbits");
+                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.RED+"Red Rabbits.");
                                     break;
                                 case "YellowYaks":
                                     mcc.teamList.get(1).add(participant);
                                     participant.fullName = "Yellow Yaks";
-                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.YELLOW+"Yellow Yaks");
+                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.YELLOW+"Yellow Yaks.");
                                     break;
                                 case "GreenGuardians":
                                     mcc.teamList.get(2).add(participant);
                                     participant.fullName = "Green Guardians";
-                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.GREEN+"Green Guardians");
+                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.GREEN+"Green Guardians.");
                                     break;
                                 case "BlueBats":
                                     mcc.teamList.get(3).add(participant);
                                     participant.fullName = "Blue Bats";
-                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.BLUE+"Blue Bats");
+                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.BLUE+"Blue Bats.");
                                     break;
                                 case "PurplePandas":
                                     mcc.teamList.get(4).add(participant);
                                     participant.fullName = "Purple Pandas";
-                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.DARK_PURPLE+"Purple Pandas");
+                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.DARK_PURPLE+"Purple Pandas.");
                                     break;
                                 case "PinkPiglets":
                                     mcc.teamList.get(5).add(participant);
                                     participant.fullName = "Pink Piglets";
-                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.LIGHT_PURPLE+"Pink Piglets");
+                                    Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.LIGHT_PURPLE+"Pink Piglets.");
                                     break;
                             }
                             participant.setTeam(args[1]);

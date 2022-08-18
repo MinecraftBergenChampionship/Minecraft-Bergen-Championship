@@ -256,7 +256,7 @@ public class BSABM {
                 placeMap(i, x);
             }
         }
-        mcc.scoreboardManager.startTimerForGame(720, "BSABM");
+        mcc.scoreboardManager.startTimerForGame(720, "BuildMart");
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             mcc.scoreboardManager.createBSABMScoreboard(p);
         }

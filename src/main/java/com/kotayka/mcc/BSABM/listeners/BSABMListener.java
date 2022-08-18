@@ -102,7 +102,7 @@ public class BSABMListener implements Listener {
                 if (e.getPlayer().getTargetBlock(null, 5).getType() != hotbarSelector.get(e.getPlayer().getUniqueId())) {
                     hotbarSelector.put(e.getPlayer().getUniqueId(), e.getPlayer().getTargetBlock(null, 5).getType());
                     if (e.getPlayer().getTargetBlock(null, 5).getType() != Material.AIR) {
-                        e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(e.getPlayer().getUniqueId()))))));
+                        e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+ "" + ChatColor.BOLD+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(e.getPlayer().getUniqueId()))))));
                     }
                     else {
                         e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
@@ -111,7 +111,7 @@ public class BSABMListener implements Listener {
             }
             else {
                 hotbarSelector.put(e.getPlayer().getUniqueId(), e.getPlayer().getTargetBlock(null, 5).getType());
-                e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(e.getPlayer().getUniqueId()))))));
+                e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+ "" + ChatColor.BOLD+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(e.getPlayer().getUniqueId()))))));
             }
         }
     }

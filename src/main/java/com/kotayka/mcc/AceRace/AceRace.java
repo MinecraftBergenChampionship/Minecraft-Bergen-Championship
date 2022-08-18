@@ -91,7 +91,7 @@ public class AceRace {
     public void playerFinishLap(Player p) {
         if (playerFinish.get(p.getUniqueId())) {
             Participant lapper= Participant.findParticipantFromPlayer(p);
-            Bukkit.broadcastMessage(lapper.teamPrefix + lapper.chatColor + "" + ChatColor.BOLD + p.getDisplayName()+ChatColor.WHITE+" finished Lap #"+(playerLaps.get(p.getUniqueId())+1)+".");
+            Bukkit.broadcastMessage(lapper.teamPrefix + lapper.chatColor + "" + ChatColor.BOLD + p.getDisplayName()+ChatColor.WHITE+ "" + ChatColor.BOLD+" finished Lap #"+(playerLaps.get(p.getUniqueId())+1)+".");
             mcc.scoreboardManager.placementPoints(mcc.scoreboardManager.players.get(p.getUniqueId()), 2, playerLapPlacement.get(playerLaps.get(p.getUniqueId())));
             playerLapPlacement.put(playerLaps.get(p.getUniqueId()), playerLapPlacement.get(playerLaps.get(p.getUniqueId()))+1);
             if (playerLaps.get(p.getUniqueId()) < 2) {
@@ -101,7 +101,7 @@ public class AceRace {
             }
             else if (playerLaps.get(p.getUniqueId()) == 2){
                 Participant finisher= Participant.findParticipantFromPlayer(p);
-                Bukkit.broadcastMessage(finisher.teamPrefix + finisher.chatColor + "" + ChatColor.BOLD +p.getDisplayName()+ChatColor.WHITE+" finished the course in place #"+(playerLapPlacement.get(playerLaps.get(p.getUniqueId())))+".");
+                Bukkit.broadcastMessage(finisher.teamPrefix + finisher.chatColor + "" + ChatColor.BOLD +p.getDisplayName()+ChatColor.WHITE+ "" + ChatColor.BOLD+" finished the course in place #"+(playerLapPlacement.get(playerLaps.get(p.getUniqueId())))+".");
                 playerFinish.put(p.getUniqueId(), false);
                 if (playerLapPlacement.get(playerLaps.get(p.getUniqueId())) == 1) {
                     mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.getUniqueId()), 25);
