@@ -147,6 +147,7 @@ public final class MCC extends JavaPlugin implements Listener {
     }
 
     public void sgGame() {
+        sg.loadWorld();
         getServer().getPluginManager().registerEvents((Listener) new SGListener(sg, game, players,this, this), this);
     }
 

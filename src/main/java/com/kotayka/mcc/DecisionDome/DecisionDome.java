@@ -138,10 +138,10 @@ public class DecisionDome {
         int[] scores = {0,0,0,0,0,0,0,0};
 
         for (Entity chick : chickens) {
-            if (quadrantMats.contains(world.getBlockAt((int) chick.getLocation().getX(), (int) (chick.getLocation().getY()-2), (int) chick.getLocation().getZ()).getType())) {
-                scores[quadrantMats.indexOf(world.getBlockAt((int) chick.getLocation().getX(), (int) (chick.getLocation().getY()-2), (int) chick.getLocation().getZ()).getType())]++;
+            if (quadrantMats.contains(world.getBlockAt((int) chick.getLocation().getBlockX(), (int) (chick.getLocation().getBlockY()-2), (int) chick.getLocation().getBlockZ()).getType())) {
+                scores[quadrantMats.indexOf(world.getBlockAt((int) chick.getLocation().getBlockX(), (int) (chick.getLocation().getBlockY()-2), (int) chick.getLocation().getBlockZ()).getType())]++;
             }
-            Bukkit.broadcastMessage(world.getBlockAt((int) chick.getLocation().getX(), (int) (chick.getLocation().getY()-2), (int) chick.getLocation().getZ()).getType().toString());
+            Bukkit.broadcastMessage(world.getBlockAt((int) chick.getLocation().getBlockX(), (int) (chick.getLocation().getBlockY()-2), (int) chick.getLocation().getBlockZ()).getType().toString());
         }
 
         currMax = getValidFirst();
@@ -185,6 +185,8 @@ public class DecisionDome {
     }
 
     public void start() {
+        chickens = new ArrayList<>();
+
         int slabY = -35;
         int ironBarY = -36;
         int baseY = -37;
