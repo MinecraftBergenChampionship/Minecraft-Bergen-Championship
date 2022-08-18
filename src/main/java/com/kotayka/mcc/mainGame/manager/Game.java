@@ -78,7 +78,7 @@ public class Game {
     }
 
     public void endGame() {
-        stats.teamScoresRound();
+        stats.createStats();
         mcc.scoreboardManager.endGame();
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             mcc.scoreboardManager.createMidLobbyBoard(p);

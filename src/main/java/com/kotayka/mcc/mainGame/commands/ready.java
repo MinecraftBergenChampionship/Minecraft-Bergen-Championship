@@ -3,6 +3,7 @@ package com.kotayka.mcc.mainGame.commands;
 import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,6 +28,7 @@ public class ready implements CommandExecutor {
                         return true;
                     }
                     else {
+                        Bukkit.broadcastMessage(p.team);
                         if (mcc.startGame.teamReadyMap.get(p.team)) {
                             mcc.scoreboardManager.removeTeam(p.team);
                             mcc.startGame.numOfTeamsReady--;

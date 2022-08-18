@@ -10,6 +10,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -120,86 +122,51 @@ public class SG {
         }
     }
 
-    public void updateEventTimer() {
-        if (eventTimer > 0) {
-            eventTimer--;
-            relaventEventTimer--;
-            if (eventTimer > 660) {
-                eventName = "Grace Period Ends";
-            }
-            else if (eventTimer > 600 && eventTimer < 659) {
-                eventName = "Supply Drop";
-            }
-            else if (eventTimer > 360 && eventTimer < 599) {
-                eventName = "Chest Refill";
-            }
-            else if (eventTimer > 240 && eventTimer < 359) {
-                eventName = "Supply Drop";
-            }
-            else {
-                if (eventTimer == 660) {
-                    relaventEventTimer=60;
+    public void events() {
+        if (mcc.game.stage.equals("SG")) {
+            String value = ChatColor.BOLD+""+ChatColor.GREEN + "Next Event: "+ChatColor.LIGHT_PURPLE;
+            int eventTime = 0;
+            switch (eventID) {
+                case 0:
+                    eventName="Starting";
+                    eventTime=10;
+                    break;
+                case 1:
+                    eventName="Grace Period Ends";
+                    for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
+                        p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60*20, 255, false, false));
+                    }
+                    eventTime=60;
+                    break;
+                case 2:
                     Bukkit.broadcastMessage(ChatColor.RED+"Grace Period is Over");
-                }
-                else if (eventTimer == 360) {
-                    relaventEventTimer=120;
+                    eventName="Supply Drop";
+                    eventTime=240;
+                    break;
+                case 3:
+                    setSupplyDropItems();
+                    eventName="Chest Refill";
+                    eventTime=240;
+                    break;
+                case 4:
                     regenChest();
                     Bukkit.broadcastMessage(ChatColor.RED+"Chest are refilled");
-                }
-                else if (eventTimer == 600 || eventTimer == 240) {
-                    relaventEventTimer=240;
+                    eventName="Supply Drop";
+                    eventTime=240;
+                    break;
+                case 5:
                     setSupplyDropItems();
-                }
-                else {
-                    eventName = "Deathmatch";
-                }
+                    eventName="Deathmatch";
+                    eventTime=240;
+                    break;
+                case 6:
+                    endGame();
+                    break;
             }
+            eventID++;
+            mcc.scoreboardManager.changeLine(21, value+eventName);
+            mcc.scoreboardManager.startTimerForGame(eventTime, "SG");
         }
-    }
-
-    public void events() {
-        String value = ChatColor.BOLD+""+ChatColor.GREEN + "Next Event: "+ChatColor.LIGHT_PURPLE;
-        int eventTime = 0;
-        switch (eventID) {
-            case 0:
-                eventName="Starting";
-                eventTime=10;
-                break;
-            case 1:
-                eventName="Grace Period Ends";
-                for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
-                    p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60*20, 255, false, false));
-                }
-                eventTime=60;
-                break;
-            case 2:
-                Bukkit.broadcastMessage(ChatColor.RED+"Grace Period is Over");
-                eventName="Supply Drop";
-                eventTime=240;
-                break;
-            case 3:
-                setSupplyDropItems();
-                eventName="Chest Refill";
-                eventTime=240;
-                break;
-            case 4:
-                regenChest();
-                Bukkit.broadcastMessage(ChatColor.RED+"Chest are refilled");
-                eventName="Supply Drop";
-                eventTime=240;
-                break;
-            case 5:
-                setSupplyDropItems();
-                eventName="Deathmatch";
-                eventTime=240;
-                break;
-            case 6:
-                endGame();
-                break;
-        }
-        eventID++;
-        mcc.scoreboardManager.changeLine(21, value+eventName);
-        mcc.scoreboardManager.startTimerForGame(eventTime, "SG");
     }
 
 
@@ -238,6 +205,11 @@ public class SG {
         loadWorld();
         regenChest();
         stage="Starting";
+        for (Entity e : world.getEntities()) {
+            if (e.getType() == EntityType.DROPPED_ITEM) {
+                e.remove();
+            }
+        }
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             for (PotionEffect effect : p.player.player.getActivePotionEffects()) {
                 p.player.player.removePotionEffect(effect.getType());
@@ -315,7 +287,7 @@ public class SG {
         Bukkit.broadcastMessage(teams.toString());
         if (teams.size()==0) {
             Bukkit.broadcastMessage("Team Size is 0");
-            return false;
+            return true;
         }
         String firstTeam = teams.get(0);
         Bukkit.broadcastMessage(ChatColor.GOLD+""+teams.size());

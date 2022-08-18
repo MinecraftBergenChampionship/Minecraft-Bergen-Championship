@@ -65,13 +65,13 @@ public class teamCommands implements CommandExecutor {
                             participant.setTeam(args[1]);
                             Participant.participantsOnATeam.add(participant);
                             mcc.scoreboardManager.addPlayer(participant);
-
-                            return true;
                         }
                     }
                     if (!mcc.startGame.teamReadyMap.containsKey(args[1])) {
                         Bukkit.broadcastMessage("bruh");
                         mcc.startGame.teamReadyMap.put(args[1], false);
+                        Bukkit.broadcastMessage(args[1]);
+                        Bukkit.broadcastMessage(mcc.startGame.teamReadyMap.get(args[1]).toString());
                     }
                 }
             }
