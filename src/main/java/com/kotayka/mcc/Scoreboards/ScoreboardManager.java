@@ -509,6 +509,31 @@ public class ScoreboardManager {
         scoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
+    public void createInstructionScoreboard(ScoreboardPlayer player) {
+        if (player.currentObj != null) {
+            player.currentObj.unregister();
+        }
+        Objective scoreboard = player.board.registerNewObjective("Instructions", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MBC");
+        player.objectiveMap.put("Instructions",scoreboard);
+        Map<Integer, String> lines = new HashMap<>();
+        player.lines.put(scoreboard, lines);
+
+        scoreboard.getScore(ChatColor.GREEN+"Game Starting Soon!").setScore(21);
+        scoreboard.getScore(ChatColor.RED+""+ ChatColor.BOLD+ "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        scoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(3);
+        scoreboard.getScore(ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+ player.gameScore).setScore(1);
+
+        GenerateTeamsGame(scoreboard, player);
+
+        player.lines.get(scoreboard).put(21, ChatColor.GREEN+"Game Starting Soon!");
+        player.lines.get(scoreboard).put(20, ChatColor.RED+""+ ChatColor.BOLD+ "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(scoreboard).put(3, ChatColor.RESET.toString()+ChatColor.RESET.toString());
+        player.lines.get(scoreboard).put(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+player.gameScore);
+
+        player.currentObj = scoreboard;
+        scoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
+
     public void createTeams(ScoreboardPlayer player) {
         String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
 
@@ -676,6 +701,9 @@ public class ScoreboardManager {
                 break;
             case "SGEnd":
                 mcc.sg.completeEndGame();
+                break;
+            case "game":
+                mcc.game.instructions.timerEnds();
                 break;
         }
     }
