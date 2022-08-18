@@ -26,6 +26,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class PaintdownListener implements Listener {
@@ -46,10 +47,12 @@ public class PaintdownListener implements Listener {
         Participant p = Participant.findParticipantFromPlayer(player);
         assert p != null;
 
+        // Cooldown
         if (player.getInventory().getItemInMainHand().getType().equals(Material.IRON_HORSE_ARMOR)) {
             long timeLeft = System.currentTimeMillis() - p.getCooldown();
-            if (TimeUnit.MILLISECONDS.toSeconds(timeLeft) >= 0.5) {
+            if (timeLeft >= 700) {
                 Snowball projectile = player.launchProjectile(Snowball.class);
+                projectile.setVelocity(new Vector(projectile.getVelocity().getX() * 1.25, projectile.getVelocity().getY() * 1.25, projectile.getVelocity().getZ() * 1.25));
                 projectile.setShooter(player); // Not sure if this is necessary
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 2);
                 p.setCooldown(System.currentTimeMillis());
@@ -68,6 +71,9 @@ public class PaintdownListener implements Listener {
         Player hitPlayer = (Player) e.getHitEntity();
         assert e.getEntity().getShooter() instanceof Player;
         Player shooter = (Player) e.getEntity().getShooter();
+
+        if (Objects.requireNonNull(Participant.findParticipantFromPlayer(hitPlayer)).team.equals(Objects.requireNonNull(Participant.findParticipantFromPlayer(shooter)).team)) return;
+
         Vector snowballVelocity = e.getEntity().getVelocity();
         hitPlayer.damage(10);
         shooter.playSound(shooter.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 5);
@@ -112,13 +118,16 @@ public class PaintdownListener implements Listener {
     @EventHandler
     public void onPotionSplash(PotionSplashEvent e) {
         if (!(paintdown.getState().equals("PLAYING"))) { return; }
+        if (!(e.getPotion().getShooter() instanceof Player)) return;
 
         Collection<LivingEntity> affected = e.getAffectedEntities();
 
         for (LivingEntity ent : affected) {
             if (ent instanceof Player) {
                 Participant p = Participant.findParticipantFromPlayer((Player) ent);
+                Participant potionThrower = Participant.findParticipantFromPlayer((Player) e.getPotion().getShooter());
                 assert p != null;
+                assert potionThrower != null;
 
                 if (p.getIsPainted()) p.setIsPainted(false);
                 else p.player.setHealth(20);
@@ -131,7 +140,8 @@ public class PaintdownListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         if (!(paintdown.getState().equals("PLAYING"))) { return; }
-        if (!(Participant.findParticipantFromPlayer(e.getPlayer()).getIsPainted())) return;
+        // Right now, if a player joins during a game and moves, it will spam "This player is not on a team" since they are not on a team
+        if (!(Objects.requireNonNull(Participant.findParticipantFromPlayer(e.getPlayer())).getIsPainted())) return;
 
         e.setCancelled(true);
         e.setTo(e.getPlayer().getLocation());
