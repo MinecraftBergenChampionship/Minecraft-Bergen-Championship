@@ -70,6 +70,7 @@ public class teamCommands implements CommandExecutor {
                         }
                     }
                     if (!mcc.startGame.teamReadyMap.containsKey(args[1])) {
+                        Bukkit.broadcastMessage("bruh");
                         mcc.startGame.teamReadyMap.put(args[1], false);
                     }
                 }
