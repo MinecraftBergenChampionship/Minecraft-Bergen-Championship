@@ -235,7 +235,7 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective lobby = player.board.registerNewObjective("lobby", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"Minecraft Bruh Championship");
+        Objective lobby = player.board.registerNewObjective("lobby", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MBC");
         player.objectiveMap.put("Lobby",lobby);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(lobby, lines);
@@ -270,7 +270,7 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective lobby = player.board.registerNewObjective("lobby", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"Minecraft Bruh Championship");
+        Objective lobby = player.board.registerNewObjective("lobby", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MBC");
         player.objectiveMap.put("Lobby",lobby);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(lobby, lines);
@@ -306,7 +306,7 @@ public class ScoreboardManager {
             player.currentObj.unregister();
         }
 
-        Objective skybattleScoreboard = player.board.registerNewObjective("Skybattle", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"Minecraft Bruh Championship");
+        Objective skybattleScoreboard = player.board.registerNewObjective("Skybattle", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MBC");
         player.objectiveMap.put("Skybattle", skybattleScoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(skybattleScoreboard, lines);
@@ -340,7 +340,7 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective tgttosScoreboard = player.board.registerNewObjective("tgttos", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"Minecraft Bruh Championship");
+        Objective tgttosScoreboard = player.board.registerNewObjective("tgttos", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MBC");
         player.objectiveMap.put("tgttos",tgttosScoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(tgttosScoreboard, lines);
@@ -374,7 +374,7 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective aceRacesScoreboard = player.board.registerNewObjective("aceRace", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"Minecraft Bruh Championship");
+        Objective aceRacesScoreboard = player.board.registerNewObjective("aceRace", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MBC");
         player.objectiveMap.put("aceRace",aceRacesScoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(aceRacesScoreboard, lines);
@@ -418,7 +418,7 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective sgScoreboard = player.board.registerNewObjective("SG", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"Minecraft Bruh Championship");
+        Objective sgScoreboard = player.board.registerNewObjective("SG", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MBC");
         player.objectiveMap.put("SG",sgScoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(sgScoreboard, lines);
@@ -453,7 +453,7 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective scoreboard = player.board.registerNewObjective("BuildMart", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"Minecraft Bruh Championship");
+        Objective scoreboard = player.board.registerNewObjective("BuildMart", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MBC");
         player.objectiveMap.put("BuildMart",scoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(scoreboard, lines);
@@ -484,7 +484,7 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective scoreboard = player.board.registerNewObjective("DecisionDome", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"Minecraft Bruh Championship");
+        Objective scoreboard = player.board.registerNewObjective("DecisionDome", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MBC");
         player.objectiveMap.put("DecisionDome",scoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(scoreboard, lines);
