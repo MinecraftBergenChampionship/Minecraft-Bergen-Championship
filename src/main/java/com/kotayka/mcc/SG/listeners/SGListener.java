@@ -56,12 +56,13 @@ public class SGListener implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         if (!sg.stage.equals("Game")) return;
-
+        sg.names.remove(e.getEntity().getName());
         Participant p = Participant.findParticipantFromPlayer(e.getEntity());
         assert p != null;
         Participant killer = Participant.findParticipantFromPlayer(p.player.getKiller());
         p.Die(e.getEntity(), p.player.getKiller(), e);
         sg.playersDead--;
+        sg.playersDeadList.add(e.getEntity().getUniqueId());
         sg.outLivePlayer();
         if (killer != null) {
             sg.kill(killer);

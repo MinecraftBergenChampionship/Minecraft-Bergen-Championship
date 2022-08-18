@@ -94,9 +94,9 @@ public class AceRace {
             Bukkit.broadcastMessage(lapper.teamPrefix + lapper.chatColor + "" + ChatColor.BOLD + p.getDisplayName()+ChatColor.WHITE+ "" + ChatColor.BOLD+" finished Lap #"+(playerLaps.get(p.getUniqueId())+1)+".");
             mcc.scoreboardManager.placementPoints(mcc.scoreboardManager.players.get(p.getUniqueId()), 2, playerLapPlacement.get(playerLaps.get(p.getUniqueId())));
             playerLapPlacement.put(playerLaps.get(p.getUniqueId()), playerLapPlacement.get(playerLaps.get(p.getUniqueId()))+1);
+            playerLaps.put(p.getUniqueId(), playerLaps.get(p.getUniqueId())+1);
             if (playerLaps.get(p.getUniqueId()) < 2) {
                 playerFinish.put(p.getUniqueId(), false);
-                playerLaps.put(p.getUniqueId(), playerLaps.get(p.getUniqueId())+1);
                 mcc.scoreboardManager.changePlayerLine(3, ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+playerLaps.get(p.getUniqueId())+"/3", mcc.scoreboardManager.players.get(p.getUniqueId()));
             }
             else if (playerLaps.get(p.getUniqueId()) == 2){
