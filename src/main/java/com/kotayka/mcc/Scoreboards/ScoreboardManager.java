@@ -235,15 +235,15 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective lobby = player.board.registerNewObjective("lobby", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+        Objective lobby = player.board.registerNewObjective("lobby", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MCC");
         player.objectiveMap.put("Lobby",lobby);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(lobby, lines);
 
-        lobby.getScore(ChatColor.BOLD+""+ChatColor.RED + "Event begins in:").setScore(22);
+        lobby.getScore(ChatColor.RED+""+ChatColor.BOLD + "Event begins in:").setScore(22);
         lobby.getScore(ChatColor.GREEN + "Teams ready").setScore(21);
         lobby.getScore(ChatColor.RESET.toString()).setScore(19);
-        lobby.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Your Team:").setScore(18);
+        lobby.getScore(ChatColor.GREEN+""+ChatColor.BOLD + "Your Team:").setScore(18);
         lobby.getScore(teamColors.get(player.player.team)+player.player.fullName).setScore(17);
         lobby.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(16);
         lobby.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
@@ -252,10 +252,10 @@ public class ScoreboardManager {
 
         GenerateTeamsGame(lobby, player);
 
-        player.lines.get(lobby).put(21, ChatColor.BOLD+""+ChatColor.RED + "Event begins in:");
+        player.lines.get(lobby).put(21, ChatColor.RED+""+ChatColor.BOLD + "Event begins in:");
         player.lines.get(lobby).put(20, ChatColor.GREEN + "Teams ready");
         player.lines.get(lobby).put(19, ChatColor.RESET.toString());
-        player.lines.get(lobby).put(18, ChatColor.BOLD+""+ChatColor.GREEN + "Your Team:");
+        player.lines.get(lobby).put(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team:");
         player.lines.get(lobby).put(17, teamColors.get(player.player.team)+player.player.fullName);
         player.lines.get(lobby).put(16, ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString());
         player.lines.get(lobby).put(15, ChatColor.GREEN+"Game Scores");
@@ -275,10 +275,10 @@ public class ScoreboardManager {
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(lobby, lines);
 
-        lobby.getScore(ChatColor.BOLD+""+ChatColor.RED + "Next Round begins in:").setScore(22);
+        lobby.getScore(ChatColor.RED+""+ChatColor.BOLD + "Next Round begins in:").setScore(22);
         lobby.getScore(ChatColor.GREEN + "Teams ready").setScore(21);
         lobby.getScore(ChatColor.RESET.toString()).setScore(19);
-        lobby.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Your Team:").setScore(18);
+        lobby.getScore(ChatColor.GREEN+""+ChatColor.BOLD + "Your Team:").setScore(18);
         lobby.getScore(teamColors.get(player.player.team)+player.player.fullName).setScore(17);
         lobby.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(16);
         lobby.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
@@ -287,10 +287,10 @@ public class ScoreboardManager {
 
         GenerateTeamsGame(lobby, player);
 
-        player.lines.get(lobby).put(21, ChatColor.BOLD+""+ChatColor.RED + "Next Round begins in:");
+        player.lines.get(lobby).put(21, ChatColor.RED+""+ChatColor.BOLD + "Next Round begins in:");
         player.lines.get(lobby).put(20, ChatColor.GREEN + "Teams ready");
         player.lines.get(lobby).put(19, ChatColor.RESET.toString());
-        player.lines.get(lobby).put(18, ChatColor.BOLD+""+ChatColor.GREEN + "Your Team:");
+        player.lines.get(lobby).put(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team:");
         player.lines.get(lobby).put(17, teamColors.get(player.player.team)+player.player.fullName);
         player.lines.get(lobby).put(16, ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString());
         player.lines.get(lobby).put(15, ChatColor.GREEN+"Game Scores");
@@ -311,10 +311,10 @@ public class ScoreboardManager {
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(skybattleScoreboard, lines);
 
-        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" Skybattle").setScore(23);
-        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"Skybattle").setScore(22);
-        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+mcc.skybattle.roundNum+"/3").setScore(21);
-        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        skybattleScoreboard.getScore(ChatColor.AQUA +""+ChatColor.BOLD+ "Game 0/8:"+ChatColor.WHITE+" Skybattle").setScore(23);
+        skybattleScoreboard.getScore(ChatColor.AQUA+""+ChatColor.BOLD + "Map: "+ChatColor.WHITE+"Skybattle").setScore(22);
+        skybattleScoreboard.getScore(ChatColor.GREEN+""+ChatColor.BOLD + "Round: "+ ChatColor.WHITE+mcc.skybattle.roundNum+"/3").setScore(21);
+        skybattleScoreboard.getScore(ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
         skybattleScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(19);
         skybattleScoreboard.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
         skybattleScoreboard.getScore(ChatColor.RESET.toString()).setScore(4);
@@ -323,10 +323,10 @@ public class ScoreboardManager {
 
         GenerateTeamsRound(skybattleScoreboard, player);
 
-        player.lines.get(skybattleScoreboard).put(23, ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" Skybattle");
-        player.lines.get(skybattleScoreboard).put(22, ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"Skybattle");
-        player.lines.get(skybattleScoreboard).put(21, ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+mcc.skybattle.roundNum+"/3");
-        player.lines.get(skybattleScoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(skybattleScoreboard).put(23, ChatColor.AQUA+""+ChatColor.BOLD + "Game 0/8:"+ChatColor.WHITE+" Skybattle");
+        player.lines.get(skybattleScoreboard).put(22, ChatColor.AQUA+""+ChatColor.BOLD + "Map: "+ChatColor.WHITE+"Skybattle");
+        player.lines.get(skybattleScoreboard).put(21, ChatColor.GREEN+""+ChatColor.BOLD + "Round: "+ ChatColor.WHITE+mcc.skybattle.roundNum+"/3");
+        player.lines.get(skybattleScoreboard).put(20, ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+"0:0");
         player.lines.get(skybattleScoreboard).put(15, ChatColor.GREEN+"Game Scores");
         player.lines.get(skybattleScoreboard).put(4, ChatColor.RESET.toString());
         player.lines.get(skybattleScoreboard).put(2, ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0");
@@ -345,10 +345,10 @@ public class ScoreboardManager {
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(tgttosScoreboard, lines);
 
-        tgttosScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" TGTTOSAWAF").setScore(23);
-        tgttosScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+mcc.tgttos.mapOrder[mcc.tgttos.gameOrder[mcc.tgttos.roundNum]]).setScore(22);
-        tgttosScoreboard.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ChatColor.WHITE+"1/7").setScore(21);
-        tgttosScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        tgttosScoreboard.getScore(ChatColor.AQUA+""+ChatColor.BOLD + "Game 0/8:"+ChatColor.WHITE+" TGTTOSAWAF").setScore(23);
+        tgttosScoreboard.getScore(ChatColor.AQUA+""+ChatColor.BOLD + "Map: "+ChatColor.WHITE+mcc.tgttos.mapOrder[mcc.tgttos.gameOrder[mcc.tgttos.roundNum]]).setScore(22);
+        tgttosScoreboard.getScore(ChatColor.GREEN +""+ChatColor.BOLD+ "Round: "+ChatColor.WHITE+"1/7").setScore(21);
+        tgttosScoreboard.getScore(ChatColor.RED +""+ChatColor.BOLD+ "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
         tgttosScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(19);
         tgttosScoreboard.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
         tgttosScoreboard.getScore(ChatColor.RESET.toString()).setScore(4);
@@ -357,10 +357,10 @@ public class ScoreboardManager {
 
         GenerateTeamsRound(tgttosScoreboard, player);
 
-        player.lines.get(tgttosScoreboard).put(23, ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" TGTTOSAWAF");
-        player.lines.get(tgttosScoreboard).put(22, ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+mcc.tgttos.mapOrder[mcc.tgttos.gameOrder[mcc.tgttos.roundNum]]);
-        player.lines.get(tgttosScoreboard).put(21, ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ChatColor.WHITE+"1/7");
-        player.lines.get(tgttosScoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(tgttosScoreboard).put(23, ChatColor.AQUA+""+ChatColor.BOLD + "Game 0/8:"+ChatColor.WHITE+" TGTTOSAWAF");
+        player.lines.get(tgttosScoreboard).put(22, ChatColor.AQUA+""+ChatColor.BOLD + "Map: "+ChatColor.WHITE+mcc.tgttos.mapOrder[mcc.tgttos.gameOrder[mcc.tgttos.roundNum]]);
+        player.lines.get(tgttosScoreboard).put(21, ChatColor.GREEN+""+ChatColor.BOLD + "Round: "+ChatColor.WHITE+"1/7");
+        player.lines.get(tgttosScoreboard).put(20, ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+"0:0");
         player.lines.get(tgttosScoreboard).put(15, ChatColor.GREEN+"Game Scores");
         player.lines.get(tgttosScoreboard).put(4, ChatColor.RESET.toString());
         player.lines.get(tgttosScoreboard).put(2, ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0");
@@ -374,13 +374,13 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective aceRacesScoreboard = player.board.registerNewObjective("aceRace", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+        Objective aceRacesScoreboard = player.board.registerNewObjective("aceRace", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MCC");
         player.objectiveMap.put("aceRace",aceRacesScoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(aceRacesScoreboard, lines);
 
-        aceRacesScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" Ace Race").setScore(23);
-        aceRacesScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        aceRacesScoreboard.getScore(ChatColor.AQUA+""+ChatColor.BOLD + "Game 0/8:"+ChatColor.WHITE+" Ace Race").setScore(23);
+        aceRacesScoreboard.getScore(ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
         aceRacesScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(19);
         aceRacesScoreboard.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
         aceRacesScoreboard.getScore(ChatColor.RESET.toString()).setScore(4);
@@ -390,8 +390,8 @@ public class ScoreboardManager {
 
         GenerateTeamsRound(aceRacesScoreboard, player);
 
-        player.lines.get(aceRacesScoreboard).put(23, ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/8:"+ChatColor.WHITE+" TGTTOSAWAF");
-        player.lines.get(aceRacesScoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(aceRacesScoreboard).put(23, ChatColor.AQUA +""+ChatColor.BOLD + "Game 0/8:"+ChatColor.WHITE+" TGTTOS");
+        player.lines.get(aceRacesScoreboard).put(20, ChatColor.RED +""+ChatColor.BOLD+ "Time left: "+ChatColor.WHITE+"0:0");
         player.lines.get(aceRacesScoreboard).put(15, ChatColor.GREEN+"Game Scores");
         player.lines.get(aceRacesScoreboard).put(4, ChatColor.RESET.toString());
         player.lines.get(aceRacesScoreboard).put(3, ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+"0/3");
@@ -418,15 +418,15 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective sgScoreboard = player.board.registerNewObjective("SG", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+        Objective sgScoreboard = player.board.registerNewObjective("SG", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MCC");
         player.objectiveMap.put("SG",sgScoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(sgScoreboard, lines);
 
-        sgScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game: 0/8:"+ChatColor.WHITE+" Survival Games").setScore(23);
-        sgScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"BCA").setScore(22);
-        sgScoreboard.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Next Event: "+ChatColor.LIGHT_PURPLE+"Starting").setScore(21);
-        sgScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        sgScoreboard.getScore(ChatColor.AQUA+""+ChatColor.BOLD + "Game: 0/8:"+ChatColor.WHITE+" Survival Games").setScore(23);
+        sgScoreboard.getScore(ChatColor.AQUA +""++ ChatColor.BOLD"Map: "+ChatColor.WHITE+"BCA").setScore(22);
+        sgScoreboard.getScore(ChatColor.GREEN+""+ChatColor.BOLD + "Next Event: "+ChatColor.LIGHT_PURPLE+"Starting").setScore(21);
+        sgScoreboard.getScore(ChatColor.RED +""+ChatColor.BOLD+ "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
         sgScoreboard.getScore(ChatColor.RESET.toString()).setScore(19);
         sgScoreboard.getScore(ChatColor.AQUA+"Game Coins:").setScore(15);
         sgScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(3);
@@ -435,10 +435,10 @@ public class ScoreboardManager {
 
         GenerateTeamsRound(sgScoreboard, player);
 
-        player.lines.get(sgScoreboard).put(23, ChatColor.BOLD+""+ChatColor.AQUA + "Game: 0/8:"+ChatColor.WHITE+" Survival Games");
-        player.lines.get(sgScoreboard).put(22, ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"BCA");
-        player.lines.get(sgScoreboard).put(21, ChatColor.BOLD+""+ChatColor.GREEN + "Next Event: "+ChatColor.LIGHT_PURPLE+"Starting");
-        player.lines.get(sgScoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(sgScoreboard).put(23, ChatColor.AQUA+""+ChatColor.BOLD + "Game: 0/8:"+ChatColor.WHITE+" Survival Games");
+        player.lines.get(sgScoreboard).put(22, ChatColor.AQUA+""+ChatColor.BOLD + "Map: "+ChatColor.WHITE+"BCA");
+        player.lines.get(sgScoreboard).put(21, ChatColor.GREEN+""+ ChatColor.BOLD+ "Next Event: "+ChatColor.LIGHT_PURPLE+"Starting");
+        player.lines.get(sgScoreboard).put(20, ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+"0:0");
         player.lines.get(sgScoreboard).put(19, ChatColor.RESET.toString());
         player.lines.get(sgScoreboard).put(15, ChatColor.AQUA+"Game Coins:");
         player.lines.get(sgScoreboard).put(3, ChatColor.RESET.toString()+ChatColor.RESET.toString());
@@ -453,13 +453,13 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective scoreboard = player.board.registerNewObjective("BSABM", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+        Objective scoreboard = player.board.registerNewObjective("BSABM", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MCC");
         player.objectiveMap.put("BSABM",scoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(scoreboard, lines);
 
-        scoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game: 0/8:"+ChatColor.WHITE+" BSABM").setScore(23);
-        scoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        scoreboard.getScore(ChatColor.AQUA+""+ChatColor.BOLD + "Game: 0/8:"+ChatColor.WHITE+" BSABM").setScore(23);
+        scoreboard.getScore(ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
         scoreboard.getScore(ChatColor.RESET.toString()).setScore(19);
         scoreboard.getScore(ChatColor.AQUA+"Game Coins:").setScore(15);
         scoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(3);
@@ -468,8 +468,8 @@ public class ScoreboardManager {
 
         GenerateTeamsRound(scoreboard, player);
 
-        player.lines.get(scoreboard).put(23, ChatColor.BOLD+""+ChatColor.AQUA + "Game: 0/8:"+ChatColor.WHITE+" BSABM");
-        player.lines.get(scoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(scoreboard).put(23, ChatColor.AQUA+""+ChatColor.BOLD + "Game: 0/8:"+ChatColor.WHITE+" BSABM");
+        player.lines.get(scoreboard).put(20, ChatColor.RED +""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+"0:0");
         player.lines.get(scoreboard).put(19, ChatColor.RESET.toString());
         player.lines.get(scoreboard).put(15, ChatColor.AQUA+"Game Coins:");
         player.lines.get(scoreboard).put(3, ChatColor.RESET.toString()+ChatColor.RESET.toString());
@@ -484,13 +484,13 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective scoreboard = player.board.registerNewObjective("DecisionDome", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+        Objective scoreboard = player.board.registerNewObjective("DecisionDome", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MCC");
         player.objectiveMap.put("DecisionDome",scoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(scoreboard, lines);
 
         scoreboard.getScore(ChatColor.GREEN+"Event: "+ChatColor.LIGHT_PURPLE+"Voting!").setScore(21);
-        scoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        scoreboard.getScore(ChatColor.RED+""+ ChatColor.BOLD+ "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
         scoreboard.getScore(ChatColor.RESET.toString()).setScore(19);
         scoreboard.getScore(ChatColor.AQUA+"Game Coins:").setScore(15);
         scoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(3);
@@ -499,7 +499,7 @@ public class ScoreboardManager {
         GenerateTeamsGame(scoreboard, player);
 
         player.lines.get(scoreboard).put(21, ChatColor.GREEN+"Event: "+ChatColor.LIGHT_PURPLE+"Voting!");
-        player.lines.get(scoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(scoreboard).put(20, ChatColor.RED +""+ChatColor.BOLD+ "Time left: "+ChatColor.WHITE+"0:0");
         player.lines.get(scoreboard).put(19, ChatColor.RESET.toString());
         player.lines.get(scoreboard).put(15, ChatColor.AQUA+"Game Coins:");
         player.lines.get(scoreboard).put(3, ChatColor.RESET.toString()+ChatColor.RESET.toString());
@@ -588,7 +588,7 @@ public class ScoreboardManager {
                             addScore(p, amount);
                         }
                     }
-                    Bukkit.broadcastMessage(teamColors.get(t)+teamNameFull.get(t)+ChatColor.WHITE+" finished first");
+                    Bukkit.broadcastMessage(teamColors.get(t)+teamNameFull.get(t)+ChatColor.WHITE+" finished first.");
                 }
             }
         }
@@ -694,7 +694,7 @@ public class ScoreboardManager {
                         if (p.lines.get(obj).containsKey(20)) {
                             obj.getScoreboard().resetScores(p.lines.get(obj).get(20));
                         }
-                        String value = ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+getFormattedTime(timer);
+                        String value = ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+getFormattedTime(timer);
                         obj.getScore(value).setScore(20);
                         p.lines.get(obj).put(20, value);
 
