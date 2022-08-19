@@ -235,7 +235,7 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective lobby = player.board.registerNewObjective("lobby", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+""+"MBC");
+        Objective lobby = player.board.registerNewObjective("lobby", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MBC");
         player.objectiveMap.put("Lobby",lobby);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(lobby, lines);
@@ -270,7 +270,7 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective lobby = player.board.registerNewObjective("lobby", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MBC");
+        Objective lobby = player.board.registerNewObjective("lobby", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MBC");
         player.objectiveMap.put("Lobby",lobby);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(lobby, lines);
@@ -306,7 +306,7 @@ public class ScoreboardManager {
             player.currentObj.unregister();
         }
 
-        Objective skybattleScoreboard = player.board.registerNewObjective("Skybattle", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MBC");
+        Objective skybattleScoreboard = player.board.registerNewObjective("Skybattle", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MBC");
         player.objectiveMap.put("Skybattle", skybattleScoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(skybattleScoreboard, lines);
@@ -340,7 +340,7 @@ public class ScoreboardManager {
         if (player.currentObj != null) {
             player.currentObj.unregister();
         }
-        Objective tgttosScoreboard = player.board.registerNewObjective("tgttos", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MBC");
+        Objective tgttosScoreboard = player.board.registerNewObjective("tgttos", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MBC");
         player.objectiveMap.put("tgttos",tgttosScoreboard);
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(tgttosScoreboard, lines);
