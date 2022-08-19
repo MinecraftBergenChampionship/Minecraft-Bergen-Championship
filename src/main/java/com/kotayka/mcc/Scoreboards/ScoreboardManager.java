@@ -400,8 +400,6 @@ public class ScoreboardManager {
                 teamsDead++;
             }
         }
-        Bukkit.broadcastMessage("teamsDead == " + teamsDead);
-        Bukkit.broadcastMessage("teamList.size()-1 == " + (teamList.size()-1));
         if (teamsDead >= teamList.size()-1) {
             switch (game) {
                 case "SG":
@@ -411,6 +409,12 @@ public class ScoreboardManager {
                     timer = 0;
                     break;
             }
+        }
+    }
+
+    public void resetTeamAmountDead() {
+        for (String t : teamList) {
+            teamAmountFinished.put(t, 0);
         }
     }
 

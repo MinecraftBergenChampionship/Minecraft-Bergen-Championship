@@ -218,12 +218,6 @@ public class SkybattleListener implements Listener {
 
         skybattle.outLivePlayer();
 
-        // DEBUG MODE (ONE PLAYER)
-        /*
-        if (skybattle.playersDeadList.size() >= 1)
-            skybattle.mcc.scoreboardManager.timer = 0;
-
-         */
 
         // TODO: end game if only one team is left
         skybattle.mcc.scoreboardManager.lastOneStanding(skybattle.mcc.scoreboardManager.players.get(p.player.getUniqueId()), "Skybattle");
@@ -265,9 +259,9 @@ public class SkybattleListener implements Listener {
         // Kill players immediately in void
         // Damage players in border
         Player p = e.getPlayer();
-        if (p.getLocation().getY() <= -40 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
+        if (p.getLocation().getY() <= -40 && p.getLocation().getY() >= -60 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
             p.setHealth(1);
-            p.teleport(new Location(p.getWorld(), p.getLocation().getX(), -64, p.getLocation().getY()));
+            p.teleport(skybattle.getKILLING_ZONE());
         } else if (p.getLocation().getY() >= skybattle.borderHeight) {
             p.damage(1);
         }
