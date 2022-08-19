@@ -62,13 +62,13 @@ public class TGTTOS {
         }
 
 
-        Location cliffSpawn = new Location(world, -148, 1, -284);
-        Location meatballSpawn = new Location(world, 615, -28, 133);
-        Location skydiveSpawn = new Location(world, 757, 53, 442);
-        Location glideSpawn = new Location(world, -176, 1, 174);
-        Location boatsSpawn = new Location(world, 175, 1, -96);
-        Location pitSpawn = new Location(world, 34, 1, 585);
-        Location wallsSpawn = new Location(world, 215, -24, 341);
+        Location cliffSpawn = new Location(world, -148, 1, -284, 90, 0);
+        Location meatballSpawn = new Location(world, 615, -28, 133, 0, 0);
+        Location skydiveSpawn = new Location(world, 757, 53, 442, 90, 0);
+        Location glideSpawn = new Location(world, -176, 1, 174, 90, 0);
+        Location boatsSpawn = new Location(world, 175, 1, -96, -90, 0);
+        Location pitSpawn = new Location(world, 34, 1, 585, 90, 0);
+        Location wallsSpawn = new Location(world, 215, -24, 341, 180, 0);
 
         int[] cliffNPC = {-259, 5, -271};
         int[] meatballNPC = {609, 47, 136};
