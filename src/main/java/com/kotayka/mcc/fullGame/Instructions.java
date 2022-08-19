@@ -120,7 +120,7 @@ public class Instructions {
         taskId[0] = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(mcc.plugin, new Runnable() {
             @Override
             public void run() {
-                Bukkit.broadcastMessage(ChatColor.GOLD+"[INSTRUCTION] "+ChatColor.BOLD+instructions.get(game)[timer]);
+                Bukkit.broadcastMessage(ChatColor.WHITE+"[INSTRUCTION] "+ChatColor.BOLD+instructions.get(game)[timer]);
                 if (timer >= 7) {
                     Bukkit.getServer().getScheduler().cancelTask(taskId[0]);
                 }
