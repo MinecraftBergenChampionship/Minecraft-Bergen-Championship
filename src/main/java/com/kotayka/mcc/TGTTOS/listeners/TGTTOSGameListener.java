@@ -34,7 +34,9 @@ public class TGTTOSGameListener implements Listener {
                 Location playerLoc = (Location) tgttos.spawnPoints.get(tgttos.gameOrder[tgttos.roundNum]);
                 Player p = (Player) event.getPlayer(); 
                 Participant didntgettotheotherside = Participant.findParticipantFromPlayer(p);
-                Bukkit.broadcastMessage(didntgettotheotherside.teamPrefix + didntgettotheotherside.chatColor + p.getDisplayName()+ChatColor.GRAY+" couldn't get to the other side.");    
+                assert didntgettotheotherside != null;
+                String randomMessage = TGTTOS.getDeathMessage(didntgettotheotherside);
+                Bukkit.broadcastMessage(randomMessage);
                 event.getPlayer().teleport(playerLoc);
             }
         }
