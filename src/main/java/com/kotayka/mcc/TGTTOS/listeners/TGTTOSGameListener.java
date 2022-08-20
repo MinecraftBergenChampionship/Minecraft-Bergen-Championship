@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
+import com.kotayka.mcc.mainGame.manager.Participant;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -31,6 +32,9 @@ public class TGTTOSGameListener implements Listener {
         if (tgttos.enabled()) {
             if (event.getPlayer().getLocation().getY() <= -35) {
                 Location playerLoc = (Location) tgttos.spawnPoints.get(tgttos.gameOrder[tgttos.roundNum]);
+                Player p = (Player) event.getPlayer(); 
+                Participant didntgettotheotherside = Participant.findParticipantFromPlayer(p);
+                Bukkit.broadcastMessage(didntgettotheotherside.teamPrefix + didntgettotheotherside.chatColor + p.getDisplayName()+ChatColor.GRAY+" couldn't get to the other side.");    
                 event.getPlayer().teleport(playerLoc);
             }
         }
@@ -75,8 +79,10 @@ public class TGTTOSGameListener implements Listener {
                     place=String.valueOf(tgttos.playerAmount)+"th";
                     break;
             }
-            Bukkit.broadcastMessage(ChatColor.GOLD+event.getDamager().getName()+ChatColor.GRAY+ " finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
-            event.getDamager().sendMessage(ChatColor.WHITE+"[+"+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
+            Player p = (Player) event.getDamager(); 
+            Participant chickenpuncher = Participant.findParticipantFromPlayer(p);
+            Bukkit.broadcastMessage(chickenpuncher.teamPrefix + chickenpuncher.chatColor + "" +event.getDamager().getName()+ChatColor.GRAY+ " finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
+            event.getDamager().sendMessage(ChatColor.WHITE+""+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
             tgttos.playerPoints--;
             if (tgttos.playerAmount >= scoreboardManager.playerList.size()) {
                 tgttos.nextRound();
@@ -111,7 +117,9 @@ public class TGTTOSGameListener implements Listener {
                     place=String.valueOf(tgttos.playerAmount)+"th";
                     break;
             }
-            Bukkit.broadcastMessage(ChatColor.GOLD+event.getPlayer().getName()+ChatColor.GRAY+ " finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
+            Player p = (Player) event.getPlayer(); 
+            Participant chickenclicker = Participant.findParticipantFromPlayer(p);
+            Bukkit.broadcastMessage(chickenclicker.teamPrefix + chickenclicker.chatColor + "" + event.getPlayer().getName()+ChatColor.GRAY+ " finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
             event.getPlayer().sendMessage(ChatColor.WHITE+"[+"+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
             tgttos.playerPoints--;
             if (tgttos.playerAmount >= scoreboardManager.playerList.size()) {

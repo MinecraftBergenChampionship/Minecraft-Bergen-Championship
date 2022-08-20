@@ -7,6 +7,7 @@ import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.Skybattle.Skybattle;
 import com.kotayka.mcc.TGTTOS.TGTTOS;
+import com.kotayka.mcc.fullGame.Instructions;
 import com.kotayka.mcc.mainGame.MCC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,6 +25,7 @@ public class Game {
     private final AceRace aceRace;
     private final DecisionDome decisionDome;
     private Stats stats;
+    public Instructions instructions;
 
     public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm, AceRace aceRace, DecisionDome decisionDome) {
         this.tgttos = tgttos;
@@ -35,8 +37,7 @@ public class Game {
         this.decisionDome = decisionDome;
     }
 
-    public void changeGame(String game) {
-        stats=mcc.stats;
+    public void changeToActGame(String game) {
         stage=game;
         switch (game) {
             case "TGTTOS":
@@ -69,12 +70,23 @@ public class Game {
         }
     }
 
-    public void start() {
+    public void changeGame(String game) {
+        InitVars();
+        instructions.starting(game);
+    }
+
+    public void InitVars() {
+        instructions = new Instructions(mcc, this);
         stats=mcc.stats;
         stage="Starting";
         mcc.scoreboardManager.clearTeams();
-        mcc.scoreboardManager.startTimerForGame(10, "Lobby");
         stats.initVars();
+        instructions.loadCoords();
+    }
+
+    public void start() {
+        InitVars();
+        mcc.scoreboardManager.startTimerForGame(10, "Lobby");
     }
 
     public void endGame() {

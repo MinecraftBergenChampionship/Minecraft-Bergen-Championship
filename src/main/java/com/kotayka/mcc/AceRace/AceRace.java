@@ -41,14 +41,14 @@ public class AceRace {
     }
 
     public void loadCheckpoints() {
-        respawnPoints.put("Forest", new Location(world, 95, 25, 119));
-        respawnPoints.put("Desert", new Location(world, -59, 26, 140));
-        respawnPoints.put("Snow", new Location(world, -119, 27, 77));
-        respawnPoints.put("Jungle", new Location(world, -138, 26, -58));
-        respawnPoints.put("Underwater", new Location(world, -49, 33, -144));
-        respawnPoints.put("Nether", new Location(world, 40, 26, -142));
-        respawnPoints.put("End", new Location(world, 138, 26, -62));
-        respawnPoints.put("Small", new Location(world, 136, 26, 67));
+        respawnPoints.put("Forest", new Location(world, 95, 25, 119, 65, 0));
+        respawnPoints.put("Desert", new Location(world, -59, 26, 140, 125, 0));
+        respawnPoints.put("Snow", new Location(world, -119, 27, 77, 135, 0));
+        respawnPoints.put("Jungle", new Location(world, -138, 26, -58, -160, 0));
+        respawnPoints.put("Underwater", new Location(world, -49, 33, -144, -90, 0));
+        respawnPoints.put("Nether", new Location(world, 40, 26, -142, -90, 0));
+        respawnPoints.put("End", new Location(world, 138, 26, -62, -10, 0));
+        respawnPoints.put("Small", new Location(world, 136, 26, 67, 35, 0));
 
         bouncerPoints.put("Forest", new Location(world, -22, 28, 150));
         bouncerPoints.put("Desert", new Location(world, -109, 32, 103));
@@ -94,9 +94,9 @@ public class AceRace {
             Bukkit.broadcastMessage(lapper.teamPrefix + lapper.chatColor + "" + ChatColor.BOLD + p.getDisplayName()+ChatColor.WHITE+ "" + ChatColor.BOLD+" finished Lap #"+(playerLaps.get(p.getUniqueId())+1)+".");
             mcc.scoreboardManager.placementPoints(mcc.scoreboardManager.players.get(p.getUniqueId()), 2, playerLapPlacement.get(playerLaps.get(p.getUniqueId())));
             playerLapPlacement.put(playerLaps.get(p.getUniqueId()), playerLapPlacement.get(playerLaps.get(p.getUniqueId()))+1);
+            playerLaps.put(p.getUniqueId(), playerLaps.get(p.getUniqueId())+1);
             if (playerLaps.get(p.getUniqueId()) < 2) {
                 playerFinish.put(p.getUniqueId(), false);
-                playerLaps.put(p.getUniqueId(), playerLaps.get(p.getUniqueId())+1);
                 mcc.scoreboardManager.changePlayerLine(3, ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+playerLaps.get(p.getUniqueId())+"/3", mcc.scoreboardManager.players.get(p.getUniqueId()));
             }
             else if (playerLaps.get(p.getUniqueId()) == 2){
