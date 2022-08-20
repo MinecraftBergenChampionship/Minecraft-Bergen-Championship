@@ -31,6 +31,25 @@ public class TGTTOS {
     public int playerAmount = 0;
     public int playerPoints;
 
+    // Death Messages
+    // there's definitely a way to get this from another file but idk
+    public static String[] deathMessages = {
+            " should've gone to mid at 15 mins.",
+            " is gonna get 1st, 2nd, and 3rd.",
+            " put a poptart in the microwave.",
+            " forgot to say 'It's morbin' time.",
+            " regrets buying Eggcoin.",
+            " was sued for being too annoying.",
+            " took a pee break during the round.",
+            " found Nikola's last trap.",
+            ", next round's your round.",
+            " forgot to take the eraser off the hot plate.",
+            " reached the other, other side.",
+            " has fallen! A cannon can be heard in the distance.",
+            " blames the lag.",
+            " was lagged out by Sebastian's tree farm."
+    };
+
     public int timeLeft = 120;
     public String[] mapOrder = {"Cliff", "Meatball", "Skydive", "Glide", "Boats", "Pit", "Walls"};
     public List<Location> spawnPoints = new ArrayList<>();
@@ -164,7 +183,7 @@ public class TGTTOS {
                                     wool.setType(Material.PINK_WOOL);
                                     break;
                                 default:
-                                    p.player.sendMessage("Your not on a team");
+                                    p.player.sendMessage("You're not on a team");
                             }
                             ItemStack shears = new ItemStack(Material.SHEARS);
                             p.player.getInventory().addItem(wool);
@@ -209,6 +228,11 @@ public class TGTTOS {
         else {
             mcc.game.endGame();
         }
+    }
+
+    public static String getDeathMessage(Participant p) {
+        String name = p.teamPrefix + p.chatColor + p.ign + ChatColor.GRAY;
+        return name + deathMessages[(int)(Math.random() * deathMessages.length)];
     }
 
     public boolean enabled() {
