@@ -82,7 +82,7 @@ public class TGTTOSGameListener implements Listener {
             Player p = (Player) event.getDamager(); 
             Participant chickenpuncher = Participant.findParticipantFromPlayer(p);
             Bukkit.broadcastMessage(chickenpuncher.teamPrefix + chickenpuncher.chatColor + "" +event.getDamager().getName()+ChatColor.GRAY+ " finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
-            event.getDamager().sendMessage(ChatColor.WHITE+""+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
+            event.getDamager().sendMessage(ChatColor.WHITE+"[+"+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GREEN+" place!");
             tgttos.playerPoints--;
             if (tgttos.playerAmount >= scoreboardManager.playerList.size()) {
                 tgttos.nextRound();
@@ -120,7 +120,7 @@ public class TGTTOSGameListener implements Listener {
             Player p = (Player) event.getPlayer(); 
             Participant chickenclicker = Participant.findParticipantFromPlayer(p);
             Bukkit.broadcastMessage(chickenclicker.teamPrefix + chickenclicker.chatColor + "" + event.getPlayer().getName()+ChatColor.GRAY+ " finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
-            event.getPlayer().sendMessage(ChatColor.WHITE+"[+"+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GRAY+" place!");
+            event.getPlayer().sendMessage(ChatColor.WHITE+"[+"+String.valueOf(tgttos.playerPoints)+"] "+ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GREEN+" place!");
             tgttos.playerPoints--;
             if (tgttos.playerAmount >= scoreboardManager.playerList.size()) {
                 tgttos.nextRound();
