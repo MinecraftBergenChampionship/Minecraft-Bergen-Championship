@@ -176,16 +176,6 @@ public final class MCC extends JavaPlugin implements Listener {
         firework.spawnFireworkWithColor(victim.player.getLocation(), victim.color);
     }
 
-    public void returnToSpawn() {
-        for (Participant participanto : Participant.participantsOnATeam) {
-            participanto.player.teleport(SPAWN);
-            participanto.player.setInvulnerable(false);
-            participanto.player.setGameMode(GameMode.ADVENTURE);
-            participanto.player.setFlying(false);
-            participanto.player.setAllowFlight(false);
-        }
-    }
-
     public void setGameOver(boolean b) {
         gameIsOver = b;
     }
