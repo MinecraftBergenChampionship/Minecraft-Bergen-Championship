@@ -34,7 +34,7 @@ public class DecisionDome {
     public List<Integer> removedQuads = new ArrayList<>();
     public final MCC mcc;
 
-    World world;
+    public World world;
 
     public void loadWorld() {
         if (Bukkit.getWorld("mbcIngameLobby") == null) {
