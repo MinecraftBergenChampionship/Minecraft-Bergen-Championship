@@ -47,7 +47,20 @@ public class TGTTOS {
             " reached the other, other side.",
             " has fallen! A cannon can be heard in the distance.",
             " blames the lag.",
-            " was lagged out by Sebastian's tree farm."
+            " was lagged out by Sebastian's tree farm.",
+            " lost all their coolness points.",
+            " dueled a disguised YouTuber...",
+            " got targetted in Micro Battle.",
+            " was not the one who knocks.",
+            " didn't get their ballpoint pen.",
+            " accidentally ran across the black line in dodgebolt.",
+            " couldn't get to the other side.",
+            " didn't pick their senior internship on time.",
+            ", please come to Dr. Bath's office immediately. Thank you!",
+            " got caught going to Chick-Fil-A during school hours",
+            " didn't get the victory royale.",
+            "'s bus crashed on the way to school."
+
     };
 
     public int timeLeft = 120;
