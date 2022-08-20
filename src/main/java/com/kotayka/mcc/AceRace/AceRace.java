@@ -95,13 +95,13 @@ public class AceRace {
             mcc.scoreboardManager.placementPoints(mcc.scoreboardManager.players.get(p.getUniqueId()), 2, playerLapPlacement.get(playerLaps.get(p.getUniqueId())));
             playerLapPlacement.put(playerLaps.get(p.getUniqueId()), playerLapPlacement.get(playerLaps.get(p.getUniqueId()))+1);
             playerLaps.put(p.getUniqueId(), playerLaps.get(p.getUniqueId())+1);
-            if (playerLaps.get(p.getUniqueId()) < 2) {
+            if (playerLaps.get(p.getUniqueId()) < 3) {
                 playerFinish.put(p.getUniqueId(), false);
                 mcc.scoreboardManager.changePlayerLine(3, ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+playerLaps.get(p.getUniqueId())+"/3", mcc.scoreboardManager.players.get(p.getUniqueId()));
             }
-            else if (playerLaps.get(p.getUniqueId()) == 2){
+            else if (playerLaps.get(p.getUniqueId()) == 3){
                 Participant finisher= Participant.findParticipantFromPlayer(p);
-                Bukkit.broadcastMessage(finisher.teamPrefix + finisher.chatColor + "" + ChatColor.BOLD +p.getDisplayName()+ChatColor.WHITE+ "" + ChatColor.BOLD+" finished the course in place #"+(playerLapPlacement.get(playerLaps.get(p.getUniqueId())))+".");
+                Bukkit.broadcastMessage(finisher.teamPrefix + finisher.chatColor + "" + ChatColor.BOLD +p.getDisplayName()+ChatColor.WHITE+ "" + ChatColor.BOLD+" finished the course in place #"+((playerLapPlacement.get(playerLaps.get(p.getUniqueId())))+1)+".");
                 playerFinish.put(p.getUniqueId(), false);
                 if (playerLapPlacement.get(playerLaps.get(p.getUniqueId())) == 1) {
                     mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.getUniqueId()), 25);
