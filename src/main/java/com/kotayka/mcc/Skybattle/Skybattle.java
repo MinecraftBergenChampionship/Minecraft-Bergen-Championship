@@ -277,6 +277,7 @@ public class Skybattle {
                 } else {
                     mcc.skybattle.resetMap();
                     mcc.skybattle.resetBorder();
+                    mcc.game.endGame();
                     mcc.skybattle.setState("INACTIVE");
                     mcc.setGameOver(true);
                 }

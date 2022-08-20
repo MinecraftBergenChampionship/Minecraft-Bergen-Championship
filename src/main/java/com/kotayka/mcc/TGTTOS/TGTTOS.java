@@ -164,7 +164,7 @@ public class TGTTOS {
                                     wool.setType(Material.PINK_WOOL);
                                     break;
                                 default:
-                                    p.player.sendMessage("Your not on a team");
+                                    p.player.sendMessage("You're not on a team!");
                             }
                             ItemStack shears = new ItemStack(Material.SHEARS);
                             p.player.getInventory().addItem(wool);

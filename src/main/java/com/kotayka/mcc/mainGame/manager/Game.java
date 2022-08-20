@@ -100,6 +100,9 @@ public class Game {
                 p.player.player.removePotionEffect(effect.getType());
             }
             p.player.player.getInventory().clear();
+            p.player.player.setInvulnerable(false);
+            p.player.player.setAllowFlight(false);
+            p.player.player.setFlying(false);
         }
         mcc.gameRound++;
         stage="Starting";
