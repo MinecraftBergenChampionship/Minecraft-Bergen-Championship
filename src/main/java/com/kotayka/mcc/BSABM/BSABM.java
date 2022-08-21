@@ -227,22 +227,22 @@ public class BSABM {
         mcc.scoreboardManager.addTeamScore(teams[teamNum], 3+(3*(mcc.scoreboardManager.teamList.size()-mapFinishes.get(teamFields[teamNum][fieldNum]))));
         switch (teamNum) {
             case 0:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.RED+"Red Rabbits"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Ⓡ Red Rabbits"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 1:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.YELLOW+"Yellow Yaks"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage(ChatColor.YELLOW+""+ChatColor.BOLD+"Ⓨ Yellow Yaks"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 3:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.GREEN+"Green Guardians"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage(ChatColor.GREEN+""+ChatColor.BOLD+"Ⓖ Green Guardians"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 2:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.BLUE+"Blue Bats"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage(ChatColor.BLUE+""+ChatColor.BOLD+"Ⓑ Blue Bats"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 4:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.DARK_PURPLE+"Purple Pandas"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage(ChatColor.DARK_PURPLE+""+ChatColor.BOLD+"Ⓤ Purple Pandas"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 5:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.LIGHT_PURPLE+"Pink Piglets"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"Ⓟ Pink Piglets"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
         }
         teamFields[teamNum][fieldNum] = teamsProgress[teamNum];

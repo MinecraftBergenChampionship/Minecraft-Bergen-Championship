@@ -73,7 +73,13 @@ public class TGTTOS {
             "'s bus crashed on the way to school.",                     // BCA
             " fell! Everyone point and laugh!",                         // Old phrase (to my knowledge) originating from Carrie
             " got distracted reading the funny death messages.",
-            " was ejected."
+            " was ejected.",
+            " got quiplashed.",                                         // Jackbox Party Pack
+            " should've played Milk the Cow instead.",                  // MBT13 Milk the Cow
+            "'s internet cut out.",
+            " should've done /top."                                     // Technoblade Minecraft Monday
+
+
     };
 
     public TGTTOS(Players players, NPCManager npcManager, Plugin plugin, MCC mcc) {
