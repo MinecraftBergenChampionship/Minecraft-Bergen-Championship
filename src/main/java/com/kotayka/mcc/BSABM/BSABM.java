@@ -275,7 +275,7 @@ public class BSABM {
             player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000000, 255, false, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000000, 255, false, false));
 
-            player.teleport(new Location(world, 11, 1, 0));
+            player.teleport(new Location(world, 11, 1, 0, -90, 0));
 
             player.setGameMode(GameMode.SURVIVAL);
         }
