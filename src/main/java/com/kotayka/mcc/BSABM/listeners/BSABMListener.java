@@ -242,14 +242,14 @@ public class BSABMListener implements Listener {
                             targetX = teamPortalLoc[5];
                             break;
                     }
-                    Location targetLoc = new Location(bsabm.world, targetX, 1, 150, playerLoc.getYaw(), playerLoc.getPitch());
+                    Location targetLoc = new Location(bsabm.world, targetX, 1, playerLoc.getZ()+150, playerLoc.getYaw(), playerLoc.getPitch());
                     player.teleport(targetLoc);
                     player.setAllowFlight(true);
                 }
             }
         }
         else {
-            Location targetLoc = new Location(bsabm.world, 13, 1, 0, playerLoc.getYaw(), playerLoc.getPitch());
+            Location targetLoc = new Location(bsabm.world, 13, 1, playerLoc.getZ()-150, playerLoc.getYaw(), playerLoc.getPitch());
             player.teleport(targetLoc);
             player.setAllowFlight(false);
         }
