@@ -55,22 +55,22 @@ public class BSABM {
         }
         List<List<Block>> tempMaps = new ArrayList<>();
         List<String> tempNames = new ArrayList<>();
-        Location map = new Location(mapWorld, -3, 186, 5);
+        Location map = new Location(mapWorld, -9, 186, -1);
         int numOfMaps = 0;
         Bukkit.broadcastMessage(ChatColor.RED+"Loading Maps");
-        while (mapWorld.getBlockAt((int) (map.getX()-3), (int) (map.getY()-1), (int) (map.getZ()-3)).getType() == Material.DIAMOND_BLOCK) {
+        while (mapWorld.getBlockAt((int) (map.getX()+3), (int) (map.getY()-1), (int) (map.getZ()+3)).getType() == Material.DIAMOND_BLOCK) {
             Bukkit.broadcastMessage(ChatColor.GREEN+"Map#" +numOfMaps+" Loaded");
             Location genMap = map.clone();
             List<Block> blocks = new ArrayList<>();
             for (int y = (int) genMap.getY(); y <= genMap.getY()+5; y++) {
-                for (int x = (int) genMap.getX(); x >= genMap.getX()-6; x--) {
-                    for (int z = (int) genMap.getZ(); z >= genMap.getZ()-6; z--) {
+                for (int x = (int) genMap.getX(); x <= genMap.getX()+6; x++) {
+                    for (int z = (int) genMap.getZ(); z <= genMap.getZ()+6; z++) {
                         blocks.add(mapWorld.getBlockAt(x,y,z));
                     }
                 }
             }
             numOfMaps++;
-            Block b = mapWorld.getBlockAt((int) (map.getX()-3), (int) (map.getY()+1), (int) (map.getZ()-8));
+            Block b = mapWorld.getBlockAt((int) (map.getX()+3), (int) (map.getY()+1), (int) (map.getZ()-2));
             if (b.getType().equals(Material.OAK_WALL_SIGN)) {
                 Sign sign = (Sign) b.getState();
                 tempNames.add(sign.getLine(0));
