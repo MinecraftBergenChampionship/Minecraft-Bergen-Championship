@@ -77,6 +77,7 @@ public class TGTTOS {
             " got quiplashed.",                                         // Jackbox Party Pack
             " should've played Milk the Cow instead.",                  // MBT13 Milk the Cow
             "'s internet cut out.",
+            " doesn't know who killed Captain Alex",                    // Old Movie Night Movie
             " was the rotten egg.",                                     // Phrase said when leaving VC
             " should've done /top."                                     // Technoblade Minecraft Monday
 
