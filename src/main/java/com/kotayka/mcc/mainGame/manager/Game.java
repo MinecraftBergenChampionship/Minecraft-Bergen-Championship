@@ -96,7 +96,7 @@ public class Game {
     }
 
     public void endGame() {
-        music.stopSound(stage);
+        music.stopSound();
         stats.createStats();
         mcc.scoreboardManager.endGame();
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {

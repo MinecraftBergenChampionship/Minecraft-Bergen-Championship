@@ -2,7 +2,10 @@ package com.kotayka.mcc.fullGame;
 
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.mainGame.MCC;
+import net.minecraft.core.BlockPosition;
+import net.minecraft.network.protocol.game.PacketPlayOutWorldEvent;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,13 +54,12 @@ public class Music {
     public void startSound(String game) {
         playSound(game);
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
-            p.player.player.playSound(p.player.player.getLocation(), disks.get(game), 1000, 1);
-            playSound(game);
+            p.player.player.playSound(p.player.player.getLocation(), disks.get(game), SoundCategory.RECORDS, 1000, 1);
         }
     }
 
     public void resetSound(String game) {
-        stopSound(game);
+        stopSound();
         startSound(game);
     }
 
@@ -68,10 +70,8 @@ public class Music {
                 @Override
                 public void run() {
                     if (timer <= 0) {
-                        for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
-                            p.player.player.playSound(p.player.player.getLocation(), disks.get(game), SoundCategory.RECORDS, 0.2f, 1);
-                            playSound(game);
-                        }
+                        Bukkit.broadcastMessage("Sound playing again");
+                        resetSound(game);
                     }
                     timer--;
                 }
@@ -79,7 +79,7 @@ public class Music {
         }
     }
 
-    public void stopSound(String game) {
+    public void stopSound() {
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             p.player.player.stopAllSounds();
         }

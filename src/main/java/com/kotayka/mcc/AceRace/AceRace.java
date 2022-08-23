@@ -22,6 +22,8 @@ public class AceRace {
     public Map<UUID, Integer> playerLaps= new HashMap<>();
     public Map<UUID, Boolean> playerFinish = new HashMap<>();
 
+    public List<UUID> playsFin = new ArrayList<>();
+
     public World world;
 
 
@@ -99,7 +101,7 @@ public class AceRace {
                 playerFinish.put(p.getUniqueId(), false);
                 mcc.scoreboardManager.changePlayerLine(3, ChatColor.LIGHT_PURPLE+"Completed Laps: "+ChatColor.WHITE+playerLaps.get(p.getUniqueId())+"/3", mcc.scoreboardManager.players.get(p.getUniqueId()));
             }
-            else if (playerLaps.get(p.getUniqueId()) == 3){
+            else if (playerLaps.get(p.getUniqueId()) == 3 && !(playsFin.contains(p.getUniqueId()))){
                 Participant finisher= Participant.findParticipantFromPlayer(p);
                 Bukkit.broadcastMessage(finisher.teamPrefix + finisher.chatColor + "" + ChatColor.BOLD +p.getDisplayName()+ChatColor.WHITE+ "" + ChatColor.BOLD+" finished the course in place #"+((playerLapPlacement.get(playerLaps.get(p.getUniqueId())))+1)+".");
                 playerFinish.put(p.getUniqueId(), false);
@@ -115,6 +117,7 @@ public class AceRace {
                 mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.getUniqueId()), 10);
                 mcc.scoreboardManager.changePlayerLine(3, ChatColor.LIGHT_PURPLE+"Finished Course", mcc.scoreboardManager.players.get(p.getUniqueId()));
                 playerFinish(p);
+                playsFin.add(p.getUniqueId());
                 mcc.scoreboardManager.teamFinish(mcc.scoreboardManager.players.get(p.getUniqueId()), 20);
                 Bukkit.broadcastMessage(""+playerLapPlacement.get(2)+" "+mcc.scoreboardManager.playerList.size());
                 if (playerLapPlacement.get(2) >= mcc.scoreboardManager.playerList.size()) {

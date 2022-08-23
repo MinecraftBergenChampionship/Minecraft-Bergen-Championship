@@ -120,9 +120,11 @@ public class Instructions {
         taskId[0] = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(mcc.plugin, new Runnable() {
             @Override
             public void run() {
-                Bukkit.broadcastMessage(ChatColor.WHITE+""+ChatColor.BOLD+"["+ChatColor.GOLD+""+ChatColor.BOLD+"INSTRUCTION"+ChatColor.WHITE+""+ChatColor.BOLD+"] "+ChatColor.RESET+ChatColor.WHITE+instructions.get(game)[timer]);
                 if (timer >= 7) {
                     Bukkit.getServer().getScheduler().cancelTask(taskId[0]);
+                }
+                else {
+                    Bukkit.broadcastMessage(ChatColor.WHITE+""+ChatColor.BOLD+"["+ChatColor.GOLD+""+ChatColor.BOLD+"INSTRUCTION"+ChatColor.WHITE+""+ChatColor.BOLD+"] "+ChatColor.RESET+ChatColor.WHITE+instructions.get(game)[timer]);
                 }
                 timer++;
             }
