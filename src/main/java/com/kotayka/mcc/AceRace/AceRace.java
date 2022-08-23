@@ -151,7 +151,7 @@ public class AceRace {
             p.player.player.getInventory().addItem(trident);
             p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
             p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-            p.player.player.teleport(new Location(world, 1, 26, 150));
+            p.player.player.teleport(new Location(world, 1, 26, 150, 90, 0));
              mcc.scoreboardManager.createAceRaceBoard(p);
         }
     }

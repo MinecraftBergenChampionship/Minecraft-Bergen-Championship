@@ -31,25 +31,6 @@ public class TGTTOS {
     public int playerAmount = 0;
     public int playerPoints;
 
-    // Death Messages
-    // there's definitely a way to get this from another file but idk
-    public static String[] deathMessages = {
-            " should've gone to mid at 15 mins.",
-            " is gonna get 1st, 2nd, and 3rd.",
-            " put a poptart in the microwave.",
-            " forgot to say 'It's morbin' time.",
-            " regrets buying Eggcoin.",
-            " was sued for being too annoying.",
-            " took a pee break during the round.",
-            " found Nikola's last trap.",
-            ", next round's your round.",
-            " forgot to take the eraser off the hot plate.",
-            " reached the other, other side.",
-            " has fallen! A cannon can be heard in the distance.",
-            " blames the lag.",
-            " was lagged out by Sebastian's tree farm."
-    };
-
     public int timeLeft = 120;
     public String[] mapOrder = {"Cliff", "Meatball", "Skydive", "Glide", "Boats", "Pit", "Walls"};
     public List<Location> spawnPoints = new ArrayList<>();
@@ -59,6 +40,49 @@ public class TGTTOS {
     public World world;
 
     public final MCC mcc;
+
+    // Death Messages
+    // THERE'S DEFINITELY A CLEANER WAY TO DO THIS BUT THIS WILL CUT IT FOR NOW
+    // How many references can you find? :-) Feel free to add more (Specific references noted below!)
+    public static String[] deathMessages = {
+            " should've gone to mid at 15 mins.",                       // MBT2 & MBT12 Survival Games
+            " is gonna get 1st, 2nd, and 3rd.",                         // MBT6 Blue: Dragons
+            " put a poptart in the microwave.",                         // BCA cause of firedrill
+            " forgot to say 'It's morbin' time.'",                      // MBT13 Green (and Red Dodgebolt)
+            " regrets buying Eggcoin.",                                 // Jesuscraft Season 1
+            " was sued for being too annoying.",                        // Jesuscraft Season 2
+            " took a pee break during the round.",                      // MBT9 Dodgebolt
+            " found Nikola's last trap.",                               // Jesuscraft Season 1
+            ": \"Next round's my round!\"",                             // Collin in Volleyball
+            " forgot to take the eraser off the hot plate.",            // Nikola in Chemistry
+            " reached the other, other side.",
+            " has fallen! A cannon can be heard in the distance.",
+            " blames the lag.",
+            " was lagged out by Sebastian's tree farm.",                // Jesuscraft Season 1
+            " lost all their coolness points.",                         // Jesuscraft Season 2
+            " dueled a disguised YouTuber...",                          // Collin's YouTube video
+            " got targeted in Micro Battle.",                           // MBT strat popularized in MBT10
+            " was not the one who knocks.",                             // MBT14 Yellow (Breaking Bad)
+            " didn't get their ballpoint pen.",                         // iDrg's promise to Ethipians
+            " reached the other side...of the Dodgebolt arena.",        // MBT4 Dodgebolt
+            " couldn't get to the other side.",
+            " didn't pick their senior internship on time.",            // BCA
+            ", please come to Dr. Bath's office immediately. Thank you!", // BCA
+            " got caught going to Chick-Fil-A during school hours.",    // BCA
+            " didn't get the #1 Victory Royale.",
+            "'s bus crashed on the way to school.",                     // BCA
+            " fell! Everyone point and laugh!",                         // Old phrase (to my knowledge) originating from Carrie
+            " got distracted reading the funny death messages.",
+            " was ejected.",
+            " got quiplashed.",                                         // Jackbox Party Pack
+            " should've played Milk the Cow instead.",                  // MBT13 Milk the Cow
+            "'s internet cut out.",
+            " doesn't know who killed Captain Alex",                    // Old Movie Night Movie
+            " was the rotten egg.",                                     // Phrase said when leaving VC
+            " should've done /top."                                     // Technoblade Minecraft Monday
+
+
+    };
 
     public TGTTOS(Players players, NPCManager npcManager, Plugin plugin, MCC mcc) {
         this.players = players;
@@ -212,7 +236,7 @@ public class TGTTOS {
                     Location npcLoc = new Location(world, xCoord, yCoord, zCoord);
                     Entity chicken = npcLoc.getWorld().spawnEntity(npcLoc, EntityType.CHICKEN);
                     entities.add(chicken);
-                    Bukkit.broadcastMessage(ChatColor.GREEN+"Spawned new NPC at "+npcLoc.getX()+", "+npcLoc.getY()+", "+npcLoc.getZ());
+                    // Bukkit.broadcastMessage(ChatColor.GREEN+"Spawned new NPC at "+npcLoc.getX()+", "+npcLoc.getY()+", "+npcLoc.getZ());
                 }
             }
         }, 0);

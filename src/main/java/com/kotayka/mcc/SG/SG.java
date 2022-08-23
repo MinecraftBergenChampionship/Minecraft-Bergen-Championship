@@ -139,7 +139,7 @@ public class SG {
                     eventTime=60;
                     break;
                 case 2:
-                    Bukkit.broadcastMessage(ChatColor.RED+"Grace Period is Over");
+                    Bukkit.broadcastMessage(ChatColor.RED+"Grace Period is Over.");
                     eventName="Supply Drop";
                     eventTime=240;
                     break;
@@ -150,7 +150,7 @@ public class SG {
                     break;
                 case 4:
                     regenChest();
-                    Bukkit.broadcastMessage(ChatColor.RED+"Chest are refilled");
+                    Bukkit.broadcastMessage(ChatColor.RED+"Chest are refilled.");
                     eventName="Supply Drop";
                     eventTime=240;
                     break;
@@ -199,7 +199,7 @@ public class SG {
         }
         boxes.add(box);
         shulkerLocs.add(supplyDrop.getLocation());
-        Bukkit.broadcastMessage(ChatColor.RED+"Supply Drop Spawned at "+supplyDrop.getX()+", "+supplyDrop.getY()+", "+supplyDrop.getZ());
+        Bukkit.broadcastMessage(ChatColor.RED+"Supply Drop Spawned at "+supplyDrop.getX()+", "+supplyDrop.getY()+", "+supplyDrop.getZ()+".");
 }
 
     public void start() {
@@ -328,7 +328,7 @@ public class SG {
         mcc.scoreboardManager.startTimerForGame(10, "SGEnd");
         mcc.scoreboardManager.changeLine(21, ChatColor.LIGHT_PURPLE+"NEXT GAME STARTING");
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
-            p.player.player.sendTitle(ChatColor.GOLD+"Round Over","",20,160,20);
+            p.player.player.sendTitle(ChatColor.GOLD+"Round Over!","",20,160,20);
         }
         for (Location loc : shulkerLocs) {
             world.getBlockAt(loc).setType(Material.CHEST);

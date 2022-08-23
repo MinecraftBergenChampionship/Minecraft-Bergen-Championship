@@ -747,9 +747,9 @@ public class ScoreboardManager {
                         p.lines.get(obj).put(20, value);
                     }
                     gameTimerEnded(game);
-                    // teleport back to spawn if game is over
+                    // teleport back to spawn if game is over (this is only for skybattle right now)
                     if (mcc.gameIsOver) {
-                        mcc.returnToSpawn();
+                        mcc.game.endGame();
                         timer = -1;
                     }
                 }

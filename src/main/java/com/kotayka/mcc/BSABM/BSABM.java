@@ -55,22 +55,22 @@ public class BSABM {
         }
         List<List<Block>> tempMaps = new ArrayList<>();
         List<String> tempNames = new ArrayList<>();
-        Location map = new Location(mapWorld, -3, 186, 5);
+        Location map = new Location(mapWorld, -9, 186, -1);
         int numOfMaps = 0;
         Bukkit.broadcastMessage(ChatColor.RED+"Loading Maps");
-        while (mapWorld.getBlockAt((int) (map.getX()-3), (int) (map.getY()-1), (int) (map.getZ()-3)).getType() == Material.DIAMOND_BLOCK) {
+        while (mapWorld.getBlockAt((int) (map.getX()+3), (int) (map.getY()-1), (int) (map.getZ()+3)).getType() == Material.DIAMOND_BLOCK) {
             Bukkit.broadcastMessage(ChatColor.GREEN+"Map#" +numOfMaps+" Loaded");
             Location genMap = map.clone();
             List<Block> blocks = new ArrayList<>();
             for (int y = (int) genMap.getY(); y <= genMap.getY()+5; y++) {
-                for (int x = (int) genMap.getX(); x >= genMap.getX()-6; x--) {
-                    for (int z = (int) genMap.getZ(); z >= genMap.getZ()-6; z--) {
+                for (int x = (int) genMap.getX(); x <= genMap.getX()+6; x++) {
+                    for (int z = (int) genMap.getZ(); z <= genMap.getZ()+6; z++) {
                         blocks.add(mapWorld.getBlockAt(x,y,z));
                     }
                 }
             }
             numOfMaps++;
-            Block b = mapWorld.getBlockAt((int) (map.getX()-3), (int) (map.getY()+1), (int) (map.getZ()-8));
+            Block b = mapWorld.getBlockAt((int) (map.getX()+3), (int) (map.getY()+1), (int) (map.getZ()-2));
             if (b.getType().equals(Material.OAK_WALL_SIGN)) {
                 Sign sign = (Sign) b.getState();
                 tempNames.add(sign.getLine(0));
@@ -227,22 +227,22 @@ public class BSABM {
         mcc.scoreboardManager.addTeamScore(teams[teamNum], 3+(3*(mcc.scoreboardManager.teamList.size()-mapFinishes.get(teamFields[teamNum][fieldNum]))));
         switch (teamNum) {
             case 0:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.RED+"Red Rabbits"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage("Ⓡ " + ChatColor.RED+""+ChatColor.BOLD+"Red Rabbits"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 1:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.YELLOW+"Yellow Yaks"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage("Ⓨ " + ChatColor.YELLOW+""+ChatColor.BOLD+"Yellow Yaks"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 3:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.GREEN+"Green Guardians"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage("Ⓖ " + ChatColor.GREEN+""+ChatColor.BOLD+"Green Guardians"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 2:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.BLUE+"Blue Bats"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage("Ⓑ " + ChatColor.BLUE+""+ChatColor.BOLD+"Blue Bats"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 4:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.DARK_PURPLE+"Purple Pandas"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage("Ⓤ " + ChatColor.DARK_PURPLE+""+ChatColor.BOLD+"Purple Pandas"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 5:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.LIGHT_PURPLE+"Pink Piglets"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage("Ⓟ " + ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"Pink Piglets"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
         }
         teamFields[teamNum][fieldNum] = teamsProgress[teamNum];
@@ -275,7 +275,7 @@ public class BSABM {
             player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000000, 255, false, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000000, 255, false, false));
 
-            player.teleport(new Location(world, 11, 1, 0));
+            player.teleport(new Location(world, 11, 1, 0, -90, 0));
 
             player.setGameMode(GameMode.SURVIVAL);
         }
