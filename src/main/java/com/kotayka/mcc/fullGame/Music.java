@@ -9,9 +9,10 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class Music {
-    public Map<String, Sound> disks = new HashMap<>();
+    public Map<String, String> discs = new HashMap<>();
     public Map<String, World> world = new HashMap<>();
     public Map<String, Integer> durations = new HashMap<>();
 
@@ -23,14 +24,14 @@ public class Music {
     }
 
     public void loadMusic() {
-        disks.put("AceRace", Sound.MUSIC_DISC_11);
-        disks.put("BSABM", Sound.MUSIC_DISC_MALL);
-        disks.put("DD", Sound.MUSIC_DISC_CAT);
-        disks.put("Dodgebolt", Sound.MUSIC_DISC_CHIRP);
-        disks.put("Paintdown", Sound.MUSIC_DISC_MELLOHI);
-        disks.put("SG", Sound.MUSIC_DISC_FAR);
-        disks.put("Skybattle", Sound.MUSIC_DISC_MELLOHI);
-        disks.put("TGTTOS", Sound.MUSIC_DISC_FAR);
+        discs.put("AceRace", "11");
+        discs.put("BSABM", "mall");
+        discs.put("DD", "cat");
+        discs.put("Dodgebolt", "chirp");
+        discs.put("Paintdown", "mellohi");
+        discs.put("SG", "far");
+        discs.put("Skybattle", "stall");
+        discs.put("TGTTOS", "otherside");
 
         world.put("AceRace", mcc.aceRace.world);
         world.put("BSABM", mcc.bsabm.world);
@@ -54,7 +55,9 @@ public class Music {
     public void startSound(String game) {
         playSound(game);
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
-            p.player.player.playSound(p.player.player.getLocation(), disks.get(game), SoundCategory.RECORDS, 1000, 1);
+            UUID musicListener = p.player.player.getUniqueId();
+            Bukkit.broadcastMessage("" + musicListener + ", " + discs.get(game));
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at " + musicListener + " run playsound minecraft:music_disc." + discs.get(game) + " record @p");
         }
     }
 
