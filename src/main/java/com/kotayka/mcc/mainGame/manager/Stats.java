@@ -152,7 +152,8 @@ public class Stats {
 
         for (Integer i : scores) {
             for (String t : player.get(i)) {
-                Bukkit.broadcastMessage(ChatColor.WHITE+""+places+". "+manager.teamColors.get(t)+t+": "+ChatColor.WHITE+i);
+                String team = manager.playerTeams.get(manager.playersWithNames.get(t)).teamName;
+                Bukkit.broadcastMessage(ChatColor.WHITE+""+places+". "+manager.teamColors.get(team)+t+": "+ChatColor.WHITE+i);
             }
             places++;
         }

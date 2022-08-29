@@ -123,7 +123,9 @@ public class Instructions {
                 if (timer >= 7) {
                     Bukkit.getServer().getScheduler().cancelTask(taskId[0]);
                 }
-                Bukkit.broadcastMessage(ChatColor.WHITE+""+ChatColor.BOLD+"["+ChatColor.GOLD+""+ChatColor.BOLD+"INSTRUCTION"+ChatColor.WHITE+""+ChatColor.BOLD+"] "+ChatColor.RESET+ChatColor.WHITE+instructions.get(game)[timer]);
+                else {
+                    Bukkit.broadcastMessage(ChatColor.WHITE+""+ChatColor.BOLD+"["+ChatColor.GOLD+""+ChatColor.BOLD+"INSTRUCTION"+ChatColor.WHITE+""+ChatColor.BOLD+"] "+ChatColor.RESET+ChatColor.WHITE+instructions.get(game)[timer]);
+                }
                 timer++;
             }
         }, 100, 100);

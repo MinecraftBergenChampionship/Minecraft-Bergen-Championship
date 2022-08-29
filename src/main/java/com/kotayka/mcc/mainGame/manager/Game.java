@@ -8,6 +8,7 @@ import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.Skybattle.Skybattle;
 import com.kotayka.mcc.TGTTOS.TGTTOS;
 import com.kotayka.mcc.fullGame.Instructions;
+import com.kotayka.mcc.fullGame.Music;
 import com.kotayka.mcc.mainGame.MCC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,6 +29,8 @@ public class Game {
     private Stats stats;
     public Instructions instructions;
 
+    public Music music;
+
     public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm, AceRace aceRace, DecisionDome decisionDome) {
         this.tgttos = tgttos;
         this.mcc = mcc;
@@ -40,6 +43,7 @@ public class Game {
 
     public void changeToActGame(String game) {
         stage=game;
+        music.startSound(game);
         switch (game) {
             case "TGTTOS":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "TGTTOS Game started");
@@ -83,6 +87,8 @@ public class Game {
         mcc.scoreboardManager.clearTeams();
         stats.initVars();
         instructions.loadCoords();
+        music = new Music(mcc);
+        music.loadMusic();
     }
 
     public void start() {
@@ -91,6 +97,7 @@ public class Game {
     }
 
     public void endGame() {
+        music.stopSound();
         stats.createStats();
         mcc.scoreboardManager.endGame();
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
