@@ -125,7 +125,7 @@ public class DecisionDome {
         mcc.game.changeGame(games.get(currMax[1]));
     }
 
-    public void addLevatioin() {
+    public void addLevitation() {
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 90, 1, false, false));
         }

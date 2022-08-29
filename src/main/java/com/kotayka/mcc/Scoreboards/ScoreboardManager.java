@@ -6,7 +6,6 @@ import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 
 import java.util.*;
@@ -691,7 +690,7 @@ public class ScoreboardManager {
                 mcc.decisionDome.voteCounterEnds();
                 break;
             case "DDTwo":
-                mcc.decisionDome.addLevatioin();
+                mcc.decisionDome.addLevitation();
                 break;
             case "DDThree":
                 mcc.decisionDome.nextGame();
