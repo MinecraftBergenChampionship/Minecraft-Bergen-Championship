@@ -79,7 +79,8 @@ public class AceRace {
             if (mapOrder.indexOf(playerProgress.get(p.getUniqueId())) < 7) {
                 playerProgress.put(p.getUniqueId(), mapOrder.get(mapOrder.indexOf(playerProgress.get(p.getUniqueId()))+1));
             }
-            else {
+            else if (!(playsFin.contains(p.getUniqueId()))) {
+
                 playerFinish.put(p.getUniqueId(), true);
                 playerProgress.put(p.getUniqueId(), "Forest");
             }

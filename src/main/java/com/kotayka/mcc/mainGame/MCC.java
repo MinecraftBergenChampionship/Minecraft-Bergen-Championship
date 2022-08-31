@@ -7,6 +7,8 @@ import com.kotayka.mcc.BSABM.commands.checkBuild;
 import com.kotayka.mcc.BSABM.listeners.BSABMListener;
 import com.kotayka.mcc.DecisionDome.DecisionDome;
 import com.kotayka.mcc.DecisionDome.listeners.DecisionDomeListener;
+import com.kotayka.mcc.Dodgebolt.Dodgebolt;
+import com.kotayka.mcc.Dodgebolt.Listener.DodgeboltListener;
 import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.SG.listeners.SGListener;
 import com.kotayka.mcc.Skybattle.Skybattle;
@@ -21,12 +23,14 @@ import com.kotayka.mcc.mainGame.manager.*;
 import com.kotayka.mcc.mainGame.manager.tabComplete.startCommand;
 import com.kotayka.mcc.mainGame.manager.tabComplete.tCommands;
 import org.bukkit.*;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.kotayka.mcc.mainGame.Listeners.playerJoinLeave;
 import com.kotayka.mcc.TGTTOS.listeners.playersAdded;
 import org.bukkit.scoreboard.*;
+import com.kotayka.mcc.mainGame.manager.tabComplete.ddstartTab;
 
 import java.util.*;
 
@@ -66,11 +70,12 @@ public final class MCC extends JavaPlugin implements Listener {
     public final AceRace aceRace = new AceRace(this);
     public final SG sg = new SG(players, this, this);
     public final BSABM bsabm = new BSABM(players, this);
+    public final Dodgebolt dodgebolt = new Dodgebolt(this);
 
     public final DecisionDome decisionDome = new DecisionDome(this);
 
 //  Game Manager
-    public final Game game = new Game(this, tgttos, sg, skybattle, bsabm, aceRace, decisionDome);
+    public final Game game = new Game(this, tgttos, sg, skybattle, bsabm, aceRace, decisionDome, dodgebolt);
     public boolean gameIsOver = false;
 
 // Location
@@ -100,6 +105,8 @@ public final class MCC extends JavaPlugin implements Listener {
         getCommand("mccteam").setTabCompleter(new tCommands());
         getCommand("world").setExecutor(new world());
         getCommand("checkbuild").setExecutor(new checkBuild(this));
+        getCommand("ddstart").setExecutor(new ddstart(game));
+        getCommand("ddstart").setTabCompleter((TabCompleter) new ddstartTab());
 
         List<Participant> redRabbits = new ArrayList<Participant>(4);
         List<Participant> greenGuardians = new ArrayList<Participant>(4);
@@ -129,7 +136,13 @@ public final class MCC extends JavaPlugin implements Listener {
         BSABM();
         AceRaceGame();
         DecisionDome();
+        Dodgebolt();
         scoreboardManager.start();
+    }
+
+    public void Dodgebolt() {
+        dodgebolt.loadWorld();
+        getServer().getPluginManager().registerEvents(new DodgeboltListener(dodgebolt, this), this);
     }
 
     public void AceRaceGame() {

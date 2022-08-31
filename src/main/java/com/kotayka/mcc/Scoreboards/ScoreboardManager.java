@@ -3,6 +3,7 @@ package com.kotayka.mcc.Scoreboards;
 import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
@@ -509,6 +510,29 @@ public class ScoreboardManager {
         scoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
+    public void createDodgebolt(ScoreboardPlayer player, String team1, String team2) {
+        if (player.currentObj != null) {
+            player.currentObj.unregister();
+        }
+        Objective scoreboard = player.board.registerNewObjective("Dodgebolt", "dummy", ChatColor.YELLOW+""+ChatColor.BOLD+"MBC");
+        player.objectiveMap.put("Dodgebolt",scoreboard);
+        Map<Integer, String> lines = new HashMap<>();
+        player.lines.put(scoreboard, lines);
+
+        scoreboard.getScore(ChatColor.AQUA+"Final Game: "+ChatColor.WHITE+"Dodgebolt").setScore(21);
+        scoreboard.getScore(ChatColor.RESET.toString()).setScore(18);
+        scoreboard.getScore(teamIcons.get(team1)+teamColors.get(team1)+"     ① ① ③").setScore(2);
+        scoreboard.getScore(teamIcons.get(team2)+teamColors.get(team2)+"     ① ① ③").setScore(1);
+
+        player.lines.get(scoreboard).put(21, ChatColor.AQUA+"Final Game: "+ChatColor.WHITE+"Dodgebolt");
+        player.lines.get(scoreboard).put(18, ChatColor.RESET.toString());
+        player.lines.get(scoreboard).put(2, teamIcons.get(team1)+teamColors.get(team1)+"     ① ① ③");
+        player.lines.get(scoreboard).put(1, teamIcons.get(team2)+teamColors.get(team2)+"     ① ① ③");
+
+        player.currentObj = scoreboard;
+        scoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
+
     public void createInstructionScoreboard(ScoreboardPlayer player) {
         if (player.currentObj != null) {
             player.currentObj.unregister();
@@ -706,6 +730,43 @@ public class ScoreboardManager {
                 mcc.game.instructions.timerEnds();
                 break;
         }
+    }
+
+    public void dodgeboltTimer() {
+        timer = 10;
+        if (taskId[0] != -1) {
+            Bukkit.getServer().getScheduler().cancelTask(taskId[0]);
+        }
+        taskId[0] = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                if (timer > 0) {
+                    for (ScoreboardPlayer p : playerList) {
+                        Objective obj = p.currentObj;
+                        if (p.lines.get(obj).containsKey(20)) {
+                            obj.getScoreboard().resetScores(p.lines.get(obj).get(20));
+                        }
+                        String value = ChatColor.RED + "" + ChatColor.BOLD + "Next Round Starts In: " + ChatColor.WHITE + getFormattedTime(timer);
+                        obj.getScore(value).setScore(20);
+                        p.lines.get(obj).put(20, value);
+                    }
+                }
+                else if (timer == 0) {
+                    for (ScoreboardPlayer p : playerList) {
+                        Objective obj = p.currentObj;
+                        if (p.lines.get(obj).containsKey(20)) {
+                            obj.getScoreboard().resetScores(p.lines.get(obj).get(20));
+                        }
+                        String value = ChatColor.RESET.toString()+ChatColor.RESET.toString();
+                        obj.getScore(value).setScore(20);
+                        p.lines.get(obj).put(20, value);
+                    }
+                    mcc.dodgebolt.resetWorld();
+                }
+                timer--;
+            }
+
+        }, 20L, 20L);
     }
 
     public void startTimerForGame(int time, String game) {

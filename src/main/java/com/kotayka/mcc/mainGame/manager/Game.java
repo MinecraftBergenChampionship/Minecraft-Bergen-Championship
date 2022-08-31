@@ -3,6 +3,7 @@ package com.kotayka.mcc.mainGame.manager;
 import com.kotayka.mcc.AceRace.AceRace;
 import com.kotayka.mcc.BSABM.BSABM;
 import com.kotayka.mcc.DecisionDome.DecisionDome;
+import com.kotayka.mcc.Dodgebolt.Dodgebolt;
 import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.Skybattle.Skybattle;
@@ -27,11 +28,12 @@ public class Game {
     private final AceRace aceRace;
     private final DecisionDome decisionDome;
     private Stats stats;
+    private final Dodgebolt dodgebolt;
     public Instructions instructions;
 
     public Music music;
 
-    public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm, AceRace aceRace, DecisionDome decisionDome) {
+    public Game(MCC mcc, TGTTOS tgttos, SG sg, Skybattle skybattle, BSABM bsabm, AceRace aceRace, DecisionDome decisionDome, Dodgebolt dodgebolt) {
         this.tgttos = tgttos;
         this.mcc = mcc;
         this.sg = sg;
@@ -39,6 +41,7 @@ public class Game {
         this.bsabm = bsabm;
         this.aceRace = aceRace;
         this.decisionDome = decisionDome;
+        this.dodgebolt = dodgebolt;
     }
 
     public void changeToActGame(String game) {
@@ -94,6 +97,15 @@ public class Game {
     public void start() {
         InitVars();
         mcc.scoreboardManager.startTimerForGame(10, "Lobby");
+    }
+
+    public void startDD(String team1, String team2) {
+        dodgebolt.start(team1, team2);
+        stage="Dodgebolt";
+
+        for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
+            mcc.scoreboardManager.createDodgebolt(p, team1, team2);
+        }
     }
 
     public void endGame() {
