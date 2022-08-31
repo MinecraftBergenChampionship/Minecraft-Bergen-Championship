@@ -95,7 +95,7 @@ public class AceRace {
     public void playerFinishLap(Player p) {
         if (playerFinish.get(p.getUniqueId())) {
             Participant lapper= Participant.findParticipantFromPlayer(p);
-            Bukkit.broadcastMessage(lapper.teamPrefix + lapper.chatColor + "" + ChatColor.BOLD + p.getDisplayName()+ChatColor.WHITE+ "" + ChatColor.BOLD+" finished Lap #"+(playerLaps.get(p.getUniqueId())+1)+".");
+            Bukkit.broadcastMessage(lapper.teamPrefix + lapper.chatColor + p.getDisplayName()+ChatColor.WHITE+ " finished Lap #"+(playerLaps.get(p.getUniqueId())+1)+".");
             mcc.scoreboardManager.placementPoints(mcc.scoreboardManager.players.get(p.getUniqueId()), 2, playerLapPlacement.get(playerLaps.get(p.getUniqueId())));
             playerLapPlacement.put(playerLaps.get(p.getUniqueId()), playerLapPlacement.get(playerLaps.get(p.getUniqueId()))+1);
             playerLaps.put(p.getUniqueId(), playerLaps.get(p.getUniqueId())+1);

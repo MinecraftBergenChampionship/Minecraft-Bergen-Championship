@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPosition;
 import net.minecraft.network.protocol.game.PacketPlayOutWorldEvent;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +57,6 @@ public class Music {
         playSound(game);
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             UUID musicListener = p.player.player.getUniqueId();
-            Bukkit.broadcastMessage("" + musicListener + ", " + discs.get(game));
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at " + musicListener + " run playsound minecraft:music_disc." + discs.get(game) + " record @p");
         }
     }
@@ -67,19 +67,20 @@ public class Music {
     }
 
     public void playSound(String game) {
-        if (mcc.game.stage.equals(game)) {
-            timer = durations.get(game);
-            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(mcc.plugin, new Runnable() {
-                @Override
-                public void run() {
-                    if (timer <= 0) {
-                        Bukkit.broadcastMessage("Sound playing again");
-                        resetSound(game);
+        timer = durations.get(game);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (timer <= 0) {
+                    if (mcc.game.stage.equals(game)) {
+                    Bukkit.broadcastMessage("Sound playing again");
+                    resetSound(game);
                     }
-                    timer--;
+                    this.cancel();
                 }
-            }, 0, 20);
-        }
+                timer--;
+            }
+        }.runTaskTimer(mcc, 0, 20);
     }
 
     public void stopSound() {
