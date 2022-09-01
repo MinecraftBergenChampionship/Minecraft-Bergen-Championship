@@ -18,7 +18,7 @@ public class DecisionDome {
 
     List<Material> quadrantMats = new ArrayList<>(Arrays.asList(Material.WHITE_CONCRETE, Material.ORANGE_CONCRETE, Material.MAGENTA_CONCRETE, Material.LIGHT_BLUE_CONCRETE, Material.YELLOW_CONCRETE, Material.LIME_CONCRETE, Material.PINK_CONCRETE, Material.GREEN_CONCRETE));
 
-    List<String> games = new ArrayList<>(Arrays.asList("SG", "TGTTOS", "BSABM","AceRace"));
+    List<String> games = new ArrayList<>(Arrays.asList("SG", "TGTTOS", "BSABM","AceRace", "Skybattle", "Paintdown"));
     public List<List<Block>> quadrants = new ArrayList<>();
     public Map<Material, List<Block>> quadMap = new HashMap<>();
 
@@ -146,6 +146,7 @@ public class DecisionDome {
 
         currMax = getValidFirst();
 
+        // Get game
         for (int i = 0; i < 8; i++) {
             if (scores[i] > currMax[0] && !removedQuads.contains(i)) {
                 currMax[0] = scores[i];
