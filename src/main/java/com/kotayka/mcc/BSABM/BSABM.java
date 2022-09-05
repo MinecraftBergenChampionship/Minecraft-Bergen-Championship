@@ -284,7 +284,6 @@ public class BSABM {
 
     public void clearChest() {
         Chunk[] c = world.getLoadedChunks();
-        Random rand = new Random();
         for(int i=0;i<c.length;i++){//loop through loaded chunks
             for(int x=0;x<c[i].getTileEntities().length;x++){//loop through tile entities within loaded chunks
                 if(c[i].getTileEntities()[x] instanceof Chest){
