@@ -64,7 +64,7 @@ public class Skybattle {
         }
 
         CENTER = new Location(world, -157, 0, -266);
-        KILLING_ZONE = new Location(world, -157, -80, -266);
+        KILLING_ZONE = new Location(world, -157, -100, -266);
     }
 
     public void loadMap() {
