@@ -20,6 +20,7 @@ import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
+import static org.bukkit.GameMode.ADVENTURE;
 import static org.bukkit.GameMode.SURVIVAL;
 
 public class Skybattle {
@@ -42,6 +43,7 @@ public class Skybattle {
     public World world;
     public WorldBorder border;
     private final Location CENTER;
+    private final Location KILLING_ZONE;
     public MCC mcc;
 
     // for events that don't repeat for each player
@@ -62,6 +64,7 @@ public class Skybattle {
         }
 
         CENTER = new Location(world, -157, 0, -266);
+        KILLING_ZONE = new Location(world, -157, -100, -266);
     }
 
     public void loadMap() {
@@ -167,6 +170,8 @@ public class Skybattle {
         creepersAndSpawned.clear();
         whoPlacedThatTNT.clear();
 
+        mcc.scoreboardManager.resetTeamAmountDead();
+
         int x = 225;
         int y = -16;
         int z = 322;
@@ -200,7 +205,7 @@ public class Skybattle {
             x++;
         }
 
-        // Clear all floor items, primed tnt, and creepers
+        // Clear all floor items, primed tnt, creepers, pearls
         for (Item item : world.getEntitiesByClass(Item.class)) {
             item.remove();
         }
@@ -209,6 +214,9 @@ public class Skybattle {
         }
         for (Entity creeper : world.getEntitiesByClass(Creeper.class)) {
             creeper.remove();
+        }
+        for (Entity pearl : world.getEntitiesByClass(EnderPearl.class)) {
+            pearl.remove();
         }
     }
 
@@ -234,6 +242,8 @@ public class Skybattle {
     public void startRound() {
         playersDeadList.clear();
         mcc.scoreboardManager.startTimerForGame(10, "Skybattle");
+        String roundValue = ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+ roundNum + "/3";
+        mcc.scoreboardManager.changeLine(21, roundValue);
         setState("STARTING");
 
         // Randomly place each team at a different spawn
@@ -245,6 +255,10 @@ public class Skybattle {
                 mcc.teamList.get(i).get(j).player.teleport(tempSpawns.get(randomNum));
             }
             tempSpawns.remove(randomNum);
+        }
+
+        for (Participant p : Participant.participantsOnATeam) {
+            p.player.setGameMode(ADVENTURE);
         }
     }
 
@@ -266,6 +280,9 @@ public class Skybattle {
                 mcc.skybattle.setState("PLAYING");
                 mcc.scoreboardManager.startTimerForGame(240, "Skybattle");
                 mcc.skybattle.removeBarriers();
+                for (Participant p : Participant.participantsOnATeam) {
+                    p.player.setGameMode(SURVIVAL);
+                }
                 break;
             case "PLAYING":
                 mcc.skybattle.setState("END_ROUND");
@@ -283,7 +300,6 @@ public class Skybattle {
                 }
                 break;
         }
-        Bukkit.broadcastMessage("Skybattle State: " + getState());
         finalShrink = false;
         // return to lobby
     }
@@ -330,7 +346,7 @@ public class Skybattle {
                 }
                 break;
             case "END_ROUND":
-                if (time == 10)
+                if (time == 9)
                     rewardLastPlayers();
                 break;
         }
@@ -369,6 +385,7 @@ public class Skybattle {
     }
 
     public Location getCenter() { return CENTER; }
+    public Location getKILLING_ZONE() { return KILLING_ZONE; }
 
     public void setState(String state) {
         this.state = state;

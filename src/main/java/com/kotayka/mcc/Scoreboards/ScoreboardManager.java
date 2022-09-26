@@ -310,10 +310,10 @@ public class ScoreboardManager {
         Map<Integer, String> lines = new HashMap<>();
         player.lines.put(skybattleScoreboard, lines);
 
-        skybattleScoreboard.getScore(ChatColor.AQUA +""+ChatColor.BOLD+ "Game 0/5:"+ChatColor.WHITE+" Skybattle").setScore(23);
-        skybattleScoreboard.getScore(ChatColor.AQUA+""+ChatColor.BOLD + "Map: "+ChatColor.WHITE+"Skybattle").setScore(22);
-        skybattleScoreboard.getScore(ChatColor.GREEN+""+ChatColor.BOLD + "Round: "+ ChatColor.WHITE+mcc.skybattle.roundNum+"/3").setScore(21);
-        skybattleScoreboard.getScore(ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
+        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/5:"+ChatColor.WHITE+" Skybattle").setScore(23);
+        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"Skybattle").setScore(22);
+        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+ "0/3").setScore(21);
+        skybattleScoreboard.getScore(ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0").setScore(20);
         skybattleScoreboard.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(19);
         skybattleScoreboard.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
         skybattleScoreboard.getScore(ChatColor.RESET.toString()).setScore(4);
@@ -322,10 +322,10 @@ public class ScoreboardManager {
 
         GenerateTeamsRound(skybattleScoreboard, player);
 
-        player.lines.get(skybattleScoreboard).put(23, ChatColor.AQUA+""+ChatColor.BOLD + "Game 0/5:"+ChatColor.WHITE+" Skybattle");
-        player.lines.get(skybattleScoreboard).put(22, ChatColor.AQUA+""+ChatColor.BOLD + "Map: "+ChatColor.WHITE+"Skybattle");
-        player.lines.get(skybattleScoreboard).put(21, ChatColor.GREEN+""+ChatColor.BOLD + "Round: "+ ChatColor.WHITE+mcc.skybattle.roundNum+"/3");
-        player.lines.get(skybattleScoreboard).put(20, ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+"0:0");
+        player.lines.get(skybattleScoreboard).put(23, ChatColor.BOLD+""+ChatColor.AQUA + "Game 0/5:"+ChatColor.WHITE+" Skybattle");
+        player.lines.get(skybattleScoreboard).put(22, ChatColor.BOLD+""+ChatColor.AQUA + "Map: "+ChatColor.WHITE+"Skybattle");
+        player.lines.get(skybattleScoreboard).put(21, ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+"0/3");
+        player.lines.get(skybattleScoreboard).put(20, ChatColor.BOLD+""+ChatColor.RED + "Time left: "+ChatColor.WHITE+"0:0");
         player.lines.get(skybattleScoreboard).put(15, ChatColor.GREEN+"Game Scores");
         player.lines.get(skybattleScoreboard).put(4, ChatColor.RESET.toString());
         player.lines.get(skybattleScoreboard).put(2, ChatColor.GREEN+"Team Coins: "+ChatColor.WHITE+"0");
@@ -626,8 +626,6 @@ public class ScoreboardManager {
                 teamsDead++;
             }
         }
-        Bukkit.broadcastMessage("teamsDead == " + teamsDead);
-        Bukkit.broadcastMessage("teamList.size()-1 == " + (teamList.size()-1));
         if (teamsDead >= teamList.size()-1) {
             switch (game) {
                 case "SG":
@@ -637,6 +635,12 @@ public class ScoreboardManager {
                     timer = 0;
                     break;
             }
+        }
+    }
+
+    public void resetTeamAmountDead() {
+        for (String t : teamList) {
+            teamAmountFinished.put(t, 0);
         }
     }
 

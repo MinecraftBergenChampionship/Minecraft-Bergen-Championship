@@ -12,9 +12,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Participant {
     public int totalCoins;
@@ -145,10 +148,24 @@ public class Participant {
                 teamPrefix = ChatColor.WHITE+"Ⓤ ";
                 break;
             case "PinkPiglets":
-                color = Color.fromRGB(255, 0, 164);
+                color = Color.fromRGB(243, 139, 170);
                 chatColor = ChatColor.LIGHT_PURPLE;
                 teamPrefix = ChatColor.WHITE+"Ⓟ ";
                 break;
+        }
+    }
+
+    // For games that might need colored leather boots
+    public ItemStack getColoredLeatherArmor(ItemStack i) {
+        try {
+            LeatherArmorMeta meta = (LeatherArmorMeta) i.getItemMeta();
+            assert meta != null;
+            meta.setColor(color);
+            i.setItemMeta(meta);
+            return i;
+        } catch (ClassCastException e) {
+            Bukkit.broadcastMessage("Passed Item Stack was not leather armor!");
+            return i;
         }
     }
 
