@@ -7,6 +7,7 @@ import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftFirework;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -29,7 +30,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
-import java.util.Objects;
 
 public class SkybattleListener implements Listener {
     public final Skybattle skybattle;
@@ -57,8 +57,19 @@ public class SkybattleListener implements Listener {
         Player p = e.getPlayer();
         if (e.getBlock().getType().equals(Material.TNT)) {
             b.setType(Material.AIR);
-            Location loc = p.getTargetBlock(null, 5).getLocation().add(0, 1, 0);
-            skybattle.whoPlacedThatTNT.put(p.getWorld().spawn(loc, TNTPrimed.class), p);
+
+            Block spawn = p.getTargetBlock(null, 5);
+            BlockFace blockFace = spawn.getFace(spawn);
+
+            // west -x east +x south +z north -z
+            switch (blockFace) {
+                case EAST -> spawn.getLocation().add(1, 0, 0);
+                case WEST -> spawn.getLocation().add(-1, 0, 0);
+                case SOUTH -> spawn.getLocation().add(0, 0, 1);
+                case NORTH -> spawn.getLocation().add(0, 0, -1);
+                default -> spawn.getLocation().add(0, 1, 0);
+            }
+            skybattle.whoPlacedThatTNT.put(p.getWorld().spawn(spawn.getLocation(), TNTPrimed.class), p);
         } else if (e.getBlock().getType().toString().matches(".*CONCRETE$")) {
             String concrete = e.getBlock().getType().toString();
             e.getPlayer().getInventory().addItem(new ItemStack(Material.getMaterial(concrete)));
@@ -100,7 +111,16 @@ public class SkybattleListener implements Listener {
             }
 
             // Add each creeper spawned to a map, use to check kill credit
-            Location spawn = p.getTargetBlock(null, 5).getLocation().add(0, 1, 0);
+            Location spawn = p.getTargetBlock(null, 5).getLocation();
+            BlockFace blockFace = e.getBlockFace();
+            // west -x east +x south +z north -z
+            switch (blockFace) {
+                case EAST -> spawn.add(1, 0, 0);
+                case WEST -> spawn.add(-1, 0, 0);
+                case SOUTH -> spawn.add(0, 0, 1);
+                case NORTH -> spawn.add(0, 0, -1);
+                default -> spawn.add(0, 1, 0);
+            }
             skybattle.creepersAndSpawned.put(p.getWorld().spawn(spawn, Creeper.class), p);
         }
     }
@@ -158,18 +178,9 @@ public class SkybattleListener implements Listener {
 
         if (e.getEntityType() == EntityType.SNOWBALL) {
             assert playerGotShot != null;
-            // Cool iDrg math: snowball send in correct direction
-            // Bug: pulls players when they are facing perfectly straight in Z direction against one another
-            double shooterX = shooter.getLocation().getX();
-            double hitPlayerX = playerGotShot.getLocation().getX();
-            double shooterZ = shooter.getLocation().getZ();
-            double hitPlayerZ = playerGotShot.getLocation().getZ();
-            double angle = Math.atan((hitPlayerZ - shooterZ)/(hitPlayerX - shooterX));
-
-            Vector velocity = hitPlayerX > shooterX ?  new Vector(0.15 * Math.cos(angle), 0.05, 0.15 * Math.sin(angle))
-                    : new Vector(0.15 * Math.cos(angle + Math.PI), 0.05, 0.15 * Math.sin(angle+Math.PI));
-
-            playerGotShot.setVelocity(velocity);
+            Vector snowballVelocity = e.getEntity().getVelocity();
+            playerGotShot.damage(0.1);
+            playerGotShot.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
         }
 
         if (skybattle.lastDamage.containsKey(playerGotShot)) {
@@ -227,12 +238,6 @@ public class SkybattleListener implements Listener {
 
         skybattle.outLivePlayer();
 
-        // DEBUG MODE (ONE PLAYER)
-        /*
-        if (skybattle.playersDeadList.size() >= 1)
-            skybattle.mcc.scoreboardManager.timer = 0;
-
-         */
 
         // TODO: end game if only one team is left
         skybattle.mcc.scoreboardManager.lastOneStanding(skybattle.mcc.scoreboardManager.players.get(p.player.getUniqueId()), "Skybattle");
@@ -271,11 +276,12 @@ public class SkybattleListener implements Listener {
         if (!(skybattle.getState().equals("PLAYING"))) { return; }
         if (!(e.getPlayer().getWorld().equals(skybattle.world))) return;
 
-        // Kill players immediately on void
+        // Kill players immediately in void
         // Damage players in border
         Player p = e.getPlayer();
-        if (p.getLocation().getY() <= -60 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
+        if (p.getLocation().getY() <= -40 && p.getLocation().getY() >= -60 && !(p.getGameMode().equals(GameMode.SPECTATOR))) {
             p.setHealth(1);
+            p.teleport(skybattle.getKILLING_ZONE());
         } else if (p.getLocation().getY() >= skybattle.borderHeight) {
             p.damage(1);
         }

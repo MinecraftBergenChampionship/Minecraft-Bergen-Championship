@@ -6,6 +6,9 @@ import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -23,6 +26,8 @@ public class TGTTOS {
 
     public int roundNum;
 
+    public List<Entity> entities = new ArrayList<>();
+
     public int playerAmount = 0;
     public int playerPoints;
 
@@ -34,7 +39,50 @@ public class TGTTOS {
 
     public World world;
 
-    private final MCC mcc;
+    public final MCC mcc;
+
+    // Death Messages
+    // THERE'S DEFINITELY A CLEANER WAY TO DO THIS BUT THIS WILL CUT IT FOR NOW
+    // How many references can you find? :-) Feel free to add more (Specific references noted below!)
+    public static String[] deathMessages = {
+            " should've gone to mid at 15 mins.",                       // MBT2 & MBT12 Survival Games
+            " is gonna get 1st, 2nd, and 3rd.",                         // MBT6 Blue: Dragons
+            " put a poptart in the microwave.",                         // BCA cause of firedrill
+            " forgot to say 'It's morbin' time.'",                      // MBT13 Green (and Red Dodgebolt)
+            " regrets buying Eggcoin.",                                 // Jesuscraft Season 1
+            " was sued for being too annoying.",                        // Jesuscraft Season 2
+            " took a pee break during the round.",                      // MBT9 Dodgebolt
+            " found Nikola's last trap.",                               // Jesuscraft Season 1
+            ": \"Next round's my round!\"",                             // Collin in Volleyball
+            " forgot to take the eraser off the hot plate.",            // Nikola in Chemistry
+            " reached the other, other side.",
+            " has fallen! A cannon can be heard in the distance.",
+            " blames the lag.",
+            " was lagged out by Sebastian's tree farm.",                // Jesuscraft Season 1
+            " lost all their coolness points.",                         // Jesuscraft Season 2
+            " dueled a disguised YouTuber...",                          // Collin's YouTube video
+            " got targeted in Micro Battle.",                           // MBT strat popularized in MBT10
+            " was not the one who knocks.",                             // MBT14 Yellow (Breaking Bad)
+            " didn't get their ballpoint pen.",                         // iDrg's promise to Ethipians
+            " reached the other side...of the Dodgebolt arena.",        // MBT4 Dodgebolt
+            " couldn't get to the other side.",
+            " didn't pick their senior internship on time.",            // BCA
+            ", please come to Dr. Bath's office immediately. Thank you!", // BCA
+            " got caught going to Chick-Fil-A during school hours.",    // BCA
+            " didn't get the #1 Victory Royale.",
+            "'s bus crashed on the way to school.",                     // BCA
+            " fell! Everyone point and laugh!",                         // Old phrase (to my knowledge) originating from Carrie
+            " got distracted reading the funny death messages.",
+            " was ejected.",
+            " got quiplashed.",                                         // Jackbox Party Pack
+            " should've played Milk the Cow instead.",                  // MBT13 Milk the Cow
+            "'s internet cut out.",
+            " doesn't know who killed Captain Alex",                    // Old Movie Night Movie
+            " was the rotten egg.",                                     // Phrase said when leaving VC
+            " should've done /top."                                     // Technoblade Minecraft Monday
+
+
+    };
 
     public TGTTOS(Players players, NPCManager npcManager, Plugin plugin, MCC mcc) {
         this.players = players;
@@ -57,24 +105,24 @@ public class TGTTOS {
         }
 
 
-        Location cliffSpawn = new Location(world, -148, 1, -284);
-        Location meatballSpawn = new Location(world, 615, -28, 133);
-        Location skydiveSpawn = new Location(world, 757, 53, 442);
-        Location glideSpawn = new Location(world, -176, 1, 174);
-        Location boatsSpawn = new Location(world, 175, 1, -96);
-        Location pitSpawn = new Location(world, 34, 1, 585);
-        Location wallsSpawn = new Location(world, 215, -24, 341);
+        Location cliffSpawn = new Location(world, -148, 1, -284, 90, 0);
+        Location meatballSpawn = new Location(world, 615, -28, 133, 0, 0);
+        Location skydiveSpawn = new Location(world, 757, 53, 442, 90, 0);
+        Location glideSpawn = new Location(world, -176, 1, 174, 90, 0);
+        Location boatsSpawn = new Location(world, 175, 1, -96, -90, 0);
+        Location pitSpawn = new Location(world, 34, 1, 585, 90, 0);
+        Location wallsSpawn = new Location(world, 215, -24, 341, 180, 0);
 
-        int[] cliffNPC = {5, -262, -274, -256, -269};
-        int[] meatballNPC = {48, 607,134, 611, 138};
-        int[] skydiveNPC = {-17, 656, 438, 665, 447};
-        int[] glideNPC = {18, -255, 169, -249, 179};
-        int[] boatsNPC = {-4, 335, -69, 347, -54};
-        int[] pitNPC = {-10, -17, 582, -10, 593};
-        int[] wallsNPC = {-12, 205, 235, 227, 259};
+        int[] cliffNPC = {-259, 5, -271};
+        int[] meatballNPC = {609, 47, 136};
+        int[] skydiveNPC = {660, -17, 442};
+        int[] glideNPC = {-253, 18, 174};
+        int[] boatsNPC = {341, -2, -61};
+        int[] pitNPC = {-14, -10, 588};
+        int[] wallsNPC = {217, -12, 247};
 
         ItemStack[] cliffItems = {};
-        ItemStack[] meatballItems = {};
+        ItemStack[] meatballItems = {new ItemStack(Material.WHITE_WOOL)};
         ItemStack[] skydiveItems = {new ItemStack(Material.WHITE_WOOL)};
         ItemStack[] glideItems = {new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.ELYTRA)};
         ItemStack[] boatItems = {new ItemStack(Material.OAK_BOAT)};
@@ -121,7 +169,6 @@ public class TGTTOS {
         mcc.scoreboardManager.changeLine(21, rvalue);
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             public void run() {
-                npcManager.removeAllNPC();
                 Random random = new Random();
                 playerPoints=players.players.size();
                 playerAmount = 0;
@@ -160,7 +207,7 @@ public class TGTTOS {
                                     wool.setType(Material.PINK_WOOL);
                                     break;
                                 default:
-                                    p.player.sendMessage("Your not on a team");
+                                    p.player.sendMessage("You're not on a team");
                             }
                             ItemStack shears = new ItemStack(Material.SHEARS);
                             p.player.getInventory().addItem(wool);
@@ -181,16 +228,15 @@ public class TGTTOS {
                 }
 
                 int[] coords =  npcSpawnpoints.get(gameRound);
-                int xupperBound = coords[3] - coords[1];
-                int yCoord = coords[0];
-                int zupperBound = coords[4] - coords[2];
-
+                int xCoord = coords[0];
+                int yCoord = coords[1];
+                int zCoord = coords[2];
 
                 for (Player p : players.players) {
-                    int xCoord = random.nextInt(xupperBound) + coords[1];
-                    int zCoord = random.nextInt(zupperBound) + coords[2];
                     Location npcLoc = new Location(world, xCoord, yCoord, zCoord);
-                    npcManager.spawnNPC(p,npcLoc);
+                    Entity chicken = npcLoc.getWorld().spawnEntity(npcLoc, EntityType.CHICKEN);
+                    entities.add(chicken);
+                    // Bukkit.broadcastMessage(ChatColor.GREEN+"Spawned new NPC at "+npcLoc.getX()+", "+npcLoc.getY()+", "+npcLoc.getZ());
                 }
             }
         }, 0);
@@ -203,6 +249,14 @@ public class TGTTOS {
             roundNum++;
             startRound(gameOrder[roundNum]);
         }
+        else {
+            mcc.game.endGame();
+        }
+    }
+
+    public static String getDeathMessage(Participant p) {
+        String name = p.teamPrefix + p.chatColor + p.ign + ChatColor.GRAY;
+        return name + deathMessages[(int)(Math.random() * deathMessages.length)];
     }
 
     public boolean enabled() {

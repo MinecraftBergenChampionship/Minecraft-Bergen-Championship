@@ -62,6 +62,9 @@ public class BSABMListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.WAXED_WEATHERED_CUT_COPPER) {
+            if (game.stage.equals("AceRace")) {
+                mcc.aceRace.nextCheckpoint(e.getPlayer());
+            }
             e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(4));
             e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.65, e.getPlayer().getVelocity().getZ()));
         }
@@ -77,6 +80,7 @@ public class BSABMListener implements Listener {
         }
         if (game.stage.equals("BSABM")) {
             if (e.getPlayer().getLocation().getY() <= -33) {
+                bsabm.givePlayerItems(e.getPlayer());
                 e.getPlayer().teleport(new Location(bsabm.world, 11, 1, 0));
             }
             if (e.getPlayer().getLocation().getBlock().getType().equals(Material.NETHER_PORTAL)) {
@@ -98,7 +102,7 @@ public class BSABMListener implements Listener {
                 if (e.getPlayer().getTargetBlock(null, 5).getType() != hotbarSelector.get(e.getPlayer().getUniqueId())) {
                     hotbarSelector.put(e.getPlayer().getUniqueId(), e.getPlayer().getTargetBlock(null, 5).getType());
                     if (e.getPlayer().getTargetBlock(null, 5).getType() != Material.AIR) {
-                        e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(e.getPlayer().getUniqueId()))))));
+                        e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+ "" + ChatColor.BOLD+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(e.getPlayer().getUniqueId()))))));
                     }
                     else {
                         e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
@@ -107,7 +111,7 @@ public class BSABMListener implements Listener {
             }
             else {
                 hotbarSelector.put(e.getPlayer().getUniqueId(), e.getPlayer().getTargetBlock(null, 5).getType());
-                e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(e.getPlayer().getUniqueId()))))));
+                e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+ "" + ChatColor.BOLD+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(e.getPlayer().getUniqueId()))))));
             }
         }
     }
@@ -238,14 +242,14 @@ public class BSABMListener implements Listener {
                             targetX = teamPortalLoc[5];
                             break;
                     }
-                    Location targetLoc = new Location(bsabm.world, targetX, 1, 150, playerLoc.getYaw(), playerLoc.getPitch());
+                    Location targetLoc = new Location(bsabm.world, targetX, 1, playerLoc.getZ()+150, playerLoc.getYaw(), playerLoc.getPitch());
                     player.teleport(targetLoc);
                     player.setAllowFlight(true);
                 }
             }
         }
         else {
-            Location targetLoc = new Location(bsabm.world, 13, 1, 0, playerLoc.getYaw(), playerLoc.getPitch());
+            Location targetLoc = new Location(bsabm.world, 13, 1, playerLoc.getZ()-150, playerLoc.getYaw(), playerLoc.getPitch());
             player.teleport(targetLoc);
             player.setAllowFlight(false);
         }

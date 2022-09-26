@@ -14,11 +14,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -31,11 +32,14 @@ public class SGListener implements Listener {
     private final Players players;
     private final Plugin plugin;
 
-    public SGListener(SG sg, Game game, Players players, Plugin plugin) {
+    private final MCC mcc;
+
+    public SGListener(SG sg, Game game, Players players, Plugin plugin, MCC mcc) {
         this.sg = sg;
         this.game = game;
         this.players = players;
         this.plugin = plugin;
+        this.mcc = mcc;
     }
 
     @EventHandler
@@ -50,37 +54,24 @@ public class SGListener implements Listener {
     }
 
     @EventHandler
-    public void playerKillEvent(PlayerDeathEvent event) {
-        if (sg.stage.equals("Game")) {
-            sg.playersDeadList.add(event.getEntity().getUniqueId());
-            Player victim = event.getEntity();
-            victim.setGameMode(GameMode.SPECTATOR);
-            final Location deathLoc = victim.getLocation();
-            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    victim.teleport(deathLoc);
-                }
-            }, 30);
-            for (Participant p : Participant.participantsOnATeam) {
-                if (event.getEntity().getKiller() != null && p.player.getUniqueId() == event.getEntity().getKiller().getUniqueId()) {
-                    sg.kill(p);
-                    p.Die(p.player, event.getEntity().getKiller(), event);
-                    sg.checkIfGameEnds(p);
-                }
-            }
-
-            victim.teleport(new Location(event.getEntity().getWorld(), 0, 6, 0));
-            sg.playersDead--;
-            for (Participant p : players.participants) {
-                if (Objects.equals(p.ign, event.getEntity().getName())) {
-                    sg.teamsAlive.remove(p.team);
-                    if (!sg.teamsAlive.contains(p.team)) {
-                        sg.teamsDead--;
-                    }
-                }
-            }
-            sg.outLivePlayer();
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        if (!sg.stage.equals("Game")) return;
+        sg.names.remove(e.getEntity().getName());
+        Participant p = Participant.findParticipantFromPlayer(e.getEntity());
+        assert p != null;
+        Participant killer = Participant.findParticipantFromPlayer(p.player.getKiller());
+        p.Die(e.getEntity(), p.player.getKiller(), e);
+        sg.playersDead--;
+        sg.playersDeadList.add(e.getEntity().getUniqueId());
+        sg.outLivePlayer();
+        if (killer != null) {
+            sg.kill(killer);
+            sg.checkIfGameEnds(killer);
+        }
+        sg.PlayerDied(e.getEntity());
+        sg.teamsAlive.remove(p.team);
+        if (!sg.teamsAlive.contains(p.team)) {
+            sg.teamsDead--;
         }
     }
 
@@ -114,8 +105,15 @@ public class SGListener implements Listener {
     }
 
     @EventHandler
+    public void blockPlace(BlockPlaceEvent event) {
+        if (event.getBlock().getType().equals(Material.STRING)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void blockBreakEvent(BlockBreakEvent event) {
-        if (sg.stage.equals("Starting")) {
+        if (mcc.game.stage.equals("SG")) {
             if (!(event.getBlock().getType() == Material.COBWEB || String.valueOf(event.getBlock().getType()).endsWith("PANE"))) {
                 event.setCancelled(true);
             }

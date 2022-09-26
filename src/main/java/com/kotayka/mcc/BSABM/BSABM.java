@@ -6,8 +6,12 @@ import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -51,22 +55,22 @@ public class BSABM {
         }
         List<List<Block>> tempMaps = new ArrayList<>();
         List<String> tempNames = new ArrayList<>();
-        Location map = new Location(mapWorld, -3, 186, 5);
+        Location map = new Location(mapWorld, -9, 186, -1);
         int numOfMaps = 0;
         Bukkit.broadcastMessage(ChatColor.RED+"Loading Maps");
-        while (mapWorld.getBlockAt((int) (map.getX()-3), (int) (map.getY()-1), (int) (map.getZ()-3)).getType() == Material.DIAMOND_BLOCK) {
+        while (mapWorld.getBlockAt((int) (map.getX()+3), (int) (map.getY()-1), (int) (map.getZ()+3)).getType() == Material.DIAMOND_BLOCK) {
             Bukkit.broadcastMessage(ChatColor.GREEN+"Map#" +numOfMaps+" Loaded");
             Location genMap = map.clone();
             List<Block> blocks = new ArrayList<>();
             for (int y = (int) genMap.getY(); y <= genMap.getY()+5; y++) {
-                for (int x = (int) genMap.getX(); x >= genMap.getX()-6; x--) {
-                    for (int z = (int) genMap.getZ(); z >= genMap.getZ()-6; z--) {
+                for (int x = (int) genMap.getX(); x <= genMap.getX()+6; x++) {
+                    for (int z = (int) genMap.getZ(); z <= genMap.getZ()+6; z++) {
                         blocks.add(mapWorld.getBlockAt(x,y,z));
                     }
                 }
             }
             numOfMaps++;
-            Block b = mapWorld.getBlockAt((int) (map.getX()-3), (int) (map.getY()+1), (int) (map.getZ()-8));
+            Block b = mapWorld.getBlockAt((int) (map.getX()+3), (int) (map.getY()+1), (int) (map.getZ()-2));
             if (b.getType().equals(Material.OAK_WALL_SIGN)) {
                 Sign sign = (Sign) b.getState();
                 tempNames.add(sign.getLine(0));
@@ -211,7 +215,7 @@ public class BSABM {
     }
 
     public void completeBuild(int teamNum, int fieldNum) {
-        String[] teams={"RedRabbits","YellowYaks","GreenGuardians","BlueBats","PurplePandas","PinkParrots"};
+        String[] teams={"RedRabbits","YellowYaks","BlueBats","GreenGuardians","PurplePandas","PinkPiglets"};
         Location fireworkLoc = getCoordsForMap(teamNum,fieldNum);
         fireworkLoc.setX(fireworkLoc.getX()+3);
         fireworkLoc.setY(fireworkLoc.getY()+3);
@@ -219,25 +223,26 @@ public class BSABM {
         Firework firework = new Firework();
         firework.spawnFirework(fireworkLoc);
         mapFinishes.set(teamFields[teamNum][fieldNum], mapFinishes.get(teamFields[teamNum][fieldNum])+1);
+        Bukkit.broadcastMessage("Score: "+(3+(3*(mcc.scoreboardManager.teamList.size()-mapFinishes.get(teamFields[teamNum][fieldNum]))))+", Map Finishes: "+mapFinishes.get(teamFields[teamNum][fieldNum]));
         mcc.scoreboardManager.addTeamScore(teams[teamNum], 3+(3*(mcc.scoreboardManager.teamList.size()-mapFinishes.get(teamFields[teamNum][fieldNum]))));
         switch (teamNum) {
             case 0:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.RED+"Red Rabbits"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage("Ⓡ " + ChatColor.RED+""+ChatColor.BOLD+"Red Rabbits"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 1:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.YELLOW+"Yellow Yaks"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
-                break;
-            case 2:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.GREEN+"Green Guardians"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage("Ⓨ " + ChatColor.YELLOW+""+ChatColor.BOLD+"Yellow Yaks"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 3:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.BLUE+"Blue Bats"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage("Ⓖ " + ChatColor.GREEN+""+ChatColor.BOLD+"Green Guardians"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
+                break;
+            case 2:
+                Bukkit.broadcastMessage("Ⓑ " + ChatColor.BLUE+""+ChatColor.BOLD+"Blue Bats"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 4:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.DARK_PURPLE+"Purple Pandas"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage("Ⓤ " + ChatColor.DARK_PURPLE+""+ChatColor.BOLD+"Purple Pandas"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
             case 5:
-                Bukkit.broadcastMessage("["+ChatColor.GOLD+"BuildMart"+ChatColor.WHITE+"] "+ChatColor.LIGHT_PURPLE+"Pink Piglets"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum])));
+                Bukkit.broadcastMessage("Ⓟ " + ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"Pink Piglets"+ChatColor.WHITE+" Finished "+ChatColor.GOLD+names.get(teamFields[teamNum][fieldNum])+ChatColor.WHITE+" in place #"+ChatColor.GOLD+(mapFinishes.get(teamFields[teamNum][fieldNum]))+".");
                 break;
         }
         teamFields[teamNum][fieldNum] = teamsProgress[teamNum];
@@ -251,39 +256,75 @@ public class BSABM {
                 placeMap(i, x);
             }
         }
-        mcc.scoreboardManager.startTimerForGame(720, "BSABM");
+        mcc.scoreboardManager.startTimerForGame(720, "BuildMart");
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             mcc.scoreboardManager.createBSABMScoreboard(p);
         }
+        List<Entity> entList = world.getEntities();
+        for(Entity current : entList){
+            if (current.getType() == EntityType.DROPPED_ITEM){
+                current.remove();
+            }
+        }
         for (Player player : players.players) {
-            player.getInventory().clear();
-            ItemStack silkPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
-            silkPickaxe.addEnchantment(Enchantment.SILK_TOUCH, 1);
-            silkPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
 
-            ItemStack regPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
-            regPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
-
-            ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
-            axe.addEnchantment(Enchantment.DURABILITY, 3);
-
-            ItemStack shovel = new ItemStack(Material.DIAMOND_SHOVEL);
-            shovel.addEnchantment(Enchantment.DURABILITY, 3);
-
-            ItemStack elytra = new ItemStack(Material.ELYTRA);
-            elytra.addEnchantment(Enchantment.DURABILITY, 3);
-
-            player.getInventory().addItem(silkPickaxe);
-            player.getInventory().addItem(regPickaxe);
-            player.getInventory().addItem(axe);
-            player.getInventory().addItem(shovel);
-            player.getInventory().setChestplate(elytra);
+            givePlayerItems(player);
 
             player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000000, 255, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000000, 255, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000000, 255, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000000, 255, false, false));
 
-            player.teleport(new Location(world, 11, 1, 0));
+            player.teleport(new Location(world, 11, 1, 0, -90, 0));
 
             player.setGameMode(GameMode.SURVIVAL);
         }
+        clearChest();
+    }
+
+    public void clearChest() {
+        Chunk[] c = world.getLoadedChunks();
+        for(int i=0;i<c.length;i++){//loop through loaded chunks
+            for(int x=0;x<c[i].getTileEntities().length;x++){//loop through tile entities within loaded chunks
+                if(c[i].getTileEntities()[x] instanceof Chest){
+                    Chest c1 = (Chest) c[i].getTileEntities()[x];
+                    c1.getInventory().clear();
+                }
+            }
+        }
+    }
+
+    public void givePlayerItems(Player player) {
+        player.getInventory().clear();
+        ItemStack silkPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
+        silkPickaxe.addEnchantment(Enchantment.SILK_TOUCH, 1);
+        silkPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
+        silkPickaxe.addEnchantment(Enchantment.DIG_SPEED, 2);
+
+        ItemStack regPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
+        regPickaxe.addEnchantment(Enchantment.DURABILITY, 3);
+        regPickaxe.addEnchantment(Enchantment.DIG_SPEED, 2);
+
+        ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
+        axe.addEnchantment(Enchantment.DURABILITY, 3);
+        axe.addEnchantment(Enchantment.DIG_SPEED, 2);
+
+        ItemStack shovel = new ItemStack(Material.DIAMOND_SHOVEL);
+        shovel.addEnchantment(Enchantment.DURABILITY, 3);
+        shovel.addEnchantment(Enchantment.DIG_SPEED, 2);
+
+        ItemStack hoe = new ItemStack(Material.NETHERITE_HOE);
+        hoe.addEnchantment(Enchantment.DURABILITY, 3);
+        hoe.addEnchantment(Enchantment.DIG_SPEED, 2);
+
+        ItemStack elytra = new ItemStack(Material.ELYTRA);
+        elytra.addEnchantment(Enchantment.DURABILITY, 3);
+
+        player.getInventory().addItem(silkPickaxe);
+        player.getInventory().addItem(regPickaxe);
+        player.getInventory().addItem(axe);
+        player.getInventory().addItem(shovel);
+        player.getInventory().addItem(hoe);
+        player.getInventory().setChestplate(elytra);
     }
 }

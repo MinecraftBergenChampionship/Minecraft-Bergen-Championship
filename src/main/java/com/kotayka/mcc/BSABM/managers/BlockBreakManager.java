@@ -19,10 +19,10 @@ public class BlockBreakManager {
     int[][] oreIslands = {{78, 81, 32}, {78, 81, 40}, {78, 81, 48}, {66, 81, 47}, {67, 81, 59}, {59, 81, 59}, {51, 81, 59}};
 
     //Sands (Red Sand, Sand, Red Sandstone, Sandstone) - 11x11x7 grid
-    int[][] sandIslands = {{-86, 74, -36},{-98, 74,-36},{-98, 85,-46},{-74,85,-46}};
+    int[][] sandIslands = {{-86, 74, -36},{-98, 74,-36},{-98, 85,-56},{-74,85,-56}};
 
     //Stones (Granite, Stone, Diorite, Andestie) - 11x11x7 grid
-    int[][] stoneIslands = {{-30,74,-84},{-8,74,-100},{-8,74,-84},{-30,74,-100}};
+    int[][] stoneIslands = {{-30,74,-84},{-8,74,-84},{-8,74,-100},{-30,74,-100}};
 
     //Logs (Oak, Birch, Spruce, Acacia, Jungle) - 9x9x20
     int[][] logsIsland = {{-71,89,32},{-83,89,32},{-97,89,18},{-83,89,4},{-71,89,4}};
@@ -55,7 +55,7 @@ public class BlockBreakManager {
             case BRICKS:
             case CHISELED_STONE_BRICKS:
             case PRISMARINE_BRICKS:
-            case MOSSY_STONE_BRICKS:
+            case MOSSY_COBBLESTONE:
                 if (Bricks(x, loc)) {
                     return true;
                 }
@@ -402,7 +402,7 @@ public class BlockBreakManager {
     }
 
     public Boolean ConcreteAndGlass(Material x, Location loc) {
-        List<String> orderOfColors  = new ArrayList<>(Arrays.asList("BLA", "LIG", "BLU", "PUR", "PIN", "WHI", "RED", "ORA", "YEL", "LIG"));
+        List<String> orderOfColors  = new ArrayList<>(Arrays.asList("BLA", "LIG", "BLU", "PUR", "PIN", "WHI", "RED", "ORA", "YEL", "LIM"));
         int index = orderOfColors.indexOf(x.toString().substring(0, 3));
         if (index == -1) {
             return false;

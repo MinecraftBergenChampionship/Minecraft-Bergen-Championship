@@ -73,8 +73,6 @@ public class NPCManager {
             }, 20);
 
         }
-
-        player.sendMessage(ChatColor.GREEN+"Spawned new NPC at "+npcLocation.getX()+", "+npcLocation.getY()+", "+npcLocation.getZ() + " With the ID of " + npcPlayer.getBukkitEntity().getEntityId());
         ids.add(npcPlayer.getBukkitEntity().getEntityId());
         npcs.add(npcPlayer);
         npcsLocations.add(npcLocation);
