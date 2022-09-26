@@ -16,12 +16,9 @@ public class startCommand implements TabCompleter {
             "TEST",
             "Skybattle",
             "BSABM",
-<<<<<<< HEAD
-            "Paintdown"
-=======
+            "Paintdown",
             "AceRace",
-            "DD",
->>>>>>> main
+            "DD"
     };
     
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {

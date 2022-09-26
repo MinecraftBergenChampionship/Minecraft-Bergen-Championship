@@ -92,7 +92,7 @@ public class Instructions {
         spawnCoords.put("SG", new Location(mcc.sg.world, -57, 48, 63));
         spawnCoords.put("BSABM", new Location(mcc.bsabm.world, 0, 161, 0));
         spawnCoords.put("Skybattle", new Location(mcc.skybattle.world, -156, 51, -265));
-        spawnCoords.put("Paintdown", new Location(mcc.tgttos.world, 62, 32, 64));
+        spawnCoords.put("Paintdown", new Location(mcc.paintdown.world, 62, 32, 64));
 
         instructions.put("TGTTOS", tgttosInstructions);
         instructions.put("AceRace", aceRaceInstructions);

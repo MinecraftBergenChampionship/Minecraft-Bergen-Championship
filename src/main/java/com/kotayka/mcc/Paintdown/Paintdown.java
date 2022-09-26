@@ -73,9 +73,8 @@ public class Paintdown {
     public void start() {
         for (ScoreboardPlayer player : mcc.scoreboardManager.playerList) {
             mcc.scoreboardManager.createPaintdownScoreboard(player);
+            player.player.player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
         }
-
-        loadMap();
 
         startRound();
     }
@@ -86,7 +85,7 @@ public class Paintdown {
         String roundValue = ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+ roundNum + "/3";
         mcc.scoreboardManager.changeLine(22, roundValue);
 
-        setState("PLAYING");
+        this.setState("PLAYING");
         mcc.scoreboardManager.startTimerForGame(240, "Paintdown");
 
         // Randomly place each team at a different spawn

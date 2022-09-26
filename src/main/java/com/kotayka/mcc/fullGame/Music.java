@@ -35,7 +35,7 @@ public class Music {
         world.put("BSABM", mcc.bsabm.world);
         world.put("DD", mcc.decisionDome.world);
         world.put("Dodgebolt", mcc.aceRace.world);
-        world.put("Paintdown", mcc.aceRace.world);
+        world.put("Paintdown", mcc.paintdown.world);
         world.put("SG", mcc.sg.world);
         world.put("Skybattle", mcc.skybattle.world);
         world.put("TGTTOS", mcc.tgttos.world);

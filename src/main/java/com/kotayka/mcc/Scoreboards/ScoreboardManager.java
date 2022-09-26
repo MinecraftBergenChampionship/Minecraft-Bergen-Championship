@@ -506,6 +506,8 @@ public class ScoreboardManager {
         player.lines.get(scoreboard).put(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + "0");
         player.lines.get(scoreboard).put(1, ChatColor.YELLOW + "Your Coins: " + ChatColor.WHITE + "0");
 
+        player.currentObj = scoreboard;
+        scoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
     public void createDecisionDome(ScoreboardPlayer player) {

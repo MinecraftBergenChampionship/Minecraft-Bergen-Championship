@@ -47,6 +47,7 @@ public class Game {
 
     public void changeToActGame(String game) {
         stage=game;
+        Bukkit.broadcastMessage("game == " + game);
         music.startSound(game);
         switch (game) {
             case "TGTTOS":
@@ -71,6 +72,7 @@ public class Game {
             case "Paintdown":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "Paintdown Game started");
                 paintdown.start();
+                break;
             case "AceRace":
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "Ace Race Game started");
                 aceRace.start();
