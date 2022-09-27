@@ -16,9 +16,12 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -47,6 +50,9 @@ public class PaintdownListener implements Listener {
         Participant p = Participant.findParticipantFromPlayer(player);
         assert p != null;
 
+        // Prevent painted players from shooting
+        if (p.getIsPainted()) return;
+
         // Cooldown
         if (player.getInventory().getItemInMainHand().getType().equals(Material.IRON_HORSE_ARMOR)) {
             long timeLeft = System.currentTimeMillis() - p.getCooldown();
@@ -72,6 +78,7 @@ public class PaintdownListener implements Listener {
         assert e.getEntity().getShooter() instanceof Player;
         Player shooter = (Player) e.getEntity().getShooter();
 
+
         if (Objects.requireNonNull(Participant.findParticipantFromPlayer(hitPlayer)).team.equals(Objects.requireNonNull(Participant.findParticipantFromPlayer(shooter)).team)) return;
 
         Vector snowballVelocity = e.getEntity().getVelocity();
@@ -92,6 +99,17 @@ public class PaintdownListener implements Listener {
         // If they died
         if((player.getHealth()-e.getDamage()) <= 0) {
             participant.setIsPainted(true);
+            // paint all the armor
+            ItemStack[] armor = participant.player.getInventory().getArmorContents();
+            for (int i = 0; i < 4; i++) {
+                ItemStack leatherPiece = paintdown.getPaintedLeatherArmor(armor[i]);
+                switch (leatherPiece.getType()) {
+                    case LEATHER_HELMET -> player.getInventory().setHelmet(leatherPiece);
+                    case LEATHER_CHESTPLATE -> player.getInventory().setChestplate(leatherPiece);
+                    case LEATHER_LEGGINGS -> player.getInventory().setLeggings(leatherPiece);
+                    case LEATHER_BOOTS -> player.getInventory().setBoots(leatherPiece);
+                }
+            }
 
             // Check if whole team died
             int deadTeammates = 0;
@@ -113,6 +131,8 @@ public class PaintdownListener implements Listener {
             e.setCancelled(true);
             player.setHealth(20);
         }
+        // paint player if they didn't die (here so no need to double paint armor)
+        paintdown.paintHitPlayer(participant);
     }
 
     @EventHandler
@@ -128,6 +148,9 @@ public class PaintdownListener implements Listener {
                 Participant potionThrower = Participant.findParticipantFromPlayer((Player) e.getPotion().getShooter());
                 assert p != null;
                 assert potionThrower != null;
+
+                // prevent healing enemy team
+                if (!(p.team.equals(potionThrower.team))) continue;
 
                 if (p.getIsPainted()) p.setIsPainted(false);
                 else p.player.setHealth(20);
@@ -155,5 +178,15 @@ public class PaintdownListener implements Listener {
         e.getPlayer().setGameMode(GameMode.SPECTATOR);
         e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 10000, 2, false, false));
         e.setRespawnLocation(paintdown.getCenter());
+    }
+
+    // Players can't take off armor
+    @EventHandler
+    public void onClick(InventoryClickEvent event)
+    {
+        if(event.getSlotType() == InventoryType.SlotType.ARMOR)
+        {
+            event.setCancelled(true);
+        }
     }
 }

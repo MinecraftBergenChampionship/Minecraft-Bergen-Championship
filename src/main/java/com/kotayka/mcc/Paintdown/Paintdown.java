@@ -6,6 +6,7 @@ import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
@@ -130,6 +131,37 @@ public class Paintdown {
         }
     }
 
+    // Paint a random number of armor from 1-3 (4 painted slots signifies eliminated)
+    public void paintHitPlayer(Participant p) {
+        ItemStack[] armor = p.player.getInventory().getArmorContents();
+        int random = (int) (Math.random() * 2 + 1);
+
+        // TODO refine algorithm to prevent double changes
+        for (int i = 0; i < random; i++) {
+            int slot = (int) (Math.random() * 2 + 1);
+            ItemStack leatherPiece = getPaintedLeatherArmor(armor[Math.abs(slot-random)]);
+            switch (leatherPiece.getType()) {
+                case LEATHER_HELMET -> p.player.getInventory().setHelmet(leatherPiece);
+                case LEATHER_CHESTPLATE -> p.player.getInventory().setChestplate(leatherPiece);
+                case LEATHER_LEGGINGS -> p.player.getInventory().setLeggings(leatherPiece);
+                case LEATHER_BOOTS -> p.player.getInventory().setBoots(leatherPiece);
+            }
+        }
+    }
+
+    public ItemStack getPaintedLeatherArmor(ItemStack i) {
+        try {
+            LeatherArmorMeta meta = (LeatherArmorMeta) i.getItemMeta();
+            assert meta != null;
+            if (meta.getColor().equals(Color.BLACK)) return i;
+            meta.setColor(Color.BLACK);
+            i.setItemMeta(meta);
+            return i;
+        } catch (ClassCastException e) {
+            Bukkit.broadcastMessage("Passed Item Stack was not leather armor!");
+            return i;
+        }
+    }
     /*
     public void timedEventsHandler(int time, ScoreboardPlayer p) {
     }

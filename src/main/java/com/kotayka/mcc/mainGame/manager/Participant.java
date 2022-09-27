@@ -157,7 +157,7 @@ public class Participant {
         }
     }
 
-    // For games that might need colored leather boots
+    // For games that might need colored leather armor
     public ItemStack getColoredLeatherArmor(ItemStack i) {
         try {
             LeatherArmorMeta meta = (LeatherArmorMeta) i.getItemMeta();
