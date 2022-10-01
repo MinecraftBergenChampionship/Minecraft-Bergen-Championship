@@ -168,6 +168,13 @@ public class Paintdown {
 
      */
 
+
+    // Eliminate team
+    /*
+    public void eliminateTeam() {
+
+    } */
+
     public void setState(String state) {
         this.state = state;
     }

@@ -38,7 +38,11 @@ public class Participant {
         this.player = player;
         this.ign = player.getName();
     }
+/*
+    public static void announceTeamDeath() {
 
+    }
+ */
     public void Die(Participant victim, Participant killer, PlayerDeathEvent e) {
         String victimName = victim.teamPrefix + victim.chatColor + victim.ign + ChatColor.WHITE;
         String oldDeathMessage = e.getDeathMessage();
