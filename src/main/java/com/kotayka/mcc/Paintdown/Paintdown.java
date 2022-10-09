@@ -5,6 +5,7 @@ import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -16,6 +17,7 @@ import org.bukkit.potion.PotionType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Paintdown {
 //  Game State
@@ -28,6 +30,12 @@ public class Paintdown {
     public World world;
     public Location CENTER;
     public List<Location> spawnPoints;
+    //public WorldBorder border;
+    public ArrayList<PaintdownRoom> rooms;
+
+    // Store painted blocks;
+    // Location also stored for easy access
+    public Map<Location, Block> paintedBlocks;
 
 // Items
     List<ItemStack> spawnItems;
@@ -58,7 +66,8 @@ public class Paintdown {
                 new ItemStack(Material.LEATHER_BOOTS),
                 new ItemStack(Material.LEATHER_CHESTPLATE),
                 new ItemStack(Material.LEATHER_HELMET),
-                new ItemStack(Material.LEATHER_LEGGINGS)
+                new ItemStack(Material.LEATHER_LEGGINGS),
+                new ItemStack(Material.WOODEN_PICKAXE)
         );
 
         Location spawnOne = new Location(world, -39, 0, -17);
@@ -74,9 +83,21 @@ public class Paintdown {
     public void start() {
         for (ScoreboardPlayer player : mcc.scoreboardManager.playerList) {
             mcc.scoreboardManager.createPaintdownScoreboard(player);
+            player.player.player.getInventory().clear();
             player.player.player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
+            player.player.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
         }
 
+        // Create all the paintdown rooms
+        PaintdownRoom spawnRoomOne = new PaintdownRoom(this, 161, 169, 147, 141, RoomType.SPAWN);
+        PaintdownRoom regularRoomOne = new PaintdownRoom(this, 141, 178, 139, 93, RoomType.REGULAR);
+        PaintdownRoom spawnRoomTwo = new PaintdownRoom(this, 146, 140, 68, 60, RoomType.SPAWN);
+        PaintdownRoom spawnRoomThree = new PaintdownRoom(this, 169, 161, -19, -13, RoomType.SPAWN);
+        PaintdownRoom regularRoomTwo = new PaintdownRoom(this, 178, 141, -11, 35, RoomType.REGULAR);
+        PaintdownRoom coinRoomOne = new PaintdownRoom(this, 138, 90, -11, 37, RoomType.COIN);
+        PaintdownRoom regularRoomThree = new PaintdownRoom(this, 90, 138, 88, 40, RoomType.REGULAR);
+        PaintdownRoom coinRoomTwo = new PaintdownRoom(this, 138, 90, 91, 139, RoomType.COIN);
+        // to complete
         startRound();
     }
 
@@ -162,6 +183,16 @@ public class Paintdown {
             return i;
         }
     }
+
+    /* Turn painted walls back to original state */
+    public void cleanPaintOfWalls() {
+        for (Map.Entry<Location, Block> entry : paintedBlocks.entrySet()) {
+            Block b = world.getBlockAt(entry.getKey());
+            b.setType(entry.getValue().getType());
+            world.setBlockData(entry.getKey(), entry.getValue().getBlockData());
+        }
+    }
+
     /*
     public void timedEventsHandler(int time, ScoreboardPlayer p) {
     }
@@ -170,10 +201,14 @@ public class Paintdown {
 
 
     // Eliminate team
-    /*
-    public void eliminateTeam() {
-
-    } */
+    public void eliminateTeam(int index) {
+        for (Participant p : mcc.teamList.get(index)) {
+            p.player.sendTitle(ChatColor.RED + "TEAM PAINTED", null, 0, 60, 40);
+            p.player.setGameMode(GameMode.SPECTATOR);
+            p.player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 10000, 2, false, false));
+            p.player.teleport(getCenter());
+        }
+    }
 
     public void setState(String state) {
         this.state = state;

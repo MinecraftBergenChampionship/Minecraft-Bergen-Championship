@@ -29,10 +29,16 @@ public class Participant {
     public String teamPrefix = "";
     public String fullName;
 
+    // Used mostly to make indexing easier (and to prevent nesting for loops wherever necessary)
+    // Used for mcc.teamList.get(teamIndex); (skip looping to find whether team matches)
+    // Red = 0, Yellow = 1, Green = 2, Blue = 3, Purple = 4, Pink = 5;
+    public int teamIndex = -1;
+
     public final Player player;
     public String ign;
     public long paintballCooldown = System.currentTimeMillis();
     public boolean isPainted = false;
+    public boolean hasTelepick = false;
 
     public Participant(Player player) {
         this.player = player;
@@ -132,31 +138,37 @@ public class Participant {
                 color = Color.RED;
                 chatColor = ChatColor.RED;
                 teamPrefix = ChatColor.WHITE+"Ⓡ ";
+                teamIndex = 0;
                 break;
             case "YellowYaks":
                 color = Color.YELLOW;
                 chatColor = ChatColor.YELLOW;
                 teamPrefix = ChatColor.WHITE+"Ⓨ ";
+                teamIndex = 1;
                 break;
             case "GreenGuardians":
                 color = Color.GREEN;
                 chatColor = ChatColor.GREEN;
                 teamPrefix = ChatColor.WHITE+"Ⓖ ";
+                teamIndex = 2;
                 break;
             case "BlueBats":
                 color = Color.BLUE;
                 chatColor = ChatColor.BLUE;
                 teamPrefix = ChatColor.WHITE+"Ⓑ ";
+                teamIndex = 3;
                 break;
             case "PurplePandas":
                 color = Color.PURPLE;
                 chatColor = ChatColor.DARK_PURPLE;
                 teamPrefix = ChatColor.WHITE+"Ⓤ ";
+                teamIndex = 4;
                 break;
             case "PinkPiglets":
                 color = Color.fromRGB(243, 139, 170);
                 chatColor = ChatColor.LIGHT_PURPLE;
                 teamPrefix = ChatColor.WHITE+"Ⓟ ";
+                teamIndex = 5;
                 break;
         }
     }
@@ -183,6 +195,7 @@ public class Participant {
         return null;
     }
 
+    // Paintdown specific
     public void setCooldown(long n) {
         paintballCooldown = n;
     }

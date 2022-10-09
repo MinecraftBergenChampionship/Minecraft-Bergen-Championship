@@ -3,6 +3,7 @@ package com.kotayka.mcc.Paintdown.Listener;
 import com.kotayka.mcc.Paintdown.Paintdown;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
@@ -52,12 +53,6 @@ public class PaintdownListener implements Listener {
 
         // Cooldown
         if (player.getInventory().getItemInMainHand().getType().equals(Material.IRON_HORSE_ARMOR)) {
-            // Can't shoot if painted
-            if (p.getIsPainted()) {
-                e.setCancelled(true);
-                return;
-            }
-
             long timeLeft = System.currentTimeMillis() - p.getCooldown();
             if (timeLeft >= 700) {
                 Snowball projectile = player.launchProjectile(Snowball.class);
@@ -70,7 +65,7 @@ public class PaintdownListener implements Listener {
             }
         }
 
-        // curing self or splashing
+        // prevent unfreezing self
         if (player.getInventory().getItemInMainHand().getType() == Material.SPLASH_POTION ||
             player.getInventory().getItemInOffHand().getType() == Material.SPLASH_POTION) {
             if (p.getIsPainted()) {
@@ -83,6 +78,37 @@ public class PaintdownListener implements Listener {
     public void onProjectileHitEvent(ProjectileHitEvent e) {
         if (!(paintdown.getState().equals("PLAYING"))) { return; }
         if (!(e.getEntity() instanceof Snowball)) return;
+
+        // If we hit a terracotta block, paint it //
+        if (e.getHitBlock() != null) {
+            Block b = e.getHitBlock();
+
+            assert e.getEntity().getShooter() instanceof Player;
+            Player shooter = (Player) e.getEntity().getShooter();
+            Participant participant = Participant.findParticipantFromPlayer(shooter);
+            if (b.toString().endsWith("Terracotta")) {
+                // Not sure if runtime is same as if we use an arraylist,
+                // might change later for memory conservation
+                if (!(paintdown.paintedBlocks.containsKey(b.getLocation()))) {
+                    // put <Location, Original Block>
+                    paintdown.paintedBlocks.put(b.getLocation(), b);
+                }
+                Material type = b.getType();
+                switch (Objects.requireNonNull(participant).team) {
+                    case "RedRabbits" -> type = Material.RED_GLAZED_TERRACOTTA;
+                    case "YellowYaks" -> type = Material.YELLOW_GLAZED_TERRACOTTA;
+                    case "GreenGuardians" -> type = Material.LIME_GLAZED_TERRACOTTA;
+                    case "BlueBats" -> type = Material.BLUE_GLAZED_TERRACOTTA;
+                    case "PurplePandas" -> type = Material.PURPLE_GLAZED_TERRACOTTA;
+                    case "PinkPiglets" -> type = Material.PINK_GLAZED_TERRACOTTA;
+                }
+                // set block team's color
+                b.setType(type);
+            }
+            return;
+        }
+
+        // Otherwise check if player was hit
         if (!(e.getHitEntity() instanceof Player)) return;
 
         Player hitPlayer = (Player) e.getHitEntity();
@@ -116,20 +142,13 @@ public class PaintdownListener implements Listener {
             }
             // Check if whole team died
             int deadTeammates = 0;
-            for (List<Participant> l : paintdown.mcc.teamList) {
-                if (l.contains(participant)) {
-                    for (int i = 0; i < l.size(); i++) {
-                        if (l.get(i).getIsPainted()) {
-                            deadTeammates++;
-                        }
-                    }
-                    if (deadTeammates == l.size()) {
-                        // There really should be a global function for this...todo?
-                        Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.team + " have been eliminated!");
-                        //paintdown.eliminateTeam();
-                        return;
-                    }
-                }
+            for (Participant p : paintdown.mcc.teamList.get(participant.teamIndex)) {
+                if (p.getIsPainted()) deadTeammates++;
+            }
+            if (deadTeammates == paintdown.mcc.teamList.get(participant.teamIndex).size()) {
+                Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.team + " have been eliminated!");
+                paintdown.eliminateTeam(participant.teamIndex);
+                return;
             }
             // Died but teammates are alive
             hitPlayer.setHealth(20);
@@ -192,6 +211,7 @@ public class PaintdownListener implements Listener {
     // Temporary
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
+        Bukkit.broadcastMessage("Uh, this really shouldn't happen");
         if (!(e.getPlayer().getWorld().equals(paintdown.world))) return;
 
         e.getPlayer().setGameMode(GameMode.SPECTATOR);
@@ -203,6 +223,8 @@ public class PaintdownListener implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event)
     {
+        if (!(paintdown.getState().equals("PLAYING"))) { return; }
+
         if(event.getSlotType() == InventoryType.SlotType.ARMOR)
         {
             event.setCancelled(true);
