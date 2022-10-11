@@ -1,6 +1,7 @@
 package com.kotayka.mcc.Paintdown.Listener;
 
 import com.kotayka.mcc.Paintdown.Paintdown;
+import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -17,9 +19,11 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -65,11 +69,26 @@ public class PaintdownListener implements Listener {
             }
         }
 
-        // prevent unfreezing self
+        // track potion usage + potion cooldown
         if (player.getInventory().getItemInMainHand().getType() == Material.SPLASH_POTION ||
             player.getInventory().getItemInOffHand().getType() == Material.SPLASH_POTION) {
-            if (p.getIsPainted()) {
-                e.setCancelled(true);
+            p.availablePotions--;
+
+            // If player has no potions, give them a potion after 15 seconds
+            if (p.availablePotions == 0) {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        if (paintdown.getState().equals("PLAYING") && player.getGameMode() == GameMode.SURVIVAL) {
+                            ItemStack potion = new ItemStack(Material.SPLASH_POTION, 3);
+                            PotionMeta meta = (PotionMeta)potion.getItemMeta();
+                            assert meta != null;
+                            meta.setColor(Color.BLUE);
+
+                            p.player.getInventory().addItem(potion);
+                        }
+                    }
+                }, 300);
             }
         }
     }
@@ -115,9 +134,11 @@ public class PaintdownListener implements Listener {
         assert e.getEntity().getShooter() instanceof Player;
         Player shooter = (Player) e.getEntity().getShooter();
         Participant participant = Participant.findParticipantFromPlayer(hitPlayer);
+        Participant participantShooter = Participant.findParticipantFromPlayer(shooter);
+        assert participantShooter != null;
         assert participant != null;
 
-        if (Objects.requireNonNull(Participant.findParticipantFromPlayer(hitPlayer)).team.equals(Objects.requireNonNull(Participant.findParticipantFromPlayer(shooter)).team)) return;
+        if ((participant.team).equals(participantShooter.team)) return;
 
         Vector snowballVelocity = e.getEntity().getVelocity();
 
@@ -146,12 +167,28 @@ public class PaintdownListener implements Listener {
                 if (p.getIsPainted()) deadTeammates++;
             }
             if (deadTeammates == paintdown.mcc.teamList.get(participant.teamIndex).size()) {
-                Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.team + " have been eliminated!");
                 paintdown.eliminateTeam(participant.teamIndex);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.team + " have been eliminated!");
+                    }
+                }, 60);
                 return;
             }
             // Died but teammates are alive
             hitPlayer.setHealth(20);
+
+            // Only send death messages to involved players (shooter's team and hit player's team)
+            for (Participant p : paintdown.mcc.teamList.get(participant.teamIndex)) {
+                p.player.sendMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was painted by "
+                        + participantShooter.teamPrefix + participantShooter.chatColor + participantShooter.ign);
+            }
+            for (Participant p : paintdown.mcc.teamList.get(participantShooter.teamIndex)) {
+                p.player.sendMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was painted by "
+                        + participantShooter.teamPrefix + participantShooter.chatColor + participantShooter.ign);
+            }
+
         } else if (!(participant.getIsPainted())) {
             hitPlayer.damage(10);
             hitPlayer.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
@@ -201,17 +238,69 @@ public class PaintdownListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         if (!(paintdown.getState().equals("PLAYING"))) { return; }
-        // Right now, if a player joins during a game and moves, it will spam "This player is not on a team" since they are not on a team
-        if (!(Objects.requireNonNull(Participant.findParticipantFromPlayer(e.getPlayer())).getIsPainted())) return;
 
-        e.setCancelled(true);
-        e.setTo(e.getPlayer().getLocation());
+        if ((Objects.requireNonNull(Participant.findParticipantFromPlayer(e.getPlayer())).getIsPainted())) {
+            e.setCancelled(true);
+            e.setTo(e.getPlayer().getLocation());
+            return;
+        }
+        Player p = e.getPlayer();
+        Participant participant = Participant.findParticipantFromPlayer(p);
+        assert participant != null;
+        if (p.getLocation().getY() < -30 ) {
+            p.setGameMode(GameMode.SPECTATOR);
+            // if necessary in the future we will prevent
+            // early spec'ing
+            // p.setSpectatorTarget();
+            Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " fell into molten lava");
+
+            int deadTeammates = 0;
+            for (Participant indexP : paintdown.mcc.teamList.get(participant.teamIndex)) {
+                if (indexP.getIsPainted()) deadTeammates++;
+            }
+            if (deadTeammates == paintdown.mcc.teamList.get(participant.teamIndex).size()) {
+                paintdown.eliminateTeam(participant.teamIndex);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.team + " have been eliminated!");
+                    }
+                }, 60);
+            }
+
+        }
+    }
+
+    @EventHandler()
+    public void onBlockBreak(BlockBreakEvent e) {
+        if (!(paintdown.getState().equals("PLAYING"))) {
+            return;
+        }
+
+        if (!(e.getBlock().getType().equals(Material.LODESTONE))) {
+            e.setCancelled(true);
+            return;
+        }
+
+        ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE);
+        if (!(e.getPlayer().getItemInUse().equals(item))) {
+            e.setCancelled(true);
+            return;
+        }
+
+        Participant brokeBlock = Participant.findParticipantFromPlayer(e.getPlayer());
+        assert brokeBlock != null;
+        for (Participant p : Participant.participantsOnATeam) {
+            if (p.teamIndex == brokeBlock.teamIndex) {
+                paintdown.mcc.scoreboardManager.addScore(paintdown.mcc.scoreboardManager.players.get(p.player.getUniqueId()), 1);
+            }
+        }
     }
 
     // Temporary
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
-        Bukkit.broadcastMessage("Uh, this really shouldn't happen");
+        if (!(paintdown.getState().equals("PLAYING"))) { return; }
         if (!(e.getPlayer().getWorld().equals(paintdown.world))) return;
 
         e.getPlayer().setGameMode(GameMode.SPECTATOR);

@@ -305,7 +305,6 @@ public class Skybattle {
         switch (this.getState()) {
             case "PLAYING":
                 if (time % 40 == 0 && time != 240 && time >= 60 && !finalShrink) {
-                    mcc.skybattle.border.setSize(mcc.skybattle.border.getSize() * 0.75, 15);
                     p.player.player.sendMessage(ChatColor.DARK_RED + "> Border is Shrinking!");
                     p.player.player.sendTitle(" ", ChatColor.RED + "Border shrinking!", 0, 20, 10);
                 } else if (((time - 10)) % 40 == 0 && !finalShrink) {
@@ -335,7 +334,9 @@ public class Skybattle {
     public void specialEvents(int time) {
         switch (this.getState()) {
             case "PLAYING":
-                if (time <= 75) {
+                if (time % 40 == 0 && time != 240 && time >= 60 && !finalShrink) {
+                    mcc.skybattle.border.setSize(mcc.skybattle.border.getSize() * 0.75, 15);
+                } else if (time <= 75) {
                     spawnParticles();
                     if (borderHeight >= 0)
                         borderHeight -= 0.22666667;

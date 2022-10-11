@@ -39,6 +39,7 @@ public class Participant {
     public long paintballCooldown = System.currentTimeMillis();
     public boolean isPainted = false;
     public boolean hasTelepick = false;
+    public int availablePotions = 3;
 
     public Participant(Player player) {
         this.player = player;

@@ -718,6 +718,9 @@ public class ScoreboardManager {
             case "AceRace":
                 mcc.aceRace.endGame();
                 break;
+            case "Paintdown":
+                mcc.paintdown.timeEndEvents();
+                break;
             case "DD":
                 mcc.decisionDome.timerEnds();
                 break;
@@ -763,16 +766,15 @@ public class ScoreboardManager {
                         // Special Cases:
                         if (mcc.game.stage.equals("Skybattle")) {
                             mcc.skybattle.timedEventsHandler(timer, p);
-                        }
-                        /*
-                        else if (mcc.game.stage.equals("Paintdown")) {
+                        } else if (mcc.game.stage.equals("Paintdown")) {
                             mcc.paintdown.timedEventsHandler(timer, p);
                         }
-                         */
                     }
                     // Events that shouldn't loop for each player
                     if (mcc.game.stage.equals("Skybattle")) {
                         mcc.skybattle.specialEvents(timer);
+                    } else if (mcc.game.stage.equals("Paintdown")) {
+                        mcc.paintdown.specialEvents(timer);
                     }
                 }
                 else if (timer == 0) {
