@@ -72,7 +72,6 @@ public class Dodgebolt {
         switch (team1) {
             case "RedRabbits":
               world.getBlockAt(new Location(world,48, 23, -14)).setType(Material.REDSTONE_BLOCK);
-              System.out.println("hi its me cam");
               break;
             case "GreenGuardians":
               world.getBlockAt(new Location(world,48, 23, -8)).setType(Material.REDSTONE_BLOCK);
@@ -276,7 +275,7 @@ public class Dodgebolt {
 
     public void matchStart() {
         stage="Playing";
-        a1 = (Arrow) world.spawnEntity(new Location(world, -6.5, 20, -0.5), EntityType.ARROW);
+        a1 = (Arrow) world.spawnEntity(new Location(world, -5.5, 20, 0.5), EntityType.ARROW);
         a1.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
         a2 = (Arrow) world.spawnEntity(new Location(world, 6.5, 20, 0.5), EntityType.ARROW);
         a2.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
