@@ -72,51 +72,43 @@ public class Dodgebolt {
         switch (team1) {
             case "RedRabbits":
               world.getBlockAt(new Location(world,48, 23, -14)).setType(Material.REDSTONE_BLOCK);
-          }
-        switch (team1) {
+              break;
             case "GreenGuardians":
               world.getBlockAt(new Location(world,48, 23, -8)).setType(Material.REDSTONE_BLOCK);
-          }
-        switch (team1) {
+              break;
             case "Yellow Yaks":
               world.getBlockAt(new Location(world,48, 23, -2)).setType(Material.REDSTONE_BLOCK);
-          }
-        switch (team1) {
+              break;
             case "BlueBats":
               world.getBlockAt(new Location(world,48, 23, 4)).setType(Material.REDSTONE_BLOCK);
-          }
-        switch (team1) {
+              break;
             case "PurplePandas":
               world.getBlockAt(new Location(world,48, 23, 10)).setType(Material.REDSTONE_BLOCK);
-          }
-        switch (team1) {
+              break;
             case "PinkParrots":
               world.getBlockAt(new Location(world,48, 23, 16)).setType(Material.REDSTONE_BLOCK);
+              break;
           }
 
         switch (team2) {
             case "RedRabbits":
               world.getBlockAt(new Location(world,-48, 23, -14)).setType(Material.REDSTONE_BLOCK);
-          }
-        switch (team2) {
+              break;
             case "GreenGuardians":
               world.getBlockAt(new Location(world,-48, 23, -8)).setType(Material.REDSTONE_BLOCK);
-          }
-        switch (team2) {
+              break;
             case "Yellow Yaks":
               world.getBlockAt(new Location(world,-48, 23, -2)).setType(Material.REDSTONE_BLOCK);
-          }
-        switch (team2) {
+              break;
             case "BlueBats":
               world.getBlockAt(new Location(world,-48, 23, 4)).setType(Material.REDSTONE_BLOCK);
-          }
-        switch (team2) {
+              break;
             case "PurplePandas":
               world.getBlockAt(new Location(world,-48, 23, 10)).setType(Material.REDSTONE_BLOCK);
-          }
-        switch (team2) {
+              break;
             case "PinkParrots":
               world.getBlockAt(new Location(world,-48, 23, 16)).setType(Material.REDSTONE_BLOCK);
+              break;
           }
 
         for (Entity e : world.getEntities()) {
