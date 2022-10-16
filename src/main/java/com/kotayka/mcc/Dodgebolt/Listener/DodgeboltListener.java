@@ -102,7 +102,7 @@ public class DodgeboltListener implements Listener {
 
     @EventHandler
     public void ArrowHit(ProjectileHitEvent event) {
-        if (event.getEntity().getType().equals(EntityType.ARROW)) {
+        if (event.getEntity().getType().equals(EntityType.ARROW) && event.getHitBlock() == null) {
             if (event.getHitBlock().getLocation().getBlockY() >= 18) {
                 if (event.getHitBlock().getLocation().getBlockX() >= 0) {
                     Arrow a1 = (Arrow) dodgebolt.world.spawnEntity(new Location(dodgebolt.world, 6.5, 20, -0.5), EntityType.ARROW);
