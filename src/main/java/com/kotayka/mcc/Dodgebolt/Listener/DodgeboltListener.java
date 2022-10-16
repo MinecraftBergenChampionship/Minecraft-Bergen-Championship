@@ -109,9 +109,10 @@ public class DodgeboltListener implements Listener {
                     a1.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
                 }
                 else {
-                    Arrow a1 = (Arrow) dodgebolt.world.spawnEntity(new Location(dodgebolt.world, -6.5, 20, -0.5), EntityType.ARROW);
+                    Arrow a1 = (Arrow) dodgebolt.world.spawnEntity(new Location(dodgebolt.world, -5.5, 20, 0.5), EntityType.ARROW);
                     a1.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
                 }
+                event.getEntity().remove();
             }
         }
     }

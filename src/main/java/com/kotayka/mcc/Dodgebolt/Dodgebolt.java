@@ -76,7 +76,7 @@ public class Dodgebolt {
             case "GreenGuardians":
               world.getBlockAt(new Location(world,48, 23, -8)).setType(Material.REDSTONE_BLOCK);
               break;
-            case "Yellow Yaks":
+            case "YellowYaks":
               world.getBlockAt(new Location(world,48, 23, -2)).setType(Material.REDSTONE_BLOCK);
               break;
             case "BlueBats":
@@ -97,7 +97,7 @@ public class Dodgebolt {
             case "GreenGuardians":
               world.getBlockAt(new Location(world,-48, 23, -8)).setType(Material.REDSTONE_BLOCK);
               break;
-            case "Yellow Yaks":
+            case "YellowYaks":
               world.getBlockAt(new Location(world,-48, 23, -2)).setType(Material.REDSTONE_BLOCK);
               break;
             case "BlueBats":
