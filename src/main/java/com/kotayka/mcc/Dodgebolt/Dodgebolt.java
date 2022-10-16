@@ -69,6 +69,56 @@ public class Dodgebolt {
         team11=team1;
         team22=team2;
 
+        switch (team1) {
+            case "RedRabbits":
+              world.getBlockAt(new Location(world,48, 23, -14)).setType(Material.REDSTONE_BLOCK);
+          }
+        switch (team1) {
+            case "GreenGuardians":
+              world.getBlockAt(new Location(world,48, 23, -8)).setType(Material.REDSTONE_BLOCK);
+          }
+        switch (team1) {
+            case "Yellow Yaks":
+              world.getBlockAt(new Location(world,48, 23, -2)).setType(Material.REDSTONE_BLOCK);
+          }
+        switch (team1) {
+            case "BlueBats":
+              world.getBlockAt(new Location(world,48, 23, 4)).setType(Material.REDSTONE_BLOCK);
+          }
+        switch (team1) {
+            case "PurplePandas":
+              world.getBlockAt(new Location(world,48, 23, 10)).setType(Material.REDSTONE_BLOCK);
+          }
+        switch (team1) {
+            case "PinkParrots":
+              world.getBlockAt(new Location(world,48, 23, 16)).setType(Material.REDSTONE_BLOCK);
+          }
+
+        switch (team2) {
+            case "RedRabbits":
+              world.getBlockAt(new Location(world,-48, 23, -14)).setType(Material.REDSTONE_BLOCK);
+          }
+        switch (team2) {
+            case "GreenGuardians":
+              world.getBlockAt(new Location(world,-48, 23, -8)).setType(Material.REDSTONE_BLOCK);
+          }
+        switch (team2) {
+            case "Yellow Yaks":
+              world.getBlockAt(new Location(world,-48, 23, -2)).setType(Material.REDSTONE_BLOCK);
+          }
+        switch (team2) {
+            case "BlueBats":
+              world.getBlockAt(new Location(world,-48, 23, 4)).setType(Material.REDSTONE_BLOCK);
+          }
+        switch (team2) {
+            case "PurplePandas":
+              world.getBlockAt(new Location(world,-48, 23, 10)).setType(Material.REDSTONE_BLOCK);
+          }
+        switch (team2) {
+            case "PinkParrots":
+              world.getBlockAt(new Location(world,-48, 23, 16)).setType(Material.REDSTONE_BLOCK);
+          }
+
         for (Entity e : world.getEntities()) {
             if (e.getType().equals(EntityType.ARROW)) {
                 e.remove();
