@@ -4,10 +4,7 @@ import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import org.bukkit.*;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -145,8 +142,14 @@ public class Dodgebolt {
     }
 
     public void roundOver(String team) {
-        mcc.scoreboardManager.dodgeboltTimer();
-        changeScoreboard();
+        if (team1Wins==3 || team2Wins==3) {
+            Bukkit.broadcastMessage("Game Over");
+        }
+        else {
+            mcc.scoreboardManager.dodgeboltTimer();
+            changeScoreboard();
+        }
+
     }
 
     public void resetWorld() {
@@ -172,9 +175,15 @@ public class Dodgebolt {
             p.player.player.getInventory().clear();
             p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10000000, 255, false, false));
             p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 10000000, 255, false, false));
-            p.player.player.teleport(team1Locs.get(team2SpawnLoc));
+            p.player.player.teleport(team2Locs.get(team2SpawnLoc));
             p.player.player.getInventory().addItem(new ItemStack(Material.BOW));
             team2SpawnLoc++;
+        }
+
+        for (Entity cur : world.getEntities()) {
+            if (cur instanceof Item || cur instanceof Arrow){//make sure we aren't deleting mobs/players
+                cur.remove();//remove it
+            }
         }
 
         if (taskID[0] != -1) {

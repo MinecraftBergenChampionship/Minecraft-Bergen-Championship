@@ -11,6 +11,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -90,7 +93,7 @@ public class DodgeboltListener implements Listener {
     @EventHandler
     public void dropItem(PlayerDropItemEvent event) {
         if (mcc.game.stage.equals("Dodgebolt")) {
-            if (event.getItemDrop().getType().equals(Material.BOW)) {
+            if (event.getItemDrop().getItemStack().getType().equals(Material.BOW)) {
                 event.setCancelled(true);
             }
         }
@@ -107,6 +110,21 @@ public class DodgeboltListener implements Listener {
                     dodgebolt.world.spawnEntity(new Location(dodgebolt.world, -6.5, 20, -0.5), EntityType.ARROW);
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void Damage(EntityDamageByEntityEvent event) {
+        if(event.getEntity() instanceof Player && event.getDamager() instanceof Arrow) {
+            dodgebolt.world.dropItemNaturally(event.getEntity().getLocation(), new ItemStack(Material.ARROW));
+            playerDied((Player) event.getEntity());
+        }
+    }
+
+    @EventHandler
+    public void blockBreak(BlockBreakEvent event) {
+        if (mcc.game.stage.equals("Dodgebolt")) {
+            event.setCancelled(true);
         }
     }
 }
