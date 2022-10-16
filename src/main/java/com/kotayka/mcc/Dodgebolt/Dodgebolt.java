@@ -72,6 +72,7 @@ public class Dodgebolt {
         switch (team1) {
             case "RedRabbits":
               world.getBlockAt(new Location(world,48, 23, -14)).setType(Material.REDSTONE_BLOCK);
+              System.out.println("hi its me cam");
               break;
             case "GreenGuardians":
               world.getBlockAt(new Location(world,48, 23, -8)).setType(Material.REDSTONE_BLOCK);
