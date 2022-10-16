@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -102,12 +103,14 @@ public class DodgeboltListener implements Listener {
     @EventHandler
     public void ArrowHit(ProjectileHitEvent event) {
         if (event.getEntity().getType().equals(EntityType.ARROW)) {
-            if (event.getHitBlock().getLocation().getBlockY() >= 21) {
+            if (event.getHitBlock().getLocation().getBlockY() >= 18) {
                 if (event.getHitBlock().getLocation().getBlockX() >= 0) {
-                    dodgebolt.world.spawnEntity(new Location(dodgebolt.world, 6.5, 20, -0.5), EntityType.ARROW);
+                    Arrow a1 = (Arrow) dodgebolt.world.spawnEntity(new Location(dodgebolt.world, 6.5, 20, -0.5), EntityType.ARROW);
+                    a1.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
                 }
                 else {
-                    dodgebolt.world.spawnEntity(new Location(dodgebolt.world, -6.5, 20, -0.5), EntityType.ARROW);
+                    Arrow a1 = (Arrow) dodgebolt.world.spawnEntity(new Location(dodgebolt.world, -6.5, 20, -0.5), EntityType.ARROW);
+                    a1.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
                 }
             }
         }
