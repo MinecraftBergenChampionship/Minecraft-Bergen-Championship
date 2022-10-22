@@ -5,7 +5,10 @@ import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Game;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -115,6 +118,10 @@ public class Instructions {
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
             p.player.player.teleport(spawnCoords.get(game));
             mcc.scoreboardManager.createInstructionScoreboard(p);
+            p.player.player.setGameMode(GameMode.ADVENTURE);
+            p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
+            p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
+            p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 255, false, false));
         }
         mcc.scoreboardManager.startTimerForGame(60, "game");
         taskId[0] = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(mcc.plugin, new Runnable() {

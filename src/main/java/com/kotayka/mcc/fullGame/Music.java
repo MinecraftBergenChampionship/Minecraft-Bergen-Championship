@@ -44,9 +44,9 @@ public class Music {
         durations.put("BSABM", 250);
         durations.put("DD", 134);
         durations.put("Dodgebolt", 217);
-        durations.put("Paintdown", 294);
+        durations.put("Paintdown", 260);
         durations.put("SG", 248);
-        durations.put("Skybattle", 254);
+        durations.put("Skybattle", 260);
         durations.put("TGTTOS", 124);
     }
 
@@ -70,8 +70,8 @@ public class Music {
             public void run() {
                 if (timer <= 0) {
                     if (mcc.game.stage.equals(game)) {
-                    Bukkit.broadcastMessage("Sound playing again");
-                    resetSound(game);
+                        Bukkit.broadcastMessage("Sound playing again");
+                        resetSound(game);
                     }
                     this.cancel();
                 }

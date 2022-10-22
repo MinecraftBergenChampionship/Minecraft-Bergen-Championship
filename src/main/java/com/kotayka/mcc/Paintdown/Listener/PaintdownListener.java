@@ -3,6 +3,7 @@ package com.kotayka.mcc.Paintdown.Listener;
 import com.kotayka.mcc.Paintdown.Paintdown;
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.mainGame.manager.Participant;
+import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
@@ -80,7 +81,7 @@ public class PaintdownListener implements Listener {
                     @Override
                     public void run() {
                         if (paintdown.getState().equals("PLAYING") && player.getGameMode() == GameMode.SURVIVAL) {
-                            ItemStack potion = new ItemStack(Material.SPLASH_POTION, 3);
+                            ItemStack potion = new ItemStack(Material.SPLASH_POTION, 1);
                             PotionMeta meta = (PotionMeta)potion.getItemMeta();
                             assert meta != null;
                             meta.setColor(Color.BLUE);
@@ -101,11 +102,10 @@ public class PaintdownListener implements Listener {
         // If we hit a terracotta block, paint it //
         if (e.getHitBlock() != null) {
             Block b = e.getHitBlock();
-
             assert e.getEntity().getShooter() instanceof Player;
             Player shooter = (Player) e.getEntity().getShooter();
             Participant participant = Participant.findParticipantFromPlayer(shooter);
-            if (b.toString().endsWith("Terracotta")) {
+            if (b.getType().toString().endsWith("TERRACOTTA")) {
                 // Not sure if runtime is same as if we use an arraylist,
                 // might change later for memory conservation
                 if (!(paintdown.paintedBlocks.containsKey(b.getLocation()))) {
@@ -163,18 +163,21 @@ public class PaintdownListener implements Listener {
             }
             // Check if whole team died
             int deadTeammates = 0;
-            for (Participant p : paintdown.mcc.teamList.get(participant.teamIndex)) {
-                if (p.getIsPainted()) deadTeammates++;
+            for (Participant indexP : paintdown.mcc.teamList.get(participant.teamIndex)) {
+                if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR)) deadTeammates++;
             }
             if (deadTeammates == paintdown.mcc.teamList.get(participant.teamIndex).size()) {
                 paintdown.eliminateTeam(participant.teamIndex);
+
+                for (Participant indexP : paintdown.mcc.teamList.get(participant.teamIndex)) {
+                    if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR)) indexP.setIsPainted(false);
+                }
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                     @Override
                     public void run() {
                         Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.team + " have been eliminated!");
                     }
                 }, 60);
-                return;
             }
             // Died but teammates are alive
             hitPlayer.setHealth(20);
@@ -247,7 +250,7 @@ public class PaintdownListener implements Listener {
         Player p = e.getPlayer();
         Participant participant = Participant.findParticipantFromPlayer(p);
         assert participant != null;
-        if (p.getLocation().getY() < -30 ) {
+        if (p.getLocation().getY() < -30 && p.getGameMode().equals(GameMode.SURVIVAL)) {
             p.setGameMode(GameMode.SPECTATOR);
             // if necessary in the future we will prevent
             // early spec'ing
@@ -256,10 +259,14 @@ public class PaintdownListener implements Listener {
 
             int deadTeammates = 0;
             for (Participant indexP : paintdown.mcc.teamList.get(participant.teamIndex)) {
-                if (indexP.getIsPainted()) deadTeammates++;
+                if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR)) deadTeammates++;
             }
             if (deadTeammates == paintdown.mcc.teamList.get(participant.teamIndex).size()) {
                 paintdown.eliminateTeam(participant.teamIndex);
+
+                for (Participant indexP : paintdown.mcc.teamList.get(participant.teamIndex)) {
+                    if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR)) indexP.setIsPainted(false);
+                }
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                     @Override
                     public void run() {
@@ -282,8 +289,7 @@ public class PaintdownListener implements Listener {
             return;
         }
 
-        ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE);
-        if (!(e.getPlayer().getItemInUse().equals(item))) {
+        if (!(Objects.equals(Objects.requireNonNull(e.getPlayer().getItemInUse()).getType(), Material.DIAMOND_PICKAXE))) {
             e.setCancelled(true);
             return;
         }

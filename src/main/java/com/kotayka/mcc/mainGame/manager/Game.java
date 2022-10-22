@@ -47,7 +47,6 @@ public class Game {
 
     public void changeToActGame(String game) {
         stage=game;
-        Bukkit.broadcastMessage("game == " + game);
         music.startSound(game);
         switch (game) {
             case "TGTTOS":
