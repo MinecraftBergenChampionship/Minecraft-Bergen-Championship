@@ -370,8 +370,7 @@ public class Paintdown {
                 break;
             case "END_ROUND":
                 if (time == 9) {
-                    // rewardLastPlayers();
-                    Bukkit.broadcastMessage("We should reward the last players now");
+                    rewardLastPlayers();
                 } else if (time == 3) {
                     resetBorder();
                 }
@@ -470,15 +469,25 @@ public class Paintdown {
     // Give coins to last players
 
     public void rewardLastPlayers() {
+        List<String> survivorNames = new ArrayList<String>(1);
         for (Participant p : Participant.participantsOnATeam) {
             if (!deadList.contains(p.player.getUniqueId())) {
                 mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 15);
                 p.setIsPainted(false);
+                survivorNames.add(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE);
                 p.player.setAllowFlight(true);
                 p.player.sendMessage(ChatColor.GREEN+"You survived the round!");
                 p.player.setFlying(true);
                 p.player.setInvulnerable(true);
             }
+        }
+
+        if (survivorNames.size() <= 1) {
+            Bukkit.broadcastMessage("The winner of this round is: " + survivorNames.get(0) + "!");
+        } else {
+            StringJoiner joiner = new StringJoiner(", ");
+            survivorNames.forEach(item -> joiner.add(item.toString()));
+            Bukkit.broadcastMessage("The winners of this round are: " + joiner + "!");
         }
     }
 

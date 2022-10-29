@@ -366,14 +366,24 @@ public class Skybattle {
     }
 
     public void rewardLastPlayers() {
+        List<String> survivorNames = new ArrayList<String>(1);
         for (Participant p : Participant.participantsOnATeam) {
             if (!playersDeadList.contains(p.player.getUniqueId())) {
+                survivorNames.add(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE);
                 mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 15);
                 p.player.setAllowFlight(true);
                 p.player.sendMessage(ChatColor.GREEN+"You survived the round!");
                 p.player.setFlying(true);
                 p.player.setInvulnerable(true);
             }
+        }
+
+        if (survivorNames.size() <= 1) {
+            Bukkit.broadcastMessage("The winner of this round is: " + survivorNames.get(0) + "!");
+        } else {
+            StringJoiner joiner = new StringJoiner(", ");
+            survivorNames.forEach(item -> joiner.add(item.toString()));
+            Bukkit.broadcastMessage("The winners of this round are: " + joiner + "!");
         }
     }
 
