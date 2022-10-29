@@ -22,16 +22,16 @@ public class Players {
     public void getOnlinePlayers() {
         for(Player p : Bukkit.getOnlinePlayers()){
             players.add(p);
-            Participant x = new Participant(p);
+            Participant x = new Participant(p, mcc);
             participants.add(x);
         }
     }
 
     public void addPlayer(Player p) {
-        String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
-        List<String> team = new ArrayList<>(Arrays.asList(teamNames));
+        //String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
+        //List<String> team = new ArrayList<>(Arrays.asList(teamNames));
         players.add(p);
-        Participant x = new Participant(p);
+        Participant x = new Participant(p, mcc);
         participants.add(x);
         mcc.roundScores.put(p.getName(), 0);
     }

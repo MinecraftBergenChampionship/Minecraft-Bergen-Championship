@@ -44,7 +44,7 @@ public class Music {
         durations.put("BSABM", 250);
         durations.put("DD", 134);
         durations.put("Dodgebolt", 217);
-        durations.put("Paintdown", 260);
+        durations.put("Paintdown", 290);
         durations.put("SG", 248);
         durations.put("Skybattle", 260);
         durations.put("TGTTOS", 124);

@@ -9,8 +9,8 @@ import com.kotayka.mcc.Paintdown.Listener.PaintdownListener;
 import com.kotayka.mcc.Paintdown.Paintdown;
 import com.kotayka.mcc.DecisionDome.DecisionDome;
 import com.kotayka.mcc.DecisionDome.listeners.DecisionDomeListener;
-import com.kotayka.mcc.SG.SG;
-import com.kotayka.mcc.SG.listeners.SGListener;
+import com.kotayka.mcc.Skybattle.SG.SG;
+import com.kotayka.mcc.Skybattle.SG.listeners.SGListener;
 import com.kotayka.mcc.Skybattle.Skybattle;
 import com.kotayka.mcc.Skybattle.listeners.SkybattleListener;
 import com.kotayka.mcc.TGTTOS.TGTTOS;
@@ -41,7 +41,8 @@ public final class MCC extends JavaPlugin implements Listener {
     public ScoreboardManager manager = Bukkit.getScoreboardManager();
 
     public Map<String, Scoreboard> scoreboards = new HashMap<String, Scoreboard>();
-    public Map<String, Team[]> teams = new HashMap<String, Team[]>();
+    // retooled
+    public Map<String, List<Participant>> teams = new HashMap<String, List<Participant>>();
 
     public Plugin plugin = this;
 
@@ -55,7 +56,7 @@ public final class MCC extends JavaPlugin implements Listener {
     public int gameRound = 0;
 
 //  Team
-    public List<List<Participant>> teamList = new ArrayList<List<Participant>>(6);
+    //public List<List<Participant>> teamList = new ArrayList<List<Participant>>(6);
 
 //  Managers
     public final Players players = new Players(this);
@@ -103,19 +104,30 @@ public final class MCC extends JavaPlugin implements Listener {
         getCommand("world").setExecutor(new world());
         getCommand("checkbuild").setExecutor(new checkBuild(this));
 
-        List<Participant> redRabbits = new ArrayList<Participant>(4);
-        List<Participant> greenGuardians = new ArrayList<Participant>(4);
-        List<Participant> yellowYaks = new ArrayList<Participant>(4);
-        List<Participant> blueBats = new ArrayList<Participant>(4);
-        List<Participant> purplePandas = new ArrayList<Participant>(4);
-        List<Participant> pinkParrots = new ArrayList<Participant>(4);
 
-        teamList.add(redRabbits);
-        teamList.add(greenGuardians);
-        teamList.add(yellowYaks);
-        teamList.add(blueBats);
-        teamList.add(purplePandas);
-        teamList.add(pinkParrots);
+
+        List<Participant> red = new ArrayList<Participant>(4);
+        List<Participant> green = new ArrayList<Participant>(4);
+        List<Participant> yellow = new ArrayList<Participant>(4);
+        List<Participant> blue = new ArrayList<Participant>(4);
+        List<Participant> purple = new ArrayList<Participant>(4);
+        List<Participant> pink = new ArrayList<Participant>(4);
+
+        teams.put("Red Rabbits", red);
+        teams.put("Green Guardians", green);
+        teams.put("Yellow Yaks", yellow);
+        teams.put("Blue Bats", blue);
+        teams.put("Purple Pandas", purple);
+        teams.put("Pink Piglets", pink);
+
+        /*
+        probably unnecessary at this point
+        teamList.add(red);
+        teamList.add(green);
+        teamList.add(yellow);
+        teamList.add(blue);
+        teamList.add(purple);
+        teamList.add(pink);*/
 
         if (Bukkit.getWorld("world") != null) {
             spawnWorld = Bukkit.getWorld("world");

@@ -32,7 +32,7 @@ public class Paintdown {
 
     // Store painted blocks;
     // Location also stored for easy access
-    public Map<Location, Block> paintedBlocks = new HashMap<>(10);
+    public Map<Location, Material> paintedBlocks = new HashMap<>(10);
 
 // Items
     List<ItemStack> spawnItems;
@@ -40,6 +40,11 @@ public class Paintdown {
 // Coins
     public List<Location> coinLocations;
 
+// Players
+    public List<UUID> deadList = new ArrayList<UUID>();
+
+    // im gonna assume the original list remains unmutated
+    public Map<String, List<Participant>> aliveTeams;
 
     public Paintdown(Players players, MCC mcc) {
         this.players = players;
@@ -52,6 +57,10 @@ public class Paintdown {
         CENTER = new Location(world, 63, 0, 64);
         createCoinLocations();
         resetMap();
+
+        aliveTeams = mcc.teams;
+        // see if theres a way to get key from value
+        // so we can remove teams with nobody on them
     }
 
     /*
@@ -82,15 +91,17 @@ public class Paintdown {
 
         spawnPoints = Arrays.asList(spawnOne, spawnTwo, spawnThree, spawnFour, spawnFive, spawnSix);
 
+        setScatteredCoins();
+        setCoinCrates(Material.LODESTONE);
+        setMiddleCoins(Material.LODESTONE);
+
         assert world != null;
         border = world.getWorldBorder();
         border.setCenter(CENTER);
-        border.setSize(500);
+        //border.setSize(500);
         border.setDamageAmount(0.5);
         border.setDamageBuffer(0);
         border.setWarningDistance(5);
-
-        setCoinCrates();
     }
 
     public void createCoinLocations() {
@@ -158,11 +169,11 @@ public class Paintdown {
         rooms = Arrays.asList(coinRoomOne, coinRoomTwo, coinRoomThree, coinRoomFour, regularRoomOne, regularRoomTwo, regularRoomThree,
                 regularRoomFour, regularRoomFive, regularRoomSix, regularRoomSeven, regularRoomEight); */
 
-        setCoinCrates();
         startRound();
     }
 
     public void startRound() {
+        deadList.clear();
         String roundValue = ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+ roundNum + "/3";
         mcc.scoreboardManager.changeLine(22, roundValue);
 
@@ -172,15 +183,20 @@ public class Paintdown {
         // Randomly place each team at a different spawn
         List<Location> tempSpawns = new ArrayList<>(spawnPoints);
 
-        for (int i = 0; i < mcc.teamList.size(); i++) {
+        for (List<Participant> l : mcc.teams.values()) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
-            for (int j = 0; j < mcc.teamList.get(i).size(); j++) {
-                mcc.teamList.get(i).get(j).player.teleport(tempSpawns.get(randomNum));
+            for (Participant p : l) {
+                p.player.teleport(tempSpawns.get(randomNum));
             }
             tempSpawns.remove(randomNum);
         }
 
         for (Participant p : Participant.participantsOnATeam) {
+            // reset win effects
+            p.player.setInvulnerable(false);
+            p.player.setAllowFlight(false);
+            p.player.setFlying(false);
+
             p.player.getInventory().clear();
             p.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 2, false, false));
             p.player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 10000, 2, false, false));
@@ -221,6 +237,10 @@ public class Paintdown {
         replaceMiddleEntrance(Material.WHITE_STAINED_GLASS);
         replaceSpawnDoors(Material.WHITE_STAINED_GLASS);
         replaceMiddleCoinCage(Material.LIGHT_BLUE_STAINED_GLASS);
+        deadList.clear();
+        setMiddleCoins(Material.LODESTONE);
+        setCoinCrates(Material.LODESTONE);
+        setScatteredCoins();
 
         /*
         // Reset all unmined coin crates
@@ -229,7 +249,7 @@ public class Paintdown {
         }
          */
 
-        resetCoinCrates();
+        //resetCoinCrates();
 
         //rooms.clear();
         /*
@@ -275,10 +295,9 @@ public class Paintdown {
     /* Turn painted walls back to original state */
     public void cleanPaintOffWalls() {
         Bukkit.broadcastMessage("Cleaning paint...");
-        for (Map.Entry<Location, Block> entry : paintedBlocks.entrySet()) {
-            Block b = world.getBlockAt(entry.getKey());
-            b.setType(entry.getValue().getType());
-            world.setBlockData(entry.getKey(), entry.getValue().getBlockData());
+        for (Map.Entry<Location, Material> entry : paintedBlocks.entrySet()) {
+            world.getBlockAt(entry.getKey()).setType(entry.getValue());
+            //world.setBlockData(entry.getKey(), entry.getValue().getBlockData());
         }
         paintedBlocks.clear();
     }
@@ -289,13 +308,16 @@ public class Paintdown {
             case "PLAYING":
                 mcc.paintdown.setState("END_ROUND");
                 mcc.scoreboardManager.startTimerForGame(10, "Paintdown");
+                for (Participant p : Participant.participantsOnATeam) {
+                    p.player.setGameMode(GameMode.ADVENTURE);
+                }
                 break;
             case "STARTING":
                 replaceSpawnDoors(Material.AIR);
                 for (Participant p : Participant.participantsOnATeam) {
                     p.player.setGameMode(SURVIVAL);
                 }
-                mcc.scoreboardManager.startTimerForGame(240, "Paintdown");
+                mcc.scoreboardManager.startTimerForGame(270, "Paintdown");
                 setState("PLAYING");
                 break;
             case "END_ROUND":
@@ -321,6 +343,7 @@ public class Paintdown {
                 if (time == 9) {
                     p.player.player.sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!", null, 0, 20, 0);
                     p.player.player.sendMessage(ChatColor.BOLD+""+ChatColor.RED+"Round Over!");
+                    p.player.player.setGameMode(GameMode.ADVENTURE);
                 }
                 break;
         }
@@ -330,17 +353,17 @@ public class Paintdown {
     public void specialEvents(int time) {
         switch(this.getState()) {
             case "PLAYING":
-                if (time == 265) {
+                if (time == 225) {
                     Bukkit.broadcastMessage(ChatColor.BOLD + "> Coin Crates will open in 15 seconds!");
-                } else if (time == 240) {
+                } else if (time == 210) {
                     Bukkit.broadcastMessage(ChatColor.AQUA + "> Coin Crates have been opened!");
                     replaceCoinCage(Material.AIR);
                 } else if (time == 180) {
                     Bukkit.broadcastMessage(ChatColor.BOLD + "> Doors to the middle room are now open!");
                     replaceMiddleEntrance(Material.AIR);
-                } else if (time == 135) {
+                } else if (time == 105) {
                   Bukkit.broadcastMessage(ChatColor.BOLD + "> The middle coin crate will open in 15 seconds!");
-                } else if (time == 120) {
+                } else if (time == 90) {
                     Bukkit.broadcastMessage(ChatColor.AQUA + "> The middle coin crate is now open!");
                     replaceMiddleCoinCage(Material.AIR);
                 }
@@ -410,40 +433,33 @@ public class Paintdown {
     public void replaceCoinCage(Material m) {
         // Sides
         for (int y = -6; y <= -4; y++) {
-            for (int z = 11; z <= 15; z++) { Location l = new Location(world, 112, y, z); l.getBlock().setType(m); }
-            for (int z = 113; z <= 117; z++) { Location l = new Location(world, 112, y, z); l.getBlock().setType(m); }
-            for (int z = 11; z <= 15; z++) { Location l = new Location(world, 116, y, z); l.getBlock().setType(m); }
-            for (int z = 113; z <= 116; z++) { Location l = new Location(world, 116, y, z); l.getBlock().setType(m); }
-            for (int x = 112; x <= 116; x++){ Location l = new Location(world, x, y, 117); l.getBlock().setType(m); }
-            for (int x = 10; x <= 14; x++) { Location l = new Location(world, x, y, 117); l.getBlock().setType(m); }
-            for (int z = 113; z <= 117; z++) { Location l = new Location(world, 14, y, z); l.getBlock().setType(m); }
-            for (int z = 11; z <= 15; z++) { Location l = new Location(world, 14, y, z); l.getBlock().setType(m); }
-            for (int x = 10; x <= 14; x++) { Location l = new Location(world, x, y, 11); l.getBlock().setType(m); }
-            for (int x = 112; x <= 116; x++) { Location l = new Location(world, x, y, 11); l.getBlock().setType(m); }
-            for (int x = 113; x <= 116; x++) { Location l = new Location(world, x, y, 15); l.getBlock().setType(m); }
-            for (int x = 10; x <= 13; x++) { Location l = new Location(world, x, y, 15); l.getBlock().setType(m); }
+            for (int z = 11; z <= 15; z++)   { world.getBlockAt(112, y, z).setType(m); }
+            for (int z = 113; z <= 117; z++) { world.getBlockAt(112, y, z).setType(m); }
+            for (int z = 11; z <= 15; z++)   { world.getBlockAt(116, y, z).setType(m); }
+            for (int z = 113; z <= 116; z++) { world.getBlockAt(116, y, z).setType(m); }
+            for (int z = 12; z <= 14; z++)   { world.getBlockAt(10, y, z).setType(m);  }
+            for (int z = 113; z <= 116; z++) { world.getBlockAt(10, y, z).setType(m);  }
+            for (int z = 113; z <= 117; z++) { world.getBlockAt(14, y, z).setType(m);  }
+            for (int z = 11; z <= 15; z++)   { world.getBlockAt(14, y, z).setType(m);  }
+            for (int x = 11; x <= 13; x++)   { world.getBlockAt(x, y, 113).setType(m); }
+            for (int x = 113; x <= 115; x++) { world.getBlockAt(x, y, 113).setType(m); }
+            for (int x = 112; x <= 116; x++) { world.getBlockAt(x, y, 117).setType(m); }
+            for (int x = 10; x <= 14; x++)   { world.getBlockAt(x, y, 117).setType(m); }
+            for (int x = 10; x <= 14; x++)   { world.getBlockAt(x, y, 11).setType(m);  }
+            for (int x = 112; x <= 116; x++) { world.getBlockAt(x, y, 11).setType(m);  }
+            for (int x = 113; x <= 115; x++) { world.getBlockAt(x, y, 15).setType(m);  }
+            for (int x = 10; x <= 13; x++)   { world.getBlockAt(x, y, 15).setType(m);  }
         }
 
         // Roof
         for (int z = 12; z <= 14; z++) {
-            for (int x = 11; x <= 13; x++) {
-                Location l = new Location(world, x, -4, z); l.getBlock().setType(m);
-            }
-            for (int x = 113; x <= 115; x++) {
-                Location l = new Location(world, x, -4, z); l.getBlock().setType(m);
-            }
+            for (int x = 11; x <= 13; x++) { world.getBlockAt(x, -4, z).setType(m); }
+            for (int x = 113; x <= 115; x++) { world.getBlockAt(x, -4, z).setType(m); }
         }
 
         for (int z = 114; z <= 116; z++) {
-            for (int x = 113; x <= 116; x++) {
-                Location l = new Location(world, x, -4, z);
-                l.getBlock().setType(m);
-            }
-
-            for (int x = 11; x <= 13; x++) {
-                Location l = new Location(world, x, -4, z);
-                l.getBlock().setType(m);
-            }
+            for (int x = 113; x <= 116; x++) { world.getBlockAt(x, -4, z).setType(m); }
+            for (int x = 11; x <= 13; x++) { world.getBlockAt(x, -4, z).setType(m); }
         }
     }
 
@@ -452,18 +468,19 @@ public class Paintdown {
     }
 
     // Give coins to last players
-    /*
+
     public void rewardLastPlayers() {
         for (Participant p : Participant.participantsOnATeam) {
-            if (!playersDeadList.contains(p.player.getUniqueId())) {
+            if (!deadList.contains(p.player.getUniqueId())) {
                 mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 15);
+                p.setIsPainted(false);
                 p.player.setAllowFlight(true);
                 p.player.sendMessage(ChatColor.GREEN+"You survived the round!");
                 p.player.setFlying(true);
                 p.player.setInvulnerable(true);
             }
         }
-    } */
+    }
 
 
     /*
@@ -519,43 +536,21 @@ public class Paintdown {
     // Open/Close Spawn Doors
     public void replaceSpawnDoors(Material m) {
         for (int y = 0; y <= 2; y++) {
-            for (int z = 62; z <= 66; z++) {
-                Location l = new Location(world, 139, y, z);
-                l.getBlock().setType(m);
-            }
-
-            for (int x = 163; x <= 167; x++) {
-                Location l = new Location(world, x, y, -12);
-                l.getBlock().setType(m);
-            }
-
-            for (int x = 163; x <= 167; x++) {
-                Location l = new Location(world, x, y, 140);
-                l.getBlock().setType(m);
-            }
-
-            for (int x = -41; x <= -37; x++) {
-                Location l = new Location(world, x, y, 140);
-                l.getBlock().setType(Material.AIR);
-            }
-
-            for (int z = 62; z <= 66; z++) {
-                Location l = new Location(world, -13, y, z);
-                l.getBlock().setType(m);
-            }
-
-            for (int x = -41; x <= -37; x++) {
-                Location l = new Location(world, x, y, -12);
-                l.getBlock().setType(m);
-            }
+            for (int z = 62; z <= 66; z++) { world.getBlockAt(139, y, z).setType(m); }
+            for (int x = 163; x <= 167; x++) { world.getBlockAt(x, y, -12).setType(m); }
+            for (int x = 163; x <= 167; x++) {world.getBlockAt(x, y, 140).setType(m); }
+            for (int x = -41; x <= -37; x++) { world.getBlockAt(x, y, 140).setType(m); }
+            for (int z = 62; z <= 66; z++) { world.getBlockAt(-13, y, z).setType(m); }
+            for (int x = -41; x <= -37; x++) { world.getBlockAt(x, y, -12).setType(m); }
         }
     }
 
 
     // Eliminate team
     public void eliminateTeam(int index) {
-        for (Participant p : mcc.teamList.get(index)) {
+        for (Participant p : mcc.teams.get(Participant.indexToName(index))) {
             p.player.sendTitle(ChatColor.RED + "TEAM PAINTED", null, 0, 60, 40);
+            deadList.add(p.player.getUniqueId());
             Bukkit.getScheduler().scheduleSyncDelayedTask(mcc.plugin, new Runnable() {
                 @Override
                 public void run() {
@@ -565,15 +560,75 @@ public class Paintdown {
                 }
             }, 60);
         }
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(mcc.plugin, new Runnable() {
+            @Override
+            public void run() {
+                // could do double loop to tradeoff some speed for not having to make deadList
+                // too lazy, but maybe in the future
+                for (Participant p : Participant.participantsOnATeam) {
+                    if (!(deadList.contains(p.player.getUniqueId()))) {
+                        mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 4);
+                    }
+                }
+            }
+        }, 60);
+
+        aliveTeams.remove(Participant.indexToName(index));
+
+        // Case where event has less than 6 teams
+        int living = 0;
+        for (List<Participant> l : mcc.teams.values()) {
+            if (l.size() == 0) continue;
+            living++;
+        }
+
+        if (living == 1) {
+            mcc.scoreboardManager.timer = 0;
+        }
     }
 
+    // Set coin crates in middle
+    public void setMiddleCoins(Material m) {
+        for (int y = -12; y <= -11; y++) {
+            for (int x = 62; x <= 64; x++) {
+                for (int z = 63; z <= 65; z++) {
+                    world.getBlockAt(x, y, z).setType(m);
+                }
+            }
+        }
+    }
+
+    // Set coin crates (not in middle)
+    public void setCoinCrates(Material m) {
+        for (int y = -6; y <=-5; y++) {
+            for (int z = 12; z <= 14; z++) {
+                for (int x = 113; x <= 115; x++) {
+                    world.getBlockAt(x, y, z).setType(m);
+                    world.getBlockAt(x-102, y, z).setType(m);
+                }
+            }
+
+            // do note i swapped the + and - 102 on this one
+            // there is no reason i just went to the other one first
+            // to get coordinates.  this is peak design trust
+            for (int z = 114; z <= 116; z++) {
+                for (int x = 11; x <= 13; x++) {
+                    world.getBlockAt(x, y, z).setType(m);
+                    world.getBlockAt(x+102, y, z).setType(m);
+                }
+            }
+        }
+    }
+
+/*
     public void resetCoinCrates() {
         for (Location l : coinLocations) {
             l.getBlock().setType(Material.AIR);
         }
-    }
+    }*/
 
-    public void setCoinCrates() {
+    public void setScatteredCoins() {
         for (Location l : coinLocations) {
             l.getBlock().setType(Material.LODESTONE);
         }

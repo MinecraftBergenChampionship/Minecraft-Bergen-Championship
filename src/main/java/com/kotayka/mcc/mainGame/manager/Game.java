@@ -4,7 +4,7 @@ import com.kotayka.mcc.AceRace.AceRace;
 import com.kotayka.mcc.BSABM.BSABM;
 import com.kotayka.mcc.Paintdown.Paintdown;
 import com.kotayka.mcc.DecisionDome.DecisionDome;
-import com.kotayka.mcc.SG.SG;
+import com.kotayka.mcc.Skybattle.SG.SG;
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.Skybattle.Skybattle;
 import com.kotayka.mcc.TGTTOS.TGTTOS;

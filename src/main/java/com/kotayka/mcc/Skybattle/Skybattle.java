@@ -245,10 +245,10 @@ public class Skybattle {
         // Randomly place each team at a different spawn
         List<Location> tempSpawns = new ArrayList<>(spawnPoints);
 
-        for (int i = 0; i < mcc.teamList.size(); i++) {
+        for (List<Participant> l : mcc.teams.values()) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
-            for (int j = 0; j < mcc.teamList.get(i).size(); j++) {
-                mcc.teamList.get(i).get(j).player.teleport(tempSpawns.get(randomNum));
+            for (Participant p : l) {
+                p.player.teleport(tempSpawns.get(randomNum));
             }
             tempSpawns.remove(randomNum);
         }

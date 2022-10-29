@@ -22,6 +22,8 @@ import java.util.Objects;
 public class Participant {
     public int totalCoins;
     public int roundCoins;
+    public final MCC mcc;
+
     public String team = "Spectator";
     public Color color = Color.WHITE;
     public ChatColor chatColor = ChatColor.GRAY;
@@ -36,14 +38,19 @@ public class Participant {
 
     public final Player player;
     public String ign;
+
+    // Eventually will probably move to separate class
+    // but that requires effort
     public long paintballCooldown = System.currentTimeMillis();
     public boolean isPainted = false;
     public boolean hasTelepick = false;
     public int availablePotions = 3;
+    public Player paintedBy;
 
-    public Participant(Player player) {
+    public Participant(Player player, MCC mcc) {
         this.player = player;
         this.ign = player.getName();
+        this.mcc = mcc;
     }
 /*
     public static void announceTeamDeath() {
@@ -140,36 +147,42 @@ public class Participant {
                 chatColor = ChatColor.RED;
                 teamPrefix = ChatColor.WHITE+"Ⓡ ";
                 teamIndex = 0;
+                mcc.teams.get("Red Rabbits").add(this);
                 break;
             case "YellowYaks":
                 color = Color.YELLOW;
                 chatColor = ChatColor.YELLOW;
                 teamPrefix = ChatColor.WHITE+"Ⓨ ";
                 teamIndex = 1;
+                mcc.teams.get("Yellow Yaks").add(this);
                 break;
             case "GreenGuardians":
                 color = Color.GREEN;
                 chatColor = ChatColor.GREEN;
                 teamPrefix = ChatColor.WHITE+"Ⓖ ";
                 teamIndex = 2;
+                mcc.teams.get("Green Guardians").add(this);
                 break;
             case "BlueBats":
                 color = Color.BLUE;
                 chatColor = ChatColor.BLUE;
                 teamPrefix = ChatColor.WHITE+"Ⓑ ";
                 teamIndex = 3;
+                mcc.teams.get("Blue Bats").add(this);
                 break;
             case "PurplePandas":
                 color = Color.PURPLE;
                 chatColor = ChatColor.DARK_PURPLE;
                 teamPrefix = ChatColor.WHITE+"Ⓤ ";
                 teamIndex = 4;
+                mcc.teams.get("Purple Pandas").add(this);
                 break;
             case "PinkPiglets":
                 color = Color.fromRGB(243, 139, 170);
                 chatColor = ChatColor.LIGHT_PURPLE;
                 teamPrefix = ChatColor.WHITE+"Ⓟ ";
                 teamIndex = 5;
+                mcc.teams.get("Pink Piglets").add(this);
                 break;
         }
     }
@@ -203,4 +216,26 @@ public class Participant {
     public long getCooldown() { return paintballCooldown; }
     public void setIsPainted(boolean b) { isPainted = b; }
     public boolean getIsPainted() { return isPainted; }
+    public void setPaintedBy(Player p) { paintedBy = p; }
+    public Player getPaintedBy() { return paintedBy; }
+
+    // not necessarily paintdown specific but for now yes
+    public static String indexToName(int index) {
+        switch(index) {
+            case 1:
+                return "Red Rabbits";
+            case 2:
+                return "Yellow Yaks";
+            case 3:
+                return "Green Guardians";
+            case 4:
+                return "Blue Bats";
+            case 5:
+                return "Purple Pandas";
+            case 6:
+                return "Pink Parrots";
+            default:
+                return "Invalid Index!";
+        }
+    }
 }
