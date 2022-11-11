@@ -56,12 +56,8 @@ public class Skybattle {
 
         lastDamage = new HashMap<>(players.players.size());
 
-        if (Bukkit.getWorld("Skybattle") == null) {
-            world = Bukkit.getWorld("world");
-        }
-        else {
-            world = Bukkit.getWorld("Skybattle");
-        }
+        // world = Bukkit.getWorld("Skybattle") unless null
+        world = Bukkit.getWorld("Skybattle") == null ? Bukkit.getWorld("world") : Bukkit.getWorld("Skybattle");
 
         CENTER = new Location(world, -157, 0, -266);
         KILLING_ZONE = new Location(world, -157, -100, -266);
@@ -249,10 +245,10 @@ public class Skybattle {
         // Randomly place each team at a different spawn
         List<Location> tempSpawns = new ArrayList<>(spawnPoints);
 
-        for (int i = 0; i < mcc.teamList.size(); i++) {
+        for (List<Participant> l : mcc.teams.values()) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
-            for (int j = 0; j < mcc.teamList.get(i).size(); j++) {
-                mcc.teamList.get(i).get(j).player.teleport(tempSpawns.get(randomNum));
+            for (Participant p : l) {
+                p.player.teleport(tempSpawns.get(randomNum));
             }
             tempSpawns.remove(randomNum);
         }
@@ -309,7 +305,6 @@ public class Skybattle {
         switch (this.getState()) {
             case "PLAYING":
                 if (time % 40 == 0 && time != 240 && time >= 60 && !finalShrink) {
-                    mcc.skybattle.border.setSize(mcc.skybattle.border.getSize() * 0.75, 15);
                     p.player.player.sendMessage(ChatColor.DARK_RED + "> Border is Shrinking!");
                     p.player.player.sendTitle(" ", ChatColor.RED + "Border shrinking!", 0, 20, 10);
                 } else if (((time - 10)) % 40 == 0 && !finalShrink) {
@@ -339,7 +334,9 @@ public class Skybattle {
     public void specialEvents(int time) {
         switch (this.getState()) {
             case "PLAYING":
-                if (time <= 75) {
+                if (time % 40 == 0 && time != 240 && time >= 60 && !finalShrink) {
+                    mcc.skybattle.border.setSize(mcc.skybattle.border.getSize() * 0.75, 15);
+                } else if (time <= 75) {
                     spawnParticles();
                     if (borderHeight >= 0)
                         borderHeight -= 0.22666667;
@@ -369,14 +366,24 @@ public class Skybattle {
     }
 
     public void rewardLastPlayers() {
+        List<String> survivorNames = new ArrayList<String>(1);
         for (Participant p : Participant.participantsOnATeam) {
             if (!playersDeadList.contains(p.player.getUniqueId())) {
+                survivorNames.add(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE);
                 mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 15);
                 p.player.setAllowFlight(true);
                 p.player.sendMessage(ChatColor.GREEN+"You survived the round!");
                 p.player.setFlying(true);
                 p.player.setInvulnerable(true);
             }
+        }
+
+        if (survivorNames.size() <= 1) {
+            Bukkit.broadcastMessage("The winner of this round is: " + survivorNames.get(0) + "!");
+        } else {
+            StringJoiner joiner = new StringJoiner(", ");
+            survivorNames.forEach(item -> joiner.add(item.toString()));
+            Bukkit.broadcastMessage("The winners of this round are: " + joiner + "!");
         }
     }
 

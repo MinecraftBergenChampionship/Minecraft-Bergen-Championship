@@ -479,6 +479,37 @@ public class ScoreboardManager {
         scoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
+    public void createPaintdownScoreboard(ScoreboardPlayer player) {
+        if (player.currentObj != null) {
+            player.currentObj.unregister();
+        }
+        Objective scoreboard = player.board.registerNewObjective("Paintdown", "dummy", ChatColor.BOLD + "" + ChatColor.YELLOW + "MCC");
+        player.objectiveMap.put("Paintdown", scoreboard);
+        Map<Integer, String> lines = new HashMap<>();
+        player.lines.put(scoreboard, lines);
+
+        scoreboard.getScore(ChatColor.BOLD + "" + ChatColor.AQUA + "Game: 0/8:" + ChatColor.WHITE + " Paintdown").setScore(23);
+        scoreboard.getScore(ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + "0:0").setScore(20);
+        scoreboard.getScore(ChatColor.RESET.toString()).setScore(19);
+        scoreboard.getScore(ChatColor.AQUA + "Game Coins:").setScore(15);
+        scoreboard.getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(3);
+        scoreboard.getScore(ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + "0").setScore(2);
+        scoreboard.getScore(ChatColor.YELLOW + "Your Coins: " + ChatColor.WHITE + "0").setScore(1);
+
+        GenerateTeamsRound(scoreboard, player);
+
+        player.lines.get(scoreboard).put(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Game: 0/8:" + ChatColor.WHITE + " Paintdown");
+        player.lines.get(scoreboard).put(20, ChatColor.BOLD + "" + ChatColor.RED + "Time left: " + ChatColor.WHITE + "0:0");
+        player.lines.get(scoreboard).put(19, ChatColor.RESET.toString());
+        player.lines.get(scoreboard).put(15, ChatColor.AQUA + "Game Coins:");
+        player.lines.get(scoreboard).put(3, ChatColor.RESET.toString() + ChatColor.RESET.toString());
+        player.lines.get(scoreboard).put(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + "0");
+        player.lines.get(scoreboard).put(1, ChatColor.YELLOW + "Your Coins: " + ChatColor.WHITE + "0");
+
+        player.currentObj = scoreboard;
+        scoreboard.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
+
     public void createDecisionDome(ScoreboardPlayer player) {
         if (player.currentObj != null) {
             player.currentObj.unregister();
@@ -687,6 +718,9 @@ public class ScoreboardManager {
             case "AceRace":
                 mcc.aceRace.endGame();
                 break;
+            case "Paintdown":
+                mcc.paintdown.timeEndEvents();
+                break;
             case "DD":
                 mcc.decisionDome.timerEnds();
                 break;
@@ -732,11 +766,15 @@ public class ScoreboardManager {
                         // Special Cases:
                         if (mcc.game.stage.equals("Skybattle")) {
                             mcc.skybattle.timedEventsHandler(timer, p);
+                        } else if (mcc.game.stage.equals("Paintdown")) {
+                            mcc.paintdown.timedEventsHandler(timer, p);
                         }
                     }
                     // Events that shouldn't loop for each player
                     if (mcc.game.stage.equals("Skybattle")) {
                         mcc.skybattle.specialEvents(timer);
+                    } else if (mcc.game.stage.equals("Paintdown")) {
+                        mcc.paintdown.specialEvents(timer);
                     }
                 }
                 else if (timer == 0) {

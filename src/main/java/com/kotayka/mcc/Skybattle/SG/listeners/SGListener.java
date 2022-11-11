@@ -1,7 +1,6 @@
-package com.kotayka.mcc.SG.listeners;
+package com.kotayka.mcc.Skybattle.SG.listeners;
 
-import com.kotayka.mcc.SG.SG;
-import com.kotayka.mcc.TGTTOS.managers.Firework;
+import com.kotayka.mcc.Skybattle.SG.SG;
 import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Game;
 import com.kotayka.mcc.mainGame.manager.Participant;
@@ -9,13 +8,10 @@ import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.ShulkerBox;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -23,8 +19,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Objects;
 
 public class SGListener implements Listener {
     private final SG sg;
