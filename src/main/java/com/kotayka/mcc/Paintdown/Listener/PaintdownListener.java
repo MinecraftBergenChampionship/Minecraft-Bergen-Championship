@@ -22,6 +22,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -55,7 +56,8 @@ public class PaintdownListener implements Listener {
         if (p.getIsPainted()) return;
 
         // Cooldown
-        if (player.getInventory().getItemInMainHand().getType().equals(Material.IRON_HORSE_ARMOR)) {
+        if (player.getInventory().getItemInMainHand().getType() == Material.IRON_HORSE_ARMOR ||
+            player.getInventory().getItemInOffHand().getType() == Material.IRON_HORSE_ARMOR) {
             long timeLeft = System.currentTimeMillis() - p.getCooldown();
             if (timeLeft >= 700) {
                 Snowball projectile = player.launchProjectile(Snowball.class);
@@ -69,7 +71,7 @@ public class PaintdownListener implements Listener {
         }
 
         // track potion usage + potion cooldown
-        if (player.getInventory().getItemInMainHand().getType() == Material.SPLASH_POTION ||
+        else if (player.getInventory().getItemInMainHand().getType() == Material.SPLASH_POTION ||
             player.getInventory().getItemInOffHand().getType() == Material.SPLASH_POTION) {
             p.availablePotions--;
 
@@ -88,6 +90,45 @@ public class PaintdownListener implements Listener {
                         }
                     }
                 }, 300);
+            }
+            return;
+        }
+
+        // Telepickaxe
+        else if (player.getInventory().getItemInMainHand().getType() == Material.WOODEN_PICKAXE) {
+            String teamName = Participant.indexToName(p.teamIndex);
+            long timeLeft = System.currentTimeMillis() - paintdown.telepickCooldowns.get(teamName);
+            // 15 second cooldown for telepick
+            if (TimeUnit.MILLISECONDS.toSeconds(timeLeft) >= 15) {
+                ItemStack itemStack = new ItemStack(Material.DIAMOND_PICKAXE);
+                ItemMeta itemMeta = itemStack.getItemMeta();
+                assert itemMeta != null;
+                itemMeta.setUnbreakable(true);
+                itemStack.setItemMeta(itemMeta);
+                player.getInventory().setItemInMainHand(itemStack);
+
+                p.hasTelepick = true;
+                paintdown.telepickCooldowns.remove(teamName);
+                paintdown.telepickCooldowns.put(teamName, System.currentTimeMillis());
+                // remove telepick from other team member if applicable
+                for (Participant participant : paintdown.mcc.teams.get(teamName)) {
+                    participant.player.sendMessage(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE + " has claimed the telepickaxe.");
+                    if (participant.hasTelepick) {
+                        for(int i = 0; i<participant.player.getInventory().getSize()-1; ++i) {
+                            ItemStack item = participant.player.getInventory().getItem(i);
+                            try {
+                                if(item.getType().equals(Material.DIAMOND_PICKAXE)) {
+                                    item.setType(Material.WOODEN_PICKAXE);
+                                }
+                            } catch(NullPointerException exception) {
+                                continue;
+                            }
+                        }
+                        participant.hasTelepick = false;
+                    }
+                }
+            } else {
+                player.sendMessage(ChatColor.RED + "Telepickaxe is on cooldown for another " + timeLeft + " seconds!");
             }
         }
     }
@@ -280,6 +321,7 @@ public class PaintdownListener implements Listener {
             // early spec'ing
             // p.setSpectatorTarget();
             Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " fell into molten lava");
+            paintdown.deadList.add(participant.player.getUniqueId());
 
             int deadTeammates = 0;
             for (Participant indexP : paintdown.mcc.teams.get(Participant.indexToName(participant.teamIndex))) {
@@ -305,7 +347,6 @@ public class PaintdownListener implements Listener {
     @EventHandler()
     public void onBlockBreak(BlockBreakEvent e) {
         if (!(paintdown.getState().equals("PLAYING")) && !(paintdown.getState().equals("STARTING")) && !(paintdown.getState().equals("END_ROUND"))) {
-            e.setCancelled(true);
             return;
         }
 
@@ -314,19 +355,15 @@ public class PaintdownListener implements Listener {
             return;
         }
 
-        try {
-            if (Objects.requireNonNull(e.getPlayer().getItemInUse()).getType() == Material.DIAMOND_PICKAXE) {
-                Participant brokeBlock = Participant.findParticipantFromPlayer(e.getPlayer());
-                assert brokeBlock != null;
-                for (Participant p : Participant.participantsOnATeam) {
-                    if (p.teamIndex == brokeBlock.teamIndex) {
-                        paintdown.mcc.scoreboardManager.addScore(paintdown.mcc.scoreboardManager.players.get(p.player.getUniqueId()), 1);
-                    }
+        if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.DIAMOND_PICKAXE) {
+            Participant brokeBlock = Participant.findParticipantFromPlayer(e.getPlayer());
+            assert brokeBlock != null;
+            for (Participant p : Participant.participantsOnATeam) {
+                if (p.teamIndex == brokeBlock.teamIndex) {
+                    paintdown.mcc.scoreboardManager.addScore(paintdown.mcc.scoreboardManager.players.get(p.player.getUniqueId()), 1);
                 }
-            } else {
-                e.setCancelled(true);
             }
-        } catch (NullPointerException exception) {
+        } else {
             e.setCancelled(true);
         }
     }

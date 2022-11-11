@@ -13,6 +13,7 @@ import com.kotayka.mcc.fullGame.Music;
 import com.kotayka.mcc.mainGame.MCC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -109,6 +110,7 @@ public class Game {
         stats.createStats();
         mcc.scoreboardManager.endGame();
         for (ScoreboardPlayer p : mcc.scoreboardManager.playerList) {
+            p.player.player.setGameMode(GameMode.ADVENTURE);
             mcc.scoreboardManager.createMidLobbyBoard(p);
             p.player.player.teleport(new Location(Bukkit.getWorld("world"), 0, 0, 0));
             for(PotionEffect effect : p.player.player.getActivePotionEffects())

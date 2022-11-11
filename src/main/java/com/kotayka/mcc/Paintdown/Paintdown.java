@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
+import static org.bukkit.GameMode.ADVENTURE;
 import static org.bukkit.GameMode.SURVIVAL;
 
 public class Paintdown {
@@ -46,6 +47,8 @@ public class Paintdown {
     // im gonna assume the original list remains unmutated
     public Map<String, List<Participant>> aliveTeams;
 
+    public Map<String, Long> telepickCooldowns = new HashMap<String, Long>();
+
     public Paintdown(Players players, MCC mcc) {
         this.players = players;
         this.mcc = mcc;
@@ -61,6 +64,13 @@ public class Paintdown {
         aliveTeams = mcc.teams;
         // see if theres a way to get key from value
         // so we can remove teams with nobody on them
+
+        telepickCooldowns.put("Red Rabbits", (long) 0);
+        telepickCooldowns.put("Yellow Yaks", (long) 0);
+        telepickCooldowns.put("Green Guardians", (long) 0);
+        telepickCooldowns.put("Blue Bats", (long) 0);
+        telepickCooldowns.put("Purple Pandas", (long) 0);
+        telepickCooldowns.put("Pink Parrots", (long) 0);
     }
 
     /*
@@ -174,6 +184,15 @@ public class Paintdown {
 
     public void startRound() {
         deadList.clear();
+        aliveTeams = mcc.teams;
+        telepickCooldowns.clear();
+        telepickCooldowns.put("Red Rabbits", (long) 0);
+        telepickCooldowns.put("Yellow Yaks", (long) 0);
+        telepickCooldowns.put("Green Guardians", (long) 0);
+        telepickCooldowns.put("Blue Bats", (long) 0);
+        telepickCooldowns.put("Purple Pandas", (long) 0);
+        telepickCooldowns.put("Pink Parrots", (long) 0);
+
         String roundValue = ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+ roundNum + "/3";
         mcc.scoreboardManager.changeLine(22, roundValue);
 
@@ -187,6 +206,7 @@ public class Paintdown {
             int randomNum = (int) (Math.random() * tempSpawns.size());
             for (Participant p : l) {
                 p.player.teleport(tempSpawns.get(randomNum));
+                p.player.setGameMode(ADVENTURE);
             }
             tempSpawns.remove(randomNum);
         }
@@ -294,7 +314,7 @@ public class Paintdown {
 
     /* Turn painted walls back to original state */
     public void cleanPaintOffWalls() {
-        Bukkit.broadcastMessage("Cleaning paint...");
+        //Bukkit.broadcastMessage("Cleaning paint...");
         for (Map.Entry<Location, Material> entry : paintedBlocks.entrySet()) {
             world.getBlockAt(entry.getKey()).setType(entry.getValue());
             //world.setBlockData(entry.getKey(), entry.getValue().getBlockData());
@@ -308,9 +328,6 @@ public class Paintdown {
             case "PLAYING":
                 mcc.paintdown.setState("END_ROUND");
                 mcc.scoreboardManager.startTimerForGame(10, "Paintdown");
-                for (Participant p : Participant.participantsOnATeam) {
-                    p.player.setGameMode(GameMode.ADVENTURE);
-                }
                 break;
             case "STARTING":
                 replaceSpawnDoors(Material.AIR);
@@ -471,7 +488,7 @@ public class Paintdown {
     public void rewardLastPlayers() {
         List<String> survivorNames = new ArrayList<String>(1);
         for (Participant p : Participant.participantsOnATeam) {
-            if (!deadList.contains(p.player.getUniqueId())) {
+            if (!(deadList.contains(p.player.getUniqueId()))) {
                 mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 15);
                 p.setIsPainted(false);
                 survivorNames.add(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE);
@@ -482,12 +499,14 @@ public class Paintdown {
             }
         }
 
-        if (survivorNames.size() <= 1) {
+        if (survivorNames.size() == 1) {
             Bukkit.broadcastMessage("The winner of this round is: " + survivorNames.get(0) + "!");
-        } else {
+        } else if (survivorNames.size() > 1) {
             StringJoiner joiner = new StringJoiner(", ");
             survivorNames.forEach(item -> joiner.add(item.toString()));
             Bukkit.broadcastMessage("The winners of this round are: " + joiner + "!");
+        } else {
+            Bukkit.broadcastMessage("No one survived the round.");
         }
     }
 
@@ -559,7 +578,11 @@ public class Paintdown {
     public void eliminateTeam(int index) {
         for (Participant p : mcc.teams.get(Participant.indexToName(index))) {
             p.player.sendTitle(ChatColor.RED + "TEAM PAINTED", null, 0, 60, 40);
-            deadList.add(p.player.getUniqueId());
+            // add to dead list if they were not
+            // (falling into lava puts you immediately on dead list
+            if (!deadList.contains(p.player.getUniqueId())) {
+                deadList.add(p.player.getUniqueId());
+            }
             Bukkit.getScheduler().scheduleSyncDelayedTask(mcc.plugin, new Runnable() {
                 @Override
                 public void run() {
@@ -583,6 +606,7 @@ public class Paintdown {
             }
         }, 60);
 
+        // check whether to end round (only one team remains)
         aliveTeams.remove(Participant.indexToName(index));
 
         // Case where event has less than 6 teams
@@ -592,7 +616,7 @@ public class Paintdown {
             living++;
         }
 
-        if (living == 1) {
+        if (living <= 1) {
             mcc.scoreboardManager.timer = 0;
         }
     }
