@@ -30,6 +30,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class SkybattleListener implements Listener {
     public final Skybattle skybattle;
@@ -62,17 +63,37 @@ public class SkybattleListener implements Listener {
             BlockFace blockFace = spawn.getFace(spawn);
 
             // west -x east +x south +z north -z
+            assert blockFace != null;
             switch (blockFace) {
                 case EAST -> spawn.getLocation().add(1, 0, 0);
                 case WEST -> spawn.getLocation().add(-1, 0, 0);
                 case SOUTH -> spawn.getLocation().add(0, 0, 1);
                 case NORTH -> spawn.getLocation().add(0, 0, -1);
-                default -> spawn.getLocation().add(0, 1, 0);
+                default -> spawn.getLocation().add(0, 2, 0);
             }
             skybattle.whoPlacedThatTNT.put(p.getWorld().spawn(spawn.getLocation(), TNTPrimed.class), p);
         } else if (e.getBlock().getType().toString().matches(".*CONCRETE$")) {
             String concrete = e.getBlock().getType().toString();
-            e.getPlayer().getInventory().addItem(new ItemStack(Material.getMaterial(concrete)));
+            // check item slot
+            assert concrete != null;
+            int index = p.getInventory().getHeldItemSlot();
+            if (p.getInventory().getItem(index).getType().toString().equals(concrete)) {
+                int amount = Objects.requireNonNull(p.getInventory().getItem(index)).getAmount();
+                p.getInventory().setItem(index, new ItemStack(Objects.requireNonNull(Material.getMaterial(concrete)),amount));
+                return;
+            }
+            if (p.getInventory().getItem(40) != null) {
+                if (p.getInventory().getItem(40).getType().toString().equals(concrete)) {
+                    int amount;
+                    // some wacky bullshit prevention
+                    if (Objects.requireNonNull(p.getInventory().getItem(40)).getAmount()+63 > 100) {
+                        amount = 64;
+                    } else {
+                        amount = Objects.requireNonNull(p.getInventory().getItem(40)).getAmount()+63;
+                    }
+                    p.getInventory().setItem(40, new ItemStack(Objects.requireNonNull(Material.getMaterial(concrete)),amount));
+                }
+            }
         }
     }
 
@@ -238,8 +259,6 @@ public class SkybattleListener implements Listener {
 
         skybattle.outLivePlayer();
 
-
-        // TODO: end game if only one team is left
         skybattle.mcc.scoreboardManager.lastOneStanding(skybattle.mcc.scoreboardManager.players.get(p.player.getUniqueId()), "Skybattle");
 
         // If player dies to direct combat

@@ -360,7 +360,6 @@ public class Paintdown {
                 if (time == 9) {
                     p.player.player.sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!", null, 0, 20, 0);
                     p.player.player.sendMessage(ChatColor.BOLD+""+ChatColor.RED+"Round Over!");
-                    p.player.player.setGameMode(GameMode.ADVENTURE);
                 }
                 break;
         }
@@ -498,7 +497,6 @@ public class Paintdown {
                 p.player.setInvulnerable(true);
             }
         }
-
         if (survivorNames.size() == 1) {
             Bukkit.broadcastMessage("The winner of this round is: " + survivorNames.get(0) + "!");
         } else if (survivorNames.size() > 1) {

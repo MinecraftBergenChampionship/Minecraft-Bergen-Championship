@@ -278,6 +278,9 @@ public class Skybattle {
                 mcc.skybattle.removeBarriers();
                 for (Participant p : Participant.participantsOnATeam) {
                     p.player.setGameMode(SURVIVAL);
+                    p.player.removePotionEffect(PotionEffectType.SATURATION);
+                    p.player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+                    p.player.removePotionEffect(PotionEffectType.WEAKNESS);
                 }
                 break;
             case "PLAYING":
@@ -378,12 +381,14 @@ public class Skybattle {
             }
         }
 
-        if (survivorNames.size() <= 1) {
+        if (survivorNames.size() == 1) {
             Bukkit.broadcastMessage("The winner of this round is: " + survivorNames.get(0) + "!");
-        } else {
+        } else if (survivorNames.size() > 1){
             StringJoiner joiner = new StringJoiner(", ");
             survivorNames.forEach(item -> joiner.add(item.toString()));
             Bukkit.broadcastMessage("The winners of this round are: " + joiner + "!");
+        } else {
+            Bukkit.broadcastMessage("No one survived the round.");
         }
     }
 
