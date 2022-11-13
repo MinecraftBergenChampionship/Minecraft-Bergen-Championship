@@ -108,7 +108,7 @@ public class Paintdown {
         assert world != null;
         border = world.getWorldBorder();
         border.setCenter(CENTER);
-        //border.setSize(500);
+        border.setSize(500);
         border.setDamageAmount(0.5);
         border.setDamageBuffer(0);
         border.setWarningDistance(5);
@@ -363,50 +363,55 @@ public class Paintdown {
                 }
                 break;
             case "PLAYING":
-                if (time == 180) {
-                    p.player.player.sendTitle("", ChatColor.BOLD + "" + ChatColor.RED + "Border shrinks in 30 seconds!", 0, 40, 20);
-                } else if (time == 165) {
-                    p.player.player.sendTitle("", ChatColor.BOLD + "" + ChatColor.RED + "Border shrinks in 15 seconds!", 0, 40, 20);
-                } else if (time == 150) {
-                    p.player.player.sendTitle("", ChatColor.BOLD + "" + ChatColor.RED + "Border Shrinking!", 0, 40, 20);
+                if (time == 105) {
+                    p.player.player.sendTitle(" ", ChatColor.RED + "Border shrinks in 15 seconds!", 0, 40, 20);
+                } else if (time == 90) {
+                    p.player.player.sendTitle(" ", ChatColor.RED + "Border Shrinking!", 0, 40, 20);
+                } else if (time == 75) {
+                    p.player.player.sendTitle(" ", ChatColor.RED + "Final Shrink!", 0, 40, 20);
                 }
+                break;
         }
     }
 
     // For events that should happen ONCE per game
     public void specialEvents(int time) {
+        /*
+         * First coin crate opens at 3 minutes
+         * Middle opens at 2 minutes
+         * Border shrinks at 1min 30 and finishes at 1 min
+         * Middle coin crate opens at 1min 30
+         */
         switch(this.getState()) {
             case "PLAYING":
-                if (time == 225) {
-                    Bukkit.broadcastMessage(ChatColor.BOLD + "> Coin Crates will open in 15 seconds!");
-                } else if (time == 210) {
-                    Bukkit.broadcastMessage(ChatColor.AQUA + "> Coin Crates have been opened!");
-                    replaceCoinCage(Material.AIR);
+                if (time == 195) {
+                    Bukkit.broadcastMessage(ChatColor.AQUA + "Coin Crates will open in 15 seconds!");
                 } else if (time == 180) {
-                    Bukkit.broadcastMessage(ChatColor.BOLD + "> Doors to the middle room are now open!");
-                    replaceMiddleEntrance(Material.AIR);
-                    Bukkit.broadcastMessage(ChatColor.RED + "The border will shrink to the middle in 30 seconds!");
-                } else if (time == 165) {
-                    Bukkit.broadcastMessage(ChatColor.RED + "The border will shrink to the middle in 15 seconds!");
-                } else if (time == 150) {
-                  Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "The border is shrinking to the middle!");
-                  border.setSize(50,10);
-                  Bukkit.broadcastMessage(ChatColor.BOLD + "> The middle coin crate will open in 15 seconds!");
+                    replaceCoinCage(Material.AIR);
+                    Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.AQUA + "> Coin Crates are now open!");
                 } else if (time == 135) {
-                    Bukkit.broadcastMessage(ChatColor.AQUA + "> The middle coin crate is now open!");
-                    replaceMiddleCoinCage(Material.AIR);
+                    Bukkit.broadcastMessage("Doors to the middle will open in 15 seconds!");
                 } else if (time == 120) {
-                    Bukkit.broadcastMessage(ChatColor.RED + "The border will shrink to final size in 15 seconds!");
-                } else if (time == 110) {
-                    Bukkit.broadcastMessage(ChatColor.RED + "Border Shrinking!");
-                    border.setSize(35, 15);
+                    replaceMiddleEntrance(Material.AIR);
+                    Bukkit.broadcastMessage(ChatColor.BOLD + "Doors to the middle have opened!");
+                } else if (time == 105) {
+                    Bukkit.broadcastMessage(ChatColor.RED + "The border will shrink in 15 seconds!");
+                    Bukkit.broadcastMessage(ChatColor.AQUA + "The middle coin crate will open in 15 seconds!");
+                } else if (time == 90) {
+                    border.setSize(50, 30);
+                    Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "The border has begun to shrink!");
+                    replaceMiddleCoinCage(Material.AIR);
+                    Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.AQUA + "The middle coin crate is open!");
+                } else if (time == 75) {
+                    Bukkit.broadcastMessage(ChatColor.RED + "The border will shrink to its final size!");
+                    border.setSize(30, 20);
                 }
                 break;
             case "END_ROUND":
                 if (time == 9) {
                     rewardLastPlayers();
                 } else if (time == 3) {
-                    resetBorder();
+                    border.setSize(500);
                 }
                 break;
         }

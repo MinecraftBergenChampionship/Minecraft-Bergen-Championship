@@ -185,10 +185,16 @@ public class PaintdownListener implements Listener {
 
         shooter.playSound(shooter.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 5);
         paintdown.paintHitPlayer(participant);
+
+        // set painted by
+        participant.setPaintedBy(shooter);
         // If player died
         if (hitPlayer.getHealth() - 10 <= 0) {
+            //TODO: if player is in the air, teleport them to bottom
+            //double y_loc = hitPlayer.getLocation().getY();
+
+
             paintdown.mcc.scoreboardManager.addScore(paintdown.mcc.scoreboardManager.players.get(shooter.getUniqueId()), 15);
-            participant.setPaintedBy(shooter);
 
             String paintedString = ChatColor.RED + "P" + ChatColor.GOLD + "A" + ChatColor.YELLOW + "I" + ChatColor.GREEN + "N" +
                                     ChatColor.AQUA + "T" + ChatColor.BLUE + "E" + ChatColor.DARK_PURPLE + "D" + ChatColor.LIGHT_PURPLE + "!";
@@ -296,6 +302,7 @@ public class PaintdownListener implements Listener {
                     }
                 } else {
                     p.player.setHealth(20);
+                    p.setPaintedBy(null);
                 }
             }
         }
@@ -320,7 +327,14 @@ public class PaintdownListener implements Listener {
             // if necessary in the future we will prevent
             // early spec'ing
             // p.setSpectatorTarget();
-            Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " fell into molten lava");
+            if (participant.getPaintedBy() == null)
+                Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " fell into molten lava");
+            else {
+                Participant lastPainted = Participant.findParticipantFromPlayer(participant.getPaintedBy());
+                assert lastPainted != null;
+                Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " fell into molten lava after being tagged by "
+                        + lastPainted.teamPrefix + lastPainted.chatColor + lastPainted.ign);
+            }
             paintdown.deadList.add(participant.player.getUniqueId());
 
             int deadTeammates = 0;
