@@ -362,6 +362,14 @@ public class Paintdown {
                     p.player.player.sendMessage(ChatColor.BOLD+""+ChatColor.RED+"Round Over!");
                 }
                 break;
+            case "PLAYING":
+                if (time == 180) {
+                    p.player.player.sendTitle("", ChatColor.BOLD + "" + ChatColor.RED + "Border shrinks in 30 seconds!", 0, 40, 20);
+                } else if (time == 165) {
+                    p.player.player.sendTitle("", ChatColor.BOLD + "" + ChatColor.RED + "Border shrinks in 15 seconds!", 0, 40, 20);
+                } else if (time == 150) {
+                    p.player.player.sendTitle("", ChatColor.BOLD + "" + ChatColor.RED + "Border Shrinking!", 0, 40, 20);
+                }
         }
     }
 
@@ -377,11 +385,21 @@ public class Paintdown {
                 } else if (time == 180) {
                     Bukkit.broadcastMessage(ChatColor.BOLD + "> Doors to the middle room are now open!");
                     replaceMiddleEntrance(Material.AIR);
-                } else if (time == 105) {
+                    Bukkit.broadcastMessage(ChatColor.RED + "The border will shrink to the middle in 30 seconds!");
+                } else if (time == 165) {
+                    Bukkit.broadcastMessage(ChatColor.RED + "The border will shrink to the middle in 15 seconds!");
+                } else if (time == 150) {
+                  Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "The border is shrinking to the middle!");
+                  border.setSize(50,10);
                   Bukkit.broadcastMessage(ChatColor.BOLD + "> The middle coin crate will open in 15 seconds!");
-                } else if (time == 90) {
+                } else if (time == 135) {
                     Bukkit.broadcastMessage(ChatColor.AQUA + "> The middle coin crate is now open!");
                     replaceMiddleCoinCage(Material.AIR);
+                } else if (time == 120) {
+                    Bukkit.broadcastMessage(ChatColor.RED + "The border will shrink to final size in 15 seconds!");
+                } else if (time == 110) {
+                    Bukkit.broadcastMessage(ChatColor.RED + "Border Shrinking!");
+                    border.setSize(35, 15);
                 }
                 break;
             case "END_ROUND":
