@@ -107,15 +107,14 @@ public class PaintdownListener implements Listener {
                 itemStack.setItemMeta(itemMeta);
                 player.getInventory().setItemInMainHand(itemStack);
 
-                p.hasTelepick = true;
                 paintdown.telepickCooldowns.remove(teamName);
                 paintdown.telepickCooldowns.put(teamName, System.currentTimeMillis());
                 // remove telepick from other team member if applicable
-                for (Participant participant : paintdown.mcc.teams.get(teamName)) {
-                    participant.player.sendMessage(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE + " has claimed the telepickaxe.");
-                    if (participant.hasTelepick) {
-                        for(int i = 0; i<participant.player.getInventory().getSize()-1; ++i) {
-                            ItemStack item = participant.player.getInventory().getItem(i);
+                for (Participant indexP : paintdown.mcc.teams.get(teamName)) {
+                    indexP.player.sendMessage(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE + " has claimed the telepickaxe.");
+                    if (indexP.hasTelepick) {
+                        for(int i = 0; i<indexP.player.getInventory().getSize()-1; ++i) {
+                            ItemStack item = indexP.player.getInventory().getItem(i);
                             try {
                                 if(item.getType().equals(Material.DIAMOND_PICKAXE)) {
                                     item.setType(Material.WOODEN_PICKAXE);
@@ -124,11 +123,16 @@ public class PaintdownListener implements Listener {
                                 continue;
                             }
                         }
-                        participant.hasTelepick = false;
+                        indexP.hasTelepick = false;
+                        // only one person should have telepick at a time
+                        break;
                     }
                 }
+                // change telepick ownership
+                // ...maybe that would've been better implementation...
+                p.hasTelepick = true;
             } else {
-                player.sendMessage(ChatColor.RED + "Telepickaxe is on cooldown for another " + timeLeft + " seconds!");
+                player.sendMessage(ChatColor.RED + "Telepickaxe is on cooldown for another " + (15 - TimeUnit.MILLISECONDS.toSeconds(timeLeft)) + " seconds!");
             }
         }
     }
@@ -212,26 +216,7 @@ public class PaintdownListener implements Listener {
                 }
             }
             // Check if whole team died
-            int deadTeammates = 0;
-            for (Participant indexP : paintdown.mcc.teams.get(Participant.indexToName(participant.teamIndex))) {
-                if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR)) deadTeammates++;
-            }
-            if (deadTeammates == paintdown.mcc.teams.get(Participant.indexToName(participant.teamIndex)).size()) {
-                paintdown.eliminateTeam(participant.teamIndex);
-
-                for (Participant indexP : paintdown.mcc.teams.get(Participant.indexToName(participant.teamIndex))) {
-                    if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR))  {
-                        indexP.setIsPainted(false);
-                    }
-                }
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + Participant.indexToName(participant.teamIndex) +
-                                ChatColor.WHITE + " have been eliminated!");
-                    }
-                }, 60);
-            }
+            paintdown.checkFullTeamDeath(participant);
             // Died but teammates are alive
             hitPlayer.setHealth(20);
 
@@ -337,24 +322,7 @@ public class PaintdownListener implements Listener {
             }
             paintdown.deadList.add(participant.player.getUniqueId());
 
-            int deadTeammates = 0;
-            for (Participant indexP : paintdown.mcc.teams.get(Participant.indexToName(participant.teamIndex))) {
-                if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR)) deadTeammates++;
-            }
-            if (deadTeammates == paintdown.mcc.teams.get(Participant.indexToName(participant.teamIndex)).size()) {
-                paintdown.eliminateTeam(participant.teamIndex);
-
-                for (Participant indexP : paintdown.mcc.teams.get(Participant.indexToName(participant.teamIndex))) {
-                    if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR)) indexP.setIsPainted(false);
-                }
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.team + " have been eliminated!");
-                    }
-                }, 60);
-            }
-
+            paintdown.checkFullTeamDeath(participant);
         }
     }
 
@@ -382,15 +350,28 @@ public class PaintdownListener implements Listener {
         }
     }
 
-    // Temporary
+    /* For BORDER DAMAGE */
     @EventHandler
-    public void onRespawn(PlayerRespawnEvent e) {
+    public void onRespawn(EntityDamageByEntityEvent e) {
         if (!(paintdown.getState().equals("PLAYING"))) { return; }
-        if (!(e.getPlayer().getWorld().equals(paintdown.world))) return;
+        if (!(e.getEntity() instanceof Player)) { return; }
+        if (!(e.getEntity().getWorld().equals(paintdown.world))) return;
 
-        e.getPlayer().setGameMode(GameMode.SPECTATOR);
-        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 10000, 2, false, false));
-        e.setRespawnLocation(paintdown.getCenter());
+        // If border damage kills player
+        Player player = (Player) e.getEntity();
+        if (player.getHealth() - e.getDamage() < 1) {
+            e.setCancelled(true);
+            player.setGameMode(GameMode.SPECTATOR);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 2, false, false));
+
+            Participant participant = Participant.findParticipantFromPlayer(player);
+            assert participant != null;
+            paintdown.deadList.add(participant.player.getUniqueId());
+
+            Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + " was stuck in a melting room");
+
+            paintdown.checkFullTeamDeath(participant);
+        }
     }
 
     // Players can't take off armor

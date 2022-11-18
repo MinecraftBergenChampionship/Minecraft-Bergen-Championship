@@ -133,7 +133,7 @@ public final class MCC extends JavaPlugin implements Listener {
             spawnWorld = Bukkit.getWorld("world");
         }
 
-        SPAWN = new Location(spawnWorld, 0, 2, 0);
+        SPAWN = new Location(spawnWorld, 0.5, 2.5, 0.5);
 
         getCommand("ready").setExecutor(new ready(players, this));
         getCommand("eventstart").setExecutor(new eventstart(this));
@@ -198,7 +198,6 @@ public final class MCC extends JavaPlugin implements Listener {
     public void setGameOver(boolean b) {
         gameIsOver = b;
     }
-
     public void loadTeams() {
         String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
 

@@ -222,17 +222,17 @@ public class Participant {
     // not necessarily paintdown specific but for now yes
     public static String indexToName(int index) {
         switch(index) {
-            case 1:
+            case 0:
                 return "Red Rabbits";
-            case 2:
+            case 1:
                 return "Yellow Yaks";
-            case 3:
+            case 2:
                 return "Green Guardians";
-            case 4:
+            case 3:
                 return "Blue Bats";
-            case 5:
+            case 4:
                 return "Purple Pandas";
-            case 6:
+            case 5:
                 return "Pink Parrots";
             default:
                 return "Invalid Index!";

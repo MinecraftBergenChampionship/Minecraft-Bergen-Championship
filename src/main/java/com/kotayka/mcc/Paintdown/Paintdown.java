@@ -642,6 +642,28 @@ public class Paintdown {
         }
     }
 
+    // Check for player death
+    public void checkFullTeamDeath(Participant participant) {
+        int deadTeammates = 0;
+        for (Participant indexP : mcc.teams.get(Participant.indexToName(participant.teamIndex))) {
+            if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR)) deadTeammates++;
+        }
+        if (deadTeammates == mcc.teams.get(Participant.indexToName(participant.teamIndex)).size()) {
+            eliminateTeam(participant.teamIndex);
+
+            for (Participant indexP : mcc.teams.get(Participant.indexToName(participant.teamIndex))) {
+                if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR))
+                    indexP.setIsPainted(false);
+            }
+            Bukkit.getScheduler().scheduleSyncDelayedTask(mcc.plugin, new Runnable() {
+                @Override
+                public void run() {
+                    Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.team + " have been eliminated!");
+                }
+            }, 60);
+        }
+    }
+
     // Set coin crates in middle
     public void setMiddleCoins(Material m) {
         for (int y = -12; y <= -11; y++) {

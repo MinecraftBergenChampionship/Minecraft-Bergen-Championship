@@ -121,7 +121,7 @@ public class Instructions {
             p.player.player.setGameMode(GameMode.ADVENTURE);
             p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
             p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-            p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 1200, 255, false, false));
+            p.player.player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 1220, 255, false, false));
         }
         mcc.scoreboardManager.startTimerForGame(60, "game");
         taskId[0] = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(mcc.plugin, new Runnable() {

@@ -57,8 +57,10 @@ public class SkybattleListener implements Listener {
         Block b = e.getBlock();
         Player p = e.getPlayer();
         if (e.getBlock().getType().equals(Material.TNT)) {
+            skybattle.whoPlacedThatTNT.put(skybattle.world.spawnEntity(b.getLocation(), EntityType.PRIMED_TNT), p);
             b.setType(Material.AIR);
 
+            /*
             Block spawn = p.getTargetBlock(null, 5);
             BlockFace blockFace = spawn.getFace(spawn);
 
@@ -72,6 +74,7 @@ public class SkybattleListener implements Listener {
                 default -> spawn.getLocation().add(0, 2, 0);
             }
             skybattle.whoPlacedThatTNT.put(p.getWorld().spawn(spawn.getLocation(), TNTPrimed.class), p);
+            */
         } else if (e.getBlock().getType().toString().matches(".*CONCRETE$")) {
             String concrete = e.getBlock().getType().toString();
             // check item slot
@@ -136,11 +139,11 @@ public class SkybattleListener implements Listener {
             BlockFace blockFace = e.getBlockFace();
             // west -x east +x south +z north -z
             switch (blockFace) {
-                case EAST -> spawn.add(1, 0, 0);
-                case WEST -> spawn.add(-1, 0, 0);
-                case SOUTH -> spawn.add(0, 0, 1);
-                case NORTH -> spawn.add(0, 0, -1);
-                default -> spawn.add(0, 1, 0);
+                case EAST -> spawn.add(1.5, 0, 0);
+                case WEST -> spawn.add(-1.5, 0, 0);
+                case SOUTH -> spawn.add(0, 0, 1.5);
+                case NORTH -> spawn.add(0, 0, -1.5);
+                default -> spawn.add(0, 1.5, 0);
             }
             skybattle.creepersAndSpawned.put(p.getWorld().spawn(spawn, Creeper.class), p);
         }

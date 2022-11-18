@@ -78,6 +78,15 @@ public class BSABMListener implements Listener {
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.OBSERVER) {
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
         }
+
+        // since all the lobby stuff is above, i'm just gonna put this here
+        // in the future we could prob move it but...for now
+        if (game.stage.equals("Lobby")) {
+            if (e.getPlayer().getLocation().getY() <= -60 && e.getPlayer().getWorld().equals(mcc.spawnWorld)) {
+                e.getPlayer().teleport(mcc.SPAWN);
+            }
+        }
+
         if (game.stage.equals("BSABM")) {
             if (e.getPlayer().getLocation().getY() <= -33) {
                 bsabm.givePlayerItems(e.getPlayer());
