@@ -356,6 +356,7 @@ public class PaintdownListener implements Listener {
             Player player = (Player) e.getEntity();
             if (player.getHealth() - e.getDamage() < 1) {
                 e.setCancelled(true);
+                player.setHealth(20);
                 player.setGameMode(GameMode.SPECTATOR);
                 player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 2, false, false));
 
