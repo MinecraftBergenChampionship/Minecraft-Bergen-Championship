@@ -1,6 +1,5 @@
 package com.kotayka.mcc.mainGame.commands;
 
-import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.teamManager;
@@ -10,7 +9,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Team;
 
 public class teamCommands implements CommandExecutor {
 
@@ -32,33 +30,40 @@ public class teamCommands implements CommandExecutor {
                             participant.team = args[1];
                             switch (args[1]) {
                                 case "RedRabbits":
-                                    participant.fullName = "Red Rabbits";
+                                    // prevent double adding to same team
+                                    if (participant.teamNameFull.equals("Red Rabbits")) return false;
                                     mcc.teams.get("Red Rabbits").add(participant);
+                                    participant.teamNameFull = "Red Rabbits";
                                     Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.RED+"Red Rabbits.");
                                     break;
                                 case "YellowYaks":
+                                    if (participant.teamNameFull.equals("Yellow Yaks")) return false;
                                     mcc.teams.get("Yellow Yaks").add(participant);
-                                    participant.fullName = "Yellow Yaks";
+                                    participant.teamNameFull = "Yellow Yaks";
                                     Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.YELLOW+"Yellow Yaks.");
                                     break;
                                 case "GreenGuardians":
+                                    if (participant.teamNameFull.equals("Green Guardians")) return false;
                                     mcc.teams.get("Green Guardians").add(participant);
-                                    participant.fullName = "Green Guardians";
+                                    participant.teamNameFull = "Green Guardians";
                                     Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.GREEN+"Green Guardians.");
                                     break;
                                 case "BlueBats":
+                                    if (participant.teamNameFull.equals("Blue Bats")) return false;
                                     mcc.teams.get("Blue Bats").add(participant);
-                                    participant.fullName = "Blue Bats";
+                                    participant.teamNameFull = "Blue Bats";
                                     Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.BLUE+"Blue Bats.");
                                     break;
                                 case "PurplePandas":
+                                    if (participant.teamNameFull.equals("Purple Pandas")) return false;
                                     mcc.teams.get("Purple Pandas").add(participant);
-                                    participant.fullName = "Purple Pandas";
+                                    participant.teamNameFull = "Purple Pandas";
                                     Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.DARK_PURPLE+"Purple Pandas.");
                                     break;
                                 case "PinkPiglets":
+                                    if (participant.teamNameFull.equals("Pink Piglets")) return false;
                                     mcc.teams.get("Pink Piglets").add(participant);
-                                    participant.fullName = "Pink Piglets";
+                                    participant.teamNameFull = "Pink Piglets";
                                     Bukkit.broadcastMessage(ChatColor.GOLD+args[0]+ChatColor.WHITE+" has joined the "+ChatColor.LIGHT_PURPLE+"Pink Piglets.");
                                     break;
                             }

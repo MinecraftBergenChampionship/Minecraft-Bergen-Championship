@@ -5,7 +5,6 @@ import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -42,12 +41,12 @@ public class Paintdown {
     public List<Location> coinLocations;
 
 // Players
-    public List<UUID> deadList = new ArrayList<UUID>();
+    public List<UUID> deadList = new ArrayList<UUID>(6);
 
     // im gonna assume the original list remains unmutated
-    public Map<String, List<Participant>> aliveTeams;
+    public Map<String, List<Participant>> aliveTeams = new HashMap<String, List<Participant>>(6);
 
-    public Map<String, Long> telepickCooldowns = new HashMap<String, Long>();
+    public Map<String, Long> telepickCooldowns = new HashMap<String, Long>(6);
 
     public Paintdown(Players players, MCC mcc) {
         this.players = players;
@@ -61,7 +60,12 @@ public class Paintdown {
         createCoinLocations();
         resetMap();
 
-        aliveTeams = mcc.teams;
+        aliveTeams.put("Red Rabbits", mcc.teams.get("Red Rabbits"));
+        aliveTeams.put("Yellow Yaks", mcc.teams.get("Yellow Yaks"));
+        aliveTeams.put("Green Guardians", mcc.teams.get("Green Guardians"));
+        aliveTeams.put("Blue Bats", mcc.teams.get("Blue Bats"));
+        aliveTeams.put("Purple Pandas", mcc.teams.get("Purple Pandas"));
+        aliveTeams.put("Pink Piglets", mcc.teams.get("Pink Piglets"));
         // see if theres a way to get key from value
         // so we can remove teams with nobody on them
 
@@ -70,7 +74,7 @@ public class Paintdown {
         telepickCooldowns.put("Green Guardians", (long) 0);
         telepickCooldowns.put("Blue Bats", (long) 0);
         telepickCooldowns.put("Purple Pandas", (long) 0);
-        telepickCooldowns.put("Pink Parrots", (long) 0);
+        telepickCooldowns.put("Pink Piglets", (long) 0);
     }
 
     /*
@@ -184,14 +188,20 @@ public class Paintdown {
 
     public void startRound() {
         deadList.clear();
-        aliveTeams = mcc.teams;
+        aliveTeams.clear();
+        aliveTeams.put("Red Rabbits", mcc.teams.get("Red Rabbits"));
+        aliveTeams.put("Yellow Yaks", mcc.teams.get("Yellow Yaks"));
+        aliveTeams.put("Green Guardians", mcc.teams.get("Green Guardians"));
+        aliveTeams.put("Blue Bats", mcc.teams.get("Blue Bats"));
+        aliveTeams.put("Purple Pandas", mcc.teams.get("Purple Pandas"));
+        aliveTeams.put("Pink Piglets", mcc.teams.get("Pink Piglets"));
         telepickCooldowns.clear();
         telepickCooldowns.put("Red Rabbits", (long) 0);
         telepickCooldowns.put("Yellow Yaks", (long) 0);
         telepickCooldowns.put("Green Guardians", (long) 0);
         telepickCooldowns.put("Blue Bats", (long) 0);
         telepickCooldowns.put("Purple Pandas", (long) 0);
-        telepickCooldowns.put("Pink Parrots", (long) 0);
+        telepickCooldowns.put("Pink Piglets", (long) 0);
 
         String roundValue = ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+ roundNum + "/3";
         mcc.scoreboardManager.changeLine(22, roundValue);
@@ -201,7 +211,6 @@ public class Paintdown {
 
         // Randomly place each team at a different spawn
         List<Location> tempSpawns = new ArrayList<>(spawnPoints);
-
         for (List<Participant> l : mcc.teams.values()) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
             for (Participant p : l) {
@@ -213,9 +222,11 @@ public class Paintdown {
 
         for (Participant p : Participant.participantsOnATeam) {
             // reset win effects
-            p.player.setInvulnerable(false);
-            p.player.setAllowFlight(false);
-            p.player.setFlying(false);
+            if (p.player.getGameMode() != GameMode.SPECTATOR) {
+                p.player.setInvulnerable(false);
+                p.player.setAllowFlight(false);
+                p.player.setFlying(false);
+            }
 
             p.player.getInventory().clear();
             p.player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 2, false, false));
@@ -277,7 +288,6 @@ public class Paintdown {
         if (paintedBlocks.size() >= 1)
             paintedBlocks.clear();
          */
-        resetBorder();
     }
 
     // Paint a random number of armor from 1-3 (4 painted slots signifies eliminated)
@@ -332,6 +342,9 @@ public class Paintdown {
             case "STARTING":
                 replaceSpawnDoors(Material.AIR);
                 for (Participant p : Participant.participantsOnATeam) {
+                    if (p.hasTelepick) {
+                        p.hasTelepick = false;
+                    }
                     p.player.setGameMode(SURVIVAL);
                 }
                 mcc.scoreboardManager.startTimerForGame(270, "Paintdown");
@@ -339,12 +352,14 @@ public class Paintdown {
                 break;
             case "END_ROUND":
                 if (roundNum < 3) {
+                    border.setSize(500);
                     nextRound();
                 } else {
                     mcc.game.endGame();
                     setState("INACTIVE");
                     mcc.setGameOver(true);
                     resetMap();
+                    resetBorder();
                 }
                 break;
         }
@@ -363,9 +378,9 @@ public class Paintdown {
                 }
                 break;
             case "PLAYING":
-                if (time == 105) {
-                    p.player.player.sendTitle(" ", ChatColor.RED + "Border shrinks in 15 seconds!", 0, 40, 20);
-                } else if (time == 90) {
+                if (time == 180 || time == 105) {
+                    p.player.player.sendTitle(" ", ChatColor.RED + "Border Shrinks in 15 seconds!", 0, 40, 20);
+                } else if (time == 165 || time == 90) {
                     p.player.player.sendTitle(" ", ChatColor.RED + "Border Shrinking!", 0, 40, 20);
                 } else if (time == 75) {
                     p.player.player.sendTitle(" ", ChatColor.RED + "Final Shrink!", 0, 40, 20);
@@ -389,6 +404,10 @@ public class Paintdown {
                 } else if (time == 180) {
                     replaceCoinCage(Material.AIR);
                     Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.AQUA + "> Coin Crates are now open!");
+                    Bukkit.broadcastMessage(ChatColor.RED + "Border will shrink in 15 seconds!");
+                } else if (time == 165) {
+                  Bukkit.broadcastMessage(ChatColor.RED + "The border is shrinking!");
+                  border.setSize(150, 15);
                 } else if (time == 135) {
                     Bukkit.broadcastMessage("Doors to the middle will open in 15 seconds!");
                 } else if (time == 120) {
@@ -398,7 +417,7 @@ public class Paintdown {
                     Bukkit.broadcastMessage(ChatColor.RED + "The border will shrink in 15 seconds!");
                     Bukkit.broadcastMessage(ChatColor.AQUA + "The middle coin crate will open in 15 seconds!");
                 } else if (time == 90) {
-                    border.setSize(50, 30);
+                    border.setSize(50, 15);
                     Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "The border has begun to shrink!");
                     replaceMiddleCoinCage(Material.AIR);
                     Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.AQUA + "The middle coin crate is open!");
@@ -410,8 +429,6 @@ public class Paintdown {
             case "END_ROUND":
                 if (time == 9) {
                     rewardLastPlayers();
-                } else if (time == 3) {
-                    border.setSize(500);
                 }
                 break;
         }
@@ -596,8 +613,8 @@ public class Paintdown {
 
 
     // Eliminate team
-    public void eliminateTeam(int index) {
-        for (Participant p : mcc.teams.get(Participant.indexToName(index))) {
+    public void eliminateTeam(String teamName) {
+        for (Participant p : mcc.teams.get(teamName)) {
             p.player.sendTitle(ChatColor.RED + "TEAM PAINTED", null, 0, 60, 40);
             // add to dead list if they were not
             // (falling into lava puts you immediately on dead list
@@ -628,7 +645,7 @@ public class Paintdown {
         }, 60);
 
         // check whether to end round (only one team remains)
-        aliveTeams.remove(Participant.indexToName(index));
+        aliveTeams.remove(teamName);
 
         // Case where event has less than 6 teams
         int living = 0;
@@ -645,20 +662,21 @@ public class Paintdown {
     // Check for player death
     public void checkFullTeamDeath(Participant participant) {
         int deadTeammates = 0;
-        for (Participant indexP : mcc.teams.get(Participant.indexToName(participant.teamIndex))) {
+        List<Participant> thisTeam = mcc.teams.get(participant.teamNameFull);
+        for (Participant indexP : thisTeam) {
             if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR)) deadTeammates++;
         }
-        if (deadTeammates == mcc.teams.get(Participant.indexToName(participant.teamIndex)).size()) {
-            eliminateTeam(participant.teamIndex);
+        if (deadTeammates == thisTeam.size()) {
+            eliminateTeam(participant.teamNameFull);
 
-            for (Participant indexP : mcc.teams.get(Participant.indexToName(participant.teamIndex))) {
+            for (Participant indexP : thisTeam) {
                 if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR))
                     indexP.setIsPainted(false);
             }
             Bukkit.getScheduler().scheduleSyncDelayedTask(mcc.plugin, new Runnable() {
                 @Override
                 public void run() {
-                    Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.team + " have been eliminated!");
+                    Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.teamNameFull + ChatColor.WHITE + " have been eliminated!");
                 }
             }, 60);
         }

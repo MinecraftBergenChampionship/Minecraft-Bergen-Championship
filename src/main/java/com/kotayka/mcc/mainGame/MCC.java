@@ -55,9 +55,6 @@ public final class MCC extends JavaPlugin implements Listener {
     public Map<UUID, Integer> teamsAlive = new HashMap<UUID, Integer>();
     public int gameRound = 0;
 
-//  Team
-    //public List<List<Participant>> teamList = new ArrayList<List<Participant>>(6);
-
 //  Managers
     public final Players players = new Players(this);
     private final NPCManager npcManager = new NPCManager(this, players);
@@ -104,8 +101,6 @@ public final class MCC extends JavaPlugin implements Listener {
         getCommand("world").setExecutor(new world());
         getCommand("checkbuild").setExecutor(new checkBuild(this));
 
-
-
         List<Participant> red = new ArrayList<Participant>(4);
         List<Participant> green = new ArrayList<Participant>(4);
         List<Participant> yellow = new ArrayList<Participant>(4);
@@ -119,15 +114,6 @@ public final class MCC extends JavaPlugin implements Listener {
         teams.put("Blue Bats", blue);
         teams.put("Purple Pandas", purple);
         teams.put("Pink Piglets", pink);
-
-        /*
-        probably unnecessary at this point
-        teamList.add(red);
-        teamList.add(green);
-        teamList.add(yellow);
-        teamList.add(blue);
-        teamList.add(purple);
-        teamList.add(pink);*/
 
         if (Bukkit.getWorld("world") != null) {
             spawnWorld = Bukkit.getWorld("world");

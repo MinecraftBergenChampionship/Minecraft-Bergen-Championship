@@ -1,10 +1,7 @@
 package com.kotayka.mcc.Paintdown.Listener;
 
 import com.kotayka.mcc.Paintdown.Paintdown;
-import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
-import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
-import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
@@ -14,10 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
@@ -30,7 +24,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -96,7 +89,7 @@ public class PaintdownListener implements Listener {
 
         // Telepickaxe
         else if (player.getInventory().getItemInMainHand().getType() == Material.WOODEN_PICKAXE) {
-            String teamName = Participant.indexToName(p.teamIndex);
+            String teamName = p.teamNameFull;
             long timeLeft = System.currentTimeMillis() - paintdown.telepickCooldowns.get(teamName);
             // 15 second cooldown for telepick
             if (TimeUnit.MILLISECONDS.toSeconds(timeLeft) >= 15) {
@@ -110,6 +103,7 @@ public class PaintdownListener implements Listener {
                 paintdown.telepickCooldowns.remove(teamName);
                 paintdown.telepickCooldowns.put(teamName, System.currentTimeMillis());
                 // remove telepick from other team member if applicable
+                Bukkit.broadcastMessage(paintdown.mcc.teams.get(teamName).size()+"");
                 for (Participant indexP : paintdown.mcc.teams.get(teamName)) {
                     indexP.player.sendMessage(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE + " has claimed the telepickaxe.");
                     if (indexP.hasTelepick) {
@@ -221,11 +215,11 @@ public class PaintdownListener implements Listener {
             hitPlayer.setHealth(20);
 
             // Only send death messages to involved players (shooter's team and hit player's team)
-            for (Participant p : paintdown.mcc.teams.get(Participant.indexToName(participant.teamIndex))) {
+            for (Participant p : paintdown.mcc.teams.get(participantShooter.teamNameFull)) {
                 p.player.sendMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was painted by "
                         + participantShooter.teamPrefix + participantShooter.chatColor + participantShooter.ign);
             }
-            for (Participant p : paintdown.mcc.teams.get(Participant.indexToName(participantShooter.teamIndex))) {
+            for (Participant p : paintdown.mcc.teams.get(participantShooter.teamNameFull)) {
                 p.player.sendMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was painted by "
                         + participantShooter.teamPrefix + participantShooter.chatColor + participantShooter.ign);
             }
@@ -257,14 +251,14 @@ public class PaintdownListener implements Listener {
                     p.setIsPainted(false);
 
                     // broadcast the exiting news to the team
-                    for (Participant temp : paintdown.mcc.teams.get(Participant.indexToName(p.teamIndex))) {
+                    for (Participant temp : paintdown.mcc.teams.get(p.teamNameFull)) {
                         temp.player.sendMessage(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE + " was revived!");
                     }
 
                     // broadcast the not very exciting news to the enemy team
                     Participant shotBy = Participant.findParticipantFromPlayer(p.getPaintedBy());
                     assert shotBy != null;
-                    for (Participant temp : paintdown.mcc.teams.get(Participant.indexToName(shotBy.teamIndex))) {
+                    for (Participant temp : paintdown.mcc.teams.get(shotBy.teamNameFull)) {
                         temp.player.sendMessage(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE + " was revived!");
                         // points are only for final kills unfortunately
                         if (temp.player.getUniqueId().equals(shotBy.player.getUniqueId())) {
@@ -341,7 +335,7 @@ public class PaintdownListener implements Listener {
             Participant brokeBlock = Participant.findParticipantFromPlayer(e.getPlayer());
             assert brokeBlock != null;
             for (Participant p : Participant.participantsOnATeam) {
-                if (p.teamIndex == brokeBlock.teamIndex) {
+                if (p.teamNameFull.equals(brokeBlock.teamNameFull)) {
                     paintdown.mcc.scoreboardManager.addScore(paintdown.mcc.scoreboardManager.players.get(p.player.getUniqueId()), 1);
                 }
             }
@@ -352,25 +346,27 @@ public class PaintdownListener implements Listener {
 
     /* For BORDER DAMAGE */
     @EventHandler
-    public void onRespawn(EntityDamageByEntityEvent e) {
+    public void onDamage(EntityDamageEvent e) {
         if (!(paintdown.getState().equals("PLAYING"))) { return; }
         if (!(e.getEntity() instanceof Player)) { return; }
         if (!(e.getEntity().getWorld().equals(paintdown.world))) return;
 
         // If border damage kills player
-        Player player = (Player) e.getEntity();
-        if (player.getHealth() - e.getDamage() < 1) {
-            e.setCancelled(true);
-            player.setGameMode(GameMode.SPECTATOR);
-            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 2, false, false));
+        if (e.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)) {
+            Player player = (Player) e.getEntity();
+            if (player.getHealth() - e.getDamage() < 1) {
+                e.setCancelled(true);
+                player.setGameMode(GameMode.SPECTATOR);
+                player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 2, false, false));
 
-            Participant participant = Participant.findParticipantFromPlayer(player);
-            assert participant != null;
-            paintdown.deadList.add(participant.player.getUniqueId());
+                Participant participant = Participant.findParticipantFromPlayer(player);
+                assert participant != null;
+                paintdown.deadList.add(participant.player.getUniqueId());
 
-            Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + " was stuck in a melting room");
+                Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was stuck in a melting room");
 
-            paintdown.checkFullTeamDeath(participant);
+                paintdown.checkFullTeamDeath(participant);
+            }
         }
     }
 

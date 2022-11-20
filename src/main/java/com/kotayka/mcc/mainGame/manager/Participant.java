@@ -1,23 +1,17 @@
 package com.kotayka.mcc.mainGame.manager;
 
-import com.kotayka.mcc.TGTTOS.managers.Firework;
 import com.kotayka.mcc.mainGame.MCC;
-import jline.internal.Nullable;
-import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Participant {
     public int totalCoins;
@@ -29,12 +23,11 @@ public class Participant {
     public ChatColor chatColor = ChatColor.GRAY;
     public static List<Participant> participantsOnATeam = new ArrayList<>();
     public String teamPrefix = "";
-    public String fullName;
 
-    // Used mostly to make indexing easier (and to prevent nesting for loops wherever necessary)
-    // Used for mcc.teamList.get(teamIndex); (skip looping to find whether team matches)
-    // Red = 0, Yellow = 1, Green = 2, Blue = 3, Purple = 4, Pink = 5;
-    public int teamIndex = -1;
+    // FULL NAME IS THE TEAM NAME
+    // WHY DID NOBODY SAY THIS BEFORE LMAO
+    public String teamNameFull = "Spectator";
+
 
     public final Player player;
     public String ign;
@@ -132,9 +125,7 @@ public class Participant {
 
         assert newOne != null;
         assert newTwo != null;
-        if (newOne.team == null || newTwo.team == null) {
-            Bukkit.broadcastMessage("Either " + newOne.ign + " or " + newTwo.ign + " is not on a team! I sure hope this message never gets sent!");
-        }
+
         return (newOne.team).equals(newTwo.team);
     }
 
@@ -146,43 +137,31 @@ public class Participant {
                 color = Color.RED;
                 chatColor = ChatColor.RED;
                 teamPrefix = ChatColor.WHITE+"Ⓡ ";
-                teamIndex = 0;
-                mcc.teams.get("Red Rabbits").add(this);
                 break;
             case "YellowYaks":
                 color = Color.YELLOW;
                 chatColor = ChatColor.YELLOW;
                 teamPrefix = ChatColor.WHITE+"Ⓨ ";
-                teamIndex = 1;
-                mcc.teams.get("Yellow Yaks").add(this);
                 break;
             case "GreenGuardians":
                 color = Color.GREEN;
                 chatColor = ChatColor.GREEN;
                 teamPrefix = ChatColor.WHITE+"Ⓖ ";
-                teamIndex = 2;
-                mcc.teams.get("Green Guardians").add(this);
                 break;
             case "BlueBats":
                 color = Color.BLUE;
                 chatColor = ChatColor.BLUE;
                 teamPrefix = ChatColor.WHITE+"Ⓑ ";
-                teamIndex = 3;
-                mcc.teams.get("Blue Bats").add(this);
                 break;
             case "PurplePandas":
                 color = Color.PURPLE;
                 chatColor = ChatColor.DARK_PURPLE;
                 teamPrefix = ChatColor.WHITE+"Ⓤ ";
-                teamIndex = 4;
-                mcc.teams.get("Purple Pandas").add(this);
                 break;
             case "PinkPiglets":
                 color = Color.fromRGB(243, 139, 170);
                 chatColor = ChatColor.LIGHT_PURPLE;
                 teamPrefix = ChatColor.WHITE+"Ⓟ ";
-                teamIndex = 5;
-                mcc.teams.get("Pink Piglets").add(this);
                 break;
         }
     }
@@ -218,24 +197,4 @@ public class Participant {
     public boolean getIsPainted() { return isPainted; }
     public void setPaintedBy(Player p) { paintedBy = p; }
     public Player getPaintedBy() { return paintedBy; }
-
-    // not necessarily paintdown specific but for now yes
-    public static String indexToName(int index) {
-        switch(index) {
-            case 0:
-                return "Red Rabbits";
-            case 1:
-                return "Yellow Yaks";
-            case 2:
-                return "Green Guardians";
-            case 3:
-                return "Blue Bats";
-            case 4:
-                return "Purple Pandas";
-            case 5:
-                return "Pink Parrots";
-            default:
-                return "Invalid Index!";
-        }
-    }
 }

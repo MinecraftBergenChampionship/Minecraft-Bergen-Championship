@@ -243,7 +243,7 @@ public class ScoreboardManager {
         lobby.getScore(ChatColor.GREEN + "Teams ready").setScore(21);
         lobby.getScore(ChatColor.RESET.toString()).setScore(19);
         lobby.getScore(ChatColor.GREEN+""+ChatColor.BOLD + "Your Team:").setScore(18);
-        lobby.getScore(teamColors.get(player.player.team)+player.player.fullName).setScore(17);
+        lobby.getScore(teamColors.get(player.player.team)+player.player.teamNameFull).setScore(17);
         lobby.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(16);
         lobby.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
         lobby.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(3);
@@ -255,7 +255,7 @@ public class ScoreboardManager {
         player.lines.get(lobby).put(20, ChatColor.GREEN + "Teams ready");
         player.lines.get(lobby).put(19, ChatColor.RESET.toString());
         player.lines.get(lobby).put(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team:");
-        player.lines.get(lobby).put(17, teamColors.get(player.player.team)+player.player.fullName);
+        player.lines.get(lobby).put(17, teamColors.get(player.player.team)+player.player.teamNameFull);
         player.lines.get(lobby).put(16, ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString());
         player.lines.get(lobby).put(15, ChatColor.GREEN+"Game Scores");
         player.lines.get(lobby).put(3, ChatColor.RESET.toString()+ChatColor.RESET.toString());
@@ -278,7 +278,7 @@ public class ScoreboardManager {
         lobby.getScore(ChatColor.GREEN + "Teams ready").setScore(21);
         lobby.getScore(ChatColor.RESET.toString()).setScore(19);
         lobby.getScore(ChatColor.GREEN+""+ChatColor.BOLD + "Your Team:").setScore(18);
-        lobby.getScore(teamColors.get(player.player.team)+player.player.fullName).setScore(17);
+        lobby.getScore(teamColors.get(player.player.team)+player.player.teamNameFull).setScore(17);
         lobby.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(16);
         lobby.getScore(ChatColor.GREEN+"Game Scores").setScore(15);
         lobby.getScore(ChatColor.RESET.toString()+ChatColor.RESET.toString()).setScore(3);
@@ -290,7 +290,7 @@ public class ScoreboardManager {
         player.lines.get(lobby).put(20, ChatColor.GREEN + "Teams ready");
         player.lines.get(lobby).put(19, ChatColor.RESET.toString());
         player.lines.get(lobby).put(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team:");
-        player.lines.get(lobby).put(17, teamColors.get(player.player.team)+player.player.fullName);
+        player.lines.get(lobby).put(17, teamColors.get(player.player.team)+player.player.teamNameFull);
         player.lines.get(lobby).put(16, ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString());
         player.lines.get(lobby).put(15, ChatColor.GREEN+"Game Scores");
         player.lines.get(lobby).put(3, ChatColor.RESET.toString()+ChatColor.RESET.toString());
