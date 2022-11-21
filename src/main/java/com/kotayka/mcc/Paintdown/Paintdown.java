@@ -58,7 +58,7 @@ public class Paintdown {
         world = Bukkit.getWorld("Meltdown") == null ? Bukkit.getWorld("world") : Bukkit.getWorld("Meltdown");
         assert world != null;
 
-        CENTER = new Location(world, 63, 0, 64);
+        CENTER = new Location(world, 63.5, 0, 64.5);
         createCoinLocations();
         resetMap();
 
@@ -232,6 +232,7 @@ public class Paintdown {
             int randomNum = (int) (Math.random() * tempSpawns.size());
             for (Participant p : l) {
                 if (p.hasTelepick) p.hasTelepick = false;
+                if (p.getPaintedBy() != null) p.setPaintedBy(null);
                 p.player.teleport(tempSpawns.get(randomNum));
                 p.player.setGameMode(ADVENTURE);
             }
@@ -312,17 +313,20 @@ public class Paintdown {
     public void paintHitPlayer(Participant p) {
         ItemStack[] armor = p.player.getInventory().getArmorContents();
         int random = (int) (Math.random() * 2 + 1);
+        // array list of armor slots will not allow .remove()
+        List<Integer> indexes = new ArrayList<Integer>(4);
+        indexes.add(0); indexes.add(1); indexes.add(2); indexes.add(4);
 
-        // TODO refine algorithm to prevent double changes
         for (int i = 0; i < random; i++) {
-            int slot = (int) (Math.random() * 2 + 1);
-            ItemStack leatherPiece = getPaintedLeatherArmor(armor[Math.abs(slot-random)]);
+            int slot = (int) (Math.random() * (indexes.size()-1));
+            ItemStack leatherPiece = getPaintedLeatherArmor(armor[slot]);
             switch (leatherPiece.getType()) {
                 case LEATHER_HELMET -> p.player.getInventory().setHelmet(leatherPiece);
                 case LEATHER_CHESTPLATE -> p.player.getInventory().setChestplate(leatherPiece);
                 case LEATHER_LEGGINGS -> p.player.getInventory().setLeggings(leatherPiece);
                 case LEATHER_BOOTS -> p.player.getInventory().setBoots(leatherPiece);
             }
+            indexes.remove(slot);
         }
     }
 
@@ -668,10 +672,8 @@ public class Paintdown {
                     if (l.size() == 0) continue;
                     living++;
                 }
-                Bukkit.broadcastMessage(aliveTeams.size()+", size");
-                Bukkit.broadcastMessage(living+"");
 
-                if ((aliveTeams.size() - living) <= 1) {
+                if ((aliveTeams.size() - living) <= 1 || (living <= 1)) {
                     mcc.scoreboardManager.timer = 0;
                 }
             }
@@ -688,13 +690,13 @@ public class Paintdown {
         if (deadTeammates == thisTeam.size()) {
             eliminateTeam(participant.teamNameFull);
 
-            for (Participant indexP : thisTeam) {
-                if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR))
-                    indexP.setIsPainted(false);
-            }
             Bukkit.getScheduler().scheduleSyncDelayedTask(mcc.plugin, new Runnable() {
                 @Override
                 public void run() {
+                    for (Participant indexP : thisTeam) {
+                        if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR))
+                            indexP.setIsPainted(false);
+                    }
                     Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.teamNameFull + ChatColor.WHITE + " have been eliminated!");
                 }
             }, 60);

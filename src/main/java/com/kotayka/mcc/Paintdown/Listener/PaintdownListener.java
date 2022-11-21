@@ -5,6 +5,7 @@ import com.kotayka.mcc.mainGame.manager.Participant;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
@@ -46,7 +47,7 @@ public class PaintdownListener implements Listener {
         Participant p = Participant.findParticipantFromPlayer(player);
         assert p != null;
 
-        // Prevent painted players from shooting
+        // Prevent painted players from doing anything
         if (p.getIsPainted()) return;
 
         // Cooldown
@@ -137,6 +138,8 @@ public class PaintdownListener implements Listener {
     @EventHandler
     public void onProjectileHitEvent(ProjectileHitEvent e) {
         if (!(paintdown.getState().equals("PLAYING"))) { return; }
+        // for debugging ONLY (leave commented during events, although in theory nothing changes)
+        // if (!(e.getEntity() instanceof Snowball) && !(e.getEntity() instanceof Arrow)) return;
         if (!(e.getEntity() instanceof Snowball)) return;
 
         // If we hit a terracotta block, paint it //
@@ -180,6 +183,7 @@ public class PaintdownListener implements Listener {
         assert participantShooter != null;
         assert participant != null;
 
+        // comment this line out ONLY when debugging solo (as in, you need to hit yourself with an arrow)
         if ((participant.team).equals(participantShooter.team)) return;
 
         Vector snowballVelocity = e.getEntity().getVelocity();
@@ -219,8 +223,35 @@ public class PaintdownListener implements Listener {
                     case LEATHER_BOOTS -> hitPlayer.getInventory().setBoots(leatherPiece);
                 }
             }
+            // if player had telepick, remove it and reset the cooldown
+            if (participant.hasTelepick) {
+                participant.hasTelepick = false;
+
+                for(int i = 0; i<participant.player.getInventory().getSize()-1; ++i) {
+                    ItemStack item = participant.player.getInventory().getItem(i);
+                    try {
+                        if(item.getType().equals(Material.DIAMOND_PICKAXE)) {
+                            item.setType(Material.WOODEN_PICKAXE);
+                            break;
+                        }
+                    } catch(NullPointerException exception) {
+                        continue;
+                    }
+                }
+                // automatically allow team to use telepick again
+                paintdown.telepickCooldowns.remove(participant.teamNameFull);
+                paintdown.telepickCooldowns.put(participant.teamNameFull, TimeUnit.SECONDS.toMillis(15));
+            }
+
             // Check if whole team died
-            paintdown.checkFullTeamDeath(participant);
+            Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+
+                @Override
+                public void run() {
+                    paintdown.checkFullTeamDeath(participant);
+                }
+
+            }, 60);
             // Died but teammates are alive
             hitPlayer.setHealth(20);
 
@@ -257,6 +288,18 @@ public class PaintdownListener implements Listener {
                 // prevent healing enemy team
                 if (!(p.team.equals(potionThrower.team))) continue;
 
+                // Restore armor
+                ItemStack[] armor = p.player.getInventory().getArmorContents();
+                for (int i = 0; i < 4; i++) {
+                    ItemStack newArmor = p.getColoredLeatherArmor(armor[i]);
+                    switch (newArmor.getType()) {
+                        case LEATHER_HELMET -> p.player.getInventory().setHelmet(newArmor);
+                        case LEATHER_CHESTPLATE -> p.player.getInventory().setChestplate(newArmor);
+                        case LEATHER_LEGGINGS -> p.player.getInventory().setLeggings(newArmor);
+                        default -> p.player.getInventory().setBoots(newArmor);
+                    }
+                }
+
                 if (p.getIsPainted())  {
                     p.setIsPainted(false);
 
@@ -277,18 +320,6 @@ public class PaintdownListener implements Listener {
                     }
 
                     p.setPaintedBy(null);
-
-                    // Restore armor
-                    ItemStack[] armor = p.player.getInventory().getArmorContents();
-                    for (int i = 0; i < 4; i++) {
-                        ItemStack newArmor = p.getColoredLeatherArmor(armor[i]);
-                        switch (newArmor.getType()) {
-                            case LEATHER_HELMET -> p.player.getInventory().setHelmet(newArmor);
-                            case LEATHER_CHESTPLATE -> p.player.getInventory().setChestplate(newArmor);
-                            case LEATHER_LEGGINGS -> p.player.getInventory().setLeggings(newArmor);
-                            default -> p.player.getInventory().setBoots(newArmor);
-                        }
-                    }
                 } else {
                     p.player.setHealth(20);
                     p.setPaintedBy(null);
@@ -325,8 +356,14 @@ public class PaintdownListener implements Listener {
                         + lastPainted.teamPrefix + lastPainted.chatColor + lastPainted.ign);
             }
             paintdown.deadList.add(participant.player.getUniqueId());
+            Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
 
-            paintdown.checkFullTeamDeath(participant);
+                @Override
+                public void run() {
+                    paintdown.checkFullTeamDeath(participant);
+                }
+
+            }, 60);
         }
     }
 
@@ -381,7 +418,14 @@ public class PaintdownListener implements Listener {
                 }
                 Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was stuck in a melting room");
 
-                paintdown.checkFullTeamDeath(participant);
+                Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+
+                    @Override
+                    public void run() {
+                        paintdown.checkFullTeamDeath(participant);
+                    }
+
+                }, 60);
             }
         }
     }
