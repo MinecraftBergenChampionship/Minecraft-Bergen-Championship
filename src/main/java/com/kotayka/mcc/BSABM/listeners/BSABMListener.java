@@ -81,7 +81,7 @@ public class BSABMListener implements Listener {
 
         // since all the lobby stuff is above, i'm just gonna put this here
         // in the future we could prob move it but...for now
-        if (game.stage.equals("Lobby")) {
+        if (e.getPlayer().getWorld().equals(mcc.spawnWorld)) {
             if (e.getPlayer().getLocation().getY() <= -60 && e.getPlayer().getWorld().equals(mcc.spawnWorld)) {
                 e.getPlayer().teleport(mcc.SPAWN);
             }

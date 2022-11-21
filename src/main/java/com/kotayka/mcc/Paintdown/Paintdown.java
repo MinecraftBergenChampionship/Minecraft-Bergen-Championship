@@ -7,7 +7,9 @@ import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -85,6 +87,21 @@ public class Paintdown {
         PotionMeta meta = (PotionMeta)potion.getItemMeta();
         assert meta != null;
         meta.setColor(Color.BLUE);
+        meta.setDisplayName("Water Bomb");
+        potion.setItemMeta(meta);
+
+        ItemStack map = new ItemStack(Material.FILLED_MAP, 1);
+        MapMeta mapMeta = (MapMeta)map.getItemMeta();
+        assert mapMeta != null;
+        /*
+        MapView mapView = Bukkit.createMap(world);
+        mapView.setCenterX(63);
+        mapView.setCenterZ(64);
+        mapView.setScale(MapView.Scale.CLOSE);
+        mapMeta.setMapView(mapView);
+         */
+        mapMeta.setMapId(55);
+        map.setItemMeta(mapMeta);
 
         // Spawn Items (for now, just iron horse armor and potions)
         spawnItems = Arrays.asList(
@@ -93,7 +110,7 @@ public class Paintdown {
                 new ItemStack(Material.LEATHER_CHESTPLATE),
                 new ItemStack(Material.LEATHER_HELMET),
                 new ItemStack(Material.LEATHER_LEGGINGS),
-                new ItemStack(Material.WOODEN_PICKAXE)
+                new ItemStack(Material.WOODEN_PICKAXE), map
         );
 
         Location spawnOne = new Location(world, -39, 0, -17);
@@ -214,6 +231,7 @@ public class Paintdown {
         for (List<Participant> l : mcc.teams.values()) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
             for (Participant p : l) {
+                if (p.hasTelepick) p.hasTelepick = false;
                 p.player.teleport(tempSpawns.get(randomNum));
                 p.player.setGameMode(ADVENTURE);
             }
@@ -379,7 +397,7 @@ public class Paintdown {
                 break;
             case "PLAYING":
                 if (time == 180 || time == 105) {
-                    p.player.player.sendTitle(" ", ChatColor.RED + "Border Shrinks in 15 seconds!", 0, 40, 20);
+                    p.player.player.sendTitle(" ", ChatColor.RED + "Border Shrinking Soon!", 0, 40, 20);
                 } else if (time == 165 || time == 90) {
                     p.player.player.sendTitle(" ", ChatColor.RED + "Border Shrinking!", 0, 40, 20);
                 } else if (time == 75) {
@@ -409,10 +427,10 @@ public class Paintdown {
                   Bukkit.broadcastMessage(ChatColor.RED + "The border is shrinking!");
                   border.setSize(150, 15);
                 } else if (time == 135) {
-                    Bukkit.broadcastMessage("Doors to the middle will open in 15 seconds!");
+                    Bukkit.broadcastMessage(ChatColor.AQUA + "Doors to the middle will open in 15 seconds!");
                 } else if (time == 120) {
                     replaceMiddleEntrance(Material.AIR);
-                    Bukkit.broadcastMessage(ChatColor.BOLD + "Doors to the middle have opened!");
+                    Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.AQUA + "Doors to the middle have opened!");
                 } else if (time == 105) {
                     Bukkit.broadcastMessage(ChatColor.RED + "The border will shrink in 15 seconds!");
                     Bukkit.broadcastMessage(ChatColor.AQUA + "The middle coin crate will open in 15 seconds!");
@@ -421,7 +439,7 @@ public class Paintdown {
                     Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "The border has begun to shrink!");
                     replaceMiddleCoinCage(Material.AIR);
                     Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.AQUA + "The middle coin crate is open!");
-                } else if (time == 75) {
+                } else if (time == 60) {
                     Bukkit.broadcastMessage(ChatColor.RED + "The border will shrink to its final size!");
                     border.setSize(30, 20);
                 }
@@ -641,22 +659,23 @@ public class Paintdown {
                         mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 4);
                     }
                 }
+                // check whether to end round (only one team remains)
+                aliveTeams.remove(teamName);
+
+                // Case where event has less than 6 teams
+                int living = 0;
+                for (List<Participant> l : mcc.teams.values()) {
+                    if (l.size() == 0) continue;
+                    living++;
+                }
+                Bukkit.broadcastMessage(aliveTeams.size()+", size");
+                Bukkit.broadcastMessage(living+"");
+
+                if ((aliveTeams.size() - living) <= 1) {
+                    mcc.scoreboardManager.timer = 0;
+                }
             }
         }, 60);
-
-        // check whether to end round (only one team remains)
-        aliveTeams.remove(teamName);
-
-        // Case where event has less than 6 teams
-        int living = 0;
-        for (List<Participant> l : mcc.teams.values()) {
-            if (l.size() == 0) continue;
-            living++;
-        }
-
-        if (living <= 1) {
-            mcc.scoreboardManager.timer = 0;
-        }
     }
 
     // Check for player death

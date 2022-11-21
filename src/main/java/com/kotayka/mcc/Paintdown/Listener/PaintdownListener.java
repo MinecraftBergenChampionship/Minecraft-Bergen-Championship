@@ -4,6 +4,7 @@ import com.kotayka.mcc.Paintdown.Paintdown;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
@@ -52,7 +53,7 @@ public class PaintdownListener implements Listener {
         if (player.getInventory().getItemInMainHand().getType() == Material.IRON_HORSE_ARMOR ||
             player.getInventory().getItemInOffHand().getType() == Material.IRON_HORSE_ARMOR) {
             long timeLeft = System.currentTimeMillis() - p.getCooldown();
-            if (timeLeft >= 700) {
+            if (timeLeft >= 500) {
                 Snowball projectile = player.launchProjectile(Snowball.class);
                 projectile.setVelocity(new Vector(projectile.getVelocity().getX() * 1.25, projectile.getVelocity().getY() * 1.25, projectile.getVelocity().getZ() * 1.25));
                 projectile.setShooter(player); // Not sure if this is necessary
@@ -78,8 +79,11 @@ public class PaintdownListener implements Listener {
                             PotionMeta meta = (PotionMeta)potion.getItemMeta();
                             assert meta != null;
                             meta.setColor(Color.BLUE);
+                            meta.setDisplayName("Water Bomb");
+                            potion.setItemMeta(meta);
 
                             p.player.getInventory().addItem(potion);
+                            p.availablePotions++;
                         }
                     }
                 }, 300);
@@ -103,7 +107,6 @@ public class PaintdownListener implements Listener {
                 paintdown.telepickCooldowns.remove(teamName);
                 paintdown.telepickCooldowns.put(teamName, System.currentTimeMillis());
                 // remove telepick from other team member if applicable
-                Bukkit.broadcastMessage(paintdown.mcc.teams.get(teamName).size()+"");
                 for (Participant indexP : paintdown.mcc.teams.get(teamName)) {
                     indexP.player.sendMessage(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE + " has claimed the telepickaxe.");
                     if (indexP.hasTelepick) {
@@ -188,9 +191,16 @@ public class PaintdownListener implements Listener {
         participant.setPaintedBy(shooter);
         // If player died
         if (hitPlayer.getHealth() - 10 <= 0) {
-            //TODO: if player is in the air, teleport them to bottom
-            //double y_loc = hitPlayer.getLocation().getY();
+            // if player is in the air, teleport them to bottom
+            /*
+            double y_loc = hitPlayer.getLocation().getY();
+            Location loc = new Location(hitPlayer.getWorld(), hitPlayer.getLocation().getX(), y_loc, hitPlayer.getLocation().getZ());
+            while (loc.getBlock().getType().equals(Material.AIR)) {
+                if (y_loc <= -[LOWEST LEVEL POSSIBLE]) {
 
+                }
+
+            }*/
 
             paintdown.mcc.scoreboardManager.addScore(paintdown.mcc.scoreboardManager.players.get(shooter.getUniqueId()), 15);
 
@@ -219,7 +229,7 @@ public class PaintdownListener implements Listener {
                 p.player.sendMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was painted by "
                         + participantShooter.teamPrefix + participantShooter.chatColor + participantShooter.ign);
             }
-            for (Participant p : paintdown.mcc.teams.get(participantShooter.teamNameFull)) {
+            for (Participant p : paintdown.mcc.teams.get(participant.teamNameFull)) {
                 p.player.sendMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was painted by "
                         + participantShooter.teamPrefix + participantShooter.chatColor + participantShooter.ign);
             }
@@ -364,6 +374,11 @@ public class PaintdownListener implements Listener {
                 assert participant != null;
                 paintdown.deadList.add(participant.player.getUniqueId());
 
+                if (participant.paintedBy != null) {
+                    // give last player to tag them 15 coins
+                    paintdown.mcc.scoreboardManager.addScore(paintdown.mcc.scoreboardManager.players.get(participant.paintedBy.getUniqueId()), 15);
+                    participant.paintedBy = null;
+                }
                 Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was stuck in a melting room");
 
                 paintdown.checkFullTeamDeath(participant);
