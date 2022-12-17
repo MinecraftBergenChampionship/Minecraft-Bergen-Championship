@@ -8,17 +8,22 @@ import com.kotayka.mcc.mainGame.manager.Players;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class SGListener implements Listener {
     private final SG sg;
@@ -111,6 +116,23 @@ public class SGListener implements Listener {
             if (!(event.getBlock().getType() == Material.COBWEB || String.valueOf(event.getBlock().getType()).endsWith("PANE"))) {
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler
+    public void onEatStew(PlayerInteractEvent e) {
+        if (!mcc.game.stage.equals("SG")) return;
+        if (!(e.getAction() == Action.RIGHT_CLICK_BLOCK) && !(e.getAction() == Action.RIGHT_CLICK_AIR)) return;
+
+        Player p = e.getPlayer();
+        if (p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW) { // main hand
+            p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 60, 1, false, true));
+            p.playSound(p.getLocation(), Sound.BLOCK_GRASS_BREAK, 1, 1);
+            p.getInventory().setItemInMainHand(null);
+        } else if (p.getInventory().getItemInOffHand().getType() == Material.MUSHROOM_STEW) { // off hand
+            p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 60, 1, false, true));
+            p.playSound(p.getLocation(), Sound.BLOCK_GRASS_BREAK, 1, 1);
+            p.getInventory().setItemInOffHand(null);
         }
     }
 }

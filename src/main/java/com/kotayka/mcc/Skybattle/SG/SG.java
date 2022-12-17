@@ -46,8 +46,18 @@ public class SG {
 
     public World world;
     public int[][] spawnLocs = {{3,-10},{0,-10},{-3,-10},{-6,-8},{-9,-6},{-10,-3},{-10,0},{-10,3},{-8,6},{-6,8,},{-3,10},{1,10},{4,9},{7,7},{9,4},{10,1},{10,-2},{9,-5},{6,-8}};
-    public Object[][] items = {{Material.STONE_SWORD,1,3},{Material.WOODEN_SWORD,1,3},{Material.STONE_AXE,1,1},{Material.GOLDEN_SWORD,1,2},{Material.MUSHROOM_STEW,1,1},{Material.LEATHER_HELMET,1,3},{Material.LEATHER_CHESTPLATE,1,2},{Material.LEATHER_LEGGINGS,1,2},{Material.LEATHER_BOOTS,1,2},{Material.GOLDEN_LEGGINGS,1,2},{Material.GOLDEN_BOOTS,1,2},{Material.BOW,1,2},{Material.CROSSBOW,1,2},{Material.ARROW,3,1},{Material.ARROW,2,2},{Material.GOLDEN_HELMET,1,3},{Material.GOLDEN_CHESTPLATE,1,2},{Material.LAPIS_LAZULI,1,3},{Material.GOLD_INGOT,1,3},{Material.IRON_INGOT,1,3},{Material.GOLDEN_LEGGINGS,1,2},{Material.GOLDEN_BOOTS,1,3},{Material.CHAINMAIL_CHESTPLATE,1,1},{Material.CHAINMAIL_LEGGINGS,1,1},{Material.CHAINMAIL_HELMET,1,2},{Material.CHAINMAIL_BOOTS,1,2},{Material.COOKIE,2,3},{Material.MELON_SLICE,4,3},{Material.STICK,1,2},{Material.STICK,2,2},{Material.STRING,1,2},{Material.STRING,2,2},{Material.BEEF,3,3},{Material.COOKED_BEEF,2,2},{Material.COOKED_PORKCHOP,1,2},{Material.PORKCHOP,3,3},{Material.APPLE,2,2},{Material.EXPERIENCE_BOTTLE,1,4}};
-    public Material[] supplyDropItems = {Material.IRON_HELMET,Material.IRON_CHESTPLATE,Material.IRON_LEGGINGS,Material.IRON_BOOTS,Material.COBWEB,Material.FISHING_ROD,Material.DIAMOND,Material.GOLDEN_APPLE};
+    public Object[][] items = {
+            {Material.STONE_SWORD,1,3},{Material.WOODEN_SWORD,1,3},{Material.STONE_AXE,1,1},{Material.GOLDEN_SWORD,1,2},{Material.MUSHROOM_STEW,1,1},
+            {Material.LEATHER_HELMET,1,3},{Material.LEATHER_CHESTPLATE,1,2},{Material.LEATHER_LEGGINGS,1,2},{Material.LEATHER_BOOTS,1,2},{Material.GOLDEN_LEGGINGS,1,2},
+            {Material.GOLDEN_BOOTS,1,2},{Material.BOW,1,1},{Material.CROSSBOW,1,1},{Material.ARROW,3,1},{Material.ARROW,2,2},{Material.GOLDEN_HELMET,1,3},
+            {Material.GOLDEN_CHESTPLATE,1,2},{Material.LAPIS_LAZULI,1,3},{Material.GOLD_INGOT,1,3},{Material.IRON_INGOT,1,3},{Material.GOLDEN_LEGGINGS,1,2},
+            {Material.GOLDEN_BOOTS,1,3},{Material.CHAINMAIL_CHESTPLATE,1,1},{Material.CHAINMAIL_LEGGINGS,1,1},{Material.CHAINMAIL_HELMET,1,2},
+            {Material.CHAINMAIL_BOOTS,1,2},{Material.COOKIE,2,3},{Material.MELON_SLICE,4,3},{Material.STICK,1,2},{Material.STICK,2,2},{Material.STRING,1,2},
+            {Material.STRING,2,2},{Material.BEEF,3,3},{Material.COOKED_BEEF,2,2},{Material.COOKED_PORKCHOP,1,2},{Material.PORKCHOP,3,3},{Material.APPLE,2,2},
+            {Material.EXPERIENCE_BOTTLE,1,4}};
+    public Material[] supplyDropItems =
+            {Material.IRON_HELMET,Material.IRON_CHESTPLATE,Material.IRON_LEGGINGS,Material.IRON_BOOTS,Material.COBWEB,
+                    Material.FISHING_ROD,Material.DIAMOND,Material.GOLDEN_APPLE};
     public List<ShulkerBox> boxes = new ArrayList<>();
     public SG(Players players, MCC mcc, Plugin plugin) {
         this.players = players;
@@ -185,7 +195,7 @@ public class SG {
                 if(c[i].getTileEntities()[x] instanceof Chest){
                     Chest c1 = (Chest) c[i].getTileEntities()[x];
                     if (c1.getX() > -200 && c1.getX() < 200 && c1.getZ() > -200 && c1.getZ() < 200)
-                    chests.add(c1);
+                        chests.add(c1);
                 }
             }
         }
