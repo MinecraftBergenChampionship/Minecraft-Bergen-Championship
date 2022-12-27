@@ -3,7 +3,9 @@ package com.kotayka.mcc.mainGame.commands;
 import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
+import com.kotayka.mcc.mainGame.manager.Team;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,13 +25,13 @@ public class ready implements CommandExecutor {
         if (sender instanceof Player && mcc.game.stage == "Waiting") {
             for (Participant p : players.participants) {
                 if (p.player.getUniqueId() == ((Player) sender).getUniqueId()) {
-                    if (p.team.equals("Spectator")) {
-                        sender.sendMessage("You are not on a team");
+                    if (p.team.getTeam().equals(Team.SPECTATORS)) {
+                        sender.sendMessage(ChatColor.RED + "You are not on a team!");
                         return true;
                     }
                     else {
-                        if (mcc.startGame.teamReadyMap.get(p.team)) {
-                            mcc.scoreboardManager.removeTeam(p.team);
+                        if (mcc.startGame.teamReadyMap.get(p.team.getTeamName())) {
+                            mcc.scoreboardManager.removeTeam(p.team.getTeamName());
                             mcc.startGame.numOfTeamsReady--;
                         }
                         else {
@@ -39,7 +41,7 @@ public class ready implements CommandExecutor {
                                 mcc.game.start();
                             }
                         }
-                        mcc.startGame.teamReadyMap.put(p.team, !mcc.startGame.teamReadyMap.get(p.team));
+                        mcc.startGame.teamReadyMap.put(p.team.getTeamName(), !mcc.startGame.teamReadyMap.get(p.team.getTeamName()));
                     }
                 }
             }

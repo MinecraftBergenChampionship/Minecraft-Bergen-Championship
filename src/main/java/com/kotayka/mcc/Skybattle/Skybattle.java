@@ -101,23 +101,23 @@ public class Skybattle {
                 if (i.getType() == Material.WHITE_CONCRETE) {
                     ItemStack concrete = new ItemStack(Material.WHITE_CONCRETE);
                     concrete.setAmount(64);
-                    switch (p.team) {
-                        case "RedRabbits":
+                    switch (p.team.getTeam()) {
+                        case RED_RABBITS:
                             concrete.setType(Material.RED_CONCRETE);
                             break;
-                        case "YellowYaks":
+                        case YELLOW_YAKS:
                             concrete.setType(Material.YELLOW_CONCRETE);
                             break;
-                        case "GreenGuardians":
+                        case GREEN_GUARDIANS:
                             concrete.setType(Material.GREEN_CONCRETE);
                             break;
-                        case "BlueBats":
+                        case BLUE_BATS:
                             concrete.setType(Material.BLUE_CONCRETE);
                             break;
-                        case "PurplePandas":
+                        case PURPLE_PANDAS:
                             concrete.setType(Material.PURPLE_CONCRETE);
                             break;
-                        case "PinkPiglets":
+                        case PINK_PIGLETS:
                             concrete.setType(Material.PINK_CONCRETE);
                             break;
                         default:
@@ -245,9 +245,9 @@ public class Skybattle {
         // Randomly place each team at a different spawn
         List<Location> tempSpawns = new ArrayList<>(spawnPoints);
 
-        for (List<Participant> l : mcc.teams.values()) {
+        for (int i = 0; i < mcc.teams.size(); i++) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
-            for (Participant p : l) {
+            for (Participant p : mcc.teams.get(i).getPlayers()) {
                 p.player.teleport(tempSpawns.get(randomNum));
             }
             tempSpawns.remove(randomNum);
@@ -372,7 +372,7 @@ public class Skybattle {
         List<String> survivorNames = new ArrayList<String>(1);
         for (Participant p : Participant.participantsOnATeam) {
             if (!playersDeadList.contains(p.player.getUniqueId())) {
-                survivorNames.add(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE);
+                survivorNames.add(p.team.getIcon() + p.team.getChatColor() + p.ign + ChatColor.WHITE);
                 mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 15);
                 p.player.setAllowFlight(true);
                 p.player.sendMessage(ChatColor.GREEN+"You survived the round!");

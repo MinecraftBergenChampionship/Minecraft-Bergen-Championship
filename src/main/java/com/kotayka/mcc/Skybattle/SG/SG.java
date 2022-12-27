@@ -103,10 +103,10 @@ public class SG {
             p.player.teleport(new Location(world, coords[0], 3, coords[1]));
             playerSpawnTeleported.add(p.player.getUniqueId());
             spawns.add(index);
-            teamsAlive.add(p.team);
+            teamsAlive.add(p.team.getTeamName());
             playersDead++;
         }
-        String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
+        String[] teamNames = {"Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets"};
         for (String team : teamNames) {
             if (teamsAlive.contains(team)) {
                 teamsDead++;

@@ -187,23 +187,23 @@ public class TGTTOS {
                         if (i.getType() == Material.WHITE_WOOL) {
                             ItemStack wool = new ItemStack(Material.WHITE_WOOL);
                             wool.setAmount(64);
-                            switch (p.team) {
-                                case "RedRabbits":
+                            switch (p.team.getTeam()) {
+                                case RED_RABBITS:
                                     wool.setType(Material.RED_WOOL);
                                     break;
-                                case "YellowYaks":
+                                case YELLOW_YAKS:
                                     wool.setType(Material.YELLOW_WOOL);
                                     break;
-                                case "GreenGuardians":
+                                case GREEN_GUARDIANS:
                                     wool.setType(Material.GREEN_WOOL);
                                     break;
-                                case "BlueBats":
+                                case BLUE_BATS:
                                     wool.setType(Material.BLUE_WOOL);
                                     break;
-                                case "PurplePandas":
+                                case PURPLE_PANDAS:
                                     wool.setType(Material.PURPLE_WOOL);
                                     break;
-                                case "PinkPiglets":
+                                case PINK_PIGLETS:
                                     wool.setType(Material.PINK_WOOL);
                                     break;
                                 default:
@@ -255,7 +255,7 @@ public class TGTTOS {
     }
 
     public static String getDeathMessage(Participant p) {
-        String name = p.teamPrefix + p.chatColor + p.ign + ChatColor.GRAY;
+        String name = p.team.getIcon() + p.team.getChatColor() + p.ign + ChatColor.GRAY;
         return name + deathMessages[(int)(Math.random() * deathMessages.length)];
     }
 

@@ -20,6 +20,7 @@ import com.kotayka.mcc.TGTTOS.managers.NPCManager;
 import com.kotayka.mcc.mainGame.Listeners.chatUpdater;
 import com.kotayka.mcc.mainGame.commands.*;
 import com.kotayka.mcc.mainGame.manager.*;
+import com.kotayka.mcc.mainGame.manager.Team;
 import com.kotayka.mcc.mainGame.manager.tabComplete.startCommand;
 import com.kotayka.mcc.mainGame.manager.tabComplete.tCommands;
 import org.bukkit.*;
@@ -34,6 +35,10 @@ import java.util.*;
 
 public final class MCC extends JavaPlugin implements Listener {
 
+    /* Values for tournament structure */
+    public static final short NUM_TEAMS = 6;
+    public static final short PLAYERS_PER_TEAM = 4;
+
 //  Starting
     public startGame startGame = new startGame();
 
@@ -41,8 +46,18 @@ public final class MCC extends JavaPlugin implements Listener {
     public ScoreboardManager manager = Bukkit.getScoreboardManager();
 
     public Map<String, Scoreboard> scoreboards = new HashMap<String, Scoreboard>();
-    // retooled
-    public Map<String, List<Participant>> teams = new HashMap<String, List<Participant>>();
+
+// MCCTeam Objects
+    private MCCTeam red = new MCCTeam(this, Team.RED_RABBITS);
+    private MCCTeam yellow = new MCCTeam(this, Team.YELLOW_YAKS);
+    private MCCTeam green = new MCCTeam(this, Team.GREEN_GUARDIANS);
+    private MCCTeam blue = new MCCTeam(this, Team.BLUE_BATS);
+    private MCCTeam purple = new MCCTeam(this, Team.PURPLE_PANDAS);
+    private MCCTeam pink = new MCCTeam(this, Team.PINK_PIGLETS);
+    //MCCTeam spectator = new MCCTeam(this, Team.SPECTATORS);
+    //teams.add(spectator);
+
+    public List<MCCTeam> teams = new ArrayList<>(Arrays.asList(red, yellow, green, blue, purple, pink));
 
     public Plugin plugin = this;
 
@@ -101,20 +116,6 @@ public final class MCC extends JavaPlugin implements Listener {
         getCommand("world").setExecutor(new world());
         getCommand("checkbuild").setExecutor(new checkBuild(this));
 
-        List<Participant> red = new ArrayList<Participant>(4);
-        List<Participant> green = new ArrayList<Participant>(4);
-        List<Participant> yellow = new ArrayList<Participant>(4);
-        List<Participant> blue = new ArrayList<Participant>(4);
-        List<Participant> purple = new ArrayList<Participant>(4);
-        List<Participant> pink = new ArrayList<Participant>(4);
-
-        teams.put("Red Rabbits", red);
-        teams.put("Green Guardians", green);
-        teams.put("Yellow Yaks", yellow);
-        teams.put("Blue Bats", blue);
-        teams.put("Purple Pandas", purple);
-        teams.put("Pink Piglets", pink);
-
         if (Bukkit.getWorld("world") != null) {
             spawnWorld = Bukkit.getWorld("world");
         }
@@ -131,6 +132,66 @@ public final class MCC extends JavaPlugin implements Listener {
         AceRaceGame();
         DecisionDome();
         scoreboardManager.start();
+    }
+
+    /*
+     * From a team name, retrieve the appropriate
+     * MCCTeam object. Works for all iterations
+     * of the String, ie "Green Guardians" returns
+     * the same value as "greenGuardians"
+     */
+    public MCCTeam getTeam(String teamName) {
+        Team t = getTeamValue(teamName);
+
+        for (MCCTeam mt : teams) {
+            if (mt.getTeam().equals(t)) {
+                return mt;
+            }
+        }
+
+        Bukkit.broadcastMessage(ChatColor.RED + "ERROR in MCC.java --> getTeam(String), invalid team name!");
+        // return last team as fail case
+        return teams.get(teams.size()-1);
+    }
+
+    // Alias for getTeam()
+    public MCCTeam getMCCTeam(String teamName) {
+        Team t = getTeamValue(teamName);
+
+        for (MCCTeam mt : teams) {
+            if (mt.getTeam().equals(t)) {
+                return mt;
+            }
+        }
+
+        Bukkit.broadcastMessage(ChatColor.RED + "ERROR in MCC.java --> getMCCTeam(String), invalid team name!");
+        // return last team as fail case
+        return teams.get(teams.size()-1);
+    }
+
+    /*
+     * Helper function to make things really
+     * neat and concise: used in getMCCTeam()
+     * for clean access to Team Enum, without
+     * hard coding team indexes.
+     */
+    private Team getTeamValue(String teamName) {
+        /*
+         * FOR CONSISTENCY (and sanity)
+         * make everything lowercase and remove spaces
+         * (to prevent errors from just loop checking
+         */
+        String newName = teamName.toLowerCase().replaceAll("\\s", "");
+        // conversion
+        return switch (newName) {
+            case "redrabbits" -> Team.RED_RABBITS;
+            case "yellowyaks" -> Team.YELLOW_YAKS;
+            case "greenguardians" -> Team.GREEN_GUARDIANS;
+            case "bluebats" -> Team.BLUE_BATS;
+            case "purplepandas" -> Team.PURPLE_PANDAS;
+            case "pinkpiglets", "pinkparrots" -> Team.PINK_PIGLETS;
+            default -> Team.SPECTATORS;
+        };
     }
 
     public void AceRaceGame() {
@@ -178,17 +239,14 @@ public final class MCC extends JavaPlugin implements Listener {
 
     public static void spawnFirework(Participant victim) {
         Firework firework = new Firework();
-        firework.spawnFireworkWithColor(victim.player.getLocation(), victim.color);
+        firework.spawnFireworkWithColor(victim.player.getLocation(), victim.team.getColor());
     }
 
     public void setGameOver(boolean b) {
         gameIsOver = b;
     }
     public void loadTeams() {
-        String[] teamNames = {"RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets"};
-
-        List<String> tn = new ArrayList<>(Arrays.asList(teamNames));
-        teamManager = new teamManager(players.participants, tn, this);
+        teamManager = new teamManager(players.participants, this);
     }
 
     @Override

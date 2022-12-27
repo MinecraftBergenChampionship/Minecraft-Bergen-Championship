@@ -8,16 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 public class teamManager {
-    public String[] teamNamesFull = {"Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets"};
     public final List<Participant> players;
-    public final List<String> teamNames;
     public final MCC mcc;
 
     public Map roundScores = new HashMap();
     public Map totalScores = new HashMap();
-    public teamManager(List<Participant> players, List<String> teamNames, MCC mcc) {
+    public teamManager(List<Participant> players, MCC mcc) {
         this.players = players;
-        this.teamNames = teamNames;
         this.mcc = mcc;
     }
 }

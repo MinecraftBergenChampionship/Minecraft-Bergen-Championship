@@ -23,11 +23,10 @@ public class chatUpdater implements Listener {
         String prefix = "";
         String message = event.getMessage();
         ChatColor color = ChatColor.GRAY;
-        String icon = "";
         for (Participant p : players.participants) {
             if (event.getPlayer() == p.player) {
-                color = p.chatColor;
-                prefix = p.teamPrefix;
+                color = p.team.getChatColor();
+                prefix = p.team.getIcon();
             }
         }
 

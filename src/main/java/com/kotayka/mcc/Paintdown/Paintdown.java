@@ -2,8 +2,10 @@ package com.kotayka.mcc.Paintdown;
 
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
 import com.kotayka.mcc.mainGame.MCC;
+import com.kotayka.mcc.mainGame.manager.MCCTeam;
 import com.kotayka.mcc.mainGame.manager.Participant;
 import com.kotayka.mcc.mainGame.manager.Players;
+import com.kotayka.mcc.mainGame.manager.Team;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -43,12 +45,11 @@ public class Paintdown {
     public List<Location> coinLocations;
 
 // Players
-    public List<UUID> deadList = new ArrayList<UUID>(6);
+    public List<UUID> deadList = new ArrayList<>(6);
 
-    // im gonna assume the original list remains unmutated
-    public Map<String, List<Participant>> aliveTeams = new HashMap<String, List<Participant>>(6);
+    public Map<Team, List<Participant>> aliveTeams = new HashMap<>(MCC.NUM_TEAMS);
 
-    public Map<String, Long> telepickCooldowns = new HashMap<String, Long>(6);
+    public Map<Team, Long> telepickCooldowns = new HashMap<>(MCC.NUM_TEAMS);
 
     public Paintdown(Players players, MCC mcc) {
         this.players = players;
@@ -62,21 +63,21 @@ public class Paintdown {
         createCoinLocations();
         resetMap();
 
-        aliveTeams.put("Red Rabbits", mcc.teams.get("Red Rabbits"));
-        aliveTeams.put("Yellow Yaks", mcc.teams.get("Yellow Yaks"));
-        aliveTeams.put("Green Guardians", mcc.teams.get("Green Guardians"));
-        aliveTeams.put("Blue Bats", mcc.teams.get("Blue Bats"));
-        aliveTeams.put("Purple Pandas", mcc.teams.get("Purple Pandas"));
-        aliveTeams.put("Pink Piglets", mcc.teams.get("Pink Piglets"));
+        aliveTeams.put(Team.RED_RABBITS, mcc.teams.get(0).getPlayers());
+        aliveTeams.put(Team.YELLOW_YAKS, mcc.teams.get(1).getPlayers());
+        aliveTeams.put(Team.GREEN_GUARDIANS, mcc.teams.get(2).getPlayers());
+        aliveTeams.put(Team.BLUE_BATS, mcc.teams.get(3).getPlayers());
+        aliveTeams.put(Team.PURPLE_PANDAS, mcc.teams.get(4).getPlayers());
+        aliveTeams.put(Team.PINK_PIGLETS, mcc.teams.get(5).getPlayers());
         // see if theres a way to get key from value
         // so we can remove teams with nobody on them
 
-        telepickCooldowns.put("Red Rabbits", (long) 0);
-        telepickCooldowns.put("Yellow Yaks", (long) 0);
-        telepickCooldowns.put("Green Guardians", (long) 0);
-        telepickCooldowns.put("Blue Bats", (long) 0);
-        telepickCooldowns.put("Purple Pandas", (long) 0);
-        telepickCooldowns.put("Pink Piglets", (long) 0);
+        telepickCooldowns.put(Team.RED_RABBITS, (long) 0);
+        telepickCooldowns.put(Team.YELLOW_YAKS, (long) 0);
+        telepickCooldowns.put(Team.GREEN_GUARDIANS, (long) 0);
+        telepickCooldowns.put(Team.BLUE_BATS, (long) 0);
+        telepickCooldowns.put(Team.PURPLE_PANDAS, (long) 0);
+        telepickCooldowns.put(Team.PINK_PIGLETS, (long) 0);
     }
 
     /*
@@ -206,19 +207,19 @@ public class Paintdown {
     public void startRound() {
         deadList.clear();
         aliveTeams.clear();
-        aliveTeams.put("Red Rabbits", mcc.teams.get("Red Rabbits"));
-        aliveTeams.put("Yellow Yaks", mcc.teams.get("Yellow Yaks"));
-        aliveTeams.put("Green Guardians", mcc.teams.get("Green Guardians"));
-        aliveTeams.put("Blue Bats", mcc.teams.get("Blue Bats"));
-        aliveTeams.put("Purple Pandas", mcc.teams.get("Purple Pandas"));
-        aliveTeams.put("Pink Piglets", mcc.teams.get("Pink Piglets"));
+        aliveTeams.put(Team.RED_RABBITS, mcc.teams.get(0).getPlayers());
+        aliveTeams.put(Team.YELLOW_YAKS, mcc.teams.get(1).getPlayers());
+        aliveTeams.put(Team.GREEN_GUARDIANS, mcc.teams.get(2).getPlayers());
+        aliveTeams.put(Team.BLUE_BATS, mcc.teams.get(3).getPlayers());
+        aliveTeams.put(Team.PURPLE_PANDAS, mcc.teams.get(4).getPlayers());
+        aliveTeams.put(Team.PINK_PIGLETS, mcc.teams.get(5).getPlayers());
         telepickCooldowns.clear();
-        telepickCooldowns.put("Red Rabbits", (long) 0);
-        telepickCooldowns.put("Yellow Yaks", (long) 0);
-        telepickCooldowns.put("Green Guardians", (long) 0);
-        telepickCooldowns.put("Blue Bats", (long) 0);
-        telepickCooldowns.put("Purple Pandas", (long) 0);
-        telepickCooldowns.put("Pink Piglets", (long) 0);
+        telepickCooldowns.put(Team.RED_RABBITS, (long) 0);
+        telepickCooldowns.put(Team.YELLOW_YAKS, (long) 0);
+        telepickCooldowns.put(Team.GREEN_GUARDIANS, (long) 0);
+        telepickCooldowns.put(Team.BLUE_BATS, (long) 0);
+        telepickCooldowns.put(Team.PURPLE_PANDAS, (long) 0);
+        telepickCooldowns.put(Team.PINK_PIGLETS, (long) 0);
 
         String roundValue = ChatColor.BOLD+""+ChatColor.GREEN + "Round: "+ ChatColor.WHITE+ roundNum + "/3";
         mcc.scoreboardManager.changeLine(22, roundValue);
@@ -228,9 +229,9 @@ public class Paintdown {
 
         // Randomly place each team at a different spawn
         List<Location> tempSpawns = new ArrayList<>(spawnPoints);
-        for (List<Participant> l : mcc.teams.values()) {
+        for (int i = 0; i < mcc.teams.size(); i++) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
-            for (Participant p : l) {
+            for (Participant p : mcc.teams.get(i).getPlayers()) {
                 if (p.hasTelepick) p.hasTelepick = false;
                 if (p.getPaintedBy() != null) p.setPaintedBy(null);
                 p.player.teleport(tempSpawns.get(randomNum));
@@ -552,7 +553,7 @@ public class Paintdown {
             if (!(deadList.contains(p.player.getUniqueId()))) {
                 mcc.scoreboardManager.addScore(mcc.scoreboardManager.players.get(p.player.getUniqueId()), 15);
                 p.setIsPainted(false);
-                survivorNames.add(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE);
+                survivorNames.add(p.team.getIcon() + p.team.getChatColor() + p.ign + ChatColor.WHITE);
                 p.player.setAllowFlight(true);
                 p.player.sendMessage(ChatColor.GREEN+"You survived the round!");
                 p.player.setFlying(true);
@@ -636,7 +637,7 @@ public class Paintdown {
 
     // Eliminate team
     public void eliminateTeam(String teamName) {
-        for (Participant p : mcc.teams.get(teamName)) {
+        for (Participant p : mcc.getTeam(teamName).getPlayers()) {
             p.player.sendTitle(ChatColor.RED + "TEAM PAINTED", null, 0, 60, 40);
             // add to dead list if they were not
             // (falling into lava puts you immediately on dead list
@@ -664,12 +665,12 @@ public class Paintdown {
                     }
                 }
                 // check whether to end round (only one team remains)
-                aliveTeams.remove(teamName);
+                aliveTeams.remove(mcc.getTeam(teamName).getTeam());
 
                 // Case where event has less than 6 teams
                 int living = 0;
-                for (List<Participant> l : mcc.teams.values()) {
-                    if (l.size() == 0) continue;
+                for (MCCTeam mcct : mcc.teams) {
+                    if (mcct.Size() == 0) continue;
                     living++;
                 }
 
@@ -683,12 +684,12 @@ public class Paintdown {
     // Check for player death
     public void checkFullTeamDeath(Participant participant) {
         int deadTeammates = 0;
-        List<Participant> thisTeam = mcc.teams.get(participant.teamNameFull);
+        List<Participant> thisTeam = participant.team.getPlayers();
         for (Participant indexP : thisTeam) {
             if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR)) deadTeammates++;
         }
         if (deadTeammates == thisTeam.size()) {
-            eliminateTeam(participant.teamNameFull);
+            eliminateTeam(participant.team.getTeamName());
 
             Bukkit.getScheduler().scheduleSyncDelayedTask(mcc.plugin, new Runnable() {
                 @Override
@@ -697,7 +698,8 @@ public class Paintdown {
                         if (indexP.getIsPainted() || indexP.player.getGameMode().equals(GameMode.SPECTATOR))
                             indexP.setIsPainted(false);
                     }
-                    Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.teamNameFull + ChatColor.WHITE + " have been eliminated!");
+
+                    participant.team.announceTeamDeath();
                 }
             }, 60);
         }

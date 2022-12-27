@@ -18,22 +18,20 @@ public class Participant {
     public int roundCoins;
     public final MCC mcc;
 
-    public String team = "Spectator";
-    public Color color = Color.WHITE;
-    public ChatColor chatColor = ChatColor.GRAY;
+    // Each Participant has a MCCTeam member which contains important
+    // information regarding graphics, ie ChatColor, Team Icon, etc.
+    public MCCTeam team;
+
+    // This list is to cycle through participants on a team.
     public static List<Participant> participantsOnATeam = new ArrayList<>();
-    public String teamPrefix = "";
 
-    // FULL NAME IS THE TEAM NAME
-    // WHY DID NOBODY SAY THIS BEFORE LMAO
-    public String teamNameFull = "Spectator";
-
-
+    // Representation of the Player by Minecraft's standard Player class.
     public final Player player;
+
+    // Player name for reference.
     public String ign;
 
     // Eventually will probably move to separate class
-    // but that requires effort
     public long paintballCooldown = System.currentTimeMillis();
     public boolean isPainted = false;
     public boolean hasTelepick = false;
@@ -45,13 +43,9 @@ public class Participant {
         this.ign = player.getName();
         this.mcc = mcc;
     }
-/*
-    public static void announceTeamDeath() {
 
-    }
- */
     public void Die(Participant victim, Participant killer, PlayerDeathEvent e) {
-        String victimName = victim.teamPrefix + victim.chatColor + victim.ign + ChatColor.WHITE;
+        String victimName = victim.team.getIcon() + victim.team.getChatColor() + victim.ign + ChatColor.WHITE;
         String oldDeathMessage = e.getDeathMessage();
         String newDeathMessage = "";
 
@@ -68,7 +62,7 @@ public class Participant {
             MCC.spawnFirework(victim);
 
             e.setDeathMessage(!(killer.ign.equals(victim.ign))
-                    ? newDeathMessage.replace(killer.ign, killer.teamPrefix + killer.chatColor + killer.ign + ChatColor.WHITE)
+                    ? newDeathMessage.replace(killer.ign, killer.team.getIcon() + killer.team.getChatColor() + killer.ign + ChatColor.WHITE)
                     : newDeathMessage);
             return;
         }
@@ -83,7 +77,7 @@ public class Participant {
     public void Die(Player victim, Player killer, PlayerDeathEvent e) {
         Participant died = Participant.findParticipantFromPlayer(victim);
         assert died != null;
-        String victimName = died.teamPrefix + died.chatColor + died.ign + ChatColor.WHITE;
+        String victimName = died.team.getIcon() + died.team.getChatColor() + died.ign + ChatColor.WHITE;
         String oldDeathMessage = e.getDeathMessage();
         String newDeathMessage = "";
 
@@ -101,7 +95,7 @@ public class Participant {
             MCC.spawnFirework(died);
 
             e.setDeathMessage(!(killedThem.ign.equals(died.ign))
-                    ? newDeathMessage.replace(killedThem.ign, killedThem.teamPrefix + killedThem.chatColor + killedThem.ign + ChatColor.WHITE)
+                    ? newDeathMessage.replace(killedThem.ign, killedThem.team.getIcon() + killedThem.team.getChatColor() + killedThem.ign + ChatColor.WHITE)
                     : newDeathMessage);
             return;
         }
@@ -129,49 +123,58 @@ public class Participant {
         return (newOne.team).equals(newTwo.team);
     }
 
-    public void setTeam(String teamName) {
-        team = teamName;
-
-        switch (teamName) {
-            case "RedRabbits":
-                color = Color.RED;
-                chatColor = ChatColor.RED;
-                teamPrefix = ChatColor.WHITE+"Ⓡ ";
-                break;
-            case "YellowYaks":
-                color = Color.YELLOW;
-                chatColor = ChatColor.YELLOW;
-                teamPrefix = ChatColor.WHITE+"Ⓨ ";
-                break;
-            case "GreenGuardians":
-                color = Color.GREEN;
-                chatColor = ChatColor.GREEN;
-                teamPrefix = ChatColor.WHITE+"Ⓖ ";
-                break;
-            case "BlueBats":
-                color = Color.BLUE;
-                chatColor = ChatColor.BLUE;
-                teamPrefix = ChatColor.WHITE+"Ⓑ ";
-                break;
-            case "PurplePandas":
-                color = Color.PURPLE;
-                chatColor = ChatColor.DARK_PURPLE;
-                teamPrefix = ChatColor.WHITE+"Ⓤ ";
-                break;
-            case "PinkPiglets":
-                color = Color.fromRGB(243, 139, 170);
-                chatColor = ChatColor.LIGHT_PURPLE;
-                teamPrefix = ChatColor.WHITE+"Ⓟ ";
-                break;
+    public boolean setTeam(String s) {
+        // prevent double adding
+        if (hasTeam(this)) return false;
+        switch (s) {
+            case "RedRabbits" -> {
+                team = mcc.teams.get(0);
+                mcc.teams.get(0).getPlayers().add(this);
+                Bukkit.broadcastMessage(ChatColor.GOLD + ign + ChatColor.WHITE + " has joined the " + team.getIcon() + ChatColor.RED + "Red Rabbits.");
+            } case "YellowYaks" -> {
+                team = mcc.teams.get(1);
+                mcc.teams.get(1).getPlayers().add(this);
+                Bukkit.broadcastMessage(ChatColor.GOLD + ign + ChatColor.WHITE + " has joined the " + ChatColor.YELLOW + "Yellow Yaks.");
+            }
+            case "GreenGuardians" -> {
+                team = mcc.teams.get(2);
+                mcc.teams.get(2).getPlayers().add(this);
+                Bukkit.broadcastMessage(ChatColor.GOLD + ign + ChatColor.WHITE + " has joined the " + ChatColor.GREEN + "Green Guardians.");
+            }
+            case "BlueBats" -> {
+                team = mcc.teams.get(3);
+                mcc.teams.get(3).getPlayers().add(this);
+                Bukkit.broadcastMessage(ChatColor.GOLD + ign + ChatColor.WHITE + " has joined the " + ChatColor.BLUE + "Blue Bats.");
+            }
+            case "PurplePandas" -> {
+                team = mcc.teams.get(4);
+                mcc.teams.get(4).getPlayers().add(this);
+                Bukkit.broadcastMessage(ChatColor.GOLD + ign + ChatColor.WHITE + " has joined the " + ChatColor.DARK_PURPLE + "Purple Pandas.");
+            }
+            case "PinkPiglets" -> {
+                team = mcc.teams.get(5);
+                mcc.teams.get(5).getPlayers().add(this);
+                Bukkit.broadcastMessage(ChatColor.GOLD + ign + ChatColor.WHITE + " has joined the " + ChatColor.LIGHT_PURPLE + "Pink Piglets.");
+            }
         }
+        return true;
     }
 
+    /*
+     * Returns true if the participant is on a team.
+     * Returns false otherwise.
+     */
+    public boolean hasTeam(Participant p) {
+        return p.team != null;
+    }
+
+    // THESE ARE MORE FOR PAINTDOWN, MORE ON THIS LATER
     // For games that might need colored leather armor
     public ItemStack getColoredLeatherArmor(ItemStack i) {
         try {
             LeatherArmorMeta meta = (LeatherArmorMeta) i.getItemMeta();
             assert meta != null;
-            meta.setColor(color);
+            meta.setColor(team.getColor());
             i.setItemMeta(meta);
             return i;
         } catch (ClassCastException e) {

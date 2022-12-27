@@ -16,7 +16,10 @@ public class ScoreboardPlayer {
     public Team[] teams;
     public Map<Objective, Map<Integer, String>> lines = new HashMap();
     public Objective currentObj = null;
-    public Object[][] teamLines = new Object[][]{{"RedRabbits",-1},{"YellowYaks",-1},{"GreenGuardians",-1},{"BlueBats",-1},{"PurplePandas",-1},{"PinkPiglets",-1}};
+    public Object[][] teamLines = new Object[][]{{com.kotayka.mcc.mainGame.manager.Team.RED_RABBITS,-1},
+            {com.kotayka.mcc.mainGame.manager.Team.YELLOW_YAKS,-1},{com.kotayka.mcc.mainGame.manager.Team.GREEN_GUARDIANS,-1},
+            {com.kotayka.mcc.mainGame.manager.Team.BLUE_BATS,-1}, {com.kotayka.mcc.mainGame.manager.Team.PURPLE_PANDAS,-1},
+            {com.kotayka.mcc.mainGame.manager.Team.PINK_PIGLETS,-1}};
     public final Scoreboard board;
     public final Participant player;
 

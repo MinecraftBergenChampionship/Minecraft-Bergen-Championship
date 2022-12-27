@@ -231,23 +231,23 @@ public class BSABMListener implements Listener {
                 int targetX = 0;
                 for (Participant p : players.participants) {
                 if (player.getUniqueId() == p.player.getUniqueId()) {
-                    switch (p.team) {
-                        case "RedRabbits":
+                    switch (p.team.getTeamName()) {
+                        case "Red Rabbits":
                             targetX = teamPortalLoc[0];
                             break;
-                        case "YellowYaks":
+                        case "Yellow Yaks":
                             targetX = teamPortalLoc[1];
                             break;
-                        case "BlueBats":
+                        case "Blue Bats":
                             targetX = teamPortalLoc[2];
                             break;
-                        case "GreenGuardians":
+                        case "Green Guardians":
                             targetX = teamPortalLoc[3];
                             break;
-                        case "PurplePandas":
+                        case "Purple Pandas":
                             targetX = teamPortalLoc[4];
                             break;
-                        case "PinkPiglets":
+                        case "Pink Piglets":
                             targetX = teamPortalLoc[5];
                             break;
                     }

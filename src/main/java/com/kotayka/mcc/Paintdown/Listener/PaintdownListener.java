@@ -2,10 +2,9 @@ package com.kotayka.mcc.Paintdown.Listener;
 
 import com.kotayka.mcc.Paintdown.Paintdown;
 import com.kotayka.mcc.mainGame.manager.Participant;
+import com.kotayka.mcc.mainGame.manager.Team;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
@@ -72,30 +71,27 @@ public class PaintdownListener implements Listener {
 
             // If player has no potions, give them a potion after 15 seconds
             if (p.availablePotions == 0) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        if (paintdown.getState().equals("PLAYING") && player.getGameMode() == GameMode.SURVIVAL) {
-                            ItemStack potion = new ItemStack(Material.SPLASH_POTION, 1);
-                            PotionMeta meta = (PotionMeta)potion.getItemMeta();
-                            assert meta != null;
-                            meta.setColor(Color.BLUE);
-                            meta.setDisplayName("Water Bomb");
-                            potion.setItemMeta(meta);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                    if (paintdown.getState().equals("PLAYING") && player.getGameMode() == GameMode.SURVIVAL) {
+                        ItemStack potion = new ItemStack(Material.SPLASH_POTION, 1);
+                        PotionMeta meta = (PotionMeta)potion.getItemMeta();
+                        assert meta != null;
+                        meta.setColor(Color.BLUE);
+                        meta.setDisplayName("Water Bomb");
+                        potion.setItemMeta(meta);
 
-                            p.player.getInventory().addItem(potion);
-                            p.availablePotions++;
-                        }
+                        p.player.getInventory().addItem(potion);
+                        p.availablePotions++;
                     }
                 }, 300);
             }
-            return;
+            //return;
         }
 
         // Telepickaxe
         else if (player.getInventory().getItemInMainHand().getType() == Material.WOODEN_PICKAXE) {
-            String teamName = p.teamNameFull;
-            long timeLeft = System.currentTimeMillis() - paintdown.telepickCooldowns.get(teamName);
+            Team t = p.team.getTeam();
+            long timeLeft = System.currentTimeMillis() - paintdown.telepickCooldowns.get(t);
             // 15 second cooldown for telepick
             if (TimeUnit.MILLISECONDS.toSeconds(timeLeft) >= 15) {
                 ItemStack itemStack = new ItemStack(Material.DIAMOND_PICKAXE);
@@ -105,11 +101,12 @@ public class PaintdownListener implements Listener {
                 itemStack.setItemMeta(itemMeta);
                 player.getInventory().setItemInMainHand(itemStack);
 
-                paintdown.telepickCooldowns.remove(teamName);
-                paintdown.telepickCooldowns.put(teamName, System.currentTimeMillis());
+                paintdown.telepickCooldowns.remove(t);
+                paintdown.telepickCooldowns.put(t, System.currentTimeMillis());
                 // remove telepick from other team member if applicable
-                for (Participant indexP : paintdown.mcc.teams.get(teamName)) {
-                    indexP.player.sendMessage(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE + " has claimed the telepickaxe.");
+                for (Participant indexP : p.team.getPlayers()) {
+                    indexP.player.sendMessage(p.team.getIcon() + p.team.getChatColor() + p.ign + ChatColor.WHITE + " has claimed the telepickaxe.");
+                    if (indexP.ign.equals(p.ign)) continue;
                     if (indexP.hasTelepick) {
                         for(int i = 0; i<indexP.player.getInventory().getSize()-1; ++i) {
                             ItemStack item = indexP.player.getInventory().getItem(i);
@@ -158,13 +155,13 @@ public class PaintdownListener implements Listener {
                     paintdown.paintedBlocks.put(b.getLocation(), type);
                 }
 
-                switch (Objects.requireNonNull(participant).team) {
-                    case "RedRabbits" -> type = Material.RED_GLAZED_TERRACOTTA;
-                    case "YellowYaks" -> type = Material.YELLOW_GLAZED_TERRACOTTA;
-                    case "GreenGuardians" -> type = Material.LIME_GLAZED_TERRACOTTA;
-                    case "BlueBats" -> type = Material.BLUE_GLAZED_TERRACOTTA;
-                    case "PurplePandas" -> type = Material.PURPLE_GLAZED_TERRACOTTA;
-                    case "PinkPiglets" -> type = Material.PINK_GLAZED_TERRACOTTA;
+                switch (Objects.requireNonNull(participant).team.getTeam()) {
+                    case RED_RABBITS -> type = Material.RED_GLAZED_TERRACOTTA;
+                    case YELLOW_YAKS -> type = Material.YELLOW_GLAZED_TERRACOTTA;
+                    case GREEN_GUARDIANS -> type = Material.LIME_GLAZED_TERRACOTTA;
+                    case BLUE_BATS -> type = Material.BLUE_GLAZED_TERRACOTTA;
+                    case PURPLE_PANDAS -> type = Material.PURPLE_GLAZED_TERRACOTTA;
+                    case PINK_PIGLETS -> type = Material.PINK_GLAZED_TERRACOTTA;
                 }
                 // set block team's color
                 b.setType(type);
@@ -239,8 +236,8 @@ public class PaintdownListener implements Listener {
                     }
                 }
                 // automatically allow team to use telepick again
-                paintdown.telepickCooldowns.remove(participant.teamNameFull);
-                paintdown.telepickCooldowns.put(participant.teamNameFull, TimeUnit.SECONDS.toMillis(15));
+                paintdown.telepickCooldowns.remove(participant.team.getTeam());
+                paintdown.telepickCooldowns.put(participant.team.getTeam(), TimeUnit.SECONDS.toMillis(15));
             }
 
             // Check if whole team died
@@ -256,13 +253,13 @@ public class PaintdownListener implements Listener {
             hitPlayer.setHealth(20);
 
             // Only send death messages to involved players (shooter's team and hit player's team)
-            for (Participant p : paintdown.mcc.teams.get(participantShooter.teamNameFull)) {
-                p.player.sendMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was painted by "
-                        + participantShooter.teamPrefix + participantShooter.chatColor + participantShooter.ign);
+            for (Participant p : participantShooter.team.getPlayers()) {
+                p.player.sendMessage(participant.team.getIcon() + participant.team.getChatColor() + participant.ign + ChatColor.WHITE + " was painted by "
+                        + participantShooter.team.getIcon() + participantShooter.team.getChatColor() + participantShooter.ign);
             }
-            for (Participant p : paintdown.mcc.teams.get(participant.teamNameFull)) {
-                p.player.sendMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was painted by "
-                        + participantShooter.teamPrefix + participantShooter.chatColor + participantShooter.ign);
+            for (Participant p : participant.team.getPlayers()) {
+                p.player.sendMessage(participant.team.getIcon() + participant.team.getChatColor() + participant.ign + ChatColor.WHITE + " was painted by "
+                        + participantShooter.team.getIcon() + participantShooter.team.getChatColor() + participantShooter.ign);
             }
 
         } else if (!(participant.getIsPainted())) {
@@ -304,15 +301,15 @@ public class PaintdownListener implements Listener {
                     p.setIsPainted(false);
 
                     // broadcast the exiting news to the team
-                    for (Participant temp : paintdown.mcc.teams.get(p.teamNameFull)) {
-                        temp.player.sendMessage(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE + " was revived!");
+                    for (Participant temp : p.team.getPlayers()) {
+                        temp.player.sendMessage(p.team.getIcon() + p.team.getChatColor() + p.ign + ChatColor.WHITE + " was revived!");
                     }
 
                     // broadcast the not very exciting news to the enemy team
                     Participant shotBy = Participant.findParticipantFromPlayer(p.getPaintedBy());
                     assert shotBy != null;
-                    for (Participant temp : paintdown.mcc.teams.get(shotBy.teamNameFull)) {
-                        temp.player.sendMessage(p.teamPrefix + p.chatColor + p.ign + ChatColor.WHITE + " was revived!");
+                    for (Participant temp : shotBy.team.getPlayers()) {
+                        temp.player.sendMessage(p.team.getIcon() + p.team.getChatColor() + p.ign + ChatColor.WHITE + " was revived!");
                         // points are only for final kills unfortunately
                         if (temp.player.getUniqueId().equals(shotBy.player.getUniqueId())) {
                             paintdown.mcc.scoreboardManager.addScore(paintdown.mcc.scoreboardManager.players.get(shotBy.player.getUniqueId()), -15);
@@ -348,12 +345,12 @@ public class PaintdownListener implements Listener {
             // early spec'ing
             // p.setSpectatorTarget();
             if (participant.getPaintedBy() == null)
-                Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " fell into molten lava");
+                Bukkit.broadcastMessage(participant.team.getIcon() + participant.team.getChatColor() + participant.ign + ChatColor.WHITE + " fell into molten lava");
             else {
                 Participant lastPainted = Participant.findParticipantFromPlayer(participant.getPaintedBy());
                 assert lastPainted != null;
-                Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " fell into molten lava after being tagged by "
-                        + lastPainted.teamPrefix + lastPainted.chatColor + lastPainted.ign);
+                Bukkit.broadcastMessage(participant.team.getIcon() + participant.team.getChatColor() + participant.ign + ChatColor.WHITE + " fell into molten lava after being tagged by "
+                        + lastPainted.team.getIcon() + lastPainted.team.getChatColor() + lastPainted.ign);
             }
             paintdown.deadList.add(participant.player.getUniqueId());
             Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
@@ -381,10 +378,8 @@ public class PaintdownListener implements Listener {
         if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.DIAMOND_PICKAXE) {
             Participant brokeBlock = Participant.findParticipantFromPlayer(e.getPlayer());
             assert brokeBlock != null;
-            for (Participant p : Participant.participantsOnATeam) {
-                if (p.teamNameFull.equals(brokeBlock.teamNameFull)) {
-                    paintdown.mcc.scoreboardManager.addScore(paintdown.mcc.scoreboardManager.players.get(p.player.getUniqueId()), 1);
-                }
+            for (Participant p : brokeBlock.team.getPlayers()) {
+                paintdown.mcc.scoreboardManager.addScore(paintdown.mcc.scoreboardManager.players.get(p.player.getUniqueId()), 1);
             }
         } else {
             e.setCancelled(true);
@@ -416,7 +411,7 @@ public class PaintdownListener implements Listener {
                     paintdown.mcc.scoreboardManager.addScore(paintdown.mcc.scoreboardManager.players.get(participant.paintedBy.getUniqueId()), 15);
                     participant.paintedBy = null;
                 }
-                Bukkit.broadcastMessage(participant.teamPrefix + participant.chatColor + participant.ign + ChatColor.WHITE + " was stuck in a melting room");
+                Bukkit.broadcastMessage(participant.team.getIcon() + participant.team.getChatColor() + participant.ign + ChatColor.WHITE + " was stuck in a melting room");
 
                 Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
 
