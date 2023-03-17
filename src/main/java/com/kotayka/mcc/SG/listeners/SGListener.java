@@ -1,6 +1,6 @@
-package com.kotayka.mcc.Skybattle.SG.listeners;
+package com.kotayka.mcc.SG.listeners;
 
-import com.kotayka.mcc.Skybattle.SG.SG;
+import com.kotayka.mcc.SG.SG;
 import com.kotayka.mcc.mainGame.MCC;
 import com.kotayka.mcc.mainGame.manager.Game;
 import com.kotayka.mcc.mainGame.manager.Participant;

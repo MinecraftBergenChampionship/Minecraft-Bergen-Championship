@@ -1,4 +1,4 @@
-package com.kotayka.mcc.Skybattle.SG;
+package com.kotayka.mcc.SG;
 
 import com.kotayka.mcc.Scoreboards.ScoreboardManager;
 import com.kotayka.mcc.Scoreboards.ScoreboardPlayer;
