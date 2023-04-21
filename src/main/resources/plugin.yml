@@ -1,41 +1,11 @@
-name: MCC
+name: MBC
 version: '${project.version}'
-author: kotayka_
-main: com.kotayka.mcc.mainGame.MCC
+main: me.kotayka.mbc.Plugin
 api-version: 1.18
-depend:
-  [ProtocolLib]
+authors: [ Kotayka, R_RR ]
+description: Minecraft Bruh Championship Mini games
 commands:
-  npc:
-    description: Spawn NPC at location
+  changeTeam:
+    description: Changing a team
   start:
-    description: Start a game
-  mccteam:
-    description: Teams
-  world:
-    description: prints out world
-  checkbuild:
-    description: Checks the build for BSABM
-  eventstart:
-    description: starts event
-  ready:
-    description: ready your team
-permissions:
-  npc:
-    description: Spawn NPC at location
-    default: op
-  start:
-    description: Start a game
-    default: op
-  mccteam:
-    description: Teams
-  world:
-    description: prints out world
-    default: op
-  checkbuild:
-    description: Checks the build for BSABM
-  eventstart:
-    description:  starts event
-    default: op
-  ready:
-    description: ready your team
+    description: start a game
