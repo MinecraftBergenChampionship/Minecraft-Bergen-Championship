@@ -3,6 +3,7 @@ package me.kotayka.mbc.gamePlayers;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.games.AceRace;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public abstract class GamePlayer {
@@ -12,6 +13,7 @@ public abstract class GamePlayer {
     public GamePlayer(Participant p)
     {
         participant = p;
+        MBC.currentGame.gamePlayers.add(this);
     }
 
     public Participant getParticipant() {
