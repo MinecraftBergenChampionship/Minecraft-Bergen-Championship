@@ -10,8 +10,7 @@ public abstract class GamePlayer {
 
     private Participant participant;
 
-    public GamePlayer(Participant p)
-    {
+    public GamePlayer(Participant p) {
         participant = p;
         MBC.currentGame.gamePlayers.add(this);
     }
