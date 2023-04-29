@@ -21,7 +21,7 @@ public class Lobby extends Game {
         createLine(21, ChatColor.GREEN + "Teams ready", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team:", p);
-        createLine(17, p.getTeam().getColor()+p.getTeam().getTeamFullName(), p);
+        createLine(17, p.getTeam().getChatColor()+p.getTeam().getTeamFullName(), p);
         createLine(16, ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.GREEN+"Game Scores", p);
         createLine(3, ChatColor.RESET.toString()+ChatColor.RESET.toString(), p);
@@ -33,7 +33,7 @@ public class Lobby extends Game {
     }
 
     public void changeTeam(Participant p) {
-        createLine(17, p.getTeam().getColor()+p.getTeam().getTeamFullName(), p);
+        createLine(17, p.getTeam().getChatColor()+p.getTeam().getTeamFullName(), p);
     }
 
     public void events() {

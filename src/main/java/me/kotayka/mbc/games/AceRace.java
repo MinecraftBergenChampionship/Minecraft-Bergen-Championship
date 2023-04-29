@@ -13,6 +13,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -48,12 +49,17 @@ public class AceRace extends Game {
     public void start() {
         setTimer(600);
         ItemStack trident = new ItemStack(Material.TRIDENT);
+        ItemMeta itemMeta = trident.getItemMeta();
+        itemMeta.setUnbreakable(true);
+        trident.setItemMeta(itemMeta);
         trident.addEnchantment(Enchantment.RIPTIDE, 1);
-        trident.addEnchantment(Enchantment.DURABILITY, 3);
+        ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
 
         for (Participant p : MBC.getIngamePlayer()) {
             p.getInventory().clear();
             p.getInventory().addItem(trident);
+            p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
+
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().teleport(new Location(world, 1, 26, 150, 90, 0));

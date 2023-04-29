@@ -2,6 +2,9 @@ package me.kotayka.mbc;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,18 +16,42 @@ public abstract class Team {
     protected String name;
     protected String fullName;
     protected Character icon;
-    protected ChatColor color;
+    protected ChatColor chatColor;
+    protected Color color;
 
     private int unMultipliedScore = 0;
     private int score = 0;
     private int roundScore = 0;
     private int roundUnMultipliedScore = 0;
 
-    public Team(String name, String fullName, Character icon, ChatColor color) {
+    public Team(String name, String fullName, Character icon, ChatColor chatColor) {
         this.name = name;
         this.fullName = fullName;
         this.icon = icon;
-        this.color = color;
+        this.chatColor = chatColor;
+        switch(chatColor) {
+            case RED:
+                this.color = Color.RED;
+                break;
+            case GREEN:
+                this.color = Color.GREEN;
+                break;
+            case YELLOW:
+                this.color = Color.YELLOW;
+                break;
+            case BLUE:
+                this.color = Color.BLUE;
+                break;
+            case DARK_PURPLE:
+                this.color = Color.PURPLE;
+                break;
+            case LIGHT_PURPLE:
+                this.color = Color.fromRGB(243, 139, 170);
+                break;
+            default:
+                this.color = Color.WHITE;
+                break;
+        }
     }
 
     public List<Participant> teamPlayers = new ArrayList<>(4);
@@ -53,17 +80,36 @@ public abstract class Team {
         return icon;
     }
 
-    public ChatColor getColor() {
-        return color;
+    public ChatColor getChatColor() {
+        return chatColor;
     }
 
-    public void addPlayer(Participant p) {
+    public Color getColor() { return color; }
 
+    public void addPlayer(Participant p) {
         teamPlayers.add(p);
     }
 
     public void removePlayer(Participant p) {
         teamPlayers.remove(p);
+    }
+
+    /**
+     *
+     * @param leatherArmor uncolored leather armor
+     * @return colored leather armor
+     */
+    public ItemStack getColoredLeatherArmor(ItemStack leatherArmor) {
+        try {
+            LeatherArmorMeta meta = (LeatherArmorMeta) leatherArmor.getItemMeta();
+            assert meta != null;
+            meta.setColor(color);
+            leatherArmor.setItemMeta(meta);
+            return leatherArmor;
+        } catch (ClassCastException e) {
+            Bukkit.broadcastMessage("Passed Item Stack was not leather armor!");
+            return leatherArmor;
+        }
     }
 
     public static Team getTeam(String team) {

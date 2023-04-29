@@ -122,7 +122,7 @@ public abstract class Game implements Scoreboard, Listener {
 
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
             Team t = teamRoundsScores.get(14-i);
-            createLine(i,String.format("%c %s%s %s%5d", t.getIcon(), t.getColor(), t.getTeamFullName(), ChatColor.WHITE, t.getRoundScore()));
+            createLine(i,String.format("%c %s%s %s%5d", t.getIcon(), t.getChatColor(), t.getTeamFullName(), ChatColor.WHITE, t.getRoundScore()));
         }
     }
 
@@ -133,7 +133,7 @@ public abstract class Game implements Scoreboard, Listener {
 
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
             Team t = teamRoundsScores.get(14-i);
-            createLine(i,String.format("%c %s%s %s%5d", t.getIcon(), t.getColor(), t.getTeamFullName(), ChatColor.WHITE, t.getScore()));
+            createLine(i,String.format("%c %s%s %s%5d", t.getIcon(), t.getChatColor(), t.getTeamFullName(), ChatColor.WHITE, t.getScore()));
         }
     }
 
