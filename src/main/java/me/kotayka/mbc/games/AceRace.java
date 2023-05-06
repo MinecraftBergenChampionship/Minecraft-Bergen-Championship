@@ -22,16 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AceRace extends Game {
+    // Change this to determine played map
     public static AceRaceMap map = new Biomes();
     public static World world = Bukkit.getWorld("AceRace");;
     public static List<AceRacePlayer> aceRacePlayerList = new ArrayList<>();
+    public static long startingTime;
 
     public AceRace() {
         super(1, "Ace Race");
     }
 
     public static void playerFinishLap(AceRacePlayer player) {
-        Bukkit.broadcastMessage(player.getParticipant().getPlayerNameWithIcon() + " has finished lap " + player.lap);
+        Bukkit.broadcastMessage(player.getParticipant().getPlayerNameWithIcon() + " has finished Lap " + player.lap + " in " + " place!");
     }
 
     public void createScoreboard(Participant p) {
@@ -45,6 +47,8 @@ public class AceRace extends Game {
         updatePlayerRoundScore(p);
     }
 
+    // TODO: implement 3-5 min practice lap
+    // this may be excessive, have to see if players are willing to try out lap before event
     public void events() {
 
     }
@@ -70,6 +74,7 @@ public class AceRace extends Game {
             aceRacePlayerList.add(new AceRacePlayer(p));
         }
         createScoreboard();
+        startingTime = System.currentTimeMillis();
     }
 
     @EventHandler

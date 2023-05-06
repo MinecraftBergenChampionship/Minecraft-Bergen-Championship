@@ -14,7 +14,8 @@ import java.util.List;
 
 /**
  * @implNote All AceRaceMaps should have first checkpoint and respawn at the very beginning of lap by default,
- *           or else the current code will not track laps correctly.
+ *           or else the current code will not track laps correctly. The first checkpoint / finish line should be
+ *           marked by carpet.
  */
 public abstract class AceRaceMap {
     public String mapName;
@@ -29,8 +30,6 @@ public abstract class AceRaceMap {
 
         mapLength = checkpoints.length;
     }
-
-    public abstract void checkFinished(PlayerMoveEvent e);
 
     public abstract void checkDeath(PlayerMoveEvent e);
 

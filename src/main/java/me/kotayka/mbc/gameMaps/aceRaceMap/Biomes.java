@@ -43,6 +43,9 @@ public class Biomes extends AceRaceMap {
         loadCheckpoints(respawns, checkpoints);
     }
 
+    // NOTE: moved implementation of lap finish to @AceRacePlayer setCheckpoint() (it was easier)
+    // removed indefinitely for now
+    /*
     public void checkFinished(PlayerMoveEvent e) {
         AceRacePlayer player = (AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer());
         assert player != null;
@@ -50,13 +53,11 @@ public class Biomes extends AceRaceMap {
         if(e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.SMOOTH_QUARTZ && lastCheckpoint) {
             AceRace.playerFinishLap(player);
         }
-    }
+    } */
 
     public void checkDeath(PlayerMoveEvent e) {
         if (e.getPlayer().getLocation().getY() < 0 || (e.getPlayer().getLocation().getBlock().getType() == Material.LAVA)) {
             int checkpoint = ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).currentCheckpoint;
-            Bukkit.broadcastMessage("checkpoint == " + checkpoint);
-            Bukkit.broadcastMessage("looking ahead for nextCheckpoint == " + ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).nextCheckpoint);
             e.getPlayer().teleport(AceRace.map.respawns.get((checkpoint < AceRace.map.mapLength) ? checkpoint : AceRace.map.mapLength-1));
             e.getPlayer().setFireTicks(0);
         }
