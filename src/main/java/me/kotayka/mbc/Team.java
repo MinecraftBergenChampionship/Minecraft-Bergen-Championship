@@ -104,6 +104,7 @@ public abstract class Team {
             LeatherArmorMeta meta = (LeatherArmorMeta) leatherArmor.getItemMeta();
             assert meta != null;
             meta.setColor(color);
+            meta.setUnbreakable(true);
             leatherArmor.setItemMeta(meta);
             return leatherArmor;
         } catch (ClassCastException e) {

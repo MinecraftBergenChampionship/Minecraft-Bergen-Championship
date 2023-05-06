@@ -22,13 +22,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AceRace extends Game {
-
     public static AceRaceMap map = new Biomes();
     public static World world = Bukkit.getWorld("AceRace");;
     public static List<AceRacePlayer> aceRacePlayerList = new ArrayList<>();
 
     public AceRace() {
         super(1, "Ace Race");
+    }
+
+    public static void playerFinishLap(AceRacePlayer player) {
+        Bukkit.broadcastMessage(player.getParticipant().getPlayerNameWithIcon() + " has finished lap " + player.lap);
     }
 
     public void createScoreboard(Participant p) {
@@ -74,22 +77,30 @@ public class AceRace extends Game {
         if (!isGameActive()) return;
 
         map.checkDeath(e);
-        map.checkFinished(e);
+        // now auto checks for finished lap in setCheckpoint()
+        //map.checkFinished(e);
 
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.WAXED_WEATHERED_CUT_COPPER) {
+        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
             e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(4));
             e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.65, e.getPlayer().getVelocity().getZ()));
-            ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).nextCheckpoint();
+            ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).setCheckpoint();
+            return;
         }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.WAXED_EXPOSED_CUT_COPPER) {
+        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
             e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(2));
             e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
+            return;
         }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.WAXED_WEATHERED_COPPER) {
+        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
             e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
+            return;
         }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.OBSERVER) {
+        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
+            return;
+        }
+        if (e.getTo().getBlock().getType().toString().toLowerCase().contains("carpet")) {
+            ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).setCheckpoint();
         }
     }
 
