@@ -6,6 +6,7 @@ import me.kotayka.mbc.games.TGTTOS;
 import me.kotayka.mbc.teams.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,6 +47,14 @@ public class MBC implements Listener {
 
     public static List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS"));
     public static List<Game> gameList = new ArrayList<>(Arrays.asList(aceRace,tgttos));
+
+    // Define Special Blocks
+    // NOTE: ALWAYS USE `getBlock().getRelative(BlockFace.DOWN)` or equivalent
+    // ALSO NOTE: may move to more general class since these are likely ubiquitous
+    public final static Material SPEED_PAD = Material.OBSERVER;
+    public final static Material BOOST_PAD = Material.WAXED_EXPOSED_CUT_COPPER;
+    public final static Material MEGA_BOOST_PAD = Material.WAXED_WEATHERED_CUT_COPPER;
+    public final static Material JUMP_PAD = Material.WAXED_WEATHERED_COPPER;
 
 
     public static int multiplier = 1;

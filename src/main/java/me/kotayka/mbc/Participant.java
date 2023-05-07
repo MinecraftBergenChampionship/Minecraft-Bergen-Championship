@@ -40,7 +40,7 @@ public class Participant {
         }
         team = t;
         team.addPlayer(this);
-        Bukkit.broadcastMessage(ChatColor.GOLD+getPlayerName()+ChatColor.WHITE+" has joined the "+team.getChatColor()+team.getTeamFullName());
+        Bukkit.broadcastMessage(ChatColor.GOLD+getPlayerNameWithIcon()+ChatColor.WHITE+" has joined the "+team.getChatColor()+team.getTeamFullName());
         if (MBC.gameID == 0 && MBC.currentGame != null) {
             ((Lobby) MBC.currentGame).changeTeam(this);
         }
@@ -58,8 +58,20 @@ public class Participant {
         return score;
     }
 
+    /**
+     *
+     * @return player's username
+     */
     public String getPlayerName() {
         return getPlayer().getName();
+    }
+
+    /**
+     * for string formatting
+     * @return team icon + player's username with color
+     */
+    public String getPlayerNameWithIcon() {
+        return (getTeam().getIcon() + " " + getTeam().getChatColor() + getPlayer().getName()) + ChatColor.WHITE;
     }
 
     public int getRoundScore() {
