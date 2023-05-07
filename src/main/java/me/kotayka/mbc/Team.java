@@ -1,10 +1,9 @@
 package me.kotayka.mbc;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
+import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.material.Wool;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,6 +109,25 @@ public abstract class Team {
         } catch (ClassCastException e) {
             Bukkit.broadcastMessage("Passed Item Stack was not leather armor!");
             return leatherArmor;
+        }
+    }
+
+    public ItemStack getColoredWool() {
+        switch (getChatColor()) {
+            case RED:
+                return new ItemStack(Material.RED_WOOL);
+            case YELLOW:
+                return new ItemStack(Material.YELLOW_WOOL);
+            case GREEN:
+                return new ItemStack(Material.GREEN_WOOL);
+            case BLUE:
+                return new ItemStack(Material.BLUE_WOOL);
+            case DARK_PURPLE:
+                return new ItemStack(Material.PURPLE_WOOL);
+            case LIGHT_PURPLE:
+                return new ItemStack(Material.PINK_WOOL);
+            default:
+                return new ItemStack(Material.WHITE_WOOL);
         }
     }
 

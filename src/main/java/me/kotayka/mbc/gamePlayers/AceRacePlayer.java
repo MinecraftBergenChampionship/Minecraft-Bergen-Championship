@@ -14,8 +14,7 @@ import java.util.Date;
 
 public class AceRacePlayer extends GamePlayer {
     public int lap = 1;
-    public int currentCheckpoint = 0;
-    public int nextCheckpoint = 1; //idk how useful this is but it helped me maybe im stupid
+    public int checkpoint = 0;
     public String[] lapTimes = new String[3]; // im going to assume all ace race maps we'll make are 3 laps to conserve (minimal) space
     public long lapStartTime;
     public long totalTime;
@@ -109,20 +108,9 @@ public class AceRacePlayer extends GamePlayer {
         if (!checkCoords()) return;
 
         // case for finishing lap
-        if (nextCheckpoint == 0) {
-            // basically reset to defaults (nC = 1, cC = 0)
-            nextCheckpoint++;
-            currentCheckpoint = 0;
-
-            // handle lap
-           Lap();
-
-        } else if (nextCheckpoint + 1 < AceRace.map.mapLength) {
-            currentCheckpoint++;
-            nextCheckpoint++;
-        } else {
-            currentCheckpoint++;
-            nextCheckpoint = 0;
+        if (++checkpoint == AceRace.map.mapLength) {
+            checkpoint = 0;
+            Lap();
         }
     }
 
@@ -134,7 +122,7 @@ public class AceRacePlayer extends GamePlayer {
      */
     public boolean checkCoords() {
         return (
-                AceRace.map.checkpoints.get(nextCheckpoint).distance(getParticipant().getPlayer().getLocation()) <= 5
+                AceRace.map.checkpoints.get(checkpoint).distance(getParticipant().getPlayer().getLocation()) <= 5
         );
     }
 }
