@@ -27,6 +27,7 @@ public class AceRacePlayer extends GamePlayer {
 
     /**
      * Handles increasing player's lap count and them finishing the game
+     * Also displays text
      */
     private void Lap() {
         ChatColor placementColor;

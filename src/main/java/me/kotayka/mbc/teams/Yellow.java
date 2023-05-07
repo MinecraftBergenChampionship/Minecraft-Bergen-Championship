@@ -6,6 +6,6 @@ import org.bukkit.ChatColor;
 public class Yellow extends Team {
 
     public Yellow() {
-        super("YellowYaks", "Yellow Yaks", 'y', ChatColor.YELLOW);
+        super("YellowYaks", "Yellow Yaks", 'Ⓨ', ChatColor.YELLOW);
     }
 }

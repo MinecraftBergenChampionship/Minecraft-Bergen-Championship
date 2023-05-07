@@ -6,6 +6,6 @@ import org.bukkit.ChatColor;
 public class Red extends Team {
 
     public Red() {
-        super("RedRabbits", "Red Rabbits", 'r', ChatColor.RED);
+        super("RedRabbits", "Red Rabbits", 'Ⓡ', ChatColor.RED);
     }
 }
