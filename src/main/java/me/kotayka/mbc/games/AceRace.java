@@ -29,12 +29,14 @@ public class AceRace extends Game {
     public static short[] finishedPlayersByLap = {0, 0, 0};
     public static long startingTime;
 
+    // SCORING VARIABLES
+    public static final short FINISH_RACE_POINTS = 8;           // points for finishing the race
+    public static final short PLACEMENT_LAP_POINTS = 1;         // points for placement for first laps
+    public static final short PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
+    public static final short[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
+
     public AceRace() {
         super(1, "Ace Race");
-    }
-
-    public static void playerFinishLap(AceRacePlayer player) {
-        Bukkit.broadcastMessage(player.getParticipant().getPlayerNameWithIcon() + " has finished Lap " + player.lap + " in " + " place!");
     }
 
     public void createScoreboard(Participant p) {

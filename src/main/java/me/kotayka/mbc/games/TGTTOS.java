@@ -96,7 +96,7 @@ public class TGTTOS extends Game {
     }
 
     @EventHandler
-    public void blocKBreak(BlockBreakEvent event) {
+    public void blockBreak(BlockBreakEvent event) {
         if (!isGameActive()) return;
 
         if (!(event.getBlock().getType().toString().endsWith("WOOL"))) {

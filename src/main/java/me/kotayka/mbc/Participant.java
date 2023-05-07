@@ -40,7 +40,7 @@ public class Participant {
         }
         team = t;
         team.addPlayer(this);
-        Bukkit.broadcastMessage(ChatColor.GOLD+getPlayerNameWithIcon()+ChatColor.WHITE+" has joined the "+team.getChatColor()+team.getTeamFullName());
+        Bukkit.broadcastMessage(getPlayerNameWithIcon()+ChatColor.WHITE+" has joined the "+team.getChatColor()+team.getTeamFullName());
         if (MBC.gameID == 0 && MBC.currentGame != null) {
             ((Lobby) MBC.currentGame).changeTeam(this);
         }
