@@ -36,8 +36,6 @@ public abstract class AceRaceMap extends Map {
         mapLength = checkpoints.length;
     }
 
-    public abstract void checkFinished(PlayerMoveEvent e);
-
     public abstract void checkDeath(PlayerMoveEvent e);
 
     public List<Location> getRespawns() {
