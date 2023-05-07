@@ -1,8 +1,10 @@
 package me.kotayka.mbc.gameMaps.aceRaceMap;
 
+import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
 import me.kotayka.mbc.gamePlayers.GamePlayer;
 import me.kotayka.mbc.games.AceRace;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -10,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class Biomes extends AceRaceMap {
-
     Location[] respawns = {
         new Location(getWorld(), 95, 25, 119, 65, 0),
         new Location(getWorld(), -59, 26, 140, 125, 0),
@@ -36,14 +37,21 @@ public class Biomes extends AceRaceMap {
     };
 
     public Biomes() {
+        mapName = "Biomes";
         loadCheckpoints(respawns, checkpoints);
     }
 
+    // NOTE: moved implementation of lap finish to @AceRacePlayer setCheckpoint() (it was easier)
+    // removed indefinitely for now
+    /*
     public void checkFinished(PlayerMoveEvent e) {
-        if(e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.SMOOTH_QUARTZ) {
-//            aceRace.playerFinishLap(event.getPlayer());
+        AceRacePlayer player = (AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer());
+        assert player != null;
+        boolean lastCheckpoint = player.nextCheckpoint == 0;
+        if(e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.SMOOTH_QUARTZ && lastCheckpoint) {
+            AceRace.playerFinishLap(player);
         }
-    }
+    } */
 
     public void checkDeath(PlayerMoveEvent e) {
         if (e.getPlayer().getLocation().getY() < 0 || (e.getPlayer().getLocation().getBlock().getType() == Material.LAVA)) {
