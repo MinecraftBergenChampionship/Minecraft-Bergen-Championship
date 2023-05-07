@@ -26,6 +26,7 @@ public class AceRace extends Game {
     public static AceRaceMap map = new Biomes();
     public static World world = Bukkit.getWorld("AceRace");;
     public static List<AceRacePlayer> aceRacePlayerList = new ArrayList<>();
+    public static short[] finishedPlayersByLap = {0, 0, 0};
     public static long startingTime;
 
     public AceRace() {

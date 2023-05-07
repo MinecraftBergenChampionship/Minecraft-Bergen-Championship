@@ -19,7 +19,7 @@ public class Biomes extends AceRaceMap {
         new Location(world, -138, 26, -58, -160, 0),
         new Location(world, -49, 33, -144, -90, 0),
         new Location(world, 57, 26, -137, -90, 0),
-        new Location(world, 103, 26, -109, -44, 0), // testing
+        new Location(world, 103, 26, -109, -44, 0),
         new Location(world, 138, 26, -62, -10, 0),
         new Location(world, 136, 26, 67, 35, 0),
         new Location(world, 95, 25, 119, 65, 0),
@@ -32,7 +32,7 @@ public class Biomes extends AceRaceMap {
         new Location(world, -150, 28, -25),
         new Location(world, -77, 54, -129),
         new Location(world, 7, 24, -144),
-        new Location(world, 102, 30, -110), // testing
+        new Location(world, 102, 30, -110),
         new Location(world, 119, 34, -93),
         new Location(world, 150, 26, 25),
         new Location(world, 125, 26, 84),
