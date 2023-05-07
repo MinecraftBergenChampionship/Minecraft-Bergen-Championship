@@ -1,5 +1,6 @@
 package me.kotayka.mbc.gamePlayers;
 
+import me.kotayka.mbc.Game;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.games.AceRace;
 import org.bukkit.Bukkit;
@@ -57,22 +58,10 @@ public class AceRacePlayer extends GamePlayer {
             lapStartTime = System.currentTimeMillis();
         }
 
-        String placementPostfix;
-        int x = placement;
-        while (x >= 10) {
-            x = x % 10;
-        }
-        placementPostfix = switch(x) {
-            case 1 -> placementPostfix = "st";
-            case 2 -> placementPostfix = "nd";
-            case 3 -> placementPostfix = "rd";
-            default -> placementPostfix = "th";
-        };
-
         if (lap < 3) {
             Bukkit.broadcastMessage(
                     this.getParticipant().getPlayerNameWithIcon() + ChatColor.GRAY + " has finished Lap " + lap + " in " +
-                    placementColor + placement + placementPostfix + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap-1] + ")");
+                    placementColor + Game.getPlace(placement) + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap-1] + ")");
             this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Completed Lap " + lap + "!", placementColor + "#" + placement + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap-1], 0, 60, 20);
             lap++;
         } else {
@@ -81,7 +70,7 @@ public class AceRacePlayer extends GamePlayer {
             this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Finished!", placementColor + "#" + placement + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap-1], 0, 60, 20);
             Bukkit.broadcastMessage(
                     this.getParticipant().getPlayerNameWithIcon() + ChatColor.GRAY + "" + ChatColor.BOLD + " has finished " + aceRace.map.mapName + " in " +
-                    placementColor + placement + placementPostfix + ChatColor.GRAY + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap-1] + ")");
+                    placementColor + Game.getPlace(placement) + ChatColor.GRAY + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap-1] + ")");
             // TODO: summon firework
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");
             this.getParticipant().getPlayer().sendMessage("                                ");
