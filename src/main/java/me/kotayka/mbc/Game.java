@@ -178,4 +178,17 @@ public abstract class Game implements Scoreboard, Listener {
     public String getFormattedTime(int seconds) {
         return String.format("%02d", seconds/60) +":"+String.format("%02d", seconds%60);
     }
+
+    public static String getPlace(int place) {
+        switch (place) {
+            case 1:
+                return "1st";
+            case 2:
+                return "2nd";
+            case 3:
+                return "3rd";
+            default:
+                return ""+place+"th";
+        }
+    }
 }

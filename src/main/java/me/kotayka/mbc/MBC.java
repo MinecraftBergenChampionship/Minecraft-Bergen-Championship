@@ -2,6 +2,7 @@ package me.kotayka.mbc;
 
 import me.kotayka.mbc.games.AceRace;
 import me.kotayka.mbc.games.Lobby;
+import me.kotayka.mbc.games.TGTTOS;
 import me.kotayka.mbc.teams.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -41,9 +42,10 @@ public class MBC implements Listener {
     public static Plugin plugin;
     public static Lobby lobby = new Lobby();
     public static AceRace aceRace = new AceRace();
+    public static TGTTOS tgttos = new TGTTOS();
 
-    public static List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace"));
-    public static List<Game> gameList = new ArrayList<>(Arrays.asList(aceRace));
+    public static List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS"));
+    public static List<Game> gameList = new ArrayList<>(Arrays.asList(aceRace,tgttos));
 
 
     public static int multiplier = 1;

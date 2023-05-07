@@ -81,8 +81,6 @@ public class Participant {
     }
 
     public void addRoundScore(int amount) {
-        team.addRoundScore(amount);
-
         roundUnMultipliedScore += amount;
         roundScore += amount*MBC.multiplier;
         team.addRoundScore(amount);

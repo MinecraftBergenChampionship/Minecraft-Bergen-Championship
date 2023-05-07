@@ -16,9 +16,6 @@ public class AceRacePlayer extends GamePlayer {
     }
 
     public void nextCheckpoint() {
-        if (AceRace.world == null) {
-            getParticipant().getPlayer().sendMessage("TEST");
-        }
         if (!checkCoords()) return;
         if (checkpoint < AceRace.map.mapLength) {
             checkpoint++;
@@ -29,6 +26,6 @@ public class AceRacePlayer extends GamePlayer {
     }
 
     public Boolean checkCoords() {
-        return (AceRace.map.checkpoints.get(checkpoint).distance(getParticipant().getPlayer().getLocation()) < 5);
+        return (AceRace.map.getCheckpoints().get(checkpoint).distance(getParticipant().getPlayer().getLocation()) < 5);
     }
 }
