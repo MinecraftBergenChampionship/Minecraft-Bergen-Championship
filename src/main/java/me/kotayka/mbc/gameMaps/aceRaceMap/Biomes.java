@@ -47,7 +47,7 @@ public class Biomes extends AceRaceMap {
 
     public void checkDeath(PlayerMoveEvent e) {
         if (e.getPlayer().getLocation().getY() < 0 || (e.getPlayer().getLocation().getBlock().getType() == Material.LAVA)) {
-            int checkpoint = ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).checkpoint;
+            int checkpoint = ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).currentCheckpoint;
             e.getPlayer().teleport(AceRace.map.getRespawns().get((checkpoint < AceRace.map.mapLength) ? checkpoint : AceRace.map.mapLength-1));
             e.getPlayer().setFireTicks(0);
         }

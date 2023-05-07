@@ -27,7 +27,6 @@ public class AceRacePlayer extends GamePlayer {
     /**
      * Determines whether a player has reached the next checkpoint.
      * Modifies values of currentCheckpoint and nextCheckpoint; both are manually reset each lap
-     *
      */
     public void setCheckpoint() {
         // debug: re-add if necessary
@@ -36,6 +35,8 @@ public class AceRacePlayer extends GamePlayer {
         //}
 
         // if we are not near a checkpoint, exit
+
+        if (!checkCoords()) return;
 
         // case for finishing lap
         if (nextCheckpoint == 0) {
@@ -48,15 +49,15 @@ public class AceRacePlayer extends GamePlayer {
                 lapStartTime = System.currentTimeMillis();
                 long lapOne = lapStartTime - AceRace.startingTime;
                 String firstTime = new SimpleDateFormat("mm:ss:SS").format(new Date(lapOne));
-                lapTimes[lap-1] = firstTime;
+                lapTimes[lap - 1] = firstTime;
             } else {
                 long middleLap = System.currentTimeMillis() - lapStartTime;
                 String middleTime = new SimpleDateFormat("mm:ss:SS").format(new Date(middleLap));
-                lapTimes[lap-1] = middleTime;
+                lapTimes[lap - 1] = middleTime;
                 lapStartTime = System.currentTimeMillis();
             }
 
-            Bukkit.broadcastMessage(this.getParticipant().getPlayerNameWithIcon() + " has finished Lap " + lap + " in " + lapTimes[lap-1]);
+            Bukkit.broadcastMessage(this.getParticipant().getPlayerNameWithIcon() + " has finished Lap " + lap + " in " + lapTimes[lap - 1]);
 
             if (lap < 3) {
                 lap++;
@@ -86,7 +87,8 @@ public class AceRacePlayer extends GamePlayer {
             nextCheckpoint = 0;
 
             Bukkit.broadcastMessage("Reached checkpoint " + currentCheckpoint + " on lap " + lap);
-
+        }
+    }
 
     /**
      * Check if player has reached next checkpoint.
@@ -94,7 +96,7 @@ public class AceRacePlayer extends GamePlayer {
      * @see AceRacePlayer setCheckpoint()
      * @return true if next checkpoint is within 5 distance, false otherwise
      */
-    public Boolean checkCoords() {
-        return (AceRace.map.getCheckpoints().get(checkpoint).distance(getParticipant().getPlayer().getLocation()) < 5);
+    public Boolean checkCoords () {
+        return (AceRace.map.getCheckpoints().get(currentCheckpoint).distance(getParticipant().getPlayer().getLocation()) < 5);
     }
 }
