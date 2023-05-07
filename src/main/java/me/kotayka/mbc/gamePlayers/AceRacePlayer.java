@@ -31,7 +31,7 @@ public class AceRacePlayer extends GamePlayer {
     private void Lap() {
         ChatColor placementColor;
         AceRace.finishedPlayersByLap[lap-1]++;  // increment amount of players that have finished
-        placement = AceRace.finishedPlayersByLap[0];
+        placement = AceRace.finishedPlayersByLap[lap-1];
         long lapTime;
         // apparently "enhanced switches" are only java 14+, idk how much that has any significance
         placementColor = switch (placement) {
