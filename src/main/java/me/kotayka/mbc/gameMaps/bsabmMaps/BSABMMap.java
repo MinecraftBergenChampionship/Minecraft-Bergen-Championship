@@ -2,7 +2,6 @@ package me.kotayka.mbc.gameMaps.bsabmMaps;
 
 import me.kotayka.mbc.gameMaps.Map;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -13,7 +12,7 @@ import java.util.List;
 
 public class BSABMMap extends Map {
 
-    private HashMap<String, BSABMPlot> plots = new HashMap<>();
+    private HashMap<String, BSABMBlueprint> plots = new HashMap<>();
     private List<String> gameOrder = new ArrayList<>();
 
 
@@ -27,7 +26,7 @@ public class BSABMMap extends Map {
         Block b = Bukkit.getWorld("bsabmMaps").getBlockAt(-6, 185, 2);
 
         while (b.getType() == Material.DIAMOND_BLOCK) {
-            BSABMPlot plot = new BSABMPlot(b.getLocation());
+            BSABMBlueprint plot = new BSABMBlueprint(b.getLocation());
             plots.put(plot.getName(), plot);
             gameOrder.add(plot.getName());
 

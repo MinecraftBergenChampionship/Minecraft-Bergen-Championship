@@ -1,76 +1,54 @@
 package me.kotayka.mbc.gameMaps.bsabmMaps;
 
-import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.bukkit.Location;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class BSABMPlot {
 
-    private Block[][][] blocks = new Block[6][7][7];
-    private final String name;
-    private final World world;
+    private BSABMBlueprint blueprint;
 
-    public BSABMPlot(Location diamondBlock) {
-        world = diamondBlock.getWorld();
+    private final Location SECorner;
+    private final Location midPoint;
 
-        Block sign = world.getBlockAt((int) diamondBlock.getX(), (int) diamondBlock.getY()+2, (int) (diamondBlock.getZ()-5));
+    private final boolean example;
 
-        if (sign.getType().equals(Material.OAK_WALL_SIGN)) {
-            name = ((Sign) sign.getState()).getLine(0);
-        }
-        else {
-            Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE+"X: "+sign.getLocation().getX()+", Y: "+sign.getLocation().getY()+", Z: "+sign.getLocation().getZ());
-            name="Undefined";
-        }
+    public BSABMPlot(Location seCorner, boolean example) {
+        SECorner = seCorner;
+        midPoint = new Location(SECorner.getWorld(), seCorner.getX()-3, seCorner.getY(), seCorner.getZ()-3);
+        this.example = example;
+    }
 
-        Location startBlock = new Location(world, (int) diamondBlock.getX()+3, (int) diamondBlock.getY()+1, (int) diamondBlock.getZ()+3);
+    public BSABMBlueprint getBlueprint() {
+        return blueprint;
+    }
 
-        for (int y = startBlock.getBlockY(); y <= startBlock.getBlockY()+5; y++) {
-            for (int x = startBlock.getBlockX(); x <= startBlock.getBlockX()-6; x--) {
-                for (int z = startBlock.getBlockZ(); z <= startBlock.getBlockZ()-6; z--) {
-                    blocks[y- startBlock.getBlockY()][startBlock.getBlockX()-x][startBlock.getBlockZ()-z] = world.getBlockAt(x,y,z);
+    public void setBlueprint(BSABMBlueprint blueprint) {
+        this.blueprint = blueprint;
+        if (example) blueprint.placeCompleteBuild(midPoint);
+        else blueprint.placeFirstLayer(midPoint);
+    }
+
+    private boolean checkBlockInGrid(Location location) {
+        if (location.getY() >= SECorner.getY()+1 && location.getY() <= SECorner.getY()+6) {
+            if (location.getX() >= SECorner.getX() && location.getX() <= SECorner.getX()+7) {
+                if (location.getZ() >= SECorner.getZ() && location.getZ() <= SECorner.getZ()+7) {
+                    return true;
                 }
             }
         }
+        return false;
     }
 
-    public void placeFirstLayer(Location midBlock) {
-        placeLayer(midBlock, 0);
-    }
-
-    public void placeLayer(Location midBlock, int y) {
-        for (int x = 0; x < 7; x++) {
-            for (int z = 0; z < 7; z++) {
-                Block b = blocks[y][x][z];
-                midBlock.getWorld().getBlockAt(midBlock.getBlockX()+3-x, midBlock.getBlockY()+y, midBlock.getBlockZ()+3-x).setType(b.getType());
-            }
+    public void blockBreak(BlockBreakEvent e) {
+        if (checkBlockInGrid(e.getBlock().getLocation())) {
+            e.setDropItems(false);
+            e.getPlayer().getInventory().addItem(new ItemStack(e.getBlock().getType()));
         }
     }
 
-    public void placeCompleteBuild(Location midBlock) {
-        for (int y = 0; y < 6; y++) {
-            placeLayer(midBlock, y);
-        }
-    }
-
-    public boolean checkBuild(Location midBlock) {
-        for (int y = 0; y < 6; y++) {
-            for (int x = 0; x < 7; x++) {
-                for (int z = 0; z < 7; z++) {
-                    Block b = blocks[y][x][z];
-                    if (!midBlock.getWorld().getBlockAt(midBlock.getBlockX()+3-x, midBlock.getBlockY()+y, midBlock.getBlockZ()+3-x).getType().equals(b.getType())) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    public String getName() {
-        return name;
+    public boolean blockPlace(BlockPlaceEvent e) {
+        return (checkBlockInGrid(e.getBlock().getLocation()) && getBlueprint().checkBuild(midPoint));
     }
 }
