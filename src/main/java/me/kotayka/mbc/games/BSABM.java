@@ -4,21 +4,24 @@ import me.kotayka.mbc.Game;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.bsabmMaps.BSABMMap;
+import me.kotayka.mbc.gamePlayers.BSABMPlayer;
 import me.kotayka.mbc.gameTeams.bsabmTeam;
 import me.kotayka.mbc.gameMaps.bsabmMaps.BuildMart;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BSABM extends Game {
 
-    BSABMMap map = new BuildMart();
-
-    private bsabmTeam red = new bsabmTeam(MBC.red, new Location(map.getWorld(), -107, 1, 150, -90, 0));
-    private bsabmTeam yellow = new bsabmTeam(MBC.yellow, new Location(map.getWorld(), -68, 1, 150, -90, 0));
-    private bsabmTeam green = new bsabmTeam(MBC.green, new Location(map.getWorld(), -28, 1, 150, -90, 0));
-    private bsabmTeam blue = new bsabmTeam(MBC.blue, new Location(map.getWorld(), 11, 1, 150, -90, 0));
-    private bsabmTeam purple = new bsabmTeam(MBC.purple, new Location(map.getWorld(), 50, 1, 150, -90, 0));
-    private bsabmTeam pink = new bsabmTeam(MBC.pink, new Location(map.getWorld(), 89, 1, 150, -90, 0));
+    public BSABMMap map = new BuildMart();
+    public bsabmTeam red = new bsabmTeam(MBC.red, new Location(map.getWorld(), -107, 1, 150, -90, 0));
+    public bsabmTeam yellow = new bsabmTeam(MBC.yellow, new Location(map.getWorld(), -68, 1, 150, -90, 0));
+    public bsabmTeam green = new bsabmTeam(MBC.green, new Location(map.getWorld(), -28, 1, 150, -90, 0));
+    public bsabmTeam blue = new bsabmTeam(MBC.blue, new Location(map.getWorld(), 11, 1, 150, -90, 0));
+    public bsabmTeam purple = new bsabmTeam(MBC.purple, new Location(map.getWorld(), 50, 1, 150, -90, 0));
+    public bsabmTeam pink = new bsabmTeam(MBC.pink, new Location(map.getWorld(), 89, 1, 150, -90, 0));
 
     public BSABM() {
         super(3, "BSABM");
@@ -44,7 +47,9 @@ public class BSABM extends Game {
     public void start() {
         setTimer(600);
         for (Participant p : MBC.getIngamePlayer()) {
-            p.getInventory().clear();
+            BSABMPlayer bsabmPlayer = new BSABMPlayer(p, this);
+            gamePlayers.add(bsabmPlayer);
+            bsabmPlayer.respawn();
             p.getPlayer().teleport(new Location(map.getWorld(), 10, 1, 0, -90, 0));
         }
     }

@@ -26,4 +26,8 @@ public class bsabmTeam extends gameTeam {
     public void addExamplePlot(BSABMPlot plot) {
         examplePlots.add(plot);
     }
+
+    public Location getSpawnLoc() {
+        return spawnLoc;
+    }
 }
