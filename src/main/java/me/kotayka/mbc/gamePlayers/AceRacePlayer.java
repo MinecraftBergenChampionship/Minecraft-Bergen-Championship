@@ -1,13 +1,10 @@
 package me.kotayka.mbc.gamePlayers;
 
-import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.games.AceRace;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,8 +17,11 @@ public class AceRacePlayer extends GamePlayer {
     public long totalTime;
     public short placement;
 
-    public AceRacePlayer(Participant p) {
+    public final AceRace aceRace;
+
+    public AceRacePlayer(Participant p, AceRace aceRace) {
         super(p);
+        this.aceRace = aceRace;
     }
 
     /**
@@ -30,8 +30,8 @@ public class AceRacePlayer extends GamePlayer {
      */
     private void Lap() {
         ChatColor placementColor;
-        AceRace.finishedPlayersByLap[lap-1]++;  // increment amount of players that have finished
-        placement = AceRace.finishedPlayersByLap[lap-1];
+        aceRace.finishedPlayersByLap[lap-1]++;  // increment amount of players that have finished
+        placement = aceRace.finishedPlayersByLap[lap-1];
         long lapTime;
         // apparently "enhanced switches" are only java 14+, idk how much that has any significance
         placementColor = switch (placement) {
@@ -45,7 +45,7 @@ public class AceRacePlayer extends GamePlayer {
 
         if (lap == 1) {  // first lap uses universal lapStartTime
             lapStartTime = System.currentTimeMillis();
-            lapTime = lapStartTime - AceRace.startingTime;
+            lapTime = lapStartTime - aceRace.startingTime;
             totalTime += lapTime;   // add to total time
             String firstTime = new SimpleDateFormat("m:ss.S").format(new Date(lapTime)); // get formatted time
             lapTimes[lap-1] = firstTime;
@@ -80,7 +80,7 @@ public class AceRacePlayer extends GamePlayer {
             this.getParticipant().getPlayer().setGameMode(GameMode.SPECTATOR);
             this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Finished!", placementColor + "#" + placement + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap-1], 0, 60, 20);
             Bukkit.broadcastMessage(
-                    this.getParticipant().getPlayerNameWithIcon() + ChatColor.GRAY + "" + ChatColor.BOLD + " has finished " + AceRace.map.mapName + " in " +
+                    this.getParticipant().getPlayerNameWithIcon() + ChatColor.GRAY + "" + ChatColor.BOLD + " has finished " + aceRace.map.mapName + " in " +
                     placementColor + placement + placementPostfix + ChatColor.GRAY + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap-1] + ")");
             // TODO: summon firework
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");
@@ -99,7 +99,7 @@ public class AceRacePlayer extends GamePlayer {
      * Handles updating player and team score
      */
     private void updateScore(Participant p) {
-        int beatPlayers = AceRace.aceRacePlayerList.size() - AceRace.finishedPlayersByLap[lap-1];
+        int beatPlayers = aceRace.aceRacePlayerList.size() - aceRace.finishedPlayersByLap[lap-1];
         if (lap < 3) {
             p.addRoundScore(beatPlayers * AceRace.PLACEMENT_LAP_POINTS);
         } else {
@@ -127,7 +127,7 @@ public class AceRacePlayer extends GamePlayer {
         if (!checkCoords()) return;
 
         // case for finishing lap
-        if (checkpoint == AceRace.map.mapLength) {
+        if (checkpoint == aceRace.map.mapLength) {
             checkpoint = 0;
             Lap();
         } else { // not last checkpoint
@@ -143,6 +143,6 @@ public class AceRacePlayer extends GamePlayer {
      */
     public boolean checkCoords() {
         // If checkpoint is out of bounds, player is on last lap and should compare to first checkpoint
-        return (AceRace.map.checkpoints.get(checkpoint < AceRace.map.mapLength ? checkpoint : 0).distance(getParticipant().getPlayer().getLocation()) <= 6);
+        return (aceRace.map.checkpoints.get(checkpoint < aceRace.map.mapLength ? checkpoint : 0).distance(getParticipant().getPlayer().getLocation()) <= 6);
     }
 }

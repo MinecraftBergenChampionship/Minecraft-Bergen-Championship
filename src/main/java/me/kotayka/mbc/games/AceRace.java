@@ -23,11 +23,11 @@ import java.util.List;
 
 public class AceRace extends Game {
     // Change this to determine played map
-    public static AceRaceMap map = new Biomes();
+    public AceRaceMap map = new Biomes();
     public static World world = Bukkit.getWorld("AceRace");;
-    public static List<AceRacePlayer> aceRacePlayerList = new ArrayList<>();
-    public static short[] finishedPlayersByLap = {0, 0, 0};
-    public static long startingTime;
+    public List<AceRacePlayer> aceRacePlayerList = new ArrayList<>();
+    public short[] finishedPlayersByLap = {0, 0, 0};
+    public long startingTime;
 
     // SCORING VARIABLES
     public static final short FINISH_RACE_POINTS = 8;           // points for finishing the race
@@ -74,7 +74,7 @@ public class AceRace extends Game {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().teleport(new Location(world, 1, 26, 150, 90, 0));
 
-            aceRacePlayerList.add(new AceRacePlayer(p));
+            aceRacePlayerList.add(new AceRacePlayer(p, this));
         }
         createScoreboard();
         startingTime = System.currentTimeMillis();
@@ -84,7 +84,13 @@ public class AceRace extends Game {
     public void PlayerMoveEvent(PlayerMoveEvent e) {
         if (!isGameActive()) return;
 
-        map.checkDeath(e);
+        if (map.checkDeath(e.getPlayer().getLocation())) {
+            e.getPlayer().sendMessage("TEST");
+            AceRacePlayer player = ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer()));
+            int checkpoint = player.checkpoint;
+            e.getPlayer().teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength-1 : checkpoint-1));
+            e.getPlayer().setFireTicks(0);
+        }
         // now auto checks for finished lap in setCheckpoint()
         //map.checkFinished(e);
 

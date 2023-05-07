@@ -34,32 +34,13 @@ public class Biomes extends AceRaceMap {
             new Location(world, 7, 24, -144),
             new Location(world, 102, 30, -110),
             new Location(world, 119, 34, -93),
-            new Location(world, 150, 26, 25),
+            new Location(world, 148, 25, 27),
             new Location(world, 125, 26, 84)
     };
 
     public Biomes() {
+        super(0, "Lava");
         mapName = "Biomes";
         loadCheckpoints(respawns, checkpoints);
-    }
-
-    // NOTE: moved implementation of lap finish to @AceRacePlayer setCheckpoint() (it was easier)
-    // removed indefinitely for now
-    /*
-    public void checkFinished(PlayerMoveEvent e) {
-        AceRacePlayer player = (AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer());
-        assert player != null;
-        boolean lastCheckpoint = player.nextCheckpoint == 0;
-        if(e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.SMOOTH_QUARTZ && lastCheckpoint) {
-            AceRace.playerFinishLap(player);
-        }
-    } */
-
-    public void checkDeath(PlayerMoveEvent e) {
-        if (e.getPlayer().getLocation().getY() < 0 || (e.getPlayer().getLocation().getBlock().getType() == Material.LAVA)) {
-            int checkpoint = ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).checkpoint;
-            e.getPlayer().teleport(AceRace.map.getRespawns().get((checkpoint == 0) ? AceRace.map.mapLength-1 : checkpoint-1));
-            e.getPlayer().setFireTicks(0);
-        }
     }
 }
