@@ -19,6 +19,7 @@ public class Plugin extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(MBC.lobby, this);
         getServer().getPluginManager().registerEvents(MBC.aceRace, this);
         getServer().getPluginManager().registerEvents(MBC.tgttos, this);
+        getServer().getPluginManager().registerEvents(MBC.skybattle, this);
 
         getCommand("changeTeam").setExecutor(new changeTeam());
         getCommand("changeTeam").setTabCompleter(new changeTeamTabCompletion());

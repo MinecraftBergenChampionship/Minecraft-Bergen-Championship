@@ -2,11 +2,13 @@ package me.kotayka.mbc;
 
 import me.kotayka.mbc.games.AceRace;
 import me.kotayka.mbc.games.Lobby;
+import me.kotayka.mbc.games.Skybattle;
 import me.kotayka.mbc.games.TGTTOS;
 import me.kotayka.mbc.teams.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,8 +23,16 @@ import java.util.List;
 import java.util.Objects;
 
 public class MBC implements Listener {
-    public static List<Participant> players = new ArrayList<>(16);
+    // event specifics
 
+    // not sure if we should do this until we resolve the "static or not" stuff
+    /*
+    public final short MAX_PLAYERS_PER_TEAM = 4;
+    public final short MAX_TEAMS = 6;
+    public final short MAX_PLAYERS = MAX_PLAYERS_PER_TEAM * MAX_TEAMS;
+     */
+
+    public static List<Participant> players = new ArrayList<>(16);
     public static Red red = new Red();
     public static Yellow yellow = new Yellow();
     public static Green green = new Green();
@@ -44,9 +54,10 @@ public class MBC implements Listener {
     public static Lobby lobby = new Lobby();
     public static AceRace aceRace = new AceRace();
     public static TGTTOS tgttos = new TGTTOS();
+    public static Skybattle skybattle = new Skybattle();
 
-    public static List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS"));
-    public static List<Game> gameList = new ArrayList<>(Arrays.asList(aceRace,tgttos));
+    public static List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS", "Skybattle"));
+    public static List<Game> gameList = new ArrayList<>(Arrays.asList(aceRace,tgttos, skybattle));
 
     // Define Special Blocks
     // NOTE: ALWAYS USE `getBlock().getRelative(BlockFace.DOWN)` or equivalent

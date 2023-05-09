@@ -57,17 +57,11 @@ public class TGTTOS extends Game {
         startRound();
     }
 
-    public void startRound() {
-        finishedParticipants = new ArrayList<>();
-
-        roundNum++;
-        setTimer(240);
-        TGTTOSMap newMap = maps.get((int) (Math.random()*maps.size()));
-        maps.remove(newMap);
-
-        map = newMap;
-        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Round: "+ roundNum+"/6:" + ChatColor.WHITE + map.getName());
-
+    /**
+     * Moved from startRound()
+     * repurpose loadPlayers() however is best needed for tgttos
+     */
+    public void loadPlayers() {
         for (Participant p : MBC.getIngamePlayer()) {
             p.getInventory().clear();
             p.getPlayer().setVelocity(new Vector(0,0,0));
@@ -82,6 +76,20 @@ public class TGTTOS extends Game {
             }
             map.getWorld().spawnEntity(map.getEndLocation(), EntityType.CHICKEN);
         }
+    }
+
+    public void startRound() {
+        finishedParticipants = new ArrayList<>();
+
+        roundNum++;
+        setTimer(240);
+        TGTTOSMap newMap = maps.get((int) (Math.random()*maps.size()));
+        maps.remove(newMap);
+
+        map = newMap;
+        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Round: "+ roundNum+"/6:" + ChatColor.WHITE + map.getName());
+
+        loadPlayers();
     }
 
     @EventHandler

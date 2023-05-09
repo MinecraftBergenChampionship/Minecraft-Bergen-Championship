@@ -1,6 +1,7 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.gamePlayers.GamePlayer;
+import me.kotayka.mbc.games.AceRace;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -37,6 +38,18 @@ public abstract class Game implements Scoreboard, Listener {
             createScoreboard(p);
         }
     }
+
+    // added templates
+    /**
+     * Should load players into appropriate spots after/during introduction
+     * Could/should handle stuff like: clearing inventory, applying potion effects, etc
+     */
+    public abstract void loadPlayers();
+
+    /**
+     * Provide game explanation
+     */
+    //public abstract void Introduction();
 
 
     public void addPlayerScore(Participant p, int score) {
@@ -190,5 +203,16 @@ public abstract class Game implements Scoreboard, Listener {
             default:
                 return ""+place+"th";
         }
+    }
+
+    public static ChatColor getPlacementColor(int place) {
+        ChatColor placementColor;
+        placementColor = switch (place) {
+            case 1 -> ChatColor.GOLD;
+            case 2 -> ChatColor.GRAY;
+            case 3 -> ChatColor.getByChar("#CD7F32"); // idk if this works yet tbh
+            default -> ChatColor.YELLOW;
+        };
+        return placementColor;
     }
 }

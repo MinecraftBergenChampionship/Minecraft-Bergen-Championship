@@ -23,11 +23,10 @@ import java.util.List;
 
 public class AceRace extends Game {
     // Change this to determine played map
-    public static AceRaceMap map = new Biomes();
-    public static World world = Bukkit.getWorld("AceRace");;
-    public static List<AceRacePlayer> aceRacePlayerList = new ArrayList<>();
-    public static short[] finishedPlayersByLap = {0, 0, 0};
-    public static long startingTime;
+    public AceRaceMap map = new Biomes(this);
+    public List<AceRacePlayer> aceRacePlayerList = new ArrayList<>();
+    public short[] finishedPlayersByLap = {0, 0, 0};
+    public long startingTime;
 
     // SCORING VARIABLES
     public static final short FINISH_RACE_POINTS = 8;           // points for finishing the race
@@ -56,8 +55,11 @@ public class AceRace extends Game {
 
     }
 
-    public void start() {
-        setTimer(600);
+    /**
+     * load players into world
+     * TODO: implement practice lap ?
+     */
+    public void loadPlayers() {
         ItemStack trident = new ItemStack(Material.TRIDENT);
         ItemMeta itemMeta = trident.getItemMeta();
         itemMeta.setUnbreakable(true);
@@ -71,11 +73,17 @@ public class AceRace extends Game {
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000, 10, false, false)); // can probably use scoreboard teams but until then
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-            p.getPlayer().teleport(new Location(world, 1, 26, 150, 90, 0));
+            p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
 
-            aceRacePlayerList.add(new AceRacePlayer(p));
+            aceRacePlayerList.add(new AceRacePlayer(p, this));
         }
+    }
+
+    public void start() {
+        setTimer(600);
+        loadPlayers();
         createScoreboard();
         startingTime = System.currentTimeMillis();
     }

@@ -19,6 +19,8 @@ public abstract class GamePlayer {
         return participant;
     }
 
+    public Player getPlayer() { return participant.getPlayer(); }
+
     public static GamePlayer getGamePlayer(Player p) {
         for (GamePlayer x : MBC.currentGame.gamePlayers) {
             if (x.getParticipant().getPlayer() == p) {
