@@ -1,6 +1,7 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.games.AceRace;
+import me.kotayka.mbc.games.BSABM;
 import me.kotayka.mbc.games.Lobby;
 import me.kotayka.mbc.games.TGTTOS;
 import me.kotayka.mbc.teams.*;
@@ -44,9 +45,10 @@ public class MBC implements Listener {
     public static Lobby lobby = new Lobby();
     public static AceRace aceRace = new AceRace();
     public static TGTTOS tgttos = new TGTTOS();
+    public static BSABM bsabm = new BSABM();
 
-    public static List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS"));
-    public static List<Game> gameList = new ArrayList<>(Arrays.asList(aceRace,tgttos));
+    public static List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS","BSABM"));
+    public static List<Game> gameList = new ArrayList<>(Arrays.asList(aceRace,tgttos,bsabm));
 
     // Define Special Blocks
     // NOTE: ALWAYS USE `getBlock().getRelative(BlockFace.DOWN)` or equivalent
