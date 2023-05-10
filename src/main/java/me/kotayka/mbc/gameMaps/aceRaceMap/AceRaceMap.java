@@ -14,17 +14,16 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 /**
- * @implNote All AceRaceMaps should have first checkpoint and respawn at the very beginning of lap by default,
+ * @implSpec All AceRaceMaps should have first checkpoint and respawn at the very beginning of lap by default,
  *           or else the current code will not track laps correctly. The first checkpoint / finish line should be
  *           marked by carpet.
  */
 public abstract class AceRaceMap extends Map {
     public String mapName;
-    public World world = Bukkit.getWorld("AceRace");
+    public World world = AceRace.world;
     public List<Location> respawns;
     public List<Location> checkpoints;
     public int mapLength;

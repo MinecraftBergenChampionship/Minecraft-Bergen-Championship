@@ -56,8 +56,11 @@ public class AceRace extends Game {
 
     }
 
-    public void start() {
-        setTimer(600);
+    /**
+     * load players into world
+     * TODO: implement practice lap ?
+     */
+    public void loadPlayers() {
         ItemStack trident = new ItemStack(Material.TRIDENT);
         ItemMeta itemMeta = trident.getItemMeta();
         itemMeta.setUnbreakable(true);
@@ -71,11 +74,17 @@ public class AceRace extends Game {
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000, 10, false, false)); // can probably use scoreboard teams but until then
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-            p.getPlayer().teleport(new Location(world, 1, 26, 150, 90, 0));
+            p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
 
             aceRacePlayerList.add(new AceRacePlayer(p, this));
         }
+    }
+
+    public void start() {
+        setTimer(600);
+        loadPlayers();
         createScoreboard();
         startingTime = System.currentTimeMillis();
     }

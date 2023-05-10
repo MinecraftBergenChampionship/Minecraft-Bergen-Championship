@@ -22,6 +22,15 @@ import java.util.List;
 import java.util.Objects;
 
 public class MBC implements Listener {
+    // event specifics
+
+    // not sure if we should do this until we resolve the "static or not" stuff
+    /*
+    public final short MAX_PLAYERS_PER_TEAM = 4;
+    public final short MAX_TEAMS = 6;
+    public final short MAX_PLAYERS = MAX_PLAYERS_PER_TEAM * MAX_TEAMS;
+     */
+
     public static List<Participant> players = new ArrayList<>(16);
 
     public static Red red = new Red();
