@@ -1,9 +1,6 @@
 package me.kotayka.mbc;
 
-import me.kotayka.mbc.games.AceRace;
-import me.kotayka.mbc.games.BSABM;
-import me.kotayka.mbc.games.Lobby;
-import me.kotayka.mbc.games.TGTTOS;
+import me.kotayka.mbc.games.*;
 import me.kotayka.mbc.teams.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -55,9 +52,10 @@ public class MBC implements Listener {
     public static AceRace aceRace = new AceRace();
     public static TGTTOS tgttos = new TGTTOS();
     public static BSABM bsabm = new BSABM();
+    public static Skybattle skybattle = new Skybattle();
 
-    public static List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS","BSABM"));
-    public static List<Game> gameList = new ArrayList<>(Arrays.asList(aceRace,tgttos,bsabm));
+    public static List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS","BSABM","Skybattle"));
+    public static List<Game> gameList = new ArrayList<>(Arrays.asList(aceRace,tgttos,bsabm,skybattle));
 
     // Define Special Blocks
     // NOTE: ALWAYS USE `getBlock().getRelative(BlockFace.DOWN)` or equivalent

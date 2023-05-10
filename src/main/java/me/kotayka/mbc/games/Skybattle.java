@@ -19,7 +19,7 @@ public class Skybattle extends Game {
     public List<SkybattlePlayer> skybattlePlayerList = new ArrayList<>();
 
     public Skybattle() {
-        super(3, "Skybattle");
+        super(4, "Skybattle");
     }
 
     @Override
@@ -57,6 +57,6 @@ public class Skybattle extends Game {
 
     @Override
     public void start() {
-
+        super.start();
     }
 }

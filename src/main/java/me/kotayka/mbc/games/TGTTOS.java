@@ -53,7 +53,7 @@ public class TGTTOS extends Game {
     }
 
     public void start() {
-        createScoreboard();
+        super.start();
         startRound();
     }
 

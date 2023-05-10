@@ -55,6 +55,8 @@ public class Lobby extends Game {
         }
     }
 
+    public void loadPlayers() {}
+
     public void start() {
         createScoreboard();
     }

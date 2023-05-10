@@ -215,4 +215,10 @@ public abstract class Game implements Scoreboard, Listener {
         };
         return placementColor;
     }
+
+    public void start() {
+        loadPlayers();
+        createScoreboard();
+    }
+    public abstract void events();
 }

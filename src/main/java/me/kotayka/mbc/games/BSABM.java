@@ -45,7 +45,11 @@ public class BSABM extends Game {
     }
 
     public void start() {
+        super.start();
         setTimer(600);
+    }
+
+    public void loadPlayers() {
         for (Participant p : MBC.getIngamePlayer()) {
             BSABMPlayer bsabmPlayer = new BSABMPlayer(p, this);
             gamePlayers.add(bsabmPlayer);

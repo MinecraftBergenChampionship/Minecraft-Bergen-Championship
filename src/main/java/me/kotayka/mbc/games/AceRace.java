@@ -83,9 +83,8 @@ public class AceRace extends Game {
     }
 
     public void start() {
+        super.start();
         setTimer(600);
-        loadPlayers();
-        createScoreboard();
         startingTime = System.currentTimeMillis();
     }
 
