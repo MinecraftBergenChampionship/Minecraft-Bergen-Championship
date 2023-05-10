@@ -47,4 +47,27 @@ public class Biomes extends AceRaceMap {
             e.getPlayer().setFireTicks(0);
         }
     }
+
+    public void setBarriers(boolean barriers) {
+        Material block = (barriers) ? Material.BARRIER : Material.AIR;
+
+        short y = 27;
+        short z = 145;
+
+        // main strip
+        for (; y <= 28; y++) {
+            for (; z <= 155; z++) {
+                getWorld().getBlockAt(0, y, z).setType(block);
+            }
+        }
+        short x = 3;
+        y = 27;
+        // sides
+        for (; x >= 1; x--) {
+            for (; y <= 28; y++) {
+                getWorld().getBlockAt(x, y, 156).setType(block);
+                getWorld().getBlockAt(x, y, 144).setType(block);
+            }
+        }
+    }
 }

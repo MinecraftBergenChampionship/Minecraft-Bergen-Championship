@@ -58,4 +58,9 @@ public class Lobby extends Game {
     public void start() {
         createScoreboard();
     }
+
+    @Override
+    public void loadPlayers() {
+        // tbd
+    }
 }

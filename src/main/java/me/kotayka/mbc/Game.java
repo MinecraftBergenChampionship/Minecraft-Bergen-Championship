@@ -1,10 +1,9 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.gamePlayers.GamePlayer;
-import me.kotayka.mbc.games.AceRace;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.GameMode;
 import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -12,9 +11,12 @@ import org.bukkit.scoreboard.Objective;
 import java.util.*;
 
 public abstract class Game implements Scoreboard, Listener {
-
     public int gameID;
     public String gameName;
+    private GameState gameState;
+
+    public SortedMap<Integer, String> teamScores = new TreeMap<>();
+    public SortedMap<Integer, GamePlayer> gameIndividual = new TreeMap<>();
 
     public Game(int gameID, String gameName) {
         this.gameID = gameID;
@@ -30,7 +32,7 @@ public abstract class Game implements Scoreboard, Listener {
     List<Participant> playersAlive = new ArrayList<>();
     List<Team> teamsAlive = new ArrayList<>();
 
-    public static int timeRemaining;
+    public int timeRemaining;
 
     public void createScoreboard() {
         for (Participant p : MBC.players) {
@@ -129,6 +131,10 @@ public abstract class Game implements Scoreboard, Listener {
 
         return newTeams;
     }
+
+    /**
+     * Sorts teams by their current round score to place onto scoreboard.
+     */
     public void teamRounds() {
         List<Team> teamRoundsScores = new ArrayList<>(getValidTeams());
         teamRoundsScores.sort(new TeamRoundSorter());
@@ -173,7 +179,9 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public boolean isGameActive() {
-        return (MBC.getGameID() == this.gameID);
+        if (MBC.getGameID() != this.gameID) return false;
+
+        return (this.getState().equals(GameState.ACTIVE));
     }
 
     public void setTimer(int time) {
@@ -192,7 +200,18 @@ public abstract class Game implements Scoreboard, Listener {
         return String.format("%02d", seconds/60) +":"+String.format("%02d", seconds%60);
     }
 
-    public static String getPlace(int place) {
+    /**
+     * Called at the end of most games
+     * Handles formatting and reveals of team and individual scores
+     *
+     * NOTE: games with additional information, (ex: Ace Race and lap times)
+     * must implement a separate function for those stats.
+     */
+    public void gameEndEvents() {
+
+    }
+
+    public String getPlace(int place) {
         switch (place) {
             case 1:
                 return "1st";
@@ -205,7 +224,7 @@ public abstract class Game implements Scoreboard, Listener {
         }
     }
 
-    public static ChatColor getPlacementColor(int place) {
+    public ChatColor getPlacementColor(int place) {
         ChatColor placementColor;
         placementColor = switch (place) {
             case 1 -> ChatColor.GOLD;
@@ -214,5 +233,94 @@ public abstract class Game implements Scoreboard, Listener {
             default -> ChatColor.YELLOW;
         };
         return placementColor;
+    }
+
+    /**
+     * Graphics for counting down when a game is about to start.
+     * Should only be called when gameState() is GameState.STARTING
+     * since it directly uses timeRemaining
+     * Does not handle events for when timer hits 0 (countdown finishes).
+     */
+    public void startingCountdown() {
+        for (GamePlayer p : gamePlayers) {
+            if (timeRemaining <= 10 && timeRemaining > 3) {
+                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+timeRemaining+"<", 0,20,0);
+            } else if (timeRemaining == 3) {
+                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.RED + timeRemaining+ChatColor.WHITE+"<", 0,20,0);
+            } else if (timeRemaining == 2) {
+                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.YELLOW + timeRemaining+ChatColor.WHITE+"<", 0,20,0);
+            } else if (timeRemaining == 1) {
+                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.GREEN + timeRemaining+ChatColor.WHITE+"<", 0,20,0);
+            }
+        }
+    }
+
+    /**
+     * Apply win effects to player
+     * Does NOT check if player won, logic must be implemented before call
+     */
+    public void winEffects(GamePlayer p) {
+        p.getPlayer().setGameMode(GameMode.ADVENTURE);
+        p.getPlayer().setFlying(true);
+        p.getPlayer().setAllowFlight(true);
+        p.getPlayer().setInvulnerable(true);
+    }
+
+    /**
+     * Display red text "Game Over!" and triggers effects for alive players (not in spectator).
+     * Does not handle scoring or removing said effects.
+     */
+    public void gameOverGraphics() {
+        Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!");
+        for (GamePlayer p : gamePlayers) {
+            p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!","",0, 60, 20);
+        }
+    }
+
+    /**
+     * Custom version of above function if other player-specific events are to be triggered
+     * within loops not handled by raw forEach loop
+     */
+    public void gameOverGraphics(GamePlayer p) {
+        p.getPlayer().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!");
+        p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!","",0, 60, 20);
+    }
+
+    /**
+     * Display red text "Round Over!" and triggers effects for alive players (not in spectator).
+     * Does not handle scoring or removing win effects.
+     */
+    public void roundOverGraphics() {
+        Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!");
+        for (GamePlayer p : gamePlayers) {
+            p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!", "", 0, 60, 20);
+        }
+    }
+
+    /**
+     * Custom version of above function if other player-specific events are to be triggered
+     * within loops not handled by raw forEach loop
+     */
+    public void roundOverGraphics(GamePlayer p) {
+        p.getPlayer().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!");
+        p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!","",0, 60, 20);
+    }
+
+    /**
+     * Accessor for current game's state
+     * @see GameState
+     * @return Enum GameState representing the current state of the game
+     */
+    public GameState getState() {
+        return gameState;
+    }
+
+    /**
+     * Mutator for current game's state
+     * @see GameState
+     * @param gameState the state which the game will change to
+     */
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 }

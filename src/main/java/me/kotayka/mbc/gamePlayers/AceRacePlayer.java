@@ -1,6 +1,7 @@
 package me.kotayka.mbc.gamePlayers;
 
 import me.kotayka.mbc.Game;
+import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.games.AceRace;
 import org.bukkit.Bukkit;
@@ -30,11 +31,13 @@ public class AceRacePlayer extends GamePlayer {
      * Also displays text and updates score
      */
     private void Lap() {
+        if (!(ACE_RACE.getState().equals(GameState.ACTIVE))) { return; }
+
         long lapTime;
-        ACE_RACE.finishedPlayersByLap[lap-1]++;  // increment amount of players that have finished
-        placement = ACE_RACE.finishedPlayersByLap[lap-1];
-        ChatColor placementColor = Game.getPlacementColor(placement);
-        String placementString = Game.getPlace(placement);
+        ACE_RACE.finishedPlayersByLap[lap - 1]++;  // increment amount of players that have finished
+        placement = ACE_RACE.finishedPlayersByLap[lap - 1];
+        ChatColor placementColor = ACE_RACE.getPlacementColor(placement);
+        String placementString = ACE_RACE.getPlace(placement);
 
         updateScore(this.getParticipant());
 
@@ -43,28 +46,28 @@ public class AceRacePlayer extends GamePlayer {
             lapTime = lapStartTime - ACE_RACE.startingTime;
             totalTime += lapTime;   // add to total time
             String firstTime = new SimpleDateFormat("m:ss.S").format(new Date(lapTime)); // get formatted time
-            lapTimes[lap-1] = firstTime;
+            lapTimes[lap - 1] = firstTime;
         } else {
             lapTime = System.currentTimeMillis() - lapStartTime;
             totalTime += lapTime;
             String lapTimeFormatted = new SimpleDateFormat("m:ss.S").format(new Date(lapTime));
-            lapTimes[lap-1] = lapTimeFormatted;
+            lapTimes[lap - 1] = lapTimeFormatted;
             lapStartTime = System.currentTimeMillis();
         }
 
         if (lap < 3) {
             Bukkit.broadcastMessage(
                     this.getParticipant().getPlayerNameWithIcon() + ChatColor.GRAY + " has finished Lap " + lap + " in " +
-                    placementColor + placementString + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap-1] + ")");
-            this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Completed Lap " + lap + "!", placementColor + "#" + placement + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap-1], 0, 60, 20);
+                            placementColor + placementString + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ")");
+            this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Completed Lap " + lap + "!", placementColor + "#" + placement + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
             lap++;
         } else {
             String totalTimeFormat = ChatColor.YELLOW + new SimpleDateFormat("m:ss.S").format(new Date(totalTime));
             this.getParticipant().getPlayer().setGameMode(GameMode.SPECTATOR);
-            this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Finished!", placementColor + "#" + placement + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap-1], 0, 60, 20);
+            this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Finished!", placementColor + "#" + placement + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
             Bukkit.broadcastMessage(
                     this.getParticipant().getPlayerNameWithIcon() + ChatColor.GRAY + "" + ChatColor.BOLD + " has finished " + ACE_RACE.map.mapName + " in " +
-                    placementColor + placementString + ChatColor.GRAY + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap-1] + ")");
+                            placementColor + placementString + ChatColor.GRAY + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ")");
             // TODO: summon firework
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");
             this.getParticipant().getPlayer().sendMessage("                                ");
@@ -75,6 +78,11 @@ public class AceRacePlayer extends GamePlayer {
             this.getParticipant().getPlayer().sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "Overall: " + ChatColor.YELLOW + new SimpleDateFormat("m:ss.S").format(new Date(totalTime)));
             this.getParticipant().getPlayer().sendMessage("                                ");
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");
+
+            // since this was the last lap, check if all players have finished the last lap
+            if (ACE_RACE.finishedPlayersByLap[2] == ACE_RACE.aceRacePlayerList.size()) {
+                ACE_RACE.timeRemaining = 0; // end the game
+            }
         }
     }
 

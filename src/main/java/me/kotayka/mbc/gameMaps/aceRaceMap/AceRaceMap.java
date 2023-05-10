@@ -40,6 +40,12 @@ public abstract class AceRaceMap extends Map {
         return respawns;
     }
 
+    /**
+     * Either place barriers or remove barriers at start of race
+     * @param barriers true if setting barriers, false if removing barriers
+     */
+    public abstract void setBarriers(boolean barriers);
+
     public List<Location> getCheckpoints() {
         return checkpoints;
     }

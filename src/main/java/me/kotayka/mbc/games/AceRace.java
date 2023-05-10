@@ -1,6 +1,7 @@
 package me.kotayka.mbc.games;
 
 import me.kotayka.mbc.Game;
+import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
@@ -49,10 +50,56 @@ public class AceRace extends Game {
         updatePlayerRoundScore(p);
     }
 
-    // TODO: implement 3-5 min practice lap
-    // this may be excessive, have to see if players are willing to try out lap before event
     public void events() {
+        if (getState().equals(GameState.TUTORIAL)) {
+            switch (timeRemaining) {
+                case 60 ->
+                        Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "One minute left on practice!");
+                case 0 -> {
+                    Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.YELLOW + "Practice Over!");
+                    for (AceRacePlayer p : aceRacePlayerList) {
+                        p.getPlayer().sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "Practice Over!", "", 0, 60, 20);
+                        p.getPlayer().setFlying(true);
+                    }
+                    setGameState(GameState.END_ROUND);
+                    setTimer(5);
+                }
+            }
+        } else if (getState().equals(GameState.END_ROUND)) {
+            if (timeRemaining == 0) {
+                map.setBarriers(true);
+                for (AceRacePlayer p : aceRacePlayerList) {
+                    p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
+                }
+                setGameState(GameState.STARTING);
+                setTimer(20);
+            }
+        } else if (getState().equals(GameState.STARTING)) {
+            if (timeRemaining > 0) {
+                startingCountdown();
+            } else {
+                setGameState(GameState.ACTIVE);
+                map.setBarriers(false);
+                setTimer(600);
+            }
+        } else if (getState().equals(GameState.ACTIVE)) {
+            if (timeRemaining == 30) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "30 seconds remaining!");
+                // TODO: play overtime music (or if there are like 2 players still racing: tbd)
+            } else if (timeRemaining == 0) {
+                for (AceRacePlayer p : aceRacePlayerList) {
+                    gameOverGraphics(p);
+                    if (!(p.getPlayer().getGameMode().equals(GameMode.SPECTATOR))) {
+                        winEffects(p); // this is just for the effects. players not in spectator by the end of the round have lost.
+                        p.getPlayer().sendMessage(ChatColor.RED + "Better luck next time!");
+                    }
+                }
+                setGameState(GameState.END_GAME);
+                setTimer(60);
+            }
+        } else if (getState().equals(GameState.END_GAME)) {
 
+        }
     }
 
     /**
@@ -82,7 +129,11 @@ public class AceRace extends Game {
     }
 
     public void start() {
-        setTimer(600);
+        setGameState(GameState.TUTORIAL);
+        setTimer(180);
+
+        Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Lap!");
+
         loadPlayers();
         createScoreboard();
         startingTime = System.currentTimeMillis();
@@ -90,7 +141,7 @@ public class AceRace extends Game {
 
     @EventHandler
     public void PlayerMoveEvent(PlayerMoveEvent e) {
-        if (!isGameActive()) return;
+        if (!(getState().equals(GameState.ACTIVE) || getState().equals(GameState.TUTORIAL))) return;
 
         map.checkDeath(e);
         // now auto checks for finished lap in setCheckpoint()
@@ -117,6 +168,14 @@ public class AceRace extends Game {
         }
         if (e.getTo().getBlock().getType().toString().toLowerCase().contains("carpet")) {
             ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).setCheckpoint();
+        }
+    }
+
+    public void raceEndEvents() {
+        switch (timeRemaining) {
+            case 59:
+                Bukkit.broadcastMessage(ChatColor.BOLD+"Each team scored this game: ");
+
         }
     }
 

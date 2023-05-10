@@ -45,6 +45,9 @@ public class Classic extends SkybattleMap {
      * there is also probably a better way to do this but nah
      */
     public void resetMap() {
+        SKYBATTLE.resetKillMaps();
+
+        // reset world
         short x = 225;
         short y = -16;
         short z = 322;
@@ -122,7 +125,6 @@ public class Classic extends SkybattleMap {
                 }
             }
         }
-
     }
 
     public void removeBarriers() {
