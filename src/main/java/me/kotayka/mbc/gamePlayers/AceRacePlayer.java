@@ -56,7 +56,7 @@ public class AceRacePlayer extends GamePlayer {
 
         if (lap < 3) {
             Bukkit.broadcastMessage(
-                    this.getParticipant().getPlayerNameWithIcon() + ChatColor.GRAY + " has finished Lap " + lap + " in " +
+                    this.getParticipant().getFormattedName() + ChatColor.GRAY + " has finished Lap " + lap + " in " +
                             placementColor + placementString + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ")");
             this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Completed Lap " + lap + "!", placementColor + "#" + placement + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
             lap++;
@@ -65,7 +65,7 @@ public class AceRacePlayer extends GamePlayer {
             this.getParticipant().getPlayer().setGameMode(GameMode.SPECTATOR);
             this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Finished!", placementColor + "#" + placement + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
             Bukkit.broadcastMessage(
-                    this.getParticipant().getPlayerNameWithIcon() + ChatColor.GRAY + "" + ChatColor.BOLD + " has finished " + ACE_RACE.map.mapName + " in " +
+                    this.getParticipant().getFormattedName() + ChatColor.GRAY + "" + ChatColor.BOLD + " has finished " + ACE_RACE.map.mapName + " in " +
                             placementColor + placementString + ChatColor.GRAY + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ")");
             // TODO: summon firework
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");

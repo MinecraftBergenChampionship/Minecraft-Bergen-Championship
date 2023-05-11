@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -40,7 +39,7 @@ public class Participant {
         }
         team = t;
         team.addPlayer(this);
-        Bukkit.broadcastMessage(getPlayerNameWithIcon()+ChatColor.WHITE+" has joined the "+team.getChatColor()+team.getTeamFullName());
+        Bukkit.broadcastMessage(getFormattedName()+ChatColor.WHITE+" has joined the "+team.getChatColor()+team.getTeamFullName());
         if (MBC.gameID == 0 && MBC.currentGame != null) {
             ((Lobby) MBC.currentGame).changeTeam(this);
         }
@@ -70,7 +69,7 @@ public class Participant {
      * for string formatting
      * @return team icon + player's username with color
      */
-    public String getPlayerNameWithIcon() {
+    public String getFormattedName() {
         return (getTeam().getIcon() + " " + getTeam().getChatColor() + getPlayer().getName()) + ChatColor.WHITE;
     }
 

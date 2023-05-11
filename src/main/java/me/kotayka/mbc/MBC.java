@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.plugin.Plugin;
@@ -98,6 +99,21 @@ public class MBC implements Listener {
     public void onKick(PlayerKickEvent e) {
         if (e.getReason().equalsIgnoreCase("Flying is not enabled on this server"))
             e.setCancelled(true);
+    }
+
+    /**
+     * Handles formatting player messages
+     * @param e PlayerChatEvent
+     */
+    @EventHandler
+    public void onPlayerChat(PlayerChatEvent e) {
+        String msg = e.getMessage();
+        for (Participant p : players) {
+            if (e.getPlayer() == p.getPlayer()) {
+                e.setFormat(p.getFormattedName() + ": " + msg);
+                break;
+            }
+        }
     }
 
     public static int getGameID() {
