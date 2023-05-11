@@ -4,7 +4,8 @@ import me.kotayka.mbc.gameMaps.Map;
 import me.kotayka.mbc.games.AceRace;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.Material;
+import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,15 +17,20 @@ import java.util.List;
  *           marked by carpet.
  */
 public abstract class AceRaceMap extends Map {
-    protected final AceRace ACE_RACE;
     public String mapName;
+    public World world = AceRace.world;
     public List<Location> respawns;
     public List<Location> checkpoints;
     public int mapLength;
 
-    protected AceRaceMap(AceRace ar) {
+    public List<String> deathObjects;
+
+    private final int deathY;
+
+    public AceRaceMap(int deathY, String... deathObject) {
         super(Bukkit.getWorld("AceRace"));
-        this.ACE_RACE = ar;
+        this.deathY = deathY;
+        deathObjects=new ArrayList<>(Arrays.asList(deathObject));
     }
 
     public void loadCheckpoints(Location[] respawns, Location[] checkpoints) {
@@ -34,7 +40,21 @@ public abstract class AceRaceMap extends Map {
         mapLength = checkpoints.length;
     }
 
-    public abstract void checkDeath(PlayerMoveEvent e);
+    public boolean checkDeath(Location l) {
+        if (l.getY() < deathY) {
+            return true;
+        }
+
+        for (String death : deathObjects) {
+            switch (death) {
+                case "Lava":
+                    if (l.getBlock().getType() == Material.LAVA) return true;
+                    break;
+            }
+        }
+
+        return false;
+    }
 
     public List<Location> getRespawns() {
         return respawns;

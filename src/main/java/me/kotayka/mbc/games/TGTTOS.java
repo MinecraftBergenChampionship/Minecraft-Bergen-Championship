@@ -53,7 +53,7 @@ public class TGTTOS extends Game {
     }
 
     public void start() {
-        createScoreboard();
+        super.start();
         startRound();
     }
 
@@ -117,7 +117,7 @@ public class TGTTOS extends Game {
     public void chickenClick(Participant p, Entity chicken) {
         p.addRoundScore(MBC.getIngamePlayer().size()-finishedParticipants.size());
         finishedParticipants.add(p);
-        String place = Game.getPlace(finishedParticipants.size());
+        String place = getPlace(finishedParticipants.size());
         chicken.remove();
         Bukkit.broadcastMessage(p.getTeam().getChatColor()+p.getPlayerName()+ChatColor.WHITE+" finished in "+ChatColor.AQUA+place);
         p.getPlayer().sendMessage(ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GREEN+" place!");

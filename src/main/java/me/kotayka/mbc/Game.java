@@ -13,7 +13,7 @@ import java.util.*;
 public abstract class Game implements Scoreboard, Listener {
     public int gameID;
     public String gameName;
-    private GameState gameState;
+    private GameState gameState = GameState.INACTIVE;
 
     public SortedMap<Integer, String> teamScores = new TreeMap<>();
     public SortedMap<Integer, GamePlayer> gameIndividual = new TreeMap<>();
@@ -212,6 +212,10 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public String getPlace(int place) {
+        if (place > 10) {
+            place = place % 10;
+        }
+
         switch (place) {
             case 1:
                 return "1st";
@@ -220,7 +224,7 @@ public abstract class Game implements Scoreboard, Listener {
             case 3:
                 return "3rd";
             default:
-                return ""+place+"th";
+                return place+"th";
         }
     }
 
@@ -235,6 +239,14 @@ public abstract class Game implements Scoreboard, Listener {
         return placementColor;
     }
 
+    public void start() {
+        loadPlayers();
+        createScoreboard();
+    }
+
+    public abstract void events();
+
+
     /**
      * Graphics for counting down when a game is about to start.
      * Should only be called when gameState() is GameState.STARTING
@@ -246,11 +258,11 @@ public abstract class Game implements Scoreboard, Listener {
             if (timeRemaining <= 10 && timeRemaining > 3) {
                 p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+timeRemaining+"<", 0,20,0);
             } else if (timeRemaining == 3) {
-                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.RED + timeRemaining+ChatColor.WHITE+"<", 0,20,0);
+                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.RED + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
             } else if (timeRemaining == 2) {
-                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.YELLOW + timeRemaining+ChatColor.WHITE+"<", 0,20,0);
+                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.YELLOW + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
             } else if (timeRemaining == 1) {
-                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.GREEN + timeRemaining+ChatColor.WHITE+"<", 0,20,0);
+                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.GREEN + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
             }
         }
     }
@@ -261,8 +273,8 @@ public abstract class Game implements Scoreboard, Listener {
      */
     public void winEffects(GamePlayer p) {
         p.getPlayer().setGameMode(GameMode.ADVENTURE);
-        p.getPlayer().setFlying(true);
         p.getPlayer().setAllowFlight(true);
+        p.getPlayer().setFlying(true);
         p.getPlayer().setInvulnerable(true);
     }
 

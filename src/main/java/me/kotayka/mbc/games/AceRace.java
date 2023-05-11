@@ -24,7 +24,8 @@ import java.util.List;
 
 public class AceRace extends Game {
     // Change this to determine played map
-    public AceRaceMap map = new Biomes(this);
+    public AceRaceMap map = new Biomes();
+    public static World world = Bukkit.getWorld("AceRace");;
     public List<AceRacePlayer> aceRacePlayerList = new ArrayList<>();
     public short[] finishedPlayersByLap = {0, 0, 0};
     public long startingTime;
@@ -52,27 +53,24 @@ public class AceRace extends Game {
 
     public void events() {
         if (getState().equals(GameState.TUTORIAL)) {
-            switch (timeRemaining) {
-                case 60 ->
-                        Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "One minute left on practice!");
-                case 0 -> {
-                    Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.YELLOW + "Practice Over!");
-                    for (AceRacePlayer p : aceRacePlayerList) {
-                        p.getPlayer().sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "Practice Over!", "", 0, 60, 20);
-                        p.getPlayer().setFlying(true);
-                    }
-                    setGameState(GameState.END_ROUND);
-                    setTimer(5);
+            if (timeRemaining == 60) {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "One minute left of practice!");
+            } else if (timeRemaining <= 0) {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.YELLOW + "Practice Over!");
+                for (AceRacePlayer p : aceRacePlayerList) {
+                    p.getPlayer().sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "Practice Over!", "", 0, 60, 20);
                 }
+                setGameState(GameState.END_ROUND);
+                timeRemaining = 5;
             }
         } else if (getState().equals(GameState.END_ROUND)) {
-            if (timeRemaining == 0) {
+            if (timeRemaining <= 0) {
                 map.setBarriers(true);
                 for (AceRacePlayer p : aceRacePlayerList) {
-                    p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
+                    p.getPlayer().teleport(new Location(map.getWorld(), 2, 26, 150, 90, 0));
                 }
                 setGameState(GameState.STARTING);
-                setTimer(20);
+                timeRemaining = 20;
             }
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
@@ -80,13 +78,14 @@ public class AceRace extends Game {
             } else {
                 setGameState(GameState.ACTIVE);
                 map.setBarriers(false);
-                setTimer(600);
+                timeRemaining = 600;
+                startingTime = System.currentTimeMillis();
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             if (timeRemaining == 30) {
                 Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "30 seconds remaining!");
                 // TODO: play overtime music (or if there are like 2 players still racing: tbd)
-            } else if (timeRemaining == 0) {
+            } else if (timeRemaining <= 0) {
                 for (AceRacePlayer p : aceRacePlayerList) {
                     gameOverGraphics(p);
                     if (!(p.getPlayer().getGameMode().equals(GameMode.SPECTATOR))) {
@@ -95,10 +94,10 @@ public class AceRace extends Game {
                     }
                 }
                 setGameState(GameState.END_GAME);
-                setTimer(60);
+                timeRemaining = 60;
             }
         } else if (getState().equals(GameState.END_GAME)) {
-
+            // todo
         }
     }
 
@@ -129,6 +128,7 @@ public class AceRace extends Game {
     }
 
     public void start() {
+        //super.start()
         setGameState(GameState.TUTORIAL);
         setTimer(180);
 
@@ -136,16 +136,18 @@ public class AceRace extends Game {
 
         loadPlayers();
         createScoreboard();
-        startingTime = System.currentTimeMillis();
     }
 
     @EventHandler
     public void PlayerMoveEvent(PlayerMoveEvent e) {
         if (!(getState().equals(GameState.ACTIVE) || getState().equals(GameState.TUTORIAL))) return;
 
-        map.checkDeath(e);
-        // now auto checks for finished lap in setCheckpoint()
-        //map.checkFinished(e);
+        if (map.checkDeath(e.getPlayer().getLocation())) {
+            AceRacePlayer player = ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer()));
+            int checkpoint = player.checkpoint;
+            e.getPlayer().teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength-1 : checkpoint-1));
+            e.getPlayer().setFireTicks(0);
+        }
 
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
             e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(4));
@@ -172,11 +174,13 @@ public class AceRace extends Game {
     }
 
     public void raceEndEvents() {
+        // TODO
+        /*
         switch (timeRemaining) {
             case 59:
                 Bukkit.broadcastMessage(ChatColor.BOLD+"Each team scored this game: ");
 
-        }
+        } */
     }
 
 

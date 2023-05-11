@@ -1,6 +1,5 @@
 package me.kotayka.mbc.gamePlayers;
 
-import me.kotayka.mbc.Game;
 import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.games.AceRace;

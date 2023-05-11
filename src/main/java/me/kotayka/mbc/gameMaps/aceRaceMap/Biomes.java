@@ -1,15 +1,11 @@
 package me.kotayka.mbc.gameMaps.aceRaceMap;
 
-import me.kotayka.mbc.gamePlayers.AceRacePlayer;
-import me.kotayka.mbc.gamePlayers.GamePlayer;
-import me.kotayka.mbc.games.AceRace;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.event.player.PlayerMoveEvent;
 
 public class Biomes extends AceRaceMap {
     Location[] respawns = {
-            new Location(getWorld(), 3,26, 150, 90, 0),  // default
+            new Location(getWorld(), 2, 26, 150, 90, 0),  // default
             new Location(getWorld(), -59, 26, 140, 125, 0),
             new Location(getWorld(), -119, 27, 77, 135, 0),
             new Location(getWorld(), -138, 26, -58, -160, 0),
@@ -22,7 +18,7 @@ public class Biomes extends AceRaceMap {
     };
 
     Location[] checkpoints = {
-            new Location(getWorld(), 3, 26, 150),    // default
+            new Location(getWorld(), 2, 26, 150),    // default
             new Location(getWorld(), -22, 28, 150),
             new Location(getWorld(), -109, 32, 103),
             new Location(getWorld(), -150, 28, -25),
@@ -34,18 +30,10 @@ public class Biomes extends AceRaceMap {
             new Location(getWorld(), 125, 26, 84)
     };
 
-    public Biomes(AceRace ar) {
-        super(ar);
+    public Biomes() {
+        super(0, "Lava");
         mapName = "Biomes";
         loadCheckpoints(respawns, checkpoints);
-    }
-
-    public void checkDeath(PlayerMoveEvent e) {
-        if (e.getPlayer().getLocation().getY() < 0 || (e.getPlayer().getLocation().getBlock().getType() == Material.LAVA)) {
-            int checkpoint = ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).checkpoint;
-            e.getPlayer().teleport(ACE_RACE.map.getRespawns().get((checkpoint == 0) ? ACE_RACE.map.mapLength-1 : checkpoint-1));
-            e.getPlayer().setFireTicks(0);
-        }
     }
 
     public void setBarriers(boolean barriers) {

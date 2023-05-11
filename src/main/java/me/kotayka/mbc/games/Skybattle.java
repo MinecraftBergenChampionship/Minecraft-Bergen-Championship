@@ -31,7 +31,7 @@ public class Skybattle extends Game {
     public Map<Entity, Player> creeperSpawners = new HashMap<Entity, Player>(5);
 
     public Skybattle() {
-        super(3, "Skybattle");
+        super(4, "Skybattle");
     }
 
     @Override
@@ -65,6 +65,8 @@ public class Skybattle extends Game {
      * Reset maps used for determining kills
      */
     public void resetKillMaps() {
+        if (creeperSpawners == null || TNTPlacers == null || skybattlePlayerList == null) return;
+
         creeperSpawners.clear();
         TNTPlacers.clear();
 
@@ -81,7 +83,7 @@ public class Skybattle extends Game {
 
     @Override
     public void start() {
-
+        super.start();
     }
 
     /**
@@ -90,7 +92,7 @@ public class Skybattle extends Game {
      */
     @EventHandler
     public void blockPlaceEvent(BlockPlaceEvent e) {
-        if (!this.getState().equals(GameState.ACTIVE)) { e.setCancelled(true); }
+        if (!isGameActive()) { e.setCancelled(true); }
 
         Block b = e.getBlock();
         Player p = e.getPlayer();
@@ -133,7 +135,7 @@ public class Skybattle extends Game {
      */
     @EventHandler
     public void blockBreakEvent(BlockBreakEvent e) {
-        if (!(this.getState().equals(GameState.ACTIVE))) return;
+        if (!isGameActive()) return;
 
         if (e.getBlock().getType().toString().endsWith("CONCRETE")) {
             e.setCancelled(true);
