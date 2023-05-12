@@ -77,14 +77,28 @@ public class Participant implements Comparable<Participant> {
     public int getRoundScore() {
         return roundScore;
     }
+    public int getUnmultipliedRoundScore() { return roundUnMultipliedScore; }
 
+
+    /**
+     * Takes each round (minigame) scores and adds to Participant's stat totals.
+     * Adds score to team, and resets the round variables for the next minigame.
+     * @see Participant addGameScore()
+     * @see Game gameEndEvents()
+     */
     public void addRoundScoreToGame() {
         addGameScore(getRoundScore());
         roundScore = 0;
+        roundUnMultipliedScore = 0;
     }
 
+    /**
+     * Helper function for addRoundScoreToGame().
+     * Adds score to team and player's stats.
+     * @see Participant addRoundScoreToGame()
+     * @param amount player's (unmultiplied) score
+     */
     public void addGameScore(int amount) {
-
         team.addGameScore(amount);
         unmultipliedScore += amount;
         score += amount*MBC.multiplier;

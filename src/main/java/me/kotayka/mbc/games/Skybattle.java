@@ -92,7 +92,7 @@ public class Skybattle extends Game {
      */
     @EventHandler
     public void blockPlaceEvent(BlockPlaceEvent e) {
-        if (!isGameActive()) { e.setCancelled(true); }
+        if (!isGameActive()) { return; }
 
         Block b = e.getBlock();
         Player p = e.getPlayer();

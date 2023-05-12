@@ -15,8 +15,7 @@ public abstract class Game implements Scoreboard, Listener {
     public String gameName;
     private GameState gameState = GameState.INACTIVE;
 
-    public SortedMap<Integer, String> teamScores = new TreeMap<>();
-    public SortedMap<Integer, GamePlayer> gameIndividual = new TreeMap<>();
+    public SortedMap<Participant, Integer> gameIndividual = new TreeMap<>(Collections.reverseOrder());
 
     public Game(int gameID, String gameName) {
         this.gameID = gameID;
@@ -200,17 +199,6 @@ public abstract class Game implements Scoreboard, Listener {
         return String.format("%02d", seconds/60) +":"+String.format("%02d", seconds%60);
     }
 
-    /**
-     * Called at the end of most games
-     * Handles formatting and reveals of team and individual scores
-     *
-     * NOTE: games with additional information, (ex: Ace Race and lap times)
-     * must implement a separate function for those stats.
-     */
-    public void gameEndEvents() {
-
-    }
-
     public String getPlace(int place) {
         if (place > 10) {
             place = place % 10;
@@ -246,6 +234,102 @@ public abstract class Game implements Scoreboard, Listener {
 
     public abstract void events();
 
+    /**
+     * Called at the end of games
+     * Handles formatting and reveals of team and individual scores
+     *
+     * NOTE: games with additional information, (ex: Ace Race and lap times)
+     * must implement a separate function for those stats.
+     */
+    public void gameEndEvents() {
+        // GAME_END should have 35 seconds by default
+        switch(timeRemaining) {
+            case 30:
+                Bukkit.broadcastMessage(ChatColor.BOLD+"Each team scored this game:");
+                break;
+            case 28:
+                printRoundScores();
+                break;
+            case 22:
+                Bukkit.broadcastMessage(ChatColor.BOLD+"Top 5 players this game:");
+                break;
+            case 20:
+                getScores();
+                break;
+            case 14:
+                Bukkit.broadcastMessage(ChatColor.BOLD+"Current event standings:");
+                break;
+            case 12:
+                printEventScores();
+                break;
+            case 1:
+                Bukkit.broadcastMessage(ChatColor.RED + "Returning to lobby...");
+            case 0:
+                // TODO return to lobby
+                break;
+        }
+    }
+
+    /**
+     * Prints out top 5 players (or more if there is a tie).
+     * Calls addRoundScoreToGame() to load stats from this game to overall MBC.
+     * @see Participant addRoundScoreToGame()
+     */
+    public void getScores() {
+        int num = 1; // separate var incase there is an absurd amount of ties
+        StringBuilder topFive = new StringBuilder();
+        int lastScore = -1;
+        int counter = 0;
+
+        for (Participant p : gameIndividual.keySet()) {
+            if (p.getUnmultipliedRoundScore() != lastScore) {
+                num++;
+                if (counter == 4) {
+                    counter--; // keep going until no ties
+                }
+            }
+
+            if (counter < 5) {
+                topFive.append(String.format(
+                        (num) + ". <-%18s> <-%5d> (<-%4d> x " + MBC.multiplier + ")\n", p.getFormattedName(), p.getRoundScore(), p.getUnmultipliedRoundScore())
+                );
+                lastScore = p.getUnMultipliedScore();
+                counter++;
+            }
+            p.addRoundScoreToGame();
+        }
+        Bukkit.broadcastMessage(topFive.toString());
+    }
+
+    public void printEventScores() {
+        List<Team> gameScores = new ArrayList<>(getValidTeams());
+        gameScores.sort(new TeamScoreSorter());
+        Collections.reverse(gameScores);
+        StringBuilder str = new StringBuilder();
+
+        for (int i = 0; i < 9; i++) {
+            str.append(String.format(
+                    ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". <-%18s> <-%5d>\n",
+                    gameScores.get(i).teamNameFormat(), gameScores.get(i).getScore())
+            );
+        }
+    }
+
+    public void printRoundScores() {
+        List<Team> teamRoundsScores = new ArrayList<>(getValidTeams());
+        teamRoundsScores.sort(new TeamRoundSorter());
+        Collections.reverse(teamRoundsScores);
+        StringBuilder teamString = new StringBuilder();
+
+        for (int i = 0; i < 9; i++) {
+            teamString.append(String.format(
+                    ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". <-%18s> <-%5d>\n",
+                    teamRoundsScores.get(i).teamNameFormat(), teamRoundsScores.get(i).getRoundScore())
+            );
+        }
+
+        Bukkit.broadcastMessage(teamString.toString());
+    }
 
     /**
      * Graphics for counting down when a game is about to start.

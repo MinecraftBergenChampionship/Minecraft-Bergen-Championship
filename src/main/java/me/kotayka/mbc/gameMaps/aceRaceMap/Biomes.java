@@ -52,12 +52,13 @@ public class Biomes extends AceRaceMap {
         int x = 3;
         y = 27;
         // sides
-        for (; x >= 0; --x) {
+        for (; x >= 0; ) {
             for (; y <= 29; y++) {
                 getWorld().getBlockAt(x, y, 156).setType(block);
                 getWorld().getBlockAt(x, y, 144).setType(block);
                 Bukkit.broadcastMessage("block at " + x + ", " + y + ", " + 156);
                 Bukkit.broadcastMessage("block at " + x + ", " + y + ", " + 144);
+                x-=1;
             }
         }
     }

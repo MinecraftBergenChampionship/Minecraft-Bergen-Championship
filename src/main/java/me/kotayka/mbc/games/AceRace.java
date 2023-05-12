@@ -97,14 +97,14 @@ public class AceRace extends Game {
                     }
                 }
                 setGameState(GameState.END_GAME);
-                timeRemaining = 45;
+                timeRemaining = 47;
             }
         } else if (getState().equals(GameState.END_GAME)) {
-            if (timeRemaining == 40) {
+            if (timeRemaining == 45) {
                 Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Fastest Laps: ");
-            } else if (timeRemaining == 38) {
+            } else if (timeRemaining == 42) {
                 topLaps();
-            } else {
+            } else if (timeRemaining < 36){
                 gameEndEvents();
             }
         }
@@ -194,6 +194,4 @@ public class AceRace extends Game {
         }
         Bukkit.broadcastMessage(topFive.toString());
    }
-
-
 }
