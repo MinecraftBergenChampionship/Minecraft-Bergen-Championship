@@ -8,7 +8,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public class AceRacePlayer extends GamePlayer {
     protected static AceRace ACE_RACE;  // essentially a global const
@@ -17,7 +20,7 @@ public class AceRacePlayer extends GamePlayer {
     public String[] lapTimes = new String[3]; // im going to assume all ace race maps we'll make are 3 laps to conserve (minimal) space
     public long lapStartTime;
     public long totalTime;
-    public short placement;
+    public int placement;
 
     public AceRacePlayer(Participant p, AceRace ar) {
         super(p);
@@ -49,9 +52,30 @@ public class AceRacePlayer extends GamePlayer {
         } else {
             lapTime = System.currentTimeMillis() - lapStartTime;
             totalTime += lapTime;
-            String lapTimeFormatted = new SimpleDateFormat("m:ss.S").format(new Date(lapTime));
-            lapTimes[lap - 1] = lapTimeFormatted;
+            lapTimes[lap - 1] = new SimpleDateFormat("m:ss.S").format(new Date(lapTime));
             lapStartTime = System.currentTimeMillis();
+        }
+
+        // only add to Top 5 if this lap's split was faster or equal to the 5th (map is maintained to be at max size 5).
+        if (ACE_RACE.fastestLaps.size() == 0) {
+            List<String> t = new ArrayList<String>();
+            t.add(this.getParticipant().getFormattedName());
+            ACE_RACE.fastestLaps.put(lapTime,t);
+        } else if (lapTime <= ACE_RACE.fastestLaps.lastKey()) {
+            Set<Long> times = ACE_RACE.fastestLaps.keySet();
+            if (times.contains(lapTime)) {
+                ACE_RACE.fastestLaps.get(lapTime).add(this.getParticipant().getFormattedName());
+            } else {
+                List<String> t = new ArrayList<String>();
+                t.add(this.getParticipant().getFormattedName());
+                ACE_RACE.fastestLaps.put(lapTime,t);
+            }
+
+            // trim map to only contain top 5
+            if (ACE_RACE.fastestLaps.size() > 5) {
+                long tmp = ACE_RACE.fastestLaps.lastKey();
+                ACE_RACE.fastestLaps.remove(tmp);
+            }
         }
 
         if (lap < 3) {
@@ -78,9 +102,18 @@ public class AceRacePlayer extends GamePlayer {
             this.getParticipant().getPlayer().sendMessage("                                ");
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");
 
+            // check if all players on team have finished last lap
+            int done = 0;
+            for (Participant p : this.getParticipant().getTeam().teamPlayers) {
+                if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) done++;
+            }
+            if (done == this.getParticipant().getTeam().teamPlayers.size()) {
+                Bukkit.broadcastMessage(this.getParticipant().getTeam().teamNameFormat() + " have all finished the race!");
+            }
+
             // since this was the last lap, check if all players have finished the last lap
             if (ACE_RACE.finishedPlayersByLap[2] == ACE_RACE.aceRacePlayerList.size()) {
-                ACE_RACE.timeRemaining = 0; // end the game
+                ACE_RACE.timeRemaining = 1; // end the game
             }
         }
     }
@@ -107,7 +140,6 @@ public class AceRacePlayer extends GamePlayer {
     /**
      * Determines whether a player has reached the next checkpoint.
      * Modifies values of currentCheckpoint and nextCheckpoint; both are manually reset each lap
-     *
      */
     public void setCheckpoint() {
         // exit if player is Spectator or done with race

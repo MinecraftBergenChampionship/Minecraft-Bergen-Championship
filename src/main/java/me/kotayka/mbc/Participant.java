@@ -7,11 +7,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Objects;
 
-public class Participant {
+public class Participant implements Comparable<Participant> {
 
     private int unmultipliedScore = 0;
     private int score = 0;
@@ -66,7 +67,7 @@ public class Participant {
     }
 
     /**
-     * for string formatting
+     * for string formatting; no hanging space
      * @return team icon + player's username with color
      */
     public String getFormattedName() {
@@ -139,5 +140,13 @@ public class Participant {
 
     public PlayerInventory getInventory() {
         return getPlayer().getInventory();
+    }
+
+    /**
+     * Comparison of players is based off unmultiplied total score.
+     */
+    @Override
+    public int compareTo(@NotNull Participant o) {
+        return (this.unmultipliedScore - o.unmultipliedScore);
     }
 }

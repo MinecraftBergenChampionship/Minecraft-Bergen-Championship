@@ -20,8 +20,8 @@ import java.util.List;
 
 public class Classic extends SkybattleMap {
     private Location center = new Location(getWorld(), -157, 0, -266);
-    private short voidHeight = 0;
-    private short topBorder = 100;
+    private int voidHeight = 0;
+    private int topBorder = 100;
     private Location[] spawns = {
         new Location(getWorld(), -220, 71, -266),
         new Location(getWorld(), -190, 71, -212),
@@ -48,9 +48,9 @@ public class Classic extends SkybattleMap {
         SKYBATTLE.resetKillMaps();
 
         // reset world
-        short x = 225;
-        short y = -16;
-        short z = 322;
+        int x = 225;
+        int y = -16;
+        int z = 322;
         World world = getWorld(); // convenience
         for (int mapX = -225; mapX <= -87; mapX++) {
             for (int mapY = 63; mapY <= 96; mapY++) {

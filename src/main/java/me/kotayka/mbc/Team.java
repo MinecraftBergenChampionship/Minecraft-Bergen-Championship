@@ -177,6 +177,22 @@ public abstract class Team {
         unMultipliedScore+=score*MBC.multiplier;
         MBC.currentGame.updateTeamGameScore(this);
     }
+
+    /**
+     * @return Formatted team name with icon and color.
+     * No hanging space.
+     */
+    public String teamNameFormat() {
+        return getIcon() + " " + this.chatColor + getTeamFullName() + ChatColor.WHITE;
+    }
+
+    /**
+     * Announces team death.
+     * TODO: maybe a sound effect
+     */
+    public void announceTeamDeath() {
+       Bukkit.broadcastMessage(teamNameFormat() + " have been eliminated!");
+    }
 }
 
 class TeamUnMultipliedScoreSorter implements Comparator<Team> {

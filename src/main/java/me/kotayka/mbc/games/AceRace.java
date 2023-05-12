@@ -19,8 +19,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class AceRace extends Game {
     // Change this to determine played map
@@ -30,10 +30,13 @@ public class AceRace extends Game {
     public short[] finishedPlayersByLap = {0, 0, 0};
     public long startingTime;
 
+    // keep track of top 5 fastest
+    public SortedMap<Long, List<String>> fastestLaps = new TreeMap<Long, List<String>>();
+
     // SCORING VARIABLES
-    public static final short FINISH_RACE_POINTS = 8;           // points for finishing the race
-    public static final short PLACEMENT_LAP_POINTS = 1;         // points for placement for first laps
-    public static final short PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
+    public static final int FINISH_RACE_POINTS = 8;           // points for finishing the race
+    public static final int PLACEMENT_LAP_POINTS = 1;         // points for placement for first laps
+    public static final int PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
     public static final short[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
 
     public AceRace() {
@@ -94,17 +97,19 @@ public class AceRace extends Game {
                     }
                 }
                 setGameState(GameState.END_GAME);
-                timeRemaining = 60;
+                timeRemaining = 45;
             }
         } else if (getState().equals(GameState.END_GAME)) {
-            // todo
+            if (timeRemaining == 40) {
+                Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Fastest Laps: ");
+            } else if (timeRemaining == 38) {
+                topLaps();
+            } else {
+                gameEndEvents();
+            }
         }
     }
 
-    /**
-     * load players into world
-     * TODO: implement practice lap ?
-     */
     public void loadPlayers() {
         ItemStack trident = new ItemStack(Material.TRIDENT);
         ItemMeta itemMeta = trident.getItemMeta();
@@ -130,17 +135,22 @@ public class AceRace extends Game {
     public void start() {
         //super.start()
         setGameState(GameState.TUTORIAL);
-        setTimer(180);
+        setTimer(10); //debug
+        //setTimer(180);
 
-        Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Lap!");
+        Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
 
         loadPlayers();
         createScoreboard();
+
+        for (AceRacePlayer p : aceRacePlayerList) {
+            p.getPlayer().sendTitle(ChatColor.GOLD+""+ChatColor.BOLD+"Practice Starting!", "", 20, 60, 20);
+        }
     }
 
     @EventHandler
     public void PlayerMoveEvent(PlayerMoveEvent e) {
-        if (!(getState().equals(GameState.ACTIVE) || getState().equals(GameState.TUTORIAL))) return;
+        if (MBC.getGameID() != this.gameID) return;
 
         if (map.checkDeath(e.getPlayer().getLocation())) {
             AceRacePlayer player = ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer()));
@@ -173,15 +183,17 @@ public class AceRace extends Game {
         }
     }
 
-    public void raceEndEvents() {
-        // TODO
-        /*
-        switch (timeRemaining) {
-            case 59:
-                Bukkit.broadcastMessage(ChatColor.BOLD+"Each team scored this game: ");
-
-        } */
-    }
+   public void topLaps() {
+        StringBuilder topFive = new StringBuilder();
+        int counter = 0;
+        for (Long l : fastestLaps.keySet()) {
+            for (int i = 0; i < fastestLaps.get(l).size(); i++) {
+                topFive.append(String.format((counter+1) + ". <-%18s> <-%9s>\n", fastestLaps.get(l).get(i), new SimpleDateFormat("m:ss.S").format(new Date(l))));
+            }
+            counter++;
+        }
+        Bukkit.broadcastMessage(topFive.toString());
+   }
 
 
 }

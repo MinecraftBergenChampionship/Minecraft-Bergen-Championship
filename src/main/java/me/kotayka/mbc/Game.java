@@ -270,6 +270,7 @@ public abstract class Game implements Scoreboard, Listener {
     /**
      * Apply win effects to player
      * Does NOT check if player won, logic must be implemented before call
+     * @param p GamePlayer that has won a round/game.
      */
     public void winEffects(GamePlayer p) {
         p.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -279,8 +280,20 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     /**
-     * Display red text "Game Over!" and triggers effects for alive players (not in spectator).
-     * Does not handle scoring or removing said effects.
+     * Removes win effects from player that has won a round/game/is in god mode.
+     * @param p GamePlayer that has won a round, game, or is invulnerable for some reason that needs to be reset.
+     */
+    public void removeWinEffect(GamePlayer p) {
+        p.getPlayer().setGameMode(GameMode.ADVENTURE);
+        p.getPlayer().setAllowFlight(false);
+        p.getPlayer().setFlying(false);
+        p.getPlayer().setInvulnerable(false);
+    }
+
+    /**
+     * Display red text "Game Over!" and send chat message
+     * Does not proceed to game scoring or call anything else.
+     * (gonna see if this is used at all in the future before deleting)
      */
     public void gameOverGraphics() {
         Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!");
@@ -299,8 +312,7 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     /**
-     * Display red text "Round Over!" and triggers effects for alive players (not in spectator).
-     * Does not handle scoring or removing win effects.
+     * Display red text "Round Over!"
      */
     public void roundOverGraphics() {
         Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!");

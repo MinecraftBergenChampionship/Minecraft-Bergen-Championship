@@ -11,8 +11,8 @@ import org.bukkit.entity.*;
 public abstract class SkybattleMap extends Map {
     protected final Skybattle SKYBATTLE;
     private Location center;
-    private short voidHeight;
-    public short borderHeight;
+    private int voidHeight;
+    public int borderHeight;
     public Location[] spawns;
 
 
@@ -22,7 +22,7 @@ public abstract class SkybattleMap extends Map {
         this.SKYBATTLE = skb;
     }
 
-    public void loadWorld(Location center, short yMin, short yMax) {
+    public void loadWorld(Location center, int yMin, int yMax) {
         this.center = center;
         this.voidHeight = yMin;
         this.borderHeight = yMax;

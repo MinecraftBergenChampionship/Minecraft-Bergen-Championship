@@ -1,5 +1,6 @@
 package me.kotayka.mbc.gameMaps.aceRaceMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -39,22 +40,24 @@ public class Biomes extends AceRaceMap {
     public void setBarriers(boolean barriers) {
         Material block = (barriers) ? Material.BARRIER : Material.AIR;
 
-        short y = 27;
-        short z = 145;
+        int y = 27;
+        int z = 145;
 
         // main strip
-        for (; y <= 28; y++) {
+        for (; y <= 29; y++) {
             for (; z <= 155; z++) {
                 getWorld().getBlockAt(0, y, z).setType(block);
             }
         }
-        short x = 3;
+        int x = 3;
         y = 27;
         // sides
-        for (; x >= 1; x--) {
-            for (; y <= 28; y++) {
+        for (; x >= 0; --x) {
+            for (; y <= 29; y++) {
                 getWorld().getBlockAt(x, y, 156).setType(block);
                 getWorld().getBlockAt(x, y, 144).setType(block);
+                Bukkit.broadcastMessage("block at " + x + ", " + y + ", " + 156);
+                Bukkit.broadcastMessage("block at " + x + ", " + y + ", " + 144);
             }
         }
     }
