@@ -281,6 +281,10 @@ public abstract class Game implements Scoreboard, Listener {
         int lastScore = -1;
         int counter = 0;
 
+        for (GamePlayer p : gamePlayers) {
+            gameIndividual.put(p.getParticipant(), p.getParticipant().getUnmultipliedRoundScore());
+        }
+
         for (Participant p : gameIndividual.keySet()) {
             if (p.getUnmultipliedRoundScore() != lastScore) {
                 num++;
@@ -291,7 +295,7 @@ public abstract class Game implements Scoreboard, Listener {
 
             if (counter < 5) {
                 topFive.append(String.format(
-                        (num) + ". <-%18s> <-%5d> (<-%4d> x " + MBC.multiplier + ")\n", p.getFormattedName(), p.getRoundScore(), p.getUnmultipliedRoundScore())
+                        (num) + ". %-18s %-5d (<%-4d x %.2f)\n", p.getFormattedName(), p.getRoundScore(), p.getUnmultipliedRoundScore(), MBC.multiplier)
                 );
                 lastScore = p.getUnMultipliedScore();
                 counter++;
@@ -321,9 +325,9 @@ public abstract class Game implements Scoreboard, Listener {
         Collections.reverse(teamRoundsScores);
         StringBuilder teamString = new StringBuilder();
 
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < teamRoundsScores.size(); i++) {
             teamString.append(String.format(
-                    ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". <-%18s> <-%5d>\n",
+                    ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". %-18s %-5d\n",
                     teamRoundsScores.get(i).teamNameFormat(), teamRoundsScores.get(i).getRoundScore())
             );
         }

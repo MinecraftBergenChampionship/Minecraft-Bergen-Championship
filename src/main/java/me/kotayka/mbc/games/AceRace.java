@@ -97,14 +97,14 @@ public class AceRace extends Game {
                     }
                 }
                 setGameState(GameState.END_GAME);
-                timeRemaining = 47;
+                timeRemaining = 42;
             }
         } else if (getState().equals(GameState.END_GAME)) {
-            if (timeRemaining == 45) {
+            if (timeRemaining == 40) {
                 Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Fastest Laps: ");
-            } else if (timeRemaining == 42) {
+            } else if (timeRemaining == 36) {
                 topLaps();
-            } else if (timeRemaining < 36){
+            } else if (timeRemaining < 34){
                 gameEndEvents();
             }
         }
@@ -188,7 +188,7 @@ public class AceRace extends Game {
         int counter = 0;
         for (Long l : fastestLaps.keySet()) {
             for (int i = 0; i < fastestLaps.get(l).size(); i++) {
-                topFive.append(String.format((counter+1) + ". <-%18s> <-%9s>\n", fastestLaps.get(l).get(i), new SimpleDateFormat("m:ss.S").format(new Date(l))));
+                topFive.append(String.format((counter+1) + ". %-18s %-9s\n", fastestLaps.get(l).get(i), new SimpleDateFormat("m:ss.S").format(new Date(l))));
             }
             counter++;
         }

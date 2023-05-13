@@ -131,6 +131,18 @@ public abstract class Team {
         }
     }
 
+    public ItemStack getConcrete() {
+        return switch (getChatColor()) {
+            case RED -> new ItemStack(Material.RED_CONCRETE);
+            case YELLOW -> new ItemStack(Material.YELLOW_CONCRETE);
+            case GREEN -> new ItemStack(Material.GREEN_CONCRETE);
+            case BLUE -> new ItemStack(Material.BLUE_CONCRETE);
+            case DARK_PURPLE -> new ItemStack(Material.PURPLE_CONCRETE);
+            case LIGHT_PURPLE -> new ItemStack(Material.PINK_CONCRETE);
+            default -> new ItemStack(Material.WHITE_CONCRETE);
+        };
+    }
+
     public static Team getTeam(String team) {
         switch (team.toLowerCase()) {
             case "redrabbits":
@@ -204,6 +216,7 @@ class TeamUnMultipliedScoreSorter implements Comparator<Team> {
 }
 
 class TeamScoreSorter implements Comparator<Team> {
+    public TeamScoreSorter() {}
 
     public int compare(Team a, Team b)
     {
@@ -212,6 +225,7 @@ class TeamScoreSorter implements Comparator<Team> {
 }
 
 class TeamRoundSorter implements Comparator<Team> {
+    public TeamRoundSorter() {}
 
     public int compare(Team a, Team b)
     {

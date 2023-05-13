@@ -78,10 +78,11 @@ public class Classic extends SkybattleMap {
                 y++;
             }
             z = 322;
-            y = 62;
+            y = -16;
             x++;
         }
         removeEntities();
+        //backup at 500 0 500
     }
 
     public void initSpawnItems() {
@@ -107,16 +108,8 @@ public class Classic extends SkybattleMap {
             // give spawn items
             for (ItemStack i : spawnItems) {
                 if (i.getType() == Material.WHITE_CONCRETE) {
-                    ItemStack concrete = new ItemStack(Material.WHITE_CONCRETE);
+                    ItemStack concrete = p.getParticipant().getTeam().getConcrete();
                     concrete.setAmount(64);
-                    switch (p.getParticipant().getTeam().getTeamName()) {
-                        case "RedRabbits" -> concrete.setType(Material.RED_CONCRETE);
-                        case "YellowYaks" -> concrete.setType(Material.YELLOW_CONCRETE);
-                        case "GreenGuardians" -> concrete.setType(Material.GREEN_CONCRETE);
-                        case "BlueBats" -> concrete.setType(Material.BLUE_CONCRETE);
-                        case "PurplePandas" -> concrete.setType(Material.PURPLE_CONCRETE);
-                        case "PinkPiglets" -> concrete.setType(Material.PINK_CONCRETE);
-                    }
                     p.getPlayer().getInventory().addItem(concrete);
                 } else if (i.getType() == Material.IRON_CHESTPLATE) {
                     p.getPlayer().getInventory().setChestplate(i);

@@ -67,7 +67,7 @@ public class MBC implements Listener {
     public final static Material JUMP_PAD = Material.WAXED_WEATHERED_COPPER;
 
 
-    public static int multiplier = 1;
+    public static double multiplier = 1;
 
     public MBC(Plugin plugin) {
         MBC.plugin = plugin;
