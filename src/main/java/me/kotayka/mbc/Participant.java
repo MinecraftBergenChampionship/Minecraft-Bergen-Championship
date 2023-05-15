@@ -59,7 +59,6 @@ public class Participant implements Comparable<Participant> {
     }
 
     /**
-     *
      * @return player's username
      */
     public String getPlayerName() {

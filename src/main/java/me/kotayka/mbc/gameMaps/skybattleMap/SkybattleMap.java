@@ -12,6 +12,7 @@ public abstract class SkybattleMap extends Map {
     protected final Skybattle SKYBATTLE;
     private Location center;
     private int voidHeight;
+    private int borderRadius;
     public int borderHeight;
     public Location[] spawns;
 
@@ -22,10 +23,11 @@ public abstract class SkybattleMap extends Map {
         this.SKYBATTLE = skb;
     }
 
-    public void loadWorld(Location center, int yMin, int yMax) {
+    public void loadWorld(Location center, int yMin, int yMax, int borderRadius) {
         this.center = center;
         this.voidHeight = yMin;
         this.borderHeight = yMax;
+        this.borderRadius = borderRadius;
 
         resetMap();
     }
@@ -64,6 +66,11 @@ public abstract class SkybattleMap extends Map {
     }
 
     /**
+     * Spawns particles at values of border
+     */
+    public abstract void borderParticles();
+
+    /**
      * Uses array of spawns to spawn players with their team in a random spawn
      */
     public abstract void spawnPlayers();
@@ -72,4 +79,6 @@ public abstract class SkybattleMap extends Map {
      * Remove barriers around spawn locations
      */
     public abstract void removeBarriers();
+
+    public int getVoidHeight() { return voidHeight; }
 }

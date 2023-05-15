@@ -1,11 +1,9 @@
 package me.kotayka.mbc.gameMaps.skybattleMap;
 
-import me.kotayka.mbc.MBC;
-import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
+import me.kotayka.mbc.Participant;
+import me.kotayka.mbc.Team;
 import me.kotayka.mbc.games.Skybattle;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BrewingStand;
 import org.bukkit.block.Chest;
@@ -20,8 +18,9 @@ import java.util.List;
 
 public class Classic extends SkybattleMap {
     private Location center = new Location(getWorld(), -157, 0, -266);
-    private int voidHeight = 0;
+    private int voidHeight = 30;
     private int topBorder = 100;
+    private int borderRadius = 80;
     private Location[] spawns = {
         new Location(getWorld(), -220, 71, -266),
         new Location(getWorld(), -190, 71, -212),
@@ -35,7 +34,7 @@ public class Classic extends SkybattleMap {
 
     public Classic(Skybattle skybattle) {
         super(skybattle);
-        loadWorld(center, voidHeight, topBorder);
+        loadWorld(center, voidHeight, topBorder, borderRadius);
     }
 
     /**
@@ -85,6 +84,16 @@ public class Classic extends SkybattleMap {
         //backup at 500 0 500
     }
 
+    public void borderParticles() {
+        for (int y = 50; y < 120; y += 20) {
+            for (double t = 0; t < 50; t+=0.5) {
+                float x = borderRadius * (float) Math.sin(t);
+                float z = borderRadius * (float) Math.cos(t);
+                getWorld().spawnParticle(Particle.ASH, x, y, z, 1);
+            }
+        }
+    }
+
     public void initSpawnItems() {
         ItemStack pick = new ItemStack(Material.IRON_PICKAXE);
         pick.addEnchantment(Enchantment.DIG_SPEED, 3);
@@ -102,21 +111,32 @@ public class Classic extends SkybattleMap {
     }
 
     public void spawnPlayers() {
-        List<Location> tempSpawns = Arrays.asList(spawns);
+        Bukkit.broadcastMessage("spawns.length == " + spawns.length);
+        ArrayList<Location> tempSpawns = new ArrayList<>(spawns.length);
+        tempSpawns.addAll(Arrays.asList(spawns));
+
         initSpawnItems();
-        for (SkybattlePlayer p : SKYBATTLE.skybattlePlayerList) {
-            // give spawn items
-            for (ItemStack i : spawnItems) {
-                if (i.getType() == Material.WHITE_CONCRETE) {
-                    ItemStack concrete = p.getParticipant().getTeam().getConcrete();
-                    concrete.setAmount(64);
-                    p.getPlayer().getInventory().addItem(concrete);
-                } else if (i.getType() == Material.IRON_CHESTPLATE) {
-                    p.getPlayer().getInventory().setChestplate(i);
-                } else {
-                    p.getPlayer().getInventory().addItem(i);
+
+        for (Team t : SKYBATTLE.getValidTeams()) {
+            int randomNum = (SKYBATTLE.getValidTeams().size() < tempSpawns.size()) ?
+                    (int) (Math.random() * SKYBATTLE.getValidTeams().size()) : (int) (Math.random() * tempSpawns.size());
+            for (Participant p : t.teamPlayers) {
+                p.getPlayer().teleport(tempSpawns.get(randomNum));
+                p.getPlayer().setGameMode(GameMode.ADVENTURE);
+                // give spawn items
+                for (ItemStack i : spawnItems) {
+                    if (i.getType() == Material.WHITE_CONCRETE) {
+                        ItemStack concrete = p.getTeam().getConcrete();
+                        concrete.setAmount(64);
+                        p.getPlayer().getInventory().addItem(concrete);
+                    } else if (i.getType() == Material.IRON_CHESTPLATE) {
+                        p.getPlayer().getInventory().setChestplate(i);
+                    } else {
+                        p.getPlayer().getInventory().addItem(i);
+                    }
                 }
             }
+            tempSpawns.remove(randomNum);
         }
     }
 

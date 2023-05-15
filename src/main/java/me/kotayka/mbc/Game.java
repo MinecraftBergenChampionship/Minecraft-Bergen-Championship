@@ -4,7 +4,9 @@ import me.kotayka.mbc.gamePlayers.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 
@@ -22,14 +24,11 @@ public abstract class Game implements Scoreboard, Listener {
         this.gameName = gameName;
     }
 
-    int playersRemaining;
-    int teamsRemaining;
-
     public List<GamePlayer> gamePlayers = new ArrayList<GamePlayer>();
     public static int taskID = -1;
 
-    List<Participant> playersAlive = new ArrayList<>();
-    List<Team> teamsAlive = new ArrayList<>();
+    public List<Participant> playersAlive = new ArrayList<>();
+    public List<Team> teamsAlive = new ArrayList<>();
 
     public int timeRemaining;
 
@@ -65,8 +64,38 @@ public abstract class Game implements Scoreboard, Listener {
 
     }
 
-    public void playerDeath() {
+    /**
+     * Handles kill graphics for both killed player and killer
+     * Removes killed player from playersAlive list
+     * @param e Event thrown when a player dies
+     */
+    public void playerDeathEffects(PlayerDeathEvent e) {
+        Participant victim = null;
+        Participant killer = null;
+        String deathMessage = e.deathMessage().toString();
 
+        for (Participant p : MBC.getIngamePlayer()) {
+            if (p.getPlayerName().equals(e.getPlayer().getName())) {
+                victim = p;
+                Bukkit.broadcastMessage("set victim!");
+                playersAlive.remove(p);
+                deathMessage = deathMessage.replace(p.getPlayerName(), p.getFormattedName());
+                if (e.getPlayer().getKiller() == null) break;
+            } else if (e.getPlayer().getKiller() != null) { // ensure that if player killed themselves killer stays null
+                if (p.getPlayerName().equals(e.getPlayer().getKiller().getName())) {
+                    killer = p;
+                    deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName());
+                }
+            }
+        }
+
+        victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
+        victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
+
+        if (killer != null) {
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayerName() + "!");
+            killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
+        }
     }
 
     public boolean checkIfDead(Participant p) {
@@ -346,11 +375,11 @@ public abstract class Game implements Scoreboard, Listener {
             if (timeRemaining <= 10 && timeRemaining > 3) {
                 p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+timeRemaining+"<", 0,20,0);
             } else if (timeRemaining == 3) {
-                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.RED + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.RED+""+ChatColor.BOLD+ timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
             } else if (timeRemaining == 2) {
-                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.YELLOW + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.YELLOW+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
             } else if (timeRemaining == 1) {
-                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.GREEN + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.GREEN+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
             }
         }
     }

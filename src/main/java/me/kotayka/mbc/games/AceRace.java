@@ -54,6 +54,22 @@ public class AceRace extends Game {
         updatePlayerRoundScore(p);
     }
 
+    public void start() {
+        super.start();
+        setGameState(GameState.TUTORIAL);
+        setTimer(10); //debug
+        //setTimer(180);
+
+        Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
+
+        //loadPlayers();
+        //createScoreboard();
+
+        for (AceRacePlayer p : aceRacePlayerList) {
+            p.getPlayer().sendTitle(ChatColor.GOLD+""+ChatColor.BOLD+"Practice Starting!", "", 20, 60, 20);
+        }
+    }
+
     public void events() {
         if (getState().equals(GameState.TUTORIAL)) {
             if (timeRemaining == 60) {
@@ -129,22 +145,6 @@ public class AceRace extends Game {
             p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
 
             aceRacePlayerList.add(new AceRacePlayer(p, this));
-        }
-    }
-
-    public void start() {
-        //super.start()
-        setGameState(GameState.TUTORIAL);
-        setTimer(10); //debug
-        //setTimer(180);
-
-        Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
-
-        loadPlayers();
-        createScoreboard();
-
-        for (AceRacePlayer p : aceRacePlayerList) {
-            p.getPlayer().sendTitle(ChatColor.GOLD+""+ChatColor.BOLD+"Practice Starting!", "", 20, 60, 20);
         }
     }
 
