@@ -67,35 +67,51 @@ public abstract class Game implements Scoreboard, Listener {
     /**
      * Handles kill graphics for both killed player and killer
      * Removes killed player from playersAlive list
+     * For use when there is no chance of a player falling into the void
      * @param e Event thrown when a player dies
      */
     public void playerDeathEffects(PlayerDeathEvent e) {
         Participant victim = null;
         Participant killer = null;
-        String deathMessage = e.deathMessage().toString();
+        String deathMessage = e.getDeathMessage();
+        boolean voidDeath;
 
         for (Participant p : MBC.getIngamePlayer()) {
             if (p.getPlayerName().equals(e.getPlayer().getName())) {
                 victim = p;
-                Bukkit.broadcastMessage("set victim!");
                 playersAlive.remove(p);
-                deathMessage = deathMessage.replace(p.getPlayerName(), p.getFormattedName());
                 if (e.getPlayer().getKiller() == null) break;
-            } else if (e.getPlayer().getKiller() != null) { // ensure that if player killed themselves killer stays null
+            } else if (e.getPlayer().getKiller() != null) {
+                // ensure that if player killed themselves killer stays null
+                // do note this means if you kill yourself you will not get the kill graphic
                 if (p.getPlayerName().equals(e.getPlayer().getKiller().getName())) {
                     killer = p;
-                    deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName());
                 }
             }
         }
 
+        // support for void deaths
+        voidDeath = deathMessage.contains(victim.getPlayerName() + " died");
+
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
+        deathMessage = deathMessage.replace(victim.getPlayerName(), victim.getFormattedName());
 
         if (killer != null) {
             killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayerName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
+            if (voidDeath) {
+                deathMessage = victim.getFormattedName() + " didn't want to live in the same world as " + killer.getFormattedName();
+            } else {
+                deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName());
+            }
+        } else {
+            if (voidDeath) { // no killer but void death
+                deathMessage = victim.getFormattedName() + " fell out of the world";
+            }
         }
+
+        e.setDeathMessage(deathMessage);
     }
 
     public boolean checkIfDead(Participant p) {

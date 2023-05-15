@@ -89,7 +89,7 @@ public class Classic extends SkybattleMap {
             for (double t = 0; t < 50; t+=0.5) {
                 float x = borderRadius * (float) Math.sin(t);
                 float z = borderRadius * (float) Math.cos(t);
-                getWorld().spawnParticle(Particle.ASH, x, y, z, 1);
+                getWorld().spawnParticle(Particle.SMOKE_LARGE, x, y, z, 1);
             }
         }
     }
@@ -111,15 +111,13 @@ public class Classic extends SkybattleMap {
     }
 
     public void spawnPlayers() {
-        Bukkit.broadcastMessage("spawns.length == " + spawns.length);
         ArrayList<Location> tempSpawns = new ArrayList<>(spawns.length);
         tempSpawns.addAll(Arrays.asList(spawns));
 
         initSpawnItems();
 
         for (Team t : SKYBATTLE.getValidTeams()) {
-            int randomNum = (SKYBATTLE.getValidTeams().size() < tempSpawns.size()) ?
-                    (int) (Math.random() * SKYBATTLE.getValidTeams().size()) : (int) (Math.random() * tempSpawns.size());
+            int randomNum = (int) (Math.random() * tempSpawns.size());
             for (Participant p : t.teamPlayers) {
                 p.getPlayer().teleport(tempSpawns.get(randomNum));
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
