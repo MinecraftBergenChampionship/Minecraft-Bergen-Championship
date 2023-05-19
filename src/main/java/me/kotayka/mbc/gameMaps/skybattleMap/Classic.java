@@ -85,11 +85,11 @@ public class Classic extends SkybattleMap {
     }
 
     public void borderParticles() {
-        for (int y = 50; y < 120; y += 20) {
+        for (int y = 50; y <= 110; y += 10) {
             for (double t = 0; t < 50; t+=0.5) {
                 float x = borderRadius * (float) Math.sin(t);
                 float z = borderRadius * (float) Math.cos(t);
-                getWorld().spawnParticle(Particle.SMOKE_LARGE, x, y, z, 1);
+                getWorld().spawnParticle(Particle.REDSTONE, center.getX() + x, y, center.getZ() + z, 5, SKYBATTLE.borderParticle);
             }
         }
     }

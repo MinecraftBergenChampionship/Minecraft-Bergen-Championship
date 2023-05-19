@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class Skybattle extends Game {
+    public final Particle.DustOptions borderParticle = new Particle.DustOptions(Color.RED, 5);
     public SkybattleMap map = new Classic(this);
     public List<SkybattlePlayer> skybattlePlayerList = new ArrayList<>();
     // Primed TNT Entity, Player (that placed that block); used for determining kills since primed tnt is spawned by world
@@ -299,10 +300,10 @@ public class Skybattle extends Game {
         if (e.getEntity().getKiller() == null || e.getPlayer().getLastDamageCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
             // used to determine the death message (ie, void, fall damage, or border?)
             @Nullable EntityDamageEvent damageCause = e.getPlayer().getLastDamageCause();
-            Bukkit.broadcastMessage("going to: skyubattleDeathGraphics");
+            Bukkit.broadcastMessage("[Debug] going to: skyubattleDeathGraphics");
             skybattleDeathGraphics(e, damageCause.getCause());
         } else {
-            Bukkit.broadcastMessage("normal death");
+            Bukkit.broadcastMessage("[Debug] normal death");
             playerDeathEffects(e); // if there was a killer, just send over to default
         }
 
@@ -350,10 +351,9 @@ public class Skybattle extends Game {
             }
 
         } else {
-            // TODO account for border
+            // TODO account for border (if necessary)
             // if no killer, the player killed themselves
             if (damageCause.equals(EntityDamageEvent.DamageCause.CUSTOM)) {
-                //if (deathMessage.equals(victim.getPlayer().getName() + " died")) {
                 deathMessage = victim.getParticipant().getFormattedName() + " fell out of the world";
             }
         }

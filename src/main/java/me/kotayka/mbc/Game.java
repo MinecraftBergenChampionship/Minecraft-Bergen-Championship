@@ -102,14 +102,6 @@ public abstract class Game implements Scoreboard, Listener {
             killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayerName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
             deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName());
-
-            /*
-            if (deathMessage.contains("died")) {
-                deathMessage = victim.getFormattedName() + " didn't want to live in the same world as " + killer.getFormattedName();
-            } else {
-                deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName());
-            }
-             */
         }
 
         e.setDeathMessage(deathMessage);
