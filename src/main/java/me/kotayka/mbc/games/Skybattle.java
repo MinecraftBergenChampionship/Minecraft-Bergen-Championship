@@ -5,10 +5,7 @@ import me.kotayka.mbc.gameMaps.skybattleMap.Classic;
 import me.kotayka.mbc.gameMaps.skybattleMap.SkybattleMap;
 import me.kotayka.mbc.gamePlayers.GamePlayer;
 import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
@@ -28,6 +25,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -240,9 +238,8 @@ public class Skybattle extends Game {
             return;
         }
 
-        // otherwise lastDamager set to damager
-        // projectile hits are handled in onProjectileHit
-        if (!(e.getDamager() instanceof Arrow) && !(e.getDamager() instanceof Snowball)) {
+        // for any general attack
+        if (e.getDamager() instanceof Player) {
             player.lastDamager = (Player) e.getDamager();
         }
     }
@@ -270,11 +267,12 @@ public class Skybattle extends Game {
             player.getPlayer().damage(0.1);
             player.getPlayer().setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
         }
-        player.lastDamager = shooter;
+        //TODO does it keep track?
+        //player.lastDamager =
     }
 
     /**
-     * Give kill credit to lastDamager
+     * Give kill credit to last damager ONLY if nobody else had hit them between
      */
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
@@ -288,14 +286,81 @@ public class Skybattle extends Game {
         }
         if (player == null) return;
 
+        // remove any concrete
+        for (ItemStack i : player.getPlayer().getInventory()) {
+            if (i != null && i.getType().toString().endsWith("CONCRETE")) {
+                player.getPlayer().getInventory().remove(i);
+            }
+        }
+
         playersAlive.remove(player.getParticipant());
         // TODO check if one player left
 
-        if (e.getEntity().getKiller() == null) {
-            e.getEntity().setKiller(player.lastDamager);
+        if (e.getEntity().getKiller() == null || e.getPlayer().getLastDamageCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
+            // used to determine the death message (ie, void, fall damage, or border?)
+            @Nullable EntityDamageEvent damageCause = e.getPlayer().getLastDamageCause();
+            Bukkit.broadcastMessage("going to: skyubattleDeathGraphics");
+            skybattleDeathGraphics(e, damageCause.getCause());
+        } else {
+            Bukkit.broadcastMessage("normal death");
+            playerDeathEffects(e); // if there was a killer, just send over to default
         }
 
-        playerDeathEffects(e);
+    }
+
+    /**
+     * Explicitly handles deaths where the player died indirectly to combat, not
+     * @param e Event thrown when a player dies
+     */
+    public void skybattleDeathGraphics(PlayerDeathEvent e, EntityDamageEvent.DamageCause damageCause) {
+        SkybattlePlayer victim = null;
+        String deathMessage = e.getDeathMessage();
+
+        for (SkybattlePlayer p : skybattlePlayerList) {
+            if (p.getPlayer().getName().equals(e.getPlayer().getName())) {
+                victim = p;
+                victim.getPlayer().setGameMode(GameMode.SPECTATOR);
+                if (e.getPlayer().getKiller() == null) break;
+            }
+        }
+
+        Bukkit.broadcastMessage("Cause of death == " + damageCause);
+        victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
+        victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
+        deathMessage = deathMessage.replace(victim.getPlayer().getName(), victim.getParticipant().getFormattedName());
+
+        if (victim.lastDamager != null) {
+            Participant killer = null;
+            // have to wait until victim is initialized
+            for (Participant p : MBC.getIngamePlayer()) {
+                if (victim.lastDamager.getName().equals(p.getPlayerName())) {
+                    killer = p;
+                    break;
+                }
+            }
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!");
+            killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
+
+            switch (damageCause) {
+                case CUSTOM -> deathMessage = victim.getParticipant().getFormattedName() + " didn't want to live in the same world as " + killer.getFormattedName();
+                case ENTITY_EXPLOSION -> deathMessage = victim.getParticipant().getFormattedName()+ " was blown up by " + killer.getFormattedName();
+                case FALL -> deathMessage = victim.getParticipant().getFormattedName() + " hit the ground too hard whilst trying to escape from " + killer.getFormattedName();
+                case SUFFOCATION -> deathMessage+= " whilst fighting " + killer.getFormattedName();
+                default -> deathMessage = victim.getParticipant().getFormattedName() + " has died to " + killer.getFormattedName();
+            }
+
+        } else {
+            // TODO account for border
+            // if no killer, the player killed themselves
+            if (damageCause.equals(EntityDamageEvent.DamageCause.CUSTOM)) {
+                //if (deathMessage.equals(victim.getPlayer().getName() + " died")) {
+                deathMessage = victim.getParticipant().getFormattedName() + " fell out of the world";
+            }
+        }
+
+
+
+        e.setDeathMessage(deathMessage);
     }
 
     /**
@@ -317,7 +382,7 @@ public class Skybattle extends Game {
         if (player == null) return;
 
         if (player.getPlayer().getLocation().getY() <= map.getVoidHeight()) {
-            player.getPlayer().damage(50, player.lastDamager);
+            player.getPlayer().damage(50);
         }
     }
 
@@ -326,7 +391,14 @@ public class Skybattle extends Game {
         if (!isGameActive()) return;
         if (!(e.getCaught() instanceof Player)) return;
 
-        SkybattlePlayer hooked = (SkybattlePlayer) e.getCaught();
+        SkybattlePlayer hooked = null;
+        for (SkybattlePlayer p : skybattlePlayerList) {
+            if (e.getCaught().getName().equals(p.getPlayer().getName())) {
+                hooked = p;
+                break;
+            }
+        }
+        if (hooked == null) return;
         hooked.lastDamager = e.getPlayer();
     }
 }

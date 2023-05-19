@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -66,20 +67,23 @@ public abstract class Game implements Scoreboard, Listener {
 
     /**
      * Handles kill graphics for both killed player and killer
-     * Removes killed player from playersAlive list
-     * For use when there is no chance of a player falling into the void
+     * Does not handle void kills (death messages will not be descriptive).
+     * Separate functions should be made to handle void kills:
+     * and as such, Skybattle has a completely separate implementation.
+     * Should work for any other PVP game not including the void.
+     * Does not handle scoring.
      * @param e Event thrown when a player dies
      */
     public void playerDeathEffects(PlayerDeathEvent e) {
         Participant victim = null;
         Participant killer = null;
         String deathMessage = e.getDeathMessage();
-        boolean voidDeath;
 
         for (Participant p : MBC.getIngamePlayer()) {
             if (p.getPlayerName().equals(e.getPlayer().getName())) {
                 victim = p;
                 playersAlive.remove(p);
+                victim.getPlayer().setGameMode(GameMode.SPECTATOR);
                 if (e.getPlayer().getKiller() == null) break;
             } else if (e.getPlayer().getKiller() != null) {
                 // ensure that if player killed themselves killer stays null
@@ -90,9 +94,6 @@ public abstract class Game implements Scoreboard, Listener {
             }
         }
 
-        // support for void deaths
-        voidDeath = deathMessage.contains(victim.getPlayerName() + " died");
-
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
         deathMessage = deathMessage.replace(victim.getPlayerName(), victim.getFormattedName());
@@ -100,15 +101,15 @@ public abstract class Game implements Scoreboard, Listener {
         if (killer != null) {
             killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayerName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
-            if (voidDeath) {
+            deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName());
+
+            /*
+            if (deathMessage.contains("died")) {
                 deathMessage = victim.getFormattedName() + " didn't want to live in the same world as " + killer.getFormattedName();
             } else {
                 deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName());
             }
-        } else {
-            if (voidDeath) { // no killer but void death
-                deathMessage = victim.getFormattedName() + " fell out of the world";
-            }
+             */
         }
 
         e.setDeathMessage(deathMessage);
@@ -149,8 +150,8 @@ public abstract class Game implements Scoreboard, Listener {
 
     public void createLine(int score, String line, Participant p) {
         if (p.objective == null || !Objects.equals(p.gameObjective, gameName)) {
-            MBC.currentGame.createScoreboard(p);
             p.gameObjective = gameName;
+            MBC.currentGame.createScoreboard(p);
         }
 
         resetLine(p, score);
