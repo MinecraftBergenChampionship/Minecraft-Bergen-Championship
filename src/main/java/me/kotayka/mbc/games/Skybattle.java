@@ -13,10 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -24,13 +21,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class Skybattle extends Game {
-    public final Particle.DustOptions borderParticle = new Particle.DustOptions(Color.RED, 5);
+    public final Particle.DustOptions BORDER_PARTICLE = new Particle.DustOptions(Color.RED, 5);
+    public final Particle.DustOptions TOP_BORDER_PARTICLE = new Particle.DustOptions(Color.ORANGE, 5);
     public SkybattleMap map = new Classic(this);
     public List<SkybattlePlayer> skybattlePlayerList = new ArrayList<>();
     // Primed TNT Entity, Player (that placed that block); used for determining kills since primed tnt is spawned by world
@@ -73,7 +70,7 @@ public class Skybattle extends Game {
     }
 
     /**
-     * Reset maps used for determining kills
+     * Maps used for determining kills
      */
     public void resetKillMaps() {
         if (creeperSpawners == null || TNTPlacers == null || skybattlePlayerList == null) return;
@@ -115,7 +112,25 @@ public class Skybattle extends Game {
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             if (timeRemaining % 2 == 0) {
-                map.borderParticles();
+                map.Border();
+            }
+
+            if (timeRemaining == 210) {
+                for (Participant p : MBC.getIngamePlayer()) {
+                    p.getPlayer().sendTitle(" ", ChatColor.DARK_RED+"Border shrinking", 0, 60, 20);
+                }
+                Bukkit.broadcastMessage(ChatColor.DARK_RED+"Horizontal border is shrinking!");
+            } else if (timeRemaining == 180) {
+                Bukkit.broadcastMessage(ChatColor.DARK_RED+"Vertical border is falling!");
+            }
+
+            if (timeRemaining <= 210) {
+                if (map.getBorderRadius() >= 0) {
+                    map.reduceBorderRadius(map.getBorderShrinkRate());
+                }
+            }
+            if (timeRemaining <= 180) {
+                map.reduceBorderHeight(map.getVerticalBorderShrinkRate());
             }
         }
 
@@ -252,8 +267,6 @@ public class Skybattle extends Game {
         if(e.getEntityType() != EntityType.ARROW && e.getEntityType() != EntityType.SNOWBALL) return;
         if(!(e.getEntity().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
         if (e.getHitEntity() == null) return;
-
-        Player shooter = (Player) e.getEntity().getShooter();
         SkybattlePlayer player = null;
         for (SkybattlePlayer p : skybattlePlayerList) {
             if (e.getEntity().getName().equals(p.getPlayer().getName())) {
@@ -265,11 +278,37 @@ public class Skybattle extends Game {
 
         if (e.getEntityType().equals(EntityType.SNOWBALL)) {
             Vector snowballVelocity = e.getEntity().getVelocity();
+            player.lastDamager = (Player) e.getEntity().getShooter();
             player.getPlayer().damage(0.1);
             player.getPlayer().setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
         }
-        //TODO does it keep track?
-        //player.lastDamager =
+
+        player.lastDamager = (Player) e.getEntity().getShooter();
+    }
+
+    @EventHandler
+    public void onSplashEvent(PotionSplashEvent e) {
+        if (!isGameActive()) return;
+        if (!(e.getPotion().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
+
+        ThrownPotion potion = e.getPotion();
+
+        Collection<PotionEffect> effects = potion.getEffects();
+        for (PotionEffect effect : effects) {
+            PotionEffectType potionType = effect.getType();
+            if (!potionType.equals(PotionEffectType.HARM)) return;
+        }
+
+        SkybattlePlayer player = null;
+        for (SkybattlePlayer p : skybattlePlayerList) {
+            if (e.getHitEntity().getName().equals(p.getPlayer().getName())) {
+                player = p;
+                break;
+            }
+        }
+        if (player == null) return;
+
+        player.lastDamager = (Player) potion.getShooter();
     }
 
     /**
@@ -343,22 +382,39 @@ public class Skybattle extends Game {
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
 
             switch (damageCause) {
-                case CUSTOM -> deathMessage = victim.getParticipant().getFormattedName() + " didn't want to live in the same world as " + killer.getFormattedName();
-                case ENTITY_EXPLOSION -> deathMessage = victim.getParticipant().getFormattedName()+ " was blown up by " + killer.getFormattedName();
-                case FALL -> deathMessage = victim.getParticipant().getFormattedName() + " hit the ground too hard whilst trying to escape from " + killer.getFormattedName();
-                case SUFFOCATION -> deathMessage+= " whilst fighting " + killer.getFormattedName();
-                default -> deathMessage = victim.getParticipant().getFormattedName() + " has died to " + killer.getFormattedName();
+                case CUSTOM:
+                    if (victim.voidDeath) {
+                        deathMessage = victim.getParticipant().getFormattedName() + " didn't want to live in the same world as " + killer.getFormattedName();
+                        victim.voidDeath = false;
+                    } else {
+                        deathMessage = victim.getParticipant().getFormattedName() + " was killed in the border whilst fighting " + killer.getFormattedName();
+                    }
+                    break;
+                case ENTITY_EXPLOSION:
+                    deathMessage = victim.getParticipant().getFormattedName()+ " was blown up by " + killer.getFormattedName();
+                    break;
+                case FALL:
+                    deathMessage = victim.getParticipant().getFormattedName() + " hit the ground too hard whilst trying to escape from " + killer.getFormattedName();
+                    break;
+                case SUFFOCATION:
+                    deathMessage+= " whilst fighting " + killer.getFormattedName();
+                    break;
+                default:
+                    deathMessage = victim.getParticipant().getFormattedName() + " has died to " + killer.getFormattedName();
+                    break;
             }
 
         } else {
-            // TODO account for border (if necessary)
             // if no killer, the player killed themselves
             if (damageCause.equals(EntityDamageEvent.DamageCause.CUSTOM)) {
-                deathMessage = victim.getParticipant().getFormattedName() + " fell out of the world";
+                if (victim.voidDeath) {
+                    deathMessage = victim.getParticipant().getFormattedName() + " fell out of the world";
+                    victim.voidDeath = false;
+                } else {
+                    deathMessage = victim.getParticipant().getFormattedName() + " was killed by border damage";
+                }
             }
         }
-
-
 
         e.setDeathMessage(deathMessage);
     }
@@ -371,7 +427,6 @@ public class Skybattle extends Game {
         if (!isGameActive()) return;
         if (!(e.getPlayer().getWorld().equals(map.getWorld()))) return;
 
-        // kill players immediately in void (experimental)
         SkybattlePlayer player = null;
         for (SkybattlePlayer p : skybattlePlayerList) {
             if (e.getPlayer().getName().equals(p.getPlayer().getName())) {
@@ -381,7 +436,9 @@ public class Skybattle extends Game {
         }
         if (player == null) return;
 
+        // kill players immediately in void
         if (player.getPlayer().getLocation().getY() <= map.getVoidHeight()) {
+            player.voidDeath = true;
             player.getPlayer().damage(50);
         }
     }

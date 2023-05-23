@@ -1,5 +1,6 @@
 package me.kotayka.mbc.gameMaps.skybattleMap;
 
+import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.Team;
 import me.kotayka.mbc.games.Skybattle;
@@ -9,6 +10,7 @@ import org.bukkit.block.BrewingStand;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,10 +19,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Classic extends SkybattleMap {
-    private Location center = new Location(getWorld(), -157, 0, -266);
-    private int voidHeight = 30;
-    private int topBorder = 100;
-    private int borderRadius = 80;
+    private final Location CENTER = new Location(getWorld(), -157, 0, -266);
+    public final double RADIUS_SHRINK_AMOUNT = 0.38;
+    public final double HEIGHT_SHRINK_AMOUNT = 0.22;
+    private float borderRadius = 80;
     private Location[] spawns = {
         new Location(getWorld(), -220, 71, -266),
         new Location(getWorld(), -190, 71, -212),
@@ -34,7 +36,9 @@ public class Classic extends SkybattleMap {
 
     public Classic(Skybattle skybattle) {
         super(skybattle);
-        loadWorld(center, voidHeight, topBorder, borderRadius);
+        int topBorder = 120;
+        int voidHeight = 30;
+        loadWorld(CENTER, voidHeight, topBorder, borderRadius, RADIUS_SHRINK_AMOUNT, HEIGHT_SHRINK_AMOUNT);
     }
 
     /**
@@ -45,6 +49,8 @@ public class Classic extends SkybattleMap {
      */
     public void resetMap() {
         SKYBATTLE.resetKillMaps();
+        setBorderHeight(120);
+        setBorderRadius(80);
 
         // reset world
         int x = 225;
@@ -84,12 +90,40 @@ public class Classic extends SkybattleMap {
         //backup at 500 0 500
     }
 
-    public void borderParticles() {
+    /**
+     * Handles spawning particles for circular and top border.
+     * Damages players that are not in the border scaling with their distance.
+     * Does not decrease border size.
+     */
+    public void Border() {
         for (int y = 50; y <= 110; y += 10) {
             for (double t = 0; t < 50; t+=0.5) {
-                float x = borderRadius * (float) Math.sin(t);
-                float z = borderRadius * (float) Math.cos(t);
-                getWorld().spawnParticle(Particle.REDSTONE, center.getX() + x, y, center.getZ() + z, 5, SKYBATTLE.borderParticle);
+                double x = (getBorderRadius() * (float) Math.cos(t)) + CENTER.getX();
+                double z = (getBorderRadius() * (float) Math.sin(t)) + CENTER.getZ();
+                getWorld().spawnParticle(Particle.REDSTONE, x, y, z, 5, SKYBATTLE.BORDER_PARTICLE);
+            }
+        }
+
+        for (int x = -170; x < -142; x+=2) {
+            for (int z = -278; z < -252; z+=2) {
+                getWorld().spawnParticle(Particle.REDSTONE, x, getBorderHeight(), z, 5, SKYBATTLE.TOP_BORDER_PARTICLE);
+            }
+        }
+
+        for (Participant p : SKYBATTLE.playersAlive) {
+            Player player = p.getPlayer();
+            if (!(player.getGameMode().equals(GameMode.SURVIVAL))) { continue; }
+
+            double distance = getBorderRadius()*getBorderRadius() - player.getLocation().distanceSquared(new Location(getWorld(), CENTER.getX(), player.getLocation().getY(), CENTER.getZ()));
+            boolean aboveBorder = player.getLocation().getY() >= getBorderHeight();
+            boolean outsideBorder = distance < 0;
+
+            if (aboveBorder && outsideBorder) {
+                player.damage(0.25*Math.abs(player.getLocation().getY()-getBorderHeight()+0.5 + 0.002*Math.abs(distance)+0.5));
+            } else if (aboveBorder) {
+                player.damage(0.25*Math.abs(player.getLocation().getY()-getBorderHeight()+0.5));
+            } else if (outsideBorder) {
+                player.damage(0.002*Math.abs(distance)+0.5);
             }
         }
     }

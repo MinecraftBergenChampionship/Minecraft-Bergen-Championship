@@ -4,7 +4,6 @@ import me.kotayka.mbc.gameMaps.Map;
 import me.kotayka.mbc.games.Skybattle;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.*;
 
 // not sure if inheriting from Map is really necessary since theres only one commonality but just in case
@@ -12,8 +11,11 @@ public abstract class SkybattleMap extends Map {
     protected final Skybattle SKYBATTLE;
     private Location center;
     private int voidHeight;
-    private int borderRadius;
-    public int borderHeight;
+    private float borderRadius;
+    private float borderHeight;
+    private double BORDER_SHRINK_AMOUNT;
+    private double VERTICAL_BORDER_SHRINK_AMOUNT;
+
     public Location[] spawns;
 
 
@@ -23,11 +25,14 @@ public abstract class SkybattleMap extends Map {
         this.SKYBATTLE = skb;
     }
 
-    public void loadWorld(Location center, int yMin, int yMax, int borderRadius) {
+    public void loadWorld(Location center, int yMin, int yMax, float borderRadius, double shrinkRate, double fallRate) {
         this.center = center;
         this.voidHeight = yMin;
         this.borderHeight = yMax;
         this.borderRadius = borderRadius;
+
+        this.BORDER_SHRINK_AMOUNT = shrinkRate;
+        this.VERTICAL_BORDER_SHRINK_AMOUNT = fallRate;
 
         resetMap();
     }
@@ -68,7 +73,7 @@ public abstract class SkybattleMap extends Map {
     /**
      * Spawns particles at values of border
      */
-    public abstract void borderParticles();
+    public abstract void Border();
 
     /**
      * Uses array of spawns to spawn players with their team in a random spawn
@@ -81,4 +86,13 @@ public abstract class SkybattleMap extends Map {
     public abstract void removeBarriers();
 
     public int getVoidHeight() { return voidHeight; }
+
+    public float getBorderHeight() { return borderHeight; }
+    public float getBorderRadius() { return borderRadius; }
+    public void reduceBorderHeight(double n) { borderHeight -= n; }
+    public void reduceBorderRadius(double n) { borderRadius -= n; }
+    public void setBorderRadius(float n) { borderRadius = n; }
+    public void setBorderHeight(float n) { borderHeight = n; }
+    public double getBorderShrinkRate() { return BORDER_SHRINK_AMOUNT; }
+    public double getVerticalBorderShrinkRate() { return VERTICAL_BORDER_SHRINK_AMOUNT; }
 }
