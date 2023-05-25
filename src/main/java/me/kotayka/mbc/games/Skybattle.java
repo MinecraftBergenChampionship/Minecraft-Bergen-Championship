@@ -38,10 +38,11 @@ public class Skybattle extends Game {
     public Skybattle() {
         super(4, "Skybattle");
     }
+    private int roundNum = 1;
 
     @Override
     public void createScoreboard(Participant p) {
-        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Game: "+ MBC.gameNum+"/8:" + ChatColor.WHITE + " Sky Battle", p);
+        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Game: "+ MBC.getInstance().gameNum+"/8:" + ChatColor.WHITE + " Sky Battle", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
@@ -52,7 +53,7 @@ public class Skybattle extends Game {
     }
 
     public void loadPlayers() {
-        for (Participant p : MBC.getIngamePlayer()) {
+        for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().getInventory().clear();
 
             p.getPlayer().setFlying(false);
@@ -115,8 +116,16 @@ public class Skybattle extends Game {
                 map.Border();
             }
 
+            if (timeRemaining == 0 && roundNum < 3) {
+                timeRemaining = 9;
+                setGameState(GameState.END_ROUND);
+            } else if (timeRemaining == 0) {
+                timeRemaining = 38;
+                setGameState(GameState.END_GAME);
+            }
+
             if (timeRemaining == 210) {
-                for (Participant p : MBC.getIngamePlayer()) {
+                for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().sendTitle(" ", ChatColor.DARK_RED+"Border shrinking", 0, 60, 20);
                 }
                 Bukkit.broadcastMessage(ChatColor.DARK_RED+"Horizontal border is shrinking!");
@@ -132,8 +141,43 @@ public class Skybattle extends Game {
             if (timeRemaining <= 180) {
                 map.reduceBorderHeight(map.getVerticalBorderShrinkRate());
             }
+        } else if (getState().equals(GameState.END_ROUND)) {
+            if (timeRemaining == 8) {
+                roundOverGraphics();
+                roundOverWinners();
+            } else if (timeRemaining == 1) {
+                roundNum++;
+                map.resetMap();
+                loadPlayers();
+                timeRemaining = 20;
+                setGameState(GameState.STARTING);
+            }
+        } else if (getState().equals(GameState.END_GAME)) {
+            if (timeRemaining == 37) {
+                gameOverGraphics();
+                roundOverWinners();
+            } else if (timeRemaining <= 35) {
+                gameEndEvents();
+            }
         }
+    }
 
+    public void roundOverWinners() {
+        if (playersAlive.size() > 1) {
+            StringBuilder survivors = new StringBuilder(ChatColor.GREEN+"The winners of this round are: ");
+            for (int i = 0; i < playersAlive.size(); i++) {
+                if (i == playersAlive.size()-1) {
+                    survivors.append("and ").append(playersAlive.get(i).getFormattedName());
+                } else {
+                    survivors.append(playersAlive.get(i).getFormattedName()).append(", ");
+                }
+            }
+            Bukkit.broadcastMessage(survivors.toString());
+        } else if (playersAlive.size() == 1) {
+            Bukkit.broadcastMessage(ChatColor.GREEN+"The winner of this round is " + playersAlive.get(0).getFormattedName());
+        } else {
+            Bukkit.broadcastMessage(ChatColor.RED+"Nobody survived the round.");
+        }
     }
 
     /**
@@ -334,7 +378,6 @@ public class Skybattle extends Game {
         }
 
         playersAlive.remove(player.getParticipant());
-        // TODO check if one player left
 
         if (e.getEntity().getKiller() == null || e.getPlayer().getLastDamageCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
             // used to determine the death message (ie, void, fall damage, or border?)
@@ -344,6 +387,16 @@ public class Skybattle extends Game {
         } else {
             Bukkit.broadcastMessage("[Debug] normal death");
             playerDeathEffects(e); // if there was a killer, just send over to default
+        }
+
+        Team t = player.getParticipant().getTeam();
+        if (checkTeamEliminated(t)) {
+            t.announceTeamDeath();
+            teamsAlive.remove(t);
+
+            if (teamsAlive.size() <= 1) {
+                timeRemaining = 1;
+            }
         }
 
     }
@@ -372,7 +425,7 @@ public class Skybattle extends Game {
         if (victim.lastDamager != null) {
             Participant killer = null;
             // have to wait until victim is initialized
-            for (Participant p : MBC.getIngamePlayer()) {
+            for (Participant p : MBC.getInstance().getPlayers()) {
                 if (victim.lastDamager.getName().equals(p.getPlayerName())) {
                     killer = p;
                     break;

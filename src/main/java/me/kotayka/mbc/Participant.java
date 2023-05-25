@@ -21,7 +21,7 @@ public class Participant implements Comparable<Participant> {
     private Team team;
     private final Player player;
 
-    public final Scoreboard board = MBC.manager.getNewScoreboard();
+    public final Scoreboard board = MBC.getInstance().manager.getNewScoreboard();
     public Objective objective;
     public String gameObjective;
 
@@ -30,7 +30,7 @@ public class Participant implements Comparable<Participant> {
     public Participant(Player p) {
         player=p;
         p.setScoreboard(board);
-        changeTeam(MBC.spectator);
+        changeTeam(MBC.getInstance().spectator);
     }
 
     public void changeTeam(Team t) {
@@ -41,8 +41,8 @@ public class Participant implements Comparable<Participant> {
         team = t;
         team.addPlayer(this);
         Bukkit.broadcastMessage(getFormattedName()+ChatColor.WHITE+" has joined the "+team.getChatColor()+team.getTeamFullName());
-        if (MBC.gameID == 0 && MBC.currentGame != null) {
-            ((Lobby) MBC.currentGame).changeTeam(this);
+        if (MBC.getInstance().gameID == 0 && MBC.getInstance().currentGame != null) {
+            MBC.getInstance().lobby.changeTeam(this);
         }
     }
     public Player getPlayer() {
@@ -100,17 +100,17 @@ public class Participant implements Comparable<Participant> {
     public void addGameScore(int amount) {
         team.addGameScore(amount);
         unmultipliedScore += amount;
-        score += amount*MBC.multiplier;
+        score += amount*MBC.getInstance().multiplier;
 
-        MBC.currentGame.updatePlayerGameScore(this);
+        MBC.getInstance().currentGame.updatePlayerGameScore(this);
     }
 
     public void addRoundScore(int amount) {
         roundUnMultipliedScore += amount;
-        roundScore += amount*MBC.multiplier;
+        roundScore += amount*MBC.getInstance().multiplier;
         team.addRoundScore(amount);
 
-        MBC.currentGame.updatePlayerRoundScore(this);
+        MBC.getInstance().currentGame.updatePlayerRoundScore(this);
     }
 
     public Team getTeam() {
@@ -118,11 +118,11 @@ public class Participant implements Comparable<Participant> {
     }
 
     public static boolean contains(Participant p) {
-        return MBC.players.contains(p);
+        return MBC.getInstance().players.contains(p);
     }
 
     public static boolean contains(Player p) {
-        for (Participant x : MBC.players) {
+        for (Participant x : MBC.getInstance().players) {
             if (Objects.equals(x.getPlayer(), p)) {
                 return true;
             }
@@ -132,7 +132,7 @@ public class Participant implements Comparable<Participant> {
     }
 
     public static Participant getParticipant(Player p) {
-        for (Participant x : MBC.players) {
+        for (Participant x : MBC.getInstance().players) {
             if (Objects.equals(x.getPlayer(), p)) {
                 return x;
             }
@@ -142,7 +142,7 @@ public class Participant implements Comparable<Participant> {
     }
 
     public static Participant getParticipant(String p) {
-        for (Participant x : MBC.players) {
+        for (Participant x : MBC.getInstance().players) {
             if (Objects.equals(x.getPlayer().getName(), p)) {
                 return x;
             }

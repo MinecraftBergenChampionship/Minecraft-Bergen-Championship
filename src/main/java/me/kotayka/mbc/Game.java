@@ -1,13 +1,14 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.gamePlayers.GamePlayer;
+import me.kotayka.mbc.games.Lobby;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 
@@ -34,7 +35,7 @@ public abstract class Game implements Scoreboard, Listener {
     public int timeRemaining;
 
     public void createScoreboard() {
-        for (Participant p : MBC.players) {
+        for (Participant p : MBC.getInstance().players) {
             newObjective(p);
             createScoreboard(p);
         }
@@ -79,7 +80,7 @@ public abstract class Game implements Scoreboard, Listener {
         Participant killer = null;
         String deathMessage = e.getDeathMessage();
 
-        for (Participant p : MBC.getIngamePlayer()) {
+        for (Participant p : MBC.getInstance().getPlayers()) {
             if (p.getPlayerName().equals(e.getPlayer().getName())) {
                 victim = p;
                 playersAlive.remove(p);
@@ -108,11 +109,27 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public boolean checkIfDead(Participant p) {
-        return true;
+        return !playersAlive.contains(p);
     }
 
     public boolean checkIfAlive(Participant p) {
-        return true;
+        return playersAlive.contains(p);
+    }
+
+    /**
+     * Makes use of teamsAlive and playersAlive lists.
+     * @return true if the team has been fully eliminated (there are no players on that team alive).
+     * @see Game checkIfDead
+     */
+    public boolean checkTeamEliminated(Team team) {
+        int deadPlayers = 0;
+        for (Participant p : team.teamPlayers) {
+            if (checkIfDead(p)) {
+                deadPlayers++;
+            }
+        }
+
+        return deadPlayers == team.teamPlayers.size();
     }
 
     public void newObjective(Participant p) {
@@ -129,7 +146,7 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public void newObjective() {
-        for (Participant p : MBC.players) {
+        for (Participant p : MBC.getInstance().players) {
             newObjective(p);
         }
     }
@@ -143,7 +160,7 @@ public abstract class Game implements Scoreboard, Listener {
     public void createLine(int score, String line, Participant p) {
         if (p.objective == null || !Objects.equals(p.gameObjective, gameName)) {
             p.gameObjective = gameName;
-            MBC.currentGame.createScoreboard(p);
+            MBC.getInstance().currentGame.createScoreboard(p);
         }
 
         resetLine(p, score);
@@ -153,7 +170,7 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public void createLine(int score, String line) {
-        for (Participant p : MBC.players) {
+        for (Participant p : MBC.getInstance().players) {
             createLine(score, line, p);
         }
     }
@@ -161,8 +178,8 @@ public abstract class Game implements Scoreboard, Listener {
     public List<Team> getValidTeams() {
         List<Team> newTeams = new ArrayList<>();
         for (int i = 0; i < MBC.teamNames.size(); i++) {
-            if (!Objects.equals(MBC.teams.get(i).fullName, "Spectator") && MBC.teams.get(i).teamPlayers.size() > 0) {
-                newTeams.add(MBC.teams.get(i));
+            if (!Objects.equals(MBC.getInstance().teams.get(i).fullName, "Spectator") && MBC.getInstance().teams.get(i).teamPlayers.size() > 0) {
+                newTeams.add(MBC.getInstance().teams.get(i));
             }
         }
 
@@ -216,7 +233,7 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public boolean isGameActive() {
-        if (MBC.getGameID() != this.gameID) return false;
+        if (MBC.getInstance().getGameID() != this.gameID) { return false; }
 
         return (this.getState().equals(GameState.ACTIVE));
     }
@@ -224,13 +241,17 @@ public abstract class Game implements Scoreboard, Listener {
     public void setTimer(int time) {
         timeRemaining = time;
 
-        taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.plugin, () -> {
+        taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
             createLine(20, ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+getFormattedTime(--timeRemaining));
             if (timeRemaining < 0) {
-                MBC.cancelEvent(taskID);
+                stopTimer();
             }
-            MBC.currentGame.events();
+            MBC.getInstance().currentGame.events();
         }, 20, 20);
+    }
+
+    public void stopTimer() {
+        MBC.getInstance().cancelEvent(taskID);
     }
 
     public String getFormattedTime(int seconds) {
@@ -266,6 +287,7 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public void start() {
+        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
         loadPlayers();
         createScoreboard();
     }
@@ -302,8 +324,11 @@ public abstract class Game implements Scoreboard, Listener {
                 break;
             case 1:
                 Bukkit.broadcastMessage(ChatColor.RED + "Returning to lobby...");
+                break;
             case 0:
-                // TODO return to lobby
+                HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
+                MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
+                returnToLobby();
                 break;
         }
     }
@@ -314,7 +339,7 @@ public abstract class Game implements Scoreboard, Listener {
      * @see Participant addRoundScoreToGame()
      */
     public void getScores() {
-        int num = 1; // separate var incase there is an absurd amount of ties
+        int num = 0; // separate var incase there is an absurd amount of ties
         StringBuilder topFive = new StringBuilder();
         int lastScore = -1;
         int counter = 0;
@@ -333,7 +358,7 @@ public abstract class Game implements Scoreboard, Listener {
 
             if (counter < 5) {
                 topFive.append(String.format(
-                        (num) + ". %-18s %-5d (<%-4d x %.2f)\n", p.getFormattedName(), p.getRoundScore(), p.getUnmultipliedRoundScore(), MBC.multiplier)
+                        (num) + ". %-18s %-5d (%-4d x %.2f)\n", p.getFormattedName(), p.getRoundScore(), p.getUnmultipliedRoundScore(), MBC.getInstance().multiplier)
                 );
                 lastScore = p.getUnMultipliedScore();
                 counter++;
@@ -344,12 +369,14 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public void printEventScores() {
+        Bukkit.broadcastMessage(getValidTeams().size()+"");
         List<Team> gameScores = new ArrayList<>(getValidTeams());
+        Bukkit.broadcastMessage(gameScores.size()+"");
         gameScores.sort(new TeamScoreSorter());
         Collections.reverse(gameScores);
         StringBuilder str = new StringBuilder();
 
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < gameScores.size(); i++) {
             str.append(String.format(
                     ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". <-%18s> <-%5d>\n",
                     gameScores.get(i).teamNameFormat(), gameScores.get(i).getScore())
@@ -371,6 +398,20 @@ public abstract class Game implements Scoreboard, Listener {
         }
 
         Bukkit.broadcastMessage(teamString.toString());
+    }
+
+    public void returnToLobby() {
+        for (GamePlayer p : gamePlayers) {
+            if (p.getPlayer().getAllowFlight()) {
+                removeWinEffect(p);
+            }
+            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().teleport(Lobby.LOBBY);
+            if (taskID != -1) {
+                MBC.getInstance().cancelEvent(taskID);
+            }
+            MBC.getInstance().lobby.start();
+        }
     }
 
     /**

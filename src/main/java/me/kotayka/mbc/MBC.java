@@ -20,66 +20,104 @@ import java.util.List;
 import java.util.Objects;
 
 public class MBC implements Listener {
+    // singleton for event
+    public static MBC mbc = null;
+
     // event specifics
 
-    // not sure if we should do this until we resolve the "static or not" stuff
-    /*
-    public final short MAX_PLAYERS_PER_TEAM = 4;
-    public final short MAX_TEAMS = 6;
-    public final short MAX_PLAYERS = MAX_PLAYERS_PER_TEAM * MAX_TEAMS;
-     */
+    public static final int MAX_PLAYERS_PER_TEAM = 4;
+    public static final int MAX_TEAMS = 6;
+    public static final int MAX_PLAYERS = MAX_PLAYERS_PER_TEAM * MAX_TEAMS;
 
-    public static List<Participant> players = new ArrayList<>(16);
+    public List<Participant> players = new ArrayList<>(16);
 
-    public static Red red = new Red();
-    public static Yellow yellow = new Yellow();
-    public static Green green = new Green();
-    public static Blue blue = new Blue();
-    public static Purple purple = new Purple();
-    public static Pink pink = new Pink();
-    public static Spectator spectator = new Spectator();
+    public Red red = new Red();
+    public Yellow yellow = new Yellow();
+    public Green green = new Green();
+    public Blue blue = new Blue();
+    public Purple purple = new Purple();
+    public Pink pink = new Pink();
+    public Spectator spectator = new Spectator();
 
-    public static List<Team> teams = new ArrayList<>(Arrays.asList(red, yellow, green, blue, purple, pink, spectator));
-    public static List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets", "Spectator"));
+    public List<Team> teams = new ArrayList<>(Arrays.asList(red, yellow, green, blue, purple, pink, spectator));
+    public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets", "Spectator"));
     public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets", "Spectator"));
-    public static ScoreboardManager manager =  Bukkit.getScoreboardManager();
+    public ScoreboardManager manager =  Bukkit.getScoreboardManager();
 
-    public static int gameID = 0;
-    public static Game currentGame;
-    public static int gameNum = -1;
+    public int gameID = 0;
+    public Game currentGame;
+    public int gameNum = -1;
 
-    public static Plugin plugin;
-    public static Lobby lobby = new Lobby();
-    public static AceRace aceRace = new AceRace();
-    public static TGTTOS tgttos = new TGTTOS();
-    public static BSABM bsabm = new BSABM();
-    public static Skybattle skybattle = new Skybattle();
+    public Plugin plugin;
+    public Lobby lobby = new Lobby();
+    public AceRace aceRace = null;
+    public TGTTOS tgttos = null;
+    public BSABM bsabm = null;
+    public Skybattle skybattle = null;
 
-    public static List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS","BSABM","Skybattle"));
-    public static List<Game> gameList = new ArrayList<>(Arrays.asList(aceRace,tgttos,bsabm,skybattle));
+    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS","BSABM","Skybattle"));
+    public final List<Game> gameList = new ArrayList<Game>(6);
 
     // Define Special Blocks
     // NOTE: ALWAYS USE `getBlock().getRelative(BlockFace.DOWN)` or equivalent
     // ALSO NOTE: may move to more general class since these are likely ubiquitous
-    public final static Material SPEED_PAD = Material.OBSERVER;
-    public final static Material BOOST_PAD = Material.WAXED_EXPOSED_CUT_COPPER;
-    public final static Material MEGA_BOOST_PAD = Material.WAXED_WEATHERED_CUT_COPPER;
-    public final static Material JUMP_PAD = Material.WAXED_WEATHERED_COPPER;
+    public static final Material SPEED_PAD = Material.OBSERVER;
+    public static final Material BOOST_PAD = Material.WAXED_EXPOSED_CUT_COPPER;
+    public static final Material MEGA_BOOST_PAD = Material.WAXED_WEATHERED_CUT_COPPER;
+    public static final Material JUMP_PAD = Material.WAXED_WEATHERED_COPPER;
+    public double multiplier = 1;
 
 
-    public static double multiplier = 1;
+    private MBC(Plugin plugin) {
+        this.plugin = plugin;
+    }
 
-    public MBC(Plugin plugin) {
-        MBC.plugin = plugin;
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            players.add(new Participant(p));
+    // ensure singular instance to remove static overuse
+    public static MBC getInstance(Plugin plugin) {
+        if (mbc == null) {
+            mbc = new MBC(plugin);
         }
-        startGame(lobby);
+        return mbc;
     }
 
-    public MBC() {
-
+    // ensure singular instance to remove static overuse
+    public static MBC getInstance() {
+        return Objects.requireNonNull(mbc);
     }
+
+    public Game gameInstance(int gameNum) {
+        switch(gameNameList.get(gameNum)) {
+            case "AceRace":
+                if (aceRace == null) {
+                    aceRace = new AceRace();
+                    this.gameID = 1;
+                }
+                return aceRace;
+            case "TGTTOS":
+                if (tgttos == null) {
+                    tgttos = new TGTTOS();
+                    this.gameID = 2;
+                }
+                return tgttos;
+            case "BSABM":
+                if (bsabm == null) {
+                    bsabm = new BSABM();
+                    this.gameID = 3;
+                }
+                return bsabm;
+            case "Skybattle":
+                if (skybattle == null) {
+                    skybattle = new Skybattle();
+                    this.gameID = 4;
+                }
+                return skybattle;
+            default:
+                return lobby;
+        }
+    }
+
+
+    private MBC() {}
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -116,31 +154,36 @@ public class MBC implements Listener {
         }
     }
 
-    public static int getGameID() {
-        return gameID;
+    public int getGameID() {
+        return this.gameID;
     }
 
-    public static void startGame(Game game) {
-        gameID = gameList.indexOf(game)+1;
+    public void startGame(Game game) {
         gameNum++;
         Bukkit.broadcastMessage(ChatColor.GOLD + game.gameName + ChatColor.WHITE + " has started");
         currentGame = game;
         currentGame.start();
     }
 
-    public static void startGame(int game) {
-        startGame(gameList.get(game));
+    public void startGame(int game) {
+        startGame(gameInstance(game));
     }
 
-    public static void cancelEvent(int taskID) {
+    public void cancelEvent(int taskID) {
         if (Bukkit.getScheduler().isCurrentlyRunning(taskID)) {
             Bukkit.getScheduler().cancelTask(taskID);
         }
     }
 
-    public static List<Participant> getIngamePlayer() {
+    /**
+     * Linear search through all players, returns list of
+     * players not on Team Spectator, including those in
+     * spectator mode.
+     * @return List of participants not on Team Spectator.
+     */
+    public List<Participant> getPlayers() {
         List<Participant> newList = new ArrayList<>();
-        for (Participant p : players) {
+        for (Participant p : getInstance().players) {
             if (!Objects.equals(p.getTeam().fullName, "Spectator")) {
                 newList.add(p);
             }

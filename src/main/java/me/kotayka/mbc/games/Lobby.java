@@ -1,14 +1,19 @@
 package me.kotayka.mbc.games;
 
 import me.kotayka.mbc.Game;
+import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 public class Lobby extends Game {
+    public static final Location LOBBY = new Location(Bukkit.getWorld("world"), 0, 1, 0);
+
     public Lobby() {
         super(0, "Lobby");
     }
@@ -51,12 +56,23 @@ public class Lobby extends Game {
             Participant p = Participant.getParticipant(e.getPlayer());
             assert p != null;
             p.addGameScore(5);
+        }
+    }
 
+    @EventHandler
+    public void onPlayerFall(PlayerMoveEvent e) {
+        if (!isGameActive()) return;
+
+        if (e.getPlayer().getLocation().getY() < 30){
+            e.getPlayer().teleport(LOBBY);
         }
     }
 
     public void start() {
+        MBC.getInstance().currentGame = this;
         createScoreboard();
+        stopTimer();
+        setTimer(120);
     }
 
     @Override

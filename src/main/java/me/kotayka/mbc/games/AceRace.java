@@ -44,7 +44,7 @@ public class AceRace extends Game {
     }
 
     public void createScoreboard(Participant p) {
-        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Game: "+MBC.gameNum+"/8:" + ChatColor.WHITE + " Ace Race", p);
+        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Game: "+MBC.getInstance().gameNum+"/8:" + ChatColor.WHITE + " Ace Race", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
@@ -134,7 +134,7 @@ public class AceRace extends Game {
         trident.addEnchantment(Enchantment.RIPTIDE, 1);
         ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
 
-        for (Participant p : MBC.getIngamePlayer()) {
+        for (Participant p : MBC.getInstance().getPlayers()) {
             p.getInventory().clear();
             p.getInventory().addItem(trident);
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
@@ -150,7 +150,7 @@ public class AceRace extends Game {
 
     @EventHandler
     public void PlayerMoveEvent(PlayerMoveEvent e) {
-        if (MBC.getGameID() != this.gameID) return;
+        if (MBC.getInstance().getGameID() != this.gameID) return;
 
         if (map.checkDeath(e.getPlayer().getLocation())) {
             AceRacePlayer player = ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer()));

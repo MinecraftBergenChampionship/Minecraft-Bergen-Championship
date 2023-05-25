@@ -37,7 +37,7 @@ public class TGTTOS extends Game {
     }
 
     public void createScoreboard(Participant p) {
-        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Game: "+ MBC.gameNum+"/8:" + ChatColor.WHITE + " TGTTOS", p);
+        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Game: "+ MBC.getInstance().gameNum+"/8:" + ChatColor.WHITE + " TGTTOS", p);
 
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
@@ -62,7 +62,7 @@ public class TGTTOS extends Game {
      * repurpose loadPlayers() however is best needed for tgttos
      */
     public void loadPlayers() {
-        for (Participant p : MBC.getIngamePlayer()) {
+        for (Participant p : MBC.getInstance().getPlayers()) {
             p.getInventory().clear();
             p.getPlayer().setVelocity(new Vector(0,0,0));
             p.getPlayer().teleport(map.getSpawnLocation());
@@ -115,14 +115,14 @@ public class TGTTOS extends Game {
     }
 
     public void chickenClick(Participant p, Entity chicken) {
-        p.addRoundScore(MBC.getIngamePlayer().size()-finishedParticipants.size());
+        p.addRoundScore(MBC.getInstance().getPlayers().size()-finishedParticipants.size());
         finishedParticipants.add(p);
         String place = getPlace(finishedParticipants.size());
         chicken.remove();
         Bukkit.broadcastMessage(p.getTeam().getChatColor()+p.getPlayerName()+ChatColor.WHITE+" finished in "+ChatColor.AQUA+place);
         p.getPlayer().sendMessage(ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GREEN+" place!");
 
-        if (finishedParticipants.size() == MBC.getIngamePlayer().size()) {
+        if (finishedParticipants.size() == MBC.getInstance().getPlayers().size()) {
             startRound();
         }
     }
@@ -166,7 +166,7 @@ public class TGTTOS extends Game {
         if (event.getBlock().getType().toString().endsWith("WOOL")) {
             ItemStack i = new ItemStack(event.getItemInHand());
             i.setAmount(1);
-            MBC.plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.plugin, () -> event.getPlayer().getInventory().addItem(i), 20);
+            MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().plugin, () -> event.getPlayer().getInventory().addItem(i), 20);
         }
     }
 }

@@ -22,7 +22,7 @@ public class start implements CommandExecutor {
                 sender.sendMessage("Please provide a valid game");
             }
 
-            MBC.startGame(MBC.gameNameList.indexOf(args[0]));
+            MBC.getInstance().startGame(MBC.gameNameList.indexOf(args[0]));
         }
         return true;
     }

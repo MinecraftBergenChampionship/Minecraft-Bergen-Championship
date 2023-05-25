@@ -38,9 +38,9 @@ public abstract class SkybattleMap extends Map {
     }
 
     /**
-     * "Expensive" function called after each round and when loading the game;
+     * Expensive function called after each round and when loading the game;
      * Resets the map to a state copied from another area in the Skybattle World.
-     * @implSpec should call removeEntities();
+     * @implSpec should call removeEntities() and resetKillMaps()
      */
     public abstract void resetMap();
 

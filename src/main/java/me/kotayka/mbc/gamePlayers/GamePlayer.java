@@ -12,7 +12,7 @@ public abstract class GamePlayer {
 
     public GamePlayer(Participant p) {
         participant = p;
-        MBC.currentGame.gamePlayers.add(this);
+        MBC.getInstance().currentGame.gamePlayers.add(this);
     }
 
     public Participant getParticipant() {
@@ -22,7 +22,7 @@ public abstract class GamePlayer {
     public Player getPlayer() { return participant.getPlayer(); }
 
     public static GamePlayer getGamePlayer(Player p) {
-        for (GamePlayer x : MBC.currentGame.gamePlayers) {
+        for (GamePlayer x : MBC.getInstance().currentGame.gamePlayers) {
             if (x.getParticipant().getPlayer() == p) {
                 return x;
             }

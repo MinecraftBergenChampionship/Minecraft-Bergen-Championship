@@ -148,31 +148,31 @@ public abstract class Team {
             case "redrabbits":
             case "redrabbit":
             case "red":
-                return MBC.red;
+                return MBC.getInstance().red;
             case "yellowyaks":
             case "yellowyak":
             case "yellow":
-                return MBC.yellow;
+                return MBC.getInstance().yellow;
             case "greenguardians":
             case "greenguardian":
             case "green":
-                return MBC.green;
+                return MBC.getInstance().green;
             case "bluebats":
             case "bluebat":
             case "blue":
-                return MBC.blue;
+                return MBC.getInstance().blue;
             case "purplepandas":
             case "purplepanda":
             case "purple":
-                return MBC.purple;
+                return MBC.getInstance().purple;
             case "pinkpiglets":
             case "pinkpiglet":
             case "pink":
-                return MBC.pink;
+                return MBC.getInstance().pink;
             case "spectator":
             case "spectators":
             case "spec":
-                return MBC.spectator;
+                return MBC.getInstance().spectator;
             default:
                 return null;
         }
@@ -180,14 +180,14 @@ public abstract class Team {
 
     public void addRoundScore(int score) {
         roundScore+=score;
-        roundUnMultipliedScore+=score*MBC.multiplier;
-        MBC.currentGame.updateTeamRoundScore(this);
+        roundUnMultipliedScore+=score*MBC.getInstance().multiplier;
+        MBC.getInstance().currentGame.updateTeamRoundScore(this);
     }
 
     public void addGameScore(int score) {
         this.score+=score;
-        unMultipliedScore+=score*MBC.multiplier;
-        MBC.currentGame.updateTeamGameScore(this);
+        unMultipliedScore+=score*MBC.getInstance().multiplier;
+        MBC.getInstance().currentGame.updateTeamGameScore(this);
     }
 
     /**
