@@ -108,7 +108,7 @@ public class AceRace extends Game {
                 for (AceRacePlayer p : aceRacePlayerList) {
                     gameOverGraphics(p);
                     if (!(p.getPlayer().getGameMode().equals(GameMode.SPECTATOR))) {
-                        winEffects(p); // this is just for the effects. players not in spectator by the end of the round have lost.
+                        winEffects(p.getParticipant()); // this is just for the effects. players not in spectator by the end of the round have lost.
                         p.getPlayer().sendMessage(ChatColor.RED + "Better luck next time!");
                     }
                 }

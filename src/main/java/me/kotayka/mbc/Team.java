@@ -203,7 +203,12 @@ public abstract class Team {
      * TODO: maybe a sound effect
      */
     public void announceTeamDeath() {
-       Bukkit.broadcastMessage(teamNameFormat() + " have been eliminated!");
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().plugin, new Runnable() {
+            @Override
+            public void run() {
+                Bukkit.broadcastMessage(teamNameFormat() + " have been eliminated!");
+            }
+        }, 10L);
     }
 }
 

@@ -53,6 +53,7 @@ public class Skybattle extends Game {
     }
 
     public void loadPlayers() {
+
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().getInventory().clear();
 
@@ -62,8 +63,13 @@ public class Skybattle extends Game {
             p.getPlayer().setHealth(20);
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 30, 10, false, false));
-            skybattlePlayerList.add(new SkybattlePlayer(p));
-            playersAlive.add(p);
+            if (roundNum == 1) {
+                skybattlePlayerList.add(new SkybattlePlayer(p));
+                playersAlive.add(p);
+            } else {
+                if (!playersAlive.contains(p))
+                    playersAlive.add(p);
+            }
         }
 
         teamsAlive.addAll(getValidTeams());
@@ -164,19 +170,23 @@ public class Skybattle extends Game {
 
     public void roundOverWinners() {
         if (playersAlive.size() > 1) {
-            StringBuilder survivors = new StringBuilder(ChatColor.GREEN+"The winners of this round are: ");
+            StringBuilder survivors = new StringBuilder("The winners of this round are: ");
             for (int i = 0; i < playersAlive.size(); i++) {
+                winEffects(playersAlive.get(i));
+                playersAlive.get(i).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
+
                 if (i == playersAlive.size()-1) {
                     survivors.append("and ").append(playersAlive.get(i).getFormattedName());
                 } else {
                     survivors.append(playersAlive.get(i).getFormattedName()).append(", ");
                 }
             }
-            Bukkit.broadcastMessage(survivors.toString());
+            Bukkit.broadcastMessage(survivors.toString()+ChatColor.WHITE+"!");
         } else if (playersAlive.size() == 1) {
-            Bukkit.broadcastMessage(ChatColor.GREEN+"The winner of this round is " + playersAlive.get(0).getFormattedName());
+            playersAlive.get(0).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
+            Bukkit.broadcastMessage("The winner of this round is " + playersAlive.get(0).getFormattedName()+"!");
         } else {
-            Bukkit.broadcastMessage(ChatColor.RED+"Nobody survived the round.");
+            Bukkit.broadcastMessage("Nobody survived the round.");
         }
     }
 
@@ -287,6 +297,9 @@ public class Skybattle extends Game {
         }
         if (player == null) return;
 
+        Participant damager = Participant.getParticipant((Player) e.getDamager());
+        if (damager.getTeam().equals(player.getParticipant().getTeam())) return;
+
         // if creeper hurt player, last damager was who spawned that creeper
         if (creeperSpawners.containsKey(e.getDamager())) {
             player.lastDamager = creeperSpawners.get(e.getDamager());
@@ -308,9 +321,10 @@ public class Skybattle extends Game {
     public void onProjectileHit(ProjectileHitEvent e) {
         if (!isGameActive()) return;
 
-        if(e.getEntityType() != EntityType.ARROW && e.getEntityType() != EntityType.SNOWBALL) return;
+        if(e.getEntityType() != EntityType.SNOWBALL) return;
         if(!(e.getEntity().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
         if (e.getHitEntity() == null) return;
+
         SkybattlePlayer player = null;
         for (SkybattlePlayer p : skybattlePlayerList) {
             if (e.getEntity().getName().equals(p.getPlayer().getName())) {
@@ -326,6 +340,10 @@ public class Skybattle extends Game {
             player.getPlayer().damage(0.1);
             player.getPlayer().setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
         }
+
+
+        Participant damager = Participant.getParticipant((Player) e.getEntity().getShooter());
+        if (damager.getTeam().equals(player.getParticipant().getTeam())) return;
 
         player.lastDamager = (Player) e.getEntity().getShooter();
     }
@@ -351,6 +369,9 @@ public class Skybattle extends Game {
             }
         }
         if (player == null) return;
+
+        Participant damager = Participant.getParticipant((Player) e.getEntity().getShooter());
+        if (damager.getTeam().equals(player.getParticipant().getTeam())) return;
 
         player.lastDamager = (Player) potion.getShooter();
     }
@@ -388,21 +409,12 @@ public class Skybattle extends Game {
             Bukkit.broadcastMessage("[Debug] normal death");
             playerDeathEffects(e); // if there was a killer, just send over to default
         }
-
-        Team t = player.getParticipant().getTeam();
-        if (checkTeamEliminated(t)) {
-            t.announceTeamDeath();
-            teamsAlive.remove(t);
-
-            if (teamsAlive.size() <= 1) {
-                timeRemaining = 1;
-            }
-        }
-
     }
 
     /**
-     * Explicitly handles deaths where the player died indirectly to combat, not
+     * Explicitly handles deaths where the player dies indirectly to combat or to
+     * custom damage (border or void).
+     * Checks for last team remaining.
      * @param e Event thrown when a player dies
      */
     public void skybattleDeathGraphics(PlayerDeathEvent e, EntityDamageEvent.DamageCause damageCause) {
@@ -470,6 +482,16 @@ public class Skybattle extends Game {
         }
 
         e.setDeathMessage(deathMessage);
+
+        Team t = victim.getParticipant().getTeam();
+        if (checkTeamEliminated(t)) {
+            t.announceTeamDeath();
+            teamsAlive.remove(t);
+
+            if (teamsAlive.size() <= 1) {
+                timeRemaining = 1;
+            }
+        }
     }
 
     /**

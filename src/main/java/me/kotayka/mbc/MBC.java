@@ -70,6 +70,7 @@ public class MBC implements Listener {
 
     private MBC(Plugin plugin) {
         this.plugin = plugin;
+        currentGame = lobby;
     }
 
     // ensure singular instance to remove static overuse

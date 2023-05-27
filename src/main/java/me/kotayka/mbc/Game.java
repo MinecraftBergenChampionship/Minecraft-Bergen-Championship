@@ -72,6 +72,7 @@ public abstract class Game implements Scoreboard, Listener {
      * Separate functions should be made to handle void kills:
      * and as such, Skybattle has a completely separate implementation.
      * Should work for any other PVP game not including the void.
+     * Checks if one team remains, and adjusts timeRemaining.
      * Does not handle scoring.
      * @param e Event thrown when a player dies
      */
@@ -106,6 +107,17 @@ public abstract class Game implements Scoreboard, Listener {
         }
 
         e.setDeathMessage(deathMessage);
+
+        // Check if only one team remains
+        Team t = victim.getTeam();
+        if (checkTeamEliminated(t)) {
+            teamsAlive.remove(t);
+            t.announceTeamDeath();
+
+            if (teamsAlive.size() <= 1) {
+                timeRemaining = 1;
+            }
+        }
     }
 
     public boolean checkIfDead(Participant p) {
@@ -251,6 +263,7 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public void stopTimer() {
+        Bukkit.broadcastMessage("Stopping timer!");
         MBC.getInstance().cancelEvent(taskID);
     }
 
@@ -358,7 +371,7 @@ public abstract class Game implements Scoreboard, Listener {
 
             if (counter < 5) {
                 topFive.append(String.format(
-                        (num) + ". %-18s %-5d (%-4d x %.2f)\n", p.getFormattedName(), p.getRoundScore(), p.getUnmultipliedRoundScore(), MBC.getInstance().multiplier)
+                        (num) + ". %-18s %5d (%d x %.2f)\n", p.getFormattedName(), p.getRoundScore(), p.getUnmultipliedRoundScore(), MBC.getInstance().multiplier)
                 );
                 lastScore = p.getUnMultipliedScore();
                 counter++;
@@ -369,19 +382,18 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public void printEventScores() {
-        Bukkit.broadcastMessage(getValidTeams().size()+"");
         List<Team> gameScores = new ArrayList<>(getValidTeams());
-        Bukkit.broadcastMessage(gameScores.size()+"");
         gameScores.sort(new TeamScoreSorter());
         Collections.reverse(gameScores);
         StringBuilder str = new StringBuilder();
 
         for (int i = 0; i < gameScores.size(); i++) {
             str.append(String.format(
-                    ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". <-%18s> <-%5d>\n",
+                    ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". %-18s %5d\n",
                     gameScores.get(i).teamNameFormat(), gameScores.get(i).getScore())
             );
         }
+        Bukkit.broadcastMessage(str.toString());
     }
 
     public void printRoundScores() {
@@ -392,7 +404,7 @@ public abstract class Game implements Scoreboard, Listener {
 
         for (int i = 0; i < teamRoundsScores.size(); i++) {
             teamString.append(String.format(
-                    ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". %-18s %-5d\n",
+                    ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". %-18s %5d\n",
                     teamRoundsScores.get(i).teamNameFormat(), teamRoundsScores.get(i).getRoundScore())
             );
         }
@@ -406,10 +418,9 @@ public abstract class Game implements Scoreboard, Listener {
                 removeWinEffect(p);
             }
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().getInventory().clear();
             p.getPlayer().teleport(Lobby.LOBBY);
-            if (taskID != -1) {
-                MBC.getInstance().cancelEvent(taskID);
-            }
+            stopTimer();
             MBC.getInstance().lobby.start();
         }
     }
@@ -439,7 +450,7 @@ public abstract class Game implements Scoreboard, Listener {
      * Does NOT check if player won, logic must be implemented before call
      * @param p GamePlayer that has won a round/game.
      */
-    public void winEffects(GamePlayer p) {
+    public void winEffects(Participant p) {
         p.getPlayer().setGameMode(GameMode.ADVENTURE);
         p.getPlayer().setAllowFlight(true);
         p.getPlayer().setFlying(true);
