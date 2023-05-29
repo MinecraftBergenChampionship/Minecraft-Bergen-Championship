@@ -92,6 +92,15 @@ public class Participant implements Comparable<Participant> {
     }
 
     /**
+     * Called inbetween games to reset scores for each game to 0
+     * Does not check whether or not game scores have been added to total event score.
+     */
+    public void resetGameScores() {
+        roundUnMultipliedScore = 0;
+        roundScore = 0;
+    }
+
+    /**
      * Helper function for addRoundScoreToGame().
      * Adds score to team and player's stats.
      * @see Participant addRoundScoreToGame()

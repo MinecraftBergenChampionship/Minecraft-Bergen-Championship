@@ -11,7 +11,9 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public abstract class Game implements Scoreboard, Listener {
@@ -72,28 +74,17 @@ public abstract class Game implements Scoreboard, Listener {
      * Separate functions should be made to handle void kills:
      * and as such, Skybattle has a completely separate implementation.
      * Should work for any other PVP game not including the void.
-     * Checks if one team remains, and adjusts timeRemaining.
+     * Checks if one team remains, and adjusts timeRemaining if necessary.
+     * Removes team from
      * Does not handle scoring.
      * @param e Event thrown when a player dies
      */
     public void playerDeathEffects(PlayerDeathEvent e) {
-        Participant victim = null;
-        Participant killer = null;
+        Participant victim = Participant.getParticipant(e.getPlayer());
+        Participant killer = Participant.getParticipant(e.getPlayer().getKiller());
         String deathMessage = e.getDeathMessage();
 
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            if (p.getPlayerName().equals(e.getPlayer().getName())) {
-                victim = p;
-                victim.getPlayer().setGameMode(GameMode.SPECTATOR);
-                if (e.getPlayer().getKiller() == null) break;
-            } else if (e.getPlayer().getKiller() != null) {
-                // ensure that if player killed themselves killer stays null
-                // do note this means if you kill yourself you will not get the kill graphic
-                if (p.getPlayerName().equals(e.getPlayer().getKiller().getName())) {
-                    killer = p;
-                }
-            }
-        }
+        if (victim == null) return;
 
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
@@ -343,8 +334,6 @@ public abstract class Game implements Scoreboard, Listener {
                 Bukkit.broadcastMessage(ChatColor.RED + "Returning to lobby...");
                 break;
             case 0:
-                HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
-                MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
                 returnToLobby();
                 break;
         }
@@ -417,6 +406,9 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public void returnToLobby() {
+        HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
+        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
+        MBC.getInstance().gameID = 0;
         for (GamePlayer p : gamePlayers) {
             if (p.getPlayer().getAllowFlight()) {
                 removeWinEffect(p);
@@ -424,10 +416,12 @@ public abstract class Game implements Scoreboard, Listener {
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().getInventory().clear();
             p.getPlayer().setExp(0);
+            updateTeamRoundScore(p.getParticipant().getTeam());
+            updatePlayerRoundScore(p.getParticipant());
             p.getPlayer().teleport(Lobby.LOBBY);
-            MBC.getInstance().gameID = 0;
-            MBC.getInstance().lobby.start();
+            p.getParticipant().resetGameScores();
         }
+        MBC.getInstance().lobby.start();
     }
 
     /**

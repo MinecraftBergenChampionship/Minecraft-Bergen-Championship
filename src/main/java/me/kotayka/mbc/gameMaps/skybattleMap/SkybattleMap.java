@@ -33,7 +33,7 @@ public abstract class SkybattleMap extends Map {
 
         this.BORDER_SHRINK_AMOUNT = shrinkRate;
         this.VERTICAL_BORDER_SHRINK_AMOUNT = fallRate;
-
+        getWorld().setSpawnLocation(center);
         resetMap();
     }
 

@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Classic extends SkybattleMap {
-    private final Location CENTER = new Location(getWorld(), -157, 0, -266);
+    private final Location CENTER = new Location(getWorld(), -157, 100, -266);
     public final double RADIUS_SHRINK_AMOUNT = 0.41;
     public final double HEIGHT_SHRINK_AMOUNT = 0.22;
     private float borderRadius = 80;
