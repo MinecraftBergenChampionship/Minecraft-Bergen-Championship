@@ -46,7 +46,7 @@ public class MBC implements Listener {
 
     public int gameID = 0;
     public Game currentGame;
-    public int gameNum = -1;
+    public int gameNum = 0;
 
     public Plugin plugin;
     public Lobby lobby = new Lobby();

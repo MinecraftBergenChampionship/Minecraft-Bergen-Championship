@@ -20,7 +20,7 @@ import java.util.List;
 
 public class Classic extends SkybattleMap {
     private final Location CENTER = new Location(getWorld(), -157, 0, -266);
-    public final double RADIUS_SHRINK_AMOUNT = 0.38;
+    public final double RADIUS_SHRINK_AMOUNT = 0.41;
     public final double HEIGHT_SHRINK_AMOUNT = 0.22;
     private float borderRadius = 80;
     private Location[] spawns = {
@@ -119,11 +119,11 @@ public class Classic extends SkybattleMap {
             boolean outsideBorder = distance < 0;
 
             if (aboveBorder && outsideBorder) {
-                player.damage(0.25*Math.abs(player.getLocation().getY()-getBorderHeight()+0.5 + 0.002*Math.abs(distance)+0.5));
+                player.damage(0.5*Math.abs(player.getLocation().getY()-getBorderHeight()+0.5 + 0.009*Math.abs(distance)+0.5));
             } else if (aboveBorder) {
-                player.damage(0.25*Math.abs(player.getLocation().getY()-getBorderHeight()+0.5));
+                player.damage(0.5*Math.abs(player.getLocation().getY()-getBorderHeight()+0.5));
             } else if (outsideBorder) {
-                player.damage(0.002*Math.abs(distance)+0.5);
+                player.damage(0.009*Math.abs(distance)+0.5);
             }
         }
     }

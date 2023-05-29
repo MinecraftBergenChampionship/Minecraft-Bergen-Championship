@@ -90,7 +90,7 @@ public abstract class SkybattleMap extends Map {
     public float getBorderHeight() { return borderHeight; }
     public float getBorderRadius() { return borderRadius; }
     public void reduceBorderHeight(double n) { borderHeight -= n; }
-    public void reduceBorderRadius(double n) { borderRadius -= n; }
+    public void reduceBorderRadius(double n) { borderRadius -= n; if(borderRadius < 0) borderRadius = 0; }
     public void setBorderRadius(float n) { borderRadius = n; }
     public void setBorderHeight(float n) { borderHeight = n; }
     public double getBorderShrinkRate() { return BORDER_SHRINK_AMOUNT; }

@@ -84,7 +84,6 @@ public abstract class Game implements Scoreboard, Listener {
         for (Participant p : MBC.getInstance().getPlayers()) {
             if (p.getPlayerName().equals(e.getPlayer().getName())) {
                 victim = p;
-                playersAlive.remove(p);
                 victim.getPlayer().setGameMode(GameMode.SPECTATOR);
                 if (e.getPlayer().getKiller() == null) break;
             } else if (e.getPlayer().getKiller() != null) {
@@ -247,7 +246,11 @@ public abstract class Game implements Scoreboard, Listener {
     public boolean isGameActive() {
         if (MBC.getInstance().getGameID() != this.gameID) { return false; }
 
+        // if lobby, return true no matter what
+        if (MBC.getInstance().getGameID() == 0) { return true; }
+
         return (this.getState().equals(GameState.ACTIVE));
+        // return (this.getState().equals(GameState.ACTIVE) || this.getState().equals(GameState.PAUSED)); <- might be dependent on event? gonna hold off
     }
 
     public void setTimer(int time) {
@@ -300,6 +303,7 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public void start() {
+        HandlerList.unregisterAll(MBC.getInstance().lobby); // unregister lobby temporarily
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
         loadPlayers();
         createScoreboard();
@@ -419,8 +423,9 @@ public abstract class Game implements Scoreboard, Listener {
             }
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().getInventory().clear();
+            p.getPlayer().setExp(0);
             p.getPlayer().teleport(Lobby.LOBBY);
-            stopTimer();
+            MBC.getInstance().gameID = 0;
             MBC.getInstance().lobby.start();
         }
     }

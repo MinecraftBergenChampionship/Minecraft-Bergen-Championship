@@ -34,6 +34,9 @@ public class Skybattle extends Game {
     public Map<Entity, Player> TNTPlacers = new HashMap<Entity, Player>(5);
     // Creeper Entity, Player (that spawned them); used for determining kills by creeper explosion
     public Map<Entity, Player> creeperSpawners = new HashMap<Entity, Player>(5);
+    public final int KILL_POINTS = 15;
+    public final int SURVIVAL_POINTS = 1;
+    public final int WIN_POINTS = 15;
 
     public Skybattle() {
         super(4, "Skybattle");
@@ -118,9 +121,7 @@ public class Skybattle extends Game {
                 timeRemaining = 240;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
-            if (timeRemaining % 2 == 0) {
-                map.Border();
-            }
+            map.Border();
 
             if (timeRemaining == 0 && roundNum < 3) {
                 timeRemaining = 9;
@@ -173,6 +174,7 @@ public class Skybattle extends Game {
             StringBuilder survivors = new StringBuilder("The winners of this round are: ");
             for (int i = 0; i < playersAlive.size(); i++) {
                 winEffects(playersAlive.get(i));
+                playersAlive.get(i).addRoundScore(WIN_POINTS);
                 playersAlive.get(i).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
 
                 if (i == playersAlive.size()-1) {
@@ -184,6 +186,8 @@ public class Skybattle extends Game {
             Bukkit.broadcastMessage(survivors.toString()+ChatColor.WHITE+"!");
         } else if (playersAlive.size() == 1) {
             playersAlive.get(0).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
+            winEffects(playersAlive.get(0));
+            playersAlive.get(0).addRoundScore(WIN_POINTS);
             Bukkit.broadcastMessage("The winner of this round is " + playersAlive.get(0).getFormattedName()+"!");
         } else {
             Bukkit.broadcastMessage("Nobody survived the round.");
@@ -297,16 +301,22 @@ public class Skybattle extends Game {
         }
         if (player == null) return;
 
-        Participant damager = Participant.getParticipant((Player) e.getDamager());
-        if (damager.getTeam().equals(player.getParticipant().getTeam())) return;
+        if (e.getDamager() instanceof Player) {
+            Participant damager = Participant.getParticipant((Player) e.getDamager());
+            if (damager.getTeam().equals(player.getParticipant().getTeam())) return;
+        }
 
         // if creeper hurt player, last damager was who spawned that creeper
         if (creeperSpawners.containsKey(e.getDamager())) {
+            Participant damager = Participant.getParticipant(creeperSpawners.get(e.getDamager()));
+            if (damager.getTeam().equals(player.getParticipant().getTeam())) return;
             player.lastDamager = creeperSpawners.get(e.getDamager());
             return;
         }
 
         if (TNTPlacers.containsKey(e.getDamager())) {
+            Participant damager = Participant.getParticipant(TNTPlacers.get(e.getDamager()));
+            if (damager.getTeam().equals(player.getParticipant().getTeam())) return;
             player.lastDamager = TNTPlacers.get(e.getDamager());
             return;
         }
@@ -335,6 +345,7 @@ public class Skybattle extends Game {
         if (player == null) return;
 
         if (e.getEntityType().equals(EntityType.SNOWBALL)) {
+            Bukkit.broadcastMessage(e.getHitEntity().getName() + " was hit by " + e.getEntity().getShooter() + " using " + e.getEntity());
             Vector snowballVelocity = e.getEntity().getVelocity();
             player.lastDamager = (Player) e.getEntity().getShooter();
             player.getPlayer().damage(0.1);
@@ -403,11 +414,16 @@ public class Skybattle extends Game {
         if (e.getEntity().getKiller() == null || e.getPlayer().getLastDamageCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
             // used to determine the death message (ie, void, fall damage, or border?)
             @Nullable EntityDamageEvent damageCause = e.getPlayer().getLastDamageCause();
-            Bukkit.broadcastMessage("[Debug] going to: skyubattleDeathGraphics");
+            Bukkit.broadcastMessage("[Debug] going to: skybattleDeathGraphics");
             skybattleDeathGraphics(e, damageCause.getCause());
         } else {
             Bukkit.broadcastMessage("[Debug] normal death");
+            Participant.getParticipant(e.getPlayer().getKiller()).addRoundScore(KILL_POINTS);
             playerDeathEffects(e); // if there was a killer, just send over to default
+        }
+
+        for (Participant p : playersAlive) {
+            p.addRoundScore(SURVIVAL_POINTS);
         }
     }
 
@@ -445,6 +461,7 @@ public class Skybattle extends Game {
             }
             killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
+            killer.addRoundScore(KILL_POINTS);
 
             switch (damageCause) {
                 case CUSTOM:

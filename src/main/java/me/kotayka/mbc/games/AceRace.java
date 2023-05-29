@@ -37,7 +37,7 @@ public class AceRace extends Game {
     public static final int FINISH_RACE_POINTS = 8;           // points for finishing the race
     public static final int PLACEMENT_LAP_POINTS = 1;         // points for placement for first laps
     public static final int PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
-    public static final short[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
+    public static final int[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
 
     public AceRace() {
         super(1, "Ace Race");
