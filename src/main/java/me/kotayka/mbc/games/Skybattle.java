@@ -45,7 +45,7 @@ public class Skybattle extends Game {
 
     @Override
     public void createScoreboard(Participant p) {
-        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Game: "+ MBC.getInstance().gameNum+"/8:" + ChatColor.WHITE + " Sky Battle", p);
+        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Game: "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Sky Battle", p);
         createLine(22, ChatColor.BOLD+""+ChatColor.GREEN+"Round: " + ChatColor.RESET+roundNum+"/3", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
