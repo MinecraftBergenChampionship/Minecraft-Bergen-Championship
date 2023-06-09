@@ -26,5 +26,5 @@
   { "material": "GOLD_INGOT", "stack_max": 2, "weight": 3},
   { "material": "DIAMOND", "stack_max": 1, "weight": 2},
 
-  { "material": "EXPERIENCE_BOTTLE", "stack_max": 3, "weight": 3}
+  { "material": "EXPERIENCE_BOTTLE", "stack_max": 3, "weight": 2}
 ]

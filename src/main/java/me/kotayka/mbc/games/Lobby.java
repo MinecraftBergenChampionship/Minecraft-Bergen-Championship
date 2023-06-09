@@ -62,6 +62,7 @@ public class Lobby extends Game {
             Participant p = Participant.getParticipant(e.getPlayer());
             assert p != null;
             p.addGameScore(5);
+            MBC.spawnFirework(p);
         }
     }
 

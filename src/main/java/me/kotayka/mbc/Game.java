@@ -88,6 +88,7 @@ public abstract class Game implements Scoreboard, Listener {
 
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
+        MBC.spawnFirework(victim);
         deathMessage = deathMessage.replace(victim.getPlayerName(), victim.getFormattedName());
 
         if (killer != null) {
@@ -247,6 +248,38 @@ public abstract class Game implements Scoreboard, Listener {
             Team t = teamRoundsScores.get(14-i);
             createLine(i,String.format("%c %s%s %s%5d", t.getIcon(), t.getChatColor(), t.getTeamFullName(), ChatColor.WHITE, t.getScore()));
         }
+    }
+
+    /**
+     * Updates each player's scoreboards to match that of playersAlive and teamsAlive.
+     * Does not do any computation and assumes playersAlive and teamsAlive has been properly
+     * computed by the function call.
+     *
+     * Standardizes the following:
+     *  Players Remaining is on line 2
+     *  Teams Remaining is on line 1
+     *
+     *  Loops for all players by default.
+     */
+    public void updateAlivePlayers() {
+        createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS);
+        createLine(1, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
+    }
+
+    /**
+     * Updates each player's scoreboards to match that of playersAlive and teamsAlive.
+     * Does not do any computation and assumes playersAlive and teamsAlive has been properly
+     * computed by the function call.
+     *
+     * Standardizes the following:
+     *  Players Remaining is on line 2
+     *  Teams Remaining is on line 1
+     *
+     * @param p Specific participant to update scoreboard
+     */
+    public void updateAlivePlayers(Participant p) {
+        createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS, p);
+        createLine(1, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS, p);
     }
 
     public void updatePlayerRoundScore(Participant p) {

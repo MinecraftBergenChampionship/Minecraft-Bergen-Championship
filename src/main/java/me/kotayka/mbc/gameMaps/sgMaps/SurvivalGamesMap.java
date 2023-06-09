@@ -17,6 +17,8 @@ public abstract class SurvivalGamesMap extends Map {
     private Location center;
     public java.util.Map<Location, Block> blocks = new HashMap<Location, Block>();
     public Location[] middleChests;
+
+    protected WorldBorder border;
     //public boolean airdrops; // incase future maps may require airdrops: not implemented yet
 
     public SurvivalGamesMap() {
@@ -55,4 +57,8 @@ public abstract class SurvivalGamesMap extends Map {
      * of a map to be considered a super chest
      */
     public abstract boolean checkChest(Chest chest);
+
+    public abstract void resetBorder();
+
+    public abstract void startBorder();
 }

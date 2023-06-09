@@ -2,15 +2,17 @@ package me.kotayka.mbc;
 
 import me.kotayka.mbc.games.*;
 import me.kotayka.mbc.teams.*;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.ScoreboardManager;
 
@@ -175,6 +177,18 @@ public class MBC implements Listener {
         }
     }
 
+    /**
+     * Prevent players from taking damage from fireworks
+     * Until this ever becomes a feature in a game
+     */
+    @EventHandler
+    public void onPlayerDamage(EntityDamageByEntityEvent e) {
+        // players should never get damaged by fireworks
+        if (e.getDamager() instanceof Firework && e.getEntity() instanceof Player) {
+            e.setCancelled(true);
+        }
+    }
+
     public int getGameID() {
         return this.gameID;
     }
@@ -194,6 +208,22 @@ public class MBC implements Listener {
         if (Bukkit.getScheduler().isCurrentlyRunning(taskID)) {
             Bukkit.getScheduler().cancelTask(taskID);
         }
+    }
+
+    /**
+     * Spawn firework on a given player
+     * @param p Participant on which the firework should spawn
+     */
+    public static void spawnFirework(Participant p) {
+        Location l = p.getPlayer().getLocation();
+        l.setY(l.getY()+1);
+        org.bukkit.entity.Firework fw = (org.bukkit.entity.Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK);
+        FireworkMeta fwm = fw.getFireworkMeta();
+
+        fwm.addEffect(FireworkEffect.builder().withColor(p.getTeam().getColor()).build());
+
+        fw.setFireworkMeta(fwm);
+        fw.detonate();
     }
 
     /**

@@ -26,6 +26,8 @@ public class BCA extends SurvivalGamesMap {
         super.middleChests = this.middleChests;
         super.mapName = "BCA";
         //super.airdrops = false;
+
+        resetBorder();
     }
 
     @Override
@@ -91,5 +93,16 @@ public class BCA extends SurvivalGamesMap {
 
         return l.getX() > -200 && l.getX() < 200
             && l.getZ() > -200 && l.getZ() < 200;
+    }
+
+    @Override
+    public void resetBorder() {
+        border.setCenter(0, 0);
+        border.setSize(400);
+    }
+
+    @Override
+    public void startBorder() {
+        border.setSize(30, 660);
     }
 }

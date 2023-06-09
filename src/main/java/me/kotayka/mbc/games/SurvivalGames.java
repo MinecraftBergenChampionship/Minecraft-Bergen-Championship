@@ -122,7 +122,9 @@ public class SurvivalGames extends Game {
                     p.getPlayer().setInvulnerable(false);
                     p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
                 }
-                Bukkit.broadcastMessage(ChatColor.DARK_RED+"Grace Period is now over.");
+                Bukkit.broadcastMessage(ChatColor.DARK_RED+"Grace period is now over.");
+                map.startBorder();
+                Bukkit.broadcastMessage(ChatColor.RED+"Border will continue to shrink!");
             } else if (timeRemaining == 600) {
                 crateLocation();
             } else if (timeRemaining == 540) {
@@ -205,7 +207,7 @@ public class SurvivalGames extends Game {
 
         Location l = crates.get(crateNum).getLocation();
         l.getBlock().setType(Material.BLACK_SHULKER_BOX);
-        ShulkerBox crate = (ShulkerBox) map.getWorld().getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+        ShulkerBox crate = (ShulkerBox) map.getWorld().getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()).getState();
 
         int chestItems = (int) (Math.random()*6+5);
         for (int b = 0; b < chestItems; b++) {
@@ -280,8 +282,7 @@ public class SurvivalGames extends Game {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
-        createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS);
-        createLine(1, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
+        updateAlivePlayers();
         createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
 
         teamRounds();
