@@ -7,5 +7,6 @@ public enum GameState {
     ACTIVE,
     END_ROUND,
     END_GAME,
+    OVERTIME,
     INACTIVE
 }

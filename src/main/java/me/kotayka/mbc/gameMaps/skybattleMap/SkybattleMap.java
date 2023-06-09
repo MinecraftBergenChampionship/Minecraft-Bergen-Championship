@@ -77,6 +77,8 @@ public abstract class SkybattleMap extends Map {
 
     /**
      * Uses array of spawns to spawn players with their team in a random spawn
+     * This is abstract to allow for customization of what items players spawn with.
+     * TODO: could maybe standardize something and then override if necessary but I'm kinda lazy
      */
     public abstract void spawnPlayers();
 

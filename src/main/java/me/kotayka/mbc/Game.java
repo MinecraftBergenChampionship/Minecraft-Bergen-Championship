@@ -110,6 +110,43 @@ public abstract class Game implements Scoreboard, Listener {
         }
     }
 
+    /**
+     * Variant of the above function but where the death message is displayed as:
+     * {Player A} was slain by {Player B} [♥ Player 2 Health]
+     * This is to resemble Minecraft Monday.
+     */
+    public void deathEffectsWithHealth(PlayerDeathEvent e) {
+        Participant victim = Participant.getParticipant(e.getPlayer());
+        Participant killer = Participant.getParticipant(e.getPlayer().getKiller());
+        String deathMessage = e.getDeathMessage();
+
+        if (victim == null) return;
+
+        victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
+        victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
+        deathMessage = deathMessage.replace(victim.getPlayerName(), victim.getFormattedName());
+
+        if (killer != null) {
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayerName() + "!");
+            killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
+            String health = String.format("["+ChatColor.RED+"♥ %.2f"+ChatColor.RESET+"]", killer.getPlayer().getHealth());
+            deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName()+health);
+        }
+
+        e.setDeathMessage(deathMessage);
+
+        // Check if only one team remains
+        Team t = victim.getTeam();
+        if (checkTeamEliminated(t)) {
+            teamsAlive.remove(t);
+            t.announceTeamDeath();
+
+            if (teamsAlive.size() <= 1) {
+                timeRemaining = 1;
+            }
+        }
+    }
+
     public boolean checkIfDead(Participant p) {
         return !playersAlive.contains(p);
     }
@@ -197,7 +234,7 @@ public abstract class Game implements Scoreboard, Listener {
 
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
             Team t = teamRoundsScores.get(14-i);
-            createLine(i,String.format("%c %s%s %s%5d", t.getIcon(), t.getChatColor(), t.getTeamFullName(), ChatColor.WHITE, t.getRoundScore()));
+            createLine(i,String.format("%-15s %s%5d", t.teamNameFormat(), ChatColor.WHITE, t.getRoundScore()));
         }
     }
 
@@ -416,6 +453,7 @@ public abstract class Game implements Scoreboard, Listener {
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().getInventory().clear();
             p.getPlayer().setExp(0);
+            p.getPlayer().setLevel(0);
             updateTeamRoundScore(p.getParticipant().getTeam());
             updatePlayerRoundScore(p.getParticipant());
             p.getPlayer().teleport(Lobby.LOBBY);
@@ -431,7 +469,7 @@ public abstract class Game implements Scoreboard, Listener {
      * Does not handle events for when timer hits 0 (countdown finishes).
      */
     public void startingCountdown() {
-        for (GamePlayer p : gamePlayers) {
+        for (Participant p : MBC.getInstance().getPlayers()) {
             if (timeRemaining <= 10 && timeRemaining > 3) {
                 p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+timeRemaining+"<", 0,20,0);
             } else if (timeRemaining == 3) {

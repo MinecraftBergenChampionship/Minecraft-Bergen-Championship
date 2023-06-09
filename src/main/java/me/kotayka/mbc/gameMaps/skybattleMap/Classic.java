@@ -150,7 +150,7 @@ public class Classic extends SkybattleMap {
 
         initSpawnItems();
 
-        for (Team t : SKYBATTLE.getValidTeams()) {
+        for (Team t : MBC.getValidTeams()) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
             for (Participant p : t.teamPlayers) {
                 p.getPlayer().teleport(tempSpawns.get(randomNum));

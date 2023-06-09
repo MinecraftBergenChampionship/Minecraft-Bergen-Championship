@@ -4,6 +4,7 @@ import org.bukkit.World;
 
 public abstract class Map {
     private final World world;
+    public String mapName;
 
     protected Map(World world) {
         this.world = world;

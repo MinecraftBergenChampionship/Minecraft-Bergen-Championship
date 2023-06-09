@@ -8,11 +8,15 @@ import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.sgMaps.BCA;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
+import me.kotayka.mbc.gamePlayers.GamePlayer;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
+import org.bukkit.block.ShulkerBox;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -24,27 +28,33 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class SurvivalGames extends Game {
     private final SurvivalGamesMap map = new BCA();
     private List<SurvivalGamesItem> items;
+    private List<SurvivalGamesItem> supply_items;
+
+    // This file must be in /home/MBCAdmin/MBC/ and re-added each time an update is made
     private final File CHEST_FILE = new File("survival_games_items.json");
+    private final File SUPPLY_FILE = new File("supply_crate_items.json");
+    private SurvivalGamesEvent event = SurvivalGamesEvent.GRACE_OVER;
+    private final List<Location> chestLocations = new ArrayList<Location>();
+    private final List<SupplyCrate> crates = new ArrayList<SupplyCrate>(3);
+    private boolean dropLocation = false;
+    private int crateNum = 0;
 
     public SurvivalGames() {
         super(5, "SurvivalGames");
-
 
         try {
             readItems();
         } catch(IOException | ParseException e) {
             Bukkit.broadcastMessage(ChatColor.YELLOW+ e.getMessage());
-            Bukkit.broadcastMessage(ChatColor.RED+"Unable to parse " + CHEST_FILE.getAbsolutePath());
+            Bukkit.broadcastMessage(ChatColor.RED+"Unable to parse " + CHEST_FILE.getAbsolutePath() + " or " + SUPPLY_FILE.getAbsolutePath());
         }
-
-        loadPlayers();
-
     }
 
     private void readItems() throws IOException, ParseException {
@@ -52,6 +62,8 @@ public class SurvivalGames extends Game {
         Type listType = new TypeToken<List<SurvivalGamesItem>>() {}.getType();
         Reader reader = new FileReader(CHEST_FILE);
         items = gson.fromJson(reader, listType);
+        reader = new FileReader(SUPPLY_FILE);
+        supply_items = gson.fromJson(reader, listType);
     }
 
     @Override
@@ -59,6 +71,7 @@ public class SurvivalGames extends Game {
         map.setBarriers(true);
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            p.getPlayer().getInventory().clear();
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 30, 10, false, false));
             map.spawnPlayers();
         }
@@ -77,19 +90,160 @@ public class SurvivalGames extends Game {
 
     @Override
     public void events() {
+        if (getState().equals(GameState.STARTING)) {
+            if (timeRemaining > 0) {
+                startingCountdown();
+            } else {
+                map.setBarriers(false);
+                for (GamePlayer p : gamePlayers) {
+                    p.getPlayer().setGameMode(GameMode.SURVIVAL);
+                    p.getPlayer().setInvulnerable(true);
+                }
+                setGameState(GameState.ACTIVE);
+                Bukkit.broadcastMessage(ChatColor.RED+"Grace ends in 1 minute!");
+                timeRemaining = 720;
+            }
+        } else if (getState().equals(GameState.ACTIVE)) {
+            /*
+             * Event timeline:
+             *  12 mins: Game Starts
+             *  11 mins: Grace Ends
+             *  10 mins: First supply crate announced; border begins to move
+             *   9 mins: First supply crate spawns
+             *   8 mins: 1 minute to chest refill, 2nd supply crate announced
+             *   7 mins: Chest Refill, 2nd supply crate spawns, 3rd supply crate announced
+             *   6 mins: Last supply crate lands
+             */
+            if (crates.size() > 0) { crateParticles(); }
 
+            if (timeRemaining == 660) {
+                event = SurvivalGamesEvent.SUPPLY_CRATE;
+                for (Participant p : MBC.getInstance().getPlayers()) {
+                    p.getPlayer().setInvulnerable(false);
+                    p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+                }
+                Bukkit.broadcastMessage(ChatColor.DARK_RED+"Grace Period is now over.");
+            } else if (timeRemaining == 600) {
+                crateLocation();
+            } else if (timeRemaining == 540) {
+                spawnSupplyCrate();
+            } else if (timeRemaining == 480) {
+                event = SurvivalGamesEvent.CHEST_REFILL;
+                crateLocation();
+                Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests will refill in one minute!");
+            } else if (timeRemaining == 420) {
+                spawnSupplyCrate();
+                Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
+                regenChest();
+                event = SurvivalGamesEvent.SUPPLY_CRATE;
+                crateLocation();
+            } else if (timeRemaining == 360) {
+                spawnSupplyCrate();
+                event = SurvivalGamesEvent.DEATHMATCH;
+            }
+            UpdateEvent();
+        } else if (getState().equals(GameState.END_GAME)) {
+            gameEndEvents();
+        }
+    }
+
+    /**
+     * Updates player scoreboard for each upcoming event using SurvivalGamesEnum
+     */
+    private void UpdateEvent() {
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            // display coordinates of last unopened supply drop separately
+            if (dropLocation && crates.size() > 0) {
+                Location l = crates.get(crateNum).getLocation();
+                createLine(22, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Supply drop: " + ChatColor.RESET + "(" + l.getX() + ", " + l.getY() + ", " + l.getZ() + ")", p);
+            } else {
+                if (event.equals(SurvivalGamesEvent.SUPPLY_CRATE) || event.equals(SurvivalGamesEvent.CHEST_REFILL) && crates.size() > 0) {
+                    dropLocation = true;
+                }
+            }
+
+            switch (event) {
+                case GRACE_OVER ->
+                        createLine(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Grace ends in: " + ChatColor.RESET + getFormattedTime(timeRemaining - 660), p);
+                case CHEST_REFILL ->
+                        createLine(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Chest refill: " + ChatColor.RESET + getFormattedTime(timeRemaining - 420));
+                case DEATHMATCH ->
+                        createLine(23, ChatColor.RED + "" + ChatColor.BOLD + "Deathmatch: " + ChatColor.WHITE + "Active");
+                case SUPPLY_CRATE -> {
+                    // hard coded times; the 2nd supply drop coincides with chest refill
+                    int nextTime = (timeRemaining > 540) ? timeRemaining - 540 : timeRemaining - 360;
+                    createLine(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Next supply crate: " + ChatColor.RESET + getFormattedTime(nextTime));
+                }
+            }
+        }
+    }
+
+    /**
+     * Generate location of supply crate
+     */
+    public void crateLocation() {
+        int index = (int) (Math.random()*chestLocations.size());
+
+        Location l = (chestLocations.get(index));
+        chestLocations.remove(l);
+        dropLocation = true;
+        crates.add(new SupplyCrate(l, false));
+        Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"Supply crate spawning at " + ChatColor.RESET+"("+l.getX()+", "+l.getY()+", "+l.getZ()+")");
+    }
+
+    /**
+     * Given the location of the crate is predetermined, replace the block
+     * with the crate block and generate loot
+     * @see SurvivalGames crateLocation()
+     */
+    public void spawnSupplyCrate() {
+        double totalWeight = 0;
+        for (SurvivalGamesItem item : items) {
+            totalWeight += item.getWeight();
+        }
+        Bukkit.broadcastMessage("Total Supply Weight == " + totalWeight);
+
+        Location l = crates.get(crateNum).getLocation();
+        l.getBlock().setType(Material.BLACK_SHULKER_BOX);
+        ShulkerBox crate = (ShulkerBox) map.getWorld().getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+
+        int chestItems = (int) (Math.random()*6+5);
+        for (int b = 0; b < chestItems; b++) {
+            // Now choose a random item.
+            int idx = 0;
+            for (double r = Math.random() * totalWeight; idx < supply_items.size() - 1; ++idx) {
+                r -= supply_items.get(idx).getWeight();
+                if (r <= 0.0) break;
+            }
+
+            //int lootNum = rand.nextInt(items.size());
+            crate.getInventory().setItem((int) (Math.random()*27), supply_items.get(idx).getItem());
+        }
+    }
+
+    /**
+     * Spawn particles at super chest spawning location
+     */
+    private void crateParticles() {
+        for (SupplyCrate crate : crates) {
+            if (!crate.beenOpened()) {
+                Location l = crate.getLocation();
+                map.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, l.getX(), l.getBlockY() + 1, l.getZ(), 5);
+                map.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, l.getX(), l.getBlockY() + 1, l.getZ(), 5);
+            }
+        }
     }
 
     /**
      * Regenerates the loot within every chest in the map.
+     * If empty, updates list of eligible Super Chests.
      */
     public void regenChest() {
-        // TEMP
-        /*
-        int totalWeight = 0;
-        for (int i = 0; i < items.size(); i++) {
-            items.get(i).
-        }*/
+        double totalWeight = 0;
+        for (SurvivalGamesItem item : items) {
+            totalWeight += item.getWeight();
+        }
+        Bukkit.broadcastMessage("Total Weight == " + totalWeight);
 
         Random rand = new Random();
         Chunk[] c = map.getWorld().getLoadedChunks();
@@ -97,11 +251,22 @@ public class SurvivalGames extends Game {
             for (int x = 0; x < chunk.getTileEntities().length; x++) {//loop through tile entities within loaded chunks
                 if (chunk.getTileEntities()[x] instanceof Chest) {
                     Chest chest = (Chest) chunk.getTileEntities()[x];
+
+                    if (crates.size() < 1 && map.checkChest(chest)) {
+                        chestLocations.add(chest.getLocation());
+                    }
+
                     chest.getInventory().clear();
-                    int chestItems = rand.nextInt(2) + 6;
+                    int chestItems = rand.nextInt(2) + 5;
                     for (int b = 0; b < chestItems; b++) {
-                        int lootNum = rand.nextInt(items.size());
-                        chest.getInventory().setItem(rand.nextInt(27), items.get(lootNum).getItem());
+                        // Now choose a random item w/weight
+                        int idx = 0;
+                        for (double r = Math.random() * totalWeight; idx < items.size() - 1; ++idx) {
+                            r -= items.get(idx).getWeight();
+                            if (r <= 0.0) break;
+                        }
+
+                        chest.getInventory().setItem(rand.nextInt(27), items.get(idx).getItem());
                     }
                 }
             }
@@ -110,7 +275,8 @@ public class SurvivalGames extends Game {
 
     @Override
     public void createScoreboard(Participant p) {
-        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Game: "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Survival Games", p);
+        createLine(24, ChatColor.AQUA + "" + ChatColor.BOLD + "Game: "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Survival Games", p);
+        createLine(21, ChatColor.AQUA+""+ChatColor.BOLD+"Map: " + ChatColor.RESET+ map.mapName);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
@@ -121,11 +287,25 @@ public class SurvivalGames extends Game {
         teamRounds();
     }
 
+    /**
+     * Handles event where player eats stew; may account for
+     * other things if other custom items are added.
+     */
     @EventHandler
-    public void onEatStew(PlayerInteractEvent e) {
+    public void onPlayerInteract(PlayerInteractEvent e) {
         if (!isGameActive()) return;
-        if (!(e.getAction() == Action.RIGHT_CLICK_BLOCK) && !(e.getAction() == Action.RIGHT_CLICK_AIR)) return;
+
+        if (!(e.getAction().isRightClick())) return;
         Player p = e.getPlayer();
+
+
+        if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.BLACK_SHULKER_BOX)) {
+            crates.get(crateNum).setOpened(true);
+            dropLocation = false;
+            crateNum++;
+            return;
+        }
+
         if (p.getInventory().getItemInMainHand().getType() != Material.MUSHROOM_STEW && p.getInventory().getItemInMainHand().getType() != Material.MUSHROOM_STEW) {
             return;
         }
@@ -133,7 +313,7 @@ public class SurvivalGames extends Game {
         boolean mainHand = p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW;
         p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 60, 1, false, true));
         p.playSound(p.getLocation(), Sound.BLOCK_GRASS_BREAK, 1, 1);
-        map.getWorld().spawnParticle(Particle.BLOCK_CRACK, p.getLocation(), 3, Material.DIRT);
+        map.getWorld().spawnParticle(Particle.BLOCK_CRACK, p.getLocation(), 3, Material.DIRT.createBlockData());
 
         if (mainHand) {
             p.getInventory().setItemInMainHand(null);
@@ -141,16 +321,56 @@ public class SurvivalGames extends Game {
             p.getInventory().setItemInOffHand(null);
         }
     }
+
+    /**
+     * Prevent item frame rotation
+     */
+    @EventHandler
+    public void onPlayerEntityInteract(PlayerInteractEntityEvent e) {
+        if (!isGameActive()) return;
+
+        if (e.getRightClicked().getType().equals(EntityType.ITEM_FRAME)) e.setCancelled(true);
+    }
+
+    /**
+     * Death events
+     */
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        deathEffectsWithHealth(e);
+        // todo: summon firework + scoring
+    }
 }
 
 class SurvivalGamesItem {
     private Material material;
     private int stack_max;
-    private int weight;
+    private double weight;
 
     public SurvivalGamesItem() {}
 
     public ItemStack getItem() {
         return new ItemStack(material, (int) (Math.random() * stack_max) +1);
     }
+    public double getWeight() { return weight; }
+}
+
+class SupplyCrate {
+    private final Location LOCATION;
+    private boolean opened;
+    public SupplyCrate(Location loc, boolean opened) {
+        LOCATION = loc;
+        this.opened = opened;
+    }
+
+    public Location getLocation() { return LOCATION; }
+    public boolean beenOpened() { return opened; }
+    public void setOpened(boolean b) { opened = b; }
+}
+
+enum SurvivalGamesEvent {
+    GRACE_OVER,
+    SUPPLY_CRATE,
+    CHEST_REFILL,
+    DEATHMATCH
 }

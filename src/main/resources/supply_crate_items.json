@@ -1,0 +1,30 @@
+[
+  { "material": "IRON_SWORD", "stack_max": 1, "weight": 3},
+  { "material": "DIAMOND_SWORD", "stack_max": 1, "weight": 0.5},
+  { "material": "IRON_AXE", "stack_max": 1, "weight": 1},
+
+  { "material": "BOW", "stack_max": 1, "weight": 2},
+  { "material": "CROSSBOW", "stack_max": 1, "weight": 2},
+  { "material": "ARROW", "stack_max": 4, "weight": 1.5},
+
+  { "material": "CHAINMAIL_CHESTPLATE", "stack_max": 1, "weight": 2},
+  { "material": "CHAINMAIL_LEGGINGS", "stack_max": 1, "weight": 2},
+
+  { "material": "IRON_HELMET", "stack_max": 1, "weight": 2},
+  { "material": "IRON_CHESTPLATE", "stack_max": 1, "weight": 3},
+  { "material": "IRON_LEGGINGS", "stack_max": 1, "weight": 3},
+  { "material": "IRON_BOOTS", "stack_max": 1, "weight": 2},
+
+  { "material": "MUSHROOM_STEW", "stack_max": 1, "weight": 3},
+  { "material": "COOKED_PORKCHOP", "stack_max": 3, "weight": 2},
+  { "material": "COOKED_BEEF", "stack_max": 3, "weight": 2},
+  { "material": "COOKED_CHICKEN", "stack_max": 3, "weight": 2},
+  { "material": "GOLDEN_APPLE", "stack_max": 1, "weight": 1},
+
+  { "material": "LAPIS_LAZULI", "stack_max": 2, "weight": 4},
+  { "material": "IRON_INGOT", "stack_max": 2, "weight": 3},
+  { "material": "GOLD_INGOT", "stack_max": 2, "weight": 3},
+  { "material": "DIAMOND", "stack_max": 1, "weight": 2},
+
+  { "material": "EXPERIENCE_BOTTLE", "stack_max": 3, "weight": 3}
+]

@@ -17,7 +17,6 @@ import java.util.List;
  *           marked by carpet.
  */
 public abstract class AceRaceMap extends Map {
-    public String mapName;
     public World world = AceRace.world;
     public List<Location> respawns;
     public List<Location> checkpoints;

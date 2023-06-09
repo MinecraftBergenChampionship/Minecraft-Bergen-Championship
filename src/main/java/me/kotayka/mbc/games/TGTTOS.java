@@ -37,7 +37,7 @@ public class TGTTOS extends Game {
     }
 
     public void createScoreboard(Participant p) {
-        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Game: "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " TGTTOS", p);
+        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game: "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " TGTTOS", p);
 
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
@@ -87,7 +87,7 @@ public class TGTTOS extends Game {
         maps.remove(newMap);
 
         map = newMap;
-        createLine(23, ChatColor.BOLD + "" + ChatColor.AQUA + "Round: "+ roundNum+"/6:" + ChatColor.WHITE + map.getName());
+        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Round: "+ roundNum+"/6:" + ChatColor.WHITE + map.getName());
 
         loadPlayers();
     }

@@ -54,8 +54,9 @@ public class MBC implements Listener {
     public TGTTOS tgttos = null;
     public BSABM bsabm = null;
     public Skybattle skybattle = null;
+    public SurvivalGames sg = null;
 
-    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS","BSABM","Skybattle"));
+    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS","BSABM","Skybattle", "SurvivalGames"));
     public final List<Game> gameList = new ArrayList<Game>(6);
 
     // Define Special Blocks
@@ -112,6 +113,12 @@ public class MBC implements Listener {
                     this.gameID = 4;
                 }
                 return skybattle;
+            case "SurvivalGames":
+                if (sg == null) {
+                    sg = new SurvivalGames();
+                    this.gameID = 5;
+                }
+                return sg;
             default:
                 return lobby;
         }
@@ -138,6 +145,19 @@ public class MBC implements Listener {
     public void onKick(PlayerKickEvent e) {
         if (e.getReason().equalsIgnoreCase("Flying is not enabled on this server"))
             e.setCancelled(true);
+    }
+
+    /**
+     * @return List of all non-spectator teams with at least one player
+     */
+    public static List<Team> getValidTeams() {
+        List<Team> newTeams = new ArrayList<>();
+        for (int i = 0; i < MBC.teamNames.size(); i++) {
+            if (!Objects.equals(MBC.getInstance().teams.get(i).fullName, "Spectator") && MBC.getInstance().teams.get(i).teamPlayers.size() > 0) {
+                newTeams.add(MBC.getInstance().teams.get(i));
+            }
+        }
+        return newTeams;
     }
 
     /**
