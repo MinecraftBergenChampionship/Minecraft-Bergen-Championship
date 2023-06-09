@@ -104,6 +104,11 @@ public class BCA extends SurvivalGamesMap {
 
     @Override
     public void startBorder() {
-        border.setSize(30, 660);
+        border.setSize(30, 630);
+    }
+
+    @Override
+    public void Overtime() {
+        border.setSize(8, 15);
     }
 }

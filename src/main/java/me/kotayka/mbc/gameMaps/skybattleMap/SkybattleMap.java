@@ -56,6 +56,7 @@ public abstract class SkybattleMap extends Map {
         for (Item item : getWorld().getEntitiesByClass(Item.class)) {
             item.remove();
         }
+
         for (Entity tnt : getWorld().getEntitiesByClass(TNTPrimed.class)) {
             tnt.remove();
         }
@@ -81,6 +82,11 @@ public abstract class SkybattleMap extends Map {
      * TODO: could maybe standardize something and then override if necessary but I'm kinda lazy
      */
     public abstract void spawnPlayers();
+
+    /**
+     * For overtime events, mainly border
+     */
+    public abstract void Overtime();
 
     /**
      * Remove barriers around spawn locations

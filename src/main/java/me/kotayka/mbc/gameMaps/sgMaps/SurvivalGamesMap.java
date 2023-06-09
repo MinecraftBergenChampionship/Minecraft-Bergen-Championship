@@ -18,7 +18,7 @@ public abstract class SurvivalGamesMap extends Map {
     public Location[] middleChests;
     public java.util.Map<Location, Material> brokenBlocks = new HashMap<Location, Material>();
 
-    protected WorldBorder border;
+    protected WorldBorder border = getWorld().getWorldBorder();
     //public boolean airdrops; // incase future maps may require airdrops: not implemented yet
 
     public SurvivalGamesMap() {
@@ -71,4 +71,6 @@ public abstract class SurvivalGamesMap extends Map {
     public abstract void resetBorder();
 
     public abstract void startBorder();
+
+    public abstract void Overtime();
 }

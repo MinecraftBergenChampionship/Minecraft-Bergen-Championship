@@ -75,7 +75,7 @@ public abstract class Game implements Scoreboard, Listener {
      * and as such, Skybattle has a completely separate implementation.
      * Should work for any other PVP game not including the void.
      * Checks if one team remains, and adjusts timeRemaining if necessary.
-     * Removes team from
+     * Removes team from teamsAlive.
      * Does not handle scoring.
      * @param e Event thrown when a player dies
      */
@@ -100,15 +100,7 @@ public abstract class Game implements Scoreboard, Listener {
         e.setDeathMessage(deathMessage);
 
         // Check if only one team remains
-        Team t = victim.getTeam();
-        if (checkTeamEliminated(t)) {
-            teamsAlive.remove(t);
-            t.announceTeamDeath();
-
-            if (teamsAlive.size() <= 1) {
-                timeRemaining = 1;
-            }
-        }
+        checkLastTeam(victim.getTeam());
     }
 
     /**
@@ -137,7 +129,14 @@ public abstract class Game implements Scoreboard, Listener {
         e.setDeathMessage(deathMessage);
 
         // Check if only one team remains
-        Team t = victim.getTeam();
+        checkLastTeam(victim.getTeam());
+    }
+
+    /**
+     * If only one team remains,
+     * @param t
+     */
+    private void checkLastTeam(Team t) {
         if (checkTeamEliminated(t)) {
             teamsAlive.remove(t);
             t.announceTeamDeath();
@@ -318,7 +317,11 @@ public abstract class Game implements Scoreboard, Listener {
         timeRemaining = time;
 
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
-            createLine(20, ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+getFormattedTime(--timeRemaining));
+            if (!gameState.equals(GameState.OVERTIME)) {
+                createLine(20, ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+getFormattedTime(--timeRemaining));
+            } else {
+                createLine(20, ChatColor.RED+""+ChatColor.BOLD+"Overtime: " +ChatColor.WHITE+getFormattedTime(--timeRemaining));
+            }
             if (timeRemaining < 0) {
                 stopTimer();
             }

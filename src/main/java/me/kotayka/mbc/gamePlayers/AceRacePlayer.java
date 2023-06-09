@@ -1,6 +1,7 @@
 package me.kotayka.mbc.gamePlayers;
 
 import me.kotayka.mbc.GameState;
+import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.games.AceRace;
 import org.bukkit.Bukkit;
@@ -91,7 +92,7 @@ public class AceRacePlayer extends GamePlayer {
             Bukkit.broadcastMessage(
                     this.getParticipant().getFormattedName() + ChatColor.GRAY + "" + ChatColor.BOLD + " has finished " + ACE_RACE.map.mapName + " in " +
                             placementColor + placementString + ChatColor.GRAY + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ")");
-            // TODO: summon firework
+            MBC.spawnFirework(this.getParticipant());
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");
             this.getParticipant().getPlayer().sendMessage("                                ");
             this.getParticipant().getPlayer().sendMessage(ChatColor.YELLOW + "Your Times: ");

@@ -201,6 +201,12 @@ public class MBC implements Listener {
     }
 
     public void startGame(int game) {
+        // prevent another game from starting if a non-lobby game is active
+        if (gameID != 0) { // TODO: decision dome may have another gameID, so add that here
+            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: Another game with MBC.gameID " + gameID + " is in progress!");
+            return;
+        }
+
         startGame(gameInstance(game));
     }
 

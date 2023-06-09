@@ -69,8 +69,10 @@ public class SurvivalGames extends Game {
 
     @Override
     public void loadPlayers() {
+        teamsAlive.addAll(getValidTeams());
         map.setBarriers(true);
         for (Participant p : MBC.getInstance().getPlayers()) {
+            playersAlive.add(p);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
             p.getPlayer().getInventory().clear();
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 30, 10, false, false));
@@ -117,10 +119,26 @@ public class SurvivalGames extends Game {
              */
             if (crates.size() > 0) { crateParticles(); }
 
+            if (timeRemaining == 0) {
+                if (teamsAlive.size() > 1) {
+                    Bukkit.broadcastMessage(ChatColor.RED+"Border shrinking!");
+                    map.Overtime();
+                    setGameState(GameState.OVERTIME);
+                    timeRemaining = 45;
+                } else {
+                    setGameState(GameState.END_GAME);
+                    for (Participant p : playersAlive) {
+                        winEffects(p);
+                    }
+                    timeRemaining = 37;
+                }
+            }
+
             if (timeRemaining == 660) {
                 event = SurvivalGamesEvent.SUPPLY_CRATE;
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().setInvulnerable(false);
+                    p.getPlayer().setGameMode(GameMode.SURVIVAL);
                     p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
                 }
                 Bukkit.broadcastMessage(ChatColor.DARK_RED+"Grace period is now over.");
@@ -145,6 +163,14 @@ public class SurvivalGames extends Game {
                 event = SurvivalGamesEvent.DEATHMATCH;
             }
             UpdateEvent();
+        } else if (getState().equals(GameState.OVERTIME)) {
+            if (timeRemaining == 0) {
+                setGameState(GameState.END_GAME);
+                for (Participant p : playersAlive) {
+                    winEffects(p);
+                }
+                timeRemaining = 37;
+            }
         } else if (getState().equals(GameState.END_GAME)) {
             gameEndEvents();
         }
@@ -201,7 +227,7 @@ public class SurvivalGames extends Game {
      */
     public void spawnSupplyCrate() {
         double totalWeight = 0;
-        for (SurvivalGamesItem item : items) {
+        for (SurvivalGamesItem item : supply_items) {
             totalWeight += item.getWeight();
         }
         Bukkit.broadcastMessage("Total Supply Weight == " + totalWeight);
@@ -295,8 +321,6 @@ public class SurvivalGames extends Game {
      */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if (!isGameActive()) return;
-
         if (!(e.getAction().isRightClick())) return;
         Player p = e.getPlayer();
 
@@ -328,9 +352,9 @@ public class SurvivalGames extends Game {
      * Death events
      */
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent e) {
+    public void onDeath(PlayerDeathEvent e) {
         deathEffectsWithHealth(e);
-        // todo: summon firework + scoring
+        playersAlive.remove(Participant.getParticipant(e.getPlayer()));
     }
 
     /**
@@ -351,8 +375,6 @@ public class SurvivalGames extends Game {
      */
     @EventHandler
     public void onPlayerEntityInteract(PlayerInteractEntityEvent e) {
-        if (!isGameActive()) return;
-
         if (e.getRightClicked().getType().equals(EntityType.ITEM_FRAME)) e.setCancelled(true);
     }
 

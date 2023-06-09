@@ -125,12 +125,19 @@ public class Skybattle extends Game {
         } else if (getState().equals(GameState.ACTIVE)) {
             map.Border();
 
-            if (timeRemaining == 0 && roundNum < 3) {
-                timeRemaining = 9;
-                setGameState(GameState.END_ROUND);
-            } else if (timeRemaining == 0) {
-                timeRemaining = 38;
-                setGameState(GameState.END_GAME);
+            if (timeRemaining == 0) {
+                if (teamsAlive.size() > 1) {
+                    timeRemaining = 30;
+                    setGameState(GameState.OVERTIME);
+                } else {
+                    if (roundNum < 3) {
+                        timeRemaining = 9;
+                        setGameState(GameState.END_ROUND);
+                    } else {
+                        timeRemaining = 38;
+                        setGameState(GameState.END_GAME);
+                    }
+                }
             }
 
             if (timeRemaining == 210) {
@@ -149,6 +156,15 @@ public class Skybattle extends Game {
             }
             if (timeRemaining <= 180) {
                 map.reduceBorderHeight(map.getVerticalBorderShrinkRate());
+            }
+        } else if (getState().equals(GameState.OVERTIME)) {
+            map.Overtime();
+            if (timeRemaining == 0 && roundNum < 3) {
+                timeRemaining = 9;
+                setGameState(GameState.END_ROUND);
+            } else if (timeRemaining == 0) {
+                timeRemaining = 38;
+                setGameState(GameState.END_GAME);
             }
         } else if (getState().equals(GameState.END_ROUND)) {
             if (timeRemaining == 8) {

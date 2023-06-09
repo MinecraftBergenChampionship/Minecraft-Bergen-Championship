@@ -20,10 +20,10 @@ import java.util.List;
 
 public class Classic extends SkybattleMap {
     private final Location CENTER = new Location(getWorld(), -157, 100, -266);
-    public final double RADIUS_SHRINK_AMOUNT = 0.41;
+    public final double RADIUS_SHRINK_AMOUNT = 0.37;
     public final double HEIGHT_SHRINK_AMOUNT = 0.22;
     private float borderRadius = 80;
-    private Location[] spawns = {
+    private final Location[] SPAWNS = {
         new Location(getWorld(), -220, 71, -266),
         new Location(getWorld(), -190, 71, -212),
         new Location(getWorld(), -124, 71, -212),
@@ -145,8 +145,8 @@ public class Classic extends SkybattleMap {
     }
 
     public void spawnPlayers() {
-        ArrayList<Location> tempSpawns = new ArrayList<>(spawns.length);
-        tempSpawns.addAll(Arrays.asList(spawns));
+        ArrayList<Location> tempSpawns = new ArrayList<>(SPAWNS.length);
+        tempSpawns.addAll(Arrays.asList(SPAWNS));
 
         initSpawnItems();
 
@@ -170,6 +170,11 @@ public class Classic extends SkybattleMap {
             }
             tempSpawns.remove(randomNum);
         }
+    }
+
+    public void Overtime() {
+        reduceBorderHeight(HEIGHT_SHRINK_AMOUNT);
+        reduceBorderRadius(RADIUS_SHRINK_AMOUNT);
     }
 
     public void removeBarriers() {
