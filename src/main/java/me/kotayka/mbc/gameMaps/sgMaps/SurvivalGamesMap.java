@@ -10,13 +10,13 @@ import org.bukkit.block.Chest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public abstract class SurvivalGamesMap extends Map {
     public int[][] spawns;
     private Location center;
     public java.util.Map<Location, Block> blocks = new HashMap<Location, Block>();
     public Location[] middleChests;
+    public java.util.Map<Location, Material> brokenBlocks = new HashMap<Location, Material>();
 
     protected WorldBorder border;
     //public boolean airdrops; // incase future maps may require airdrops: not implemented yet
@@ -50,6 +50,16 @@ public abstract class SurvivalGamesMap extends Map {
             }
             tempSpawns.remove(randomNum);
         }
+    }
+
+    public void resetMap() {
+        resetBorder();
+
+        for (java.util.Map.Entry<Location,Material> entry : brokenBlocks.entrySet()) {
+            getWorld().getBlockAt(entry.getKey()).setType(entry.getValue());
+        }
+
+        MBC.getInstance().sg.resetCrates();
     }
 
     /**

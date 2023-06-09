@@ -21,6 +21,7 @@ public class BCA extends SurvivalGamesMap {
             new Location(getWorld(), 0, 3,-1),
             new Location(getWorld(), -1, 3,0),
     };
+
     public BCA() {
         super.spawns = this.spawns;
         super.middleChests = this.middleChests;

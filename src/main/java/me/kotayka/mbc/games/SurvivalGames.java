@@ -15,6 +15,7 @@ import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -41,7 +42,7 @@ public class SurvivalGames extends Game {
     private final File CHEST_FILE = new File("survival_games_items.json");
     private final File SUPPLY_FILE = new File("supply_crate_items.json");
     private SurvivalGamesEvent event = SurvivalGamesEvent.GRACE_OVER;
-    private final List<Location> chestLocations = new ArrayList<Location>();
+    private final List<Location> chestLocations = new ArrayList<Location>(50);
     private final List<SupplyCrate> crates = new ArrayList<SupplyCrate>(3);
     private boolean dropLocation = false;
     private int crateNum = 0;
@@ -324,6 +325,28 @@ public class SurvivalGames extends Game {
     }
 
     /**
+     * Death events
+     */
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        deathEffectsWithHealth(e);
+        // todo: summon firework + scoring
+    }
+
+    /**
+     * TODO: better standardization across maps
+     * For now: prevent blocks from being broken if they are not glass blocks
+     */
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent e) {
+        // this solution might be temporary, not sure if other maps or other blocks are necessary to add.
+        String brokenBlock = e.getBlock().getType().toString();
+        if (!brokenBlock.endsWith("GLASS"))  e.setCancelled(true);
+
+        map.brokenBlocks.put(e.getBlock().getLocation(), e.getBlock().getType());
+    }
+
+    /**
      * Prevent item frame rotation
      */
     @EventHandler
@@ -334,12 +357,12 @@ public class SurvivalGames extends Game {
     }
 
     /**
-     * Death events
+     * Reset all transformed crates
      */
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent e) {
-        deathEffectsWithHealth(e);
-        // todo: summon firework + scoring
+    public void resetCrates() {
+        for (SupplyCrate crate : crates) {
+            crate.getLocation().getBlock().setType(Material.CHEST);
+        }
     }
 }
 
