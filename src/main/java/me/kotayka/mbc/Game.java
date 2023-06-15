@@ -11,9 +11,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 public abstract class Game implements Scoreboard, Listener {
@@ -100,11 +98,11 @@ public abstract class Game implements Scoreboard, Listener {
         e.setDeathMessage(deathMessage);
 
         // Check if only one team remains
-        checkLastTeam(victim.getTeam());
+        updatePlayersAlive(victim);
     }
 
     /**
-     * Variant of the above function but where the death message is displayed as:
+     * Variant of playerDeathEffects() but where the death message is displayed as:
      * {Player A} was slain by {Player B} [♥ Player 2 Health]
      * This is to resemble Minecraft Monday.
      */
@@ -129,7 +127,19 @@ public abstract class Game implements Scoreboard, Listener {
         e.setDeathMessage(deathMessage);
 
         // Check if only one team remains
-        checkLastTeam(victim.getTeam());
+        updatePlayersAlive(victim);
+    }
+
+    /**
+     * Removes player from playersAlive list
+     * WIP: likely needs more docs, this is kind of important
+     * Optional: Additional restructure TBD
+     * @param p Participant to be removed
+     */
+    public void updatePlayersAlive(Participant p) {
+        playersAlive.remove(p);
+
+        checkLastTeam(p.getTeam());
     }
 
     /**
@@ -260,7 +270,7 @@ public abstract class Game implements Scoreboard, Listener {
      *
      *  Loops for all players by default.
      */
-    public void updateAlivePlayers() {
+    public void updatePlayersAliveScoreboard() {
         createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS);
         createLine(1, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
     }
@@ -276,7 +286,7 @@ public abstract class Game implements Scoreboard, Listener {
      *
      * @param p Specific participant to update scoreboard
      */
-    public void updateAlivePlayers(Participant p) {
+    public void updatePlayersAliveScoreboard(Participant p) {
         createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS, p);
         createLine(1, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS, p);
     }
@@ -352,6 +362,33 @@ public abstract class Game implements Scoreboard, Listener {
                 return "3rd";
             default:
                 return place+"th";
+        }
+    }
+
+    /**
+     * General formatting function to get winners of a round and broadcast text.
+     * Does not handle scoring.
+     */
+    public void roundWinners() {
+        if (playersAlive.size() > 1) {
+            StringBuilder survivors = new StringBuilder("The winners of this round are: ");
+            for (int i = 0; i < playersAlive.size(); i++) {
+                winEffects(playersAlive.get(i));
+                playersAlive.get(i).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
+
+                if (i == playersAlive.size()-1) {
+                    survivors.append("and ").append(playersAlive.get(i).getFormattedName());
+                } else {
+                    survivors.append(playersAlive.get(i).getFormattedName()).append(", ");
+                }
+            }
+            Bukkit.broadcastMessage(survivors.toString()+ChatColor.WHITE+"!");
+        } else if (playersAlive.size() == 1) {
+            playersAlive.get(0).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
+            winEffects(playersAlive.get(0));
+            Bukkit.broadcastMessage("The winner of this round is " + playersAlive.get(0).getFormattedName()+"!");
+        } else {
+            Bukkit.broadcastMessage("Nobody survived the round.");
         }
     }
 

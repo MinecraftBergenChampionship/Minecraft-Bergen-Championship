@@ -50,7 +50,7 @@ public class Skybattle extends Game {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
-        updateAlivePlayers();
+        updatePlayersAliveScoreboard();
         createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
 
         teamRounds();
@@ -75,7 +75,7 @@ public class Skybattle extends Game {
                     playersAlive.add(p);
             }
             // reset scoreboard after each round
-            updateAlivePlayers(p);
+            updatePlayersAliveScoreboard(p);
             createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+((SkybattlePlayer) (Objects.requireNonNull(SkybattlePlayer.getGamePlayer(p.getPlayer())))).kills);
         }
         map.spawnPlayers();
@@ -85,13 +85,19 @@ public class Skybattle extends Game {
      * Maps used for determining kills
      */
     public void resetKillMaps() {
-        if (creeperSpawners == null || TNTPlacers == null || skybattlePlayerList == null) return;
+        if (creeperSpawners != null) {
+            creeperSpawners.clear();
+        }
 
-        creeperSpawners.clear();
-        TNTPlacers.clear();
+        if (TNTPlacers != null) {
+            TNTPlacers.clear();
+        }
 
-        for (SkybattlePlayer p : skybattlePlayerList) {
-            p.lastDamager = null;
+        // not sure if necessary
+        if (skybattlePlayerList != null) {
+            for (SkybattlePlayer p : skybattlePlayerList) {
+                p.lastDamager = null;
+            }
         }
     }
 
@@ -169,7 +175,10 @@ public class Skybattle extends Game {
         } else if (getState().equals(GameState.END_ROUND)) {
             if (timeRemaining == 8) {
                 roundOverGraphics();
-                roundOverWinners();
+                roundWinners();
+                for (Participant p : playersAlive) {
+                    p.addRoundScore(WIN_POINTS);
+                }
             } else if (timeRemaining == 1) {
                 roundNum++;
                 map.resetMap();
@@ -180,37 +189,13 @@ public class Skybattle extends Game {
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 37) {
                 gameOverGraphics();
-                roundOverWinners();
+                roundWinners();
             } else if (timeRemaining <= 35) {
                 gameEndEvents();
             }
         }
     }
 
-    public void roundOverWinners() {
-        if (playersAlive.size() > 1) {
-            StringBuilder survivors = new StringBuilder("The winners of this round are: ");
-            for (int i = 0; i < playersAlive.size(); i++) {
-                winEffects(playersAlive.get(i));
-                playersAlive.get(i).addRoundScore(WIN_POINTS);
-                playersAlive.get(i).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
-
-                if (i == playersAlive.size()-1) {
-                    survivors.append("and ").append(playersAlive.get(i).getFormattedName());
-                } else {
-                    survivors.append(playersAlive.get(i).getFormattedName()).append(", ");
-                }
-            }
-            Bukkit.broadcastMessage(survivors.toString()+ChatColor.WHITE+"!");
-        } else if (playersAlive.size() == 1) {
-            playersAlive.get(0).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
-            winEffects(playersAlive.get(0));
-            playersAlive.get(0).addRoundScore(WIN_POINTS);
-            Bukkit.broadcastMessage("The winner of this round is " + playersAlive.get(0).getFormattedName()+"!");
-        } else {
-            Bukkit.broadcastMessage("Nobody survived the round.");
-        }
-    }
 
     /**
      * Handles auto-priming of TNT and giving players infinite concrete
@@ -415,8 +400,6 @@ public class Skybattle extends Game {
             }
         }
 
-        playersAlive.remove(player.getParticipant());
-
         if (e.getEntity().getKiller() == null || e.getPlayer().getLastDamageCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
             // used to determine the death message (ie, void, fall damage, or border?)
             @Nullable EntityDamageEvent damageCause = e.getPlayer().getLastDamageCause();
@@ -432,11 +415,12 @@ public class Skybattle extends Game {
         }
 
         for (Participant p : playersAlive) {
+            Bukkit.broadcastMessage("[Debug] p.getName() == " + p.getFormattedName());
             p.addRoundScore(SURVIVAL_POINTS);
         }
 
         // may require testing due to concurrency
-        updateAlivePlayers();
+        updatePlayersAliveScoreboard();
         player.getPlayer().teleport(map.getWorld().getSpawnLocation());
     }
 
@@ -503,17 +487,8 @@ public class Skybattle extends Game {
 
         e.setDeathMessage(deathMessage);
 
-        Team t = victim.getParticipant().getTeam();
-        if (checkTeamEliminated(t)) {
-            t.announceTeamDeath();
-            teamsAlive.remove(t);
-
-            if (teamsAlive.size() <= 1) {
-                timeRemaining = 1;
-            }
-        }
-
-        updateAlivePlayers();
+        updatePlayersAlive(victim.getParticipant());
+        updatePlayersAliveScoreboard();
     }
 
     /**

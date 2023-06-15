@@ -309,7 +309,7 @@ public class SurvivalGames extends Game {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
-        updateAlivePlayers();
+        updatePlayersAliveScoreboard();
         createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
 
         teamRounds();
@@ -354,7 +354,6 @@ public class SurvivalGames extends Game {
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         deathEffectsWithHealth(e);
-        playersAlive.remove(Participant.getParticipant(e.getPlayer()));
     }
 
     /**

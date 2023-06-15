@@ -203,6 +203,7 @@ public abstract class Team {
      * TODO: maybe a sound effect
      */
     public void announceTeamDeath() {
+        // small delay to sync messages correctly
         Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().plugin, new Runnable() {
             @Override
             public void run() {
