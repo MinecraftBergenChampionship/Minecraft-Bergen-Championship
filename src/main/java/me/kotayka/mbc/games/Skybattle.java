@@ -282,9 +282,9 @@ public class Skybattle extends Game {
         if (!isGameActive()) return;
 
         if (e.getBlock().getType().toString().endsWith("CONCRETE")) {
-            e.setCancelled(true);
-            e.getBlock().setType(Material.AIR);
+            e.setDropItems(false);
         }
+
     }
 
     /**

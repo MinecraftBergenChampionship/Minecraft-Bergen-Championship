@@ -1,12 +1,14 @@
 package me.kotayka.mbc.games;
 
 import me.kotayka.mbc.Game;
+import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.tgttosMap.TGTTOSMap;
-import me.kotayka.mbc.gameMaps.tgttosMap.Test;
+import me.kotayka.mbc.gameMaps.tgttosMap.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -17,20 +19,31 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class TGTTOS extends Game {
-
-    private static int roundNum = 0;
+    private int roundNum = 0;
+    private static final int MAX_ROUNDS = 6;
     private TGTTOSMap map = null;
-
-    private List<TGTTOSMap> maps = new ArrayList<>(Arrays.asList(new Test(), new Test()));
+    private List<TGTTOSMap> maps = new ArrayList<>(
+            Arrays.asList(new Pit(), new Meatball(), new Walls(),
+                          new Cliffs(), new Glide(), new Skydive(),
+                          new Boats()
+            ));
 
     private List<Participant> finishedParticipants;
+    private String[] deathMessages = new String[39];
+    private static final ItemStack SHEARS = new ItemStack(Material.SHEARS);
 
     public TGTTOS() {
         super(2, "TGTTOS");
@@ -49,11 +62,60 @@ public class TGTTOS extends Game {
     }
 
     public void events() {
+        if (getState().equals(GameState.STARTING)) {
+           if (timeRemaining == 0) {
+               for (Participant p : MBC.getInstance().getPlayers()) {
+                    p.getPlayer().setGameMode(GameMode.SURVIVAL);
+               }
+               map.Barriers(false);
+               setGameState(GameState.ACTIVE);
+               timeRemaining = 120;
+           } else {
+               Countdown();
+           }
+        } else if (getState().equals(GameState.ACTIVE)) {
+            if (timeRemaining == 0) {
+                for (Participant p : MBC.getInstance().getPlayers()) {
+                    if (!finishedParticipants.contains(p)) {
+                        winEffects(p); // just for the flying
+                        p.getPlayer().sendMessage(ChatColor.RED+"You didn't finish in time!");
+                    }
+                }
 
+                if (roundNum == MAX_ROUNDS) {
+                    setGameState(GameState.END_GAME);
+                    timeRemaining = 37;
+                } else {
+                    setGameState(GameState.END_ROUND);
+                    timeRemaining = 5;
+                }
+            }
+        } else if (getState().equals(GameState.END_ROUND)) {
+            if (timeRemaining == 0) {
+                startRound();
+            } else if (timeRemaining == 5) {
+                roundOverGraphics();
+            }
+        } else if (getState().equals(GameState.END_GAME)) {
+            gameEndEvents();
+        }
     }
 
     public void start() {
         super.start();
+
+        ItemMeta meta = SHEARS.getItemMeta();
+        meta.setUnbreakable(true);
+        SHEARS.setItemMeta(meta);
+
+        setDeathMessages();
+        //setGameState(GameState.TUTORIAL);
+        setGameState(GameState.STARTING);
+
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 30, 10, false, false));
+        }
+
         startRound();
     }
 
@@ -62,10 +124,30 @@ public class TGTTOS extends Game {
      * repurpose loadPlayers() however is best needed for tgttos
      */
     public void loadPlayers() {
+        if (map == null) {
+            return;
+        }
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getInventory().clear();
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
             p.getPlayer().setVelocity(new Vector(0,0,0));
             p.getPlayer().teleport(map.getSpawnLocation());
+
+            if (p.getPlayer().getAllowFlight()) {
+                removeWinEffect(p);
+            }
+
+            if (p.getPlayer().hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
+                p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+            }
+
+            if (map instanceof Meatball) {
+                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
+            }
+
+            if (map.getItems() == null) continue;
+
+            Bukkit.broadcastMessage("Map items: " + map.getItems().toString());
             for (ItemStack i : map.getItems()) {
                 if (i.getType().equals(Material.WHITE_WOOL)) {
                     ItemStack wool = p.getTeam().getColoredWool();
@@ -74,22 +156,81 @@ public class TGTTOS extends Game {
                     p.getInventory().addItem(new ItemStack(Material.SHEARS));
                 }
             }
-            map.getWorld().spawnEntity(map.getEndLocation(), EntityType.CHICKEN);
         }
     }
 
+    /**
+     * Resets variables and map for next round
+     * If at maximum rounds, ends the game
+     */
     public void startRound() {
-        finishedParticipants = new ArrayList<>();
+        if (roundNum == MAX_ROUNDS) {
+            setGameState(GameState.END_GAME);
+            timeRemaining = 37;
+            return;
+        } else {
+            roundNum++;
+        }
 
-        roundNum++;
-        setTimer(240);
+        finishedParticipants = new ArrayList<>(MBC.getInstance().players.size());
         TGTTOSMap newMap = maps.get((int) (Math.random()*maps.size()));
-        maps.remove(newMap);
-
         map = newMap;
-        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Round: "+ roundNum+"/6:" + ChatColor.WHITE + map.getName());
+        maps.remove(newMap);
+        map.Barriers(true);
 
-        loadPlayers();
+        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Round: "+ roundNum+"/6: " + ChatColor.WHITE + map.getName());
+
+        if (map != null) {
+            loadPlayers();
+        }
+        map.getWorld().spawnEntity(map.getEndLocation(), EntityType.CHICKEN);
+
+        setGameState(GameState.STARTING);
+        setTimer(20);
+    }
+
+    private void setDeathMessages() {
+        try {
+            FileReader fr = new FileReader("tgttos_death_messages.txt");
+            BufferedReader br = new BufferedReader(fr);
+            int i = 0;
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                deathMessages[i] = line;
+                i++;
+            }
+            br.close();
+            fr.close();
+        } catch (IOException e) {
+            Bukkit.broadcastMessage(ChatColor.RED+"Error: " + e.getMessage());
+        }
+    }
+
+    private void printDeathMessage(Participant p) {
+        int rand = (int) (Math.random() * deathMessages.length);
+        Bukkit.broadcastMessage(ChatColor.GRAY+deathMessages[rand].replace("{player}", p.getFormattedName() + ChatColor.GRAY));
+    }
+
+    private void Countdown() {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (timeRemaining <= 10 && timeRemaining > 3) {
+                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">"+timeRemaining+"<", 0,20,0);
+            } else if (timeRemaining == 3) {
+                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">"+ChatColor.RED+""+ChatColor.BOLD+ timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+            } else if (timeRemaining == 2) {
+                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">"+ChatColor.YELLOW+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+            } else if (timeRemaining == 1) {
+                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">"+ChatColor.GREEN+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+            }
+        }
+    }
+
+    /**
+     * Custom Shears for unbreaking
+     * @return unbreakable shears
+     */
+    public static ItemStack getShears() {
+        return SHEARS;
     }
 
     @EventHandler
@@ -100,6 +241,7 @@ public class TGTTOS extends Game {
         if (e.getPlayer().getLocation().getY() < map.getDeathY()) {
             e.getPlayer().setVelocity(new Vector(0,0,0));
             e.getPlayer().teleport(map.getSpawnLocation());
+            printDeathMessage(Participant.getParticipant(e.getPlayer()));
         }
     }
 
@@ -119,11 +261,14 @@ public class TGTTOS extends Game {
         finishedParticipants.add(p);
         String place = getPlace(finishedParticipants.size());
         chicken.remove();
-        Bukkit.broadcastMessage(p.getTeam().getChatColor()+p.getPlayerName()+ChatColor.WHITE+" finished in "+ChatColor.AQUA+place);
+        Bukkit.broadcastMessage(p.getTeam().getChatColor()+p.getPlayerName()+ChatColor.WHITE+" finished in "+ChatColor.AQUA+place+"!");
+        MBC.spawnFirework(p);
+        p.getPlayer().setGameMode(GameMode.SPECTATOR);
         p.getPlayer().sendMessage(ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GREEN+" place!");
 
         if (finishedParticipants.size() == MBC.getInstance().getPlayers().size()) {
-            startRound();
+            setGameState(GameState.END_ROUND);
+            timeRemaining = 5;
         }
     }
 
@@ -132,7 +277,10 @@ public class TGTTOS extends Game {
         if (!isGameActive()) return;
 
         if (event.getEntity() instanceof Chicken && event.getDamager() instanceof Player) {
-            chickenClick(Participant.getParticipant((Player) event.getDamager()), event.getEntity());
+            if (((Player) event.getDamager()).getGameMode() != GameMode.SURVIVAL)
+                event.setCancelled(true);
+            else
+                chickenClick(Participant.getParticipant((Player) event.getDamager()), event.getEntity());
         }
     }
 

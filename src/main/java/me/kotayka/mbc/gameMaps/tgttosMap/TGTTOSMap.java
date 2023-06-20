@@ -5,30 +5,36 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public abstract class TGTTOSMap extends Map {
-
-    private Location[] spawn;
+    // changed from Location[] to just Location; let's just spawn everyone at one square, at least for now
+    private Location spawn;
     private Location[] end;
     private int deathY;
     private final String name;
-    private List<ItemStack> items;
+    private List<ItemStack> items = null;
 
-    public TGTTOSMap(String name, ItemStack[] i) {
-        super(Bukkit.getWorld("TGTTOS"));
+    public TGTTOSMap(String name, @Nullable ItemStack[] i) {
+        super(Bukkit.getWorld("TGTTOSAWAP"));
         this.name = name;
-        items = new ArrayList<>(Arrays.asList(i));
+        if (i != null)
+            items = new ArrayList<>(Arrays.asList(i));
     }
 
-    public void loadMap(Location[] spawn, Location[] end, int spawnDeath) {
+    public void loadMap(Location spawn, Location[] end, int spawnDeath) {
         this.spawn = spawn;
         this.end = end;
         this.deathY = spawnDeath;
     }
 
+    public Location getSpawnLocation() {
+        return spawn;
+    }
+/*
     public Location getSpawnLocation() {
         double x1 = Math.min(spawn[0].getX(), spawn[1].getX());
         double y1 = Math.min(spawn[0].getY(), spawn[1].getY());
@@ -40,7 +46,7 @@ public abstract class TGTTOSMap extends Map {
 
         return new Location(getWorld(), Math.random()*(x2-x1)+x1, Math.random()*(y2-y1)+y1, Math.random()*(z2-z1)+z1);
     }
-
+*/
     public Location getEndLocation() {
         double x1 = Math.min(end[0].getX(), end[1].getX());
         double y1 = Math.min(end[0].getY(), end[1].getY());
@@ -52,6 +58,8 @@ public abstract class TGTTOSMap extends Map {
 
         return new Location(getWorld(), Math.random()*(x2-x1)+x1, Math.random()*(y2-y1)+y1, Math.random()*(z2-z1)+z1);
     }
+
+    public abstract void Barriers(boolean barriers);
 
     public List<ItemStack> getItems() {
         return items;

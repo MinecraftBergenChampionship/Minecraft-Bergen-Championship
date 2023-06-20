@@ -1,0 +1,31 @@
+package me.kotayka.mbc.gameMaps.tgttosMap;
+
+import me.kotayka.mbc.games.TGTTOS;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+public class Pit extends TGTTOSMap {
+    public Pit() {
+        super("Pit", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), TGTTOS.getShears(), new ItemStack(Material.SNOWBALL, 6)});
+        super.loadMap(
+                new Location(getWorld(), 100, 70, 100),
+                new Location[]{new Location(getWorld(), 151, 59, 104), new Location(getWorld(), 145, 59, 104)},
+                50
+        );
+    }
+
+    /**
+     * Set air or barriers at the start of each tgttos round.
+     * @param barriers TRUE = Barriers, FALSE = Air
+     */
+    @Override
+    public void Barriers(boolean barriers) {
+        Material block = (barriers) ? Material.BARRIER : Material.AIR;
+        for (int y = 70; y <= 72; y++) {
+            for (int z = 94; z <= 107; z++) {
+                getWorld().getBlockAt(103, y, z).setType(block);
+            }
+        }
+    }
+}

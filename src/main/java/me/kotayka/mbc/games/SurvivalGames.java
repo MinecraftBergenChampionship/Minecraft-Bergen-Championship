@@ -65,6 +65,7 @@ public class SurvivalGames extends Game {
         items = gson.fromJson(reader, listType);
         reader = new FileReader(SUPPLY_FILE);
         supply_items = gson.fromJson(reader, listType);
+        reader.close();
     }
 
     @Override

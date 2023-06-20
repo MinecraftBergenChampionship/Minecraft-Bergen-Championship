@@ -70,7 +70,7 @@ public class Participant implements Comparable<Participant> {
      * @return team icon + player's username with color
      */
     public String getFormattedName() {
-        return (getTeam().getIcon() + " " + getTeam().getChatColor() + getPlayer().getName()) + ChatColor.WHITE;
+        return (ChatColor.WHITE + "" + getTeam().getIcon() + " " + getTeam().getChatColor() + getPlayer().getName()) + ChatColor.WHITE;
     }
 
     public int getRoundScore() {

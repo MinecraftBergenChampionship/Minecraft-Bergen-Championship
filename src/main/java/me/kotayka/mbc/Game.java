@@ -5,6 +5,7 @@ import me.kotayka.mbc.games.Lobby;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -32,7 +33,7 @@ public abstract class Game implements Scoreboard, Listener {
     public List<Participant> playersAlive = new ArrayList<>();
     public List<Team> teamsAlive = new ArrayList<>();
 
-    public int timeRemaining;
+    public int timeRemaining = -1;
 
     public void createScoreboard() {
         for (Participant p : MBC.getInstance().players) {
@@ -324,6 +325,11 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public void setTimer(int time) {
+        if (timeRemaining != -1) {
+            timeRemaining = time;
+            return;
+        }
+
         timeRemaining = time;
 
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
@@ -521,7 +527,7 @@ public abstract class Game implements Scoreboard, Listener {
         MBC.getInstance().gameID = 0;
         for (GamePlayer p : gamePlayers) {
             if (p.getPlayer().getAllowFlight()) {
-                removeWinEffect(p);
+                removeWinEffect(p.getParticipant());
             }
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().getInventory().clear();
@@ -542,15 +548,15 @@ public abstract class Game implements Scoreboard, Listener {
      * Does not handle events for when timer hits 0 (countdown finishes).
      */
     public void startingCountdown() {
-        for (Participant p : MBC.getInstance().getPlayers()) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
             if (timeRemaining <= 10 && timeRemaining > 3) {
-                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+timeRemaining+"<", 0,20,0);
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+timeRemaining+"<", 0,20,0);
             } else if (timeRemaining == 3) {
-                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.RED+""+ChatColor.BOLD+ timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.RED+""+ChatColor.BOLD+ timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
             } else if (timeRemaining == 2) {
-                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.YELLOW+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.YELLOW+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
             } else if (timeRemaining == 1) {
-                p.getPlayer().sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.GREEN+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.GREEN+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
             }
         }
     }
@@ -571,7 +577,7 @@ public abstract class Game implements Scoreboard, Listener {
      * Removes win effects from player that has won a round/game/is in god mode.
      * @param p GamePlayer that has won a round, game, or is invulnerable for some reason that needs to be reset.
      */
-    public void removeWinEffect(GamePlayer p) {
+    public void removeWinEffect(Participant p) {
         p.getPlayer().setGameMode(GameMode.ADVENTURE);
         p.getPlayer().setAllowFlight(false);
         p.getPlayer().setFlying(false);
