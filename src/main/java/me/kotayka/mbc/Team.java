@@ -88,7 +88,7 @@ public abstract class Team {
     public void addPlayer(Participant p) {
         teamPlayers.add(p);
     }
-
+    public List<Participant> getPlayers() { return teamPlayers; }
     public void removePlayer(Participant p) {
         teamPlayers.remove(p);
     }

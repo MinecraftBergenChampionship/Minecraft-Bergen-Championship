@@ -7,9 +7,9 @@ import org.bukkit.inventory.ItemStack;
 
 public class Walls extends TGTTOSMap {
     public Walls() {
-        super("Walls", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), TGTTOS.getShears(), new ItemStack(Material.SNOWBALL, 6)});
+        super("Walls", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.SHEARS), new ItemStack(Material.SNOWBALL, 6), new ItemStack(Material.LEATHER_BOOTS)});
         super.loadMap(
-                new Location(getWorld(), 100, 71, -100),
+                new Location(getWorld(), 100, 72, -100),
                 new Location[]{new Location(getWorld(), 94, 83, -182), new Location(getWorld(), 108, 83, -186)},
                 57
         );

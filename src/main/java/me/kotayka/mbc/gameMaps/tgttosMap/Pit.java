@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Pit extends TGTTOSMap {
     public Pit() {
-        super("Pit", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), TGTTOS.getShears(), new ItemStack(Material.SNOWBALL, 6)});
+        super("Pit", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.SHEARS), new ItemStack(Material.SNOWBALL, 6), new ItemStack(Material.LEATHER_BOOTS)});
         super.loadMap(
                 new Location(getWorld(), 100, 70, 100),
                 new Location[]{new Location(getWorld(), 151, 59, 104), new Location(getWorld(), 145, 59, 104)},

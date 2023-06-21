@@ -2,13 +2,15 @@ package me.kotayka.mbc.gameMaps.tgttosMap;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 public class Cliffs extends TGTTOSMap {
     public Cliffs() {
-        super("Cliffs", null);
+        super("Cliffs", new ItemStack[]{new ItemStack(Material.LEATHER_BOOTS)});
+        Location l = new Location(getWorld(), -100, 71, -100);
+        l.setYaw((float) 180);
         super.loadMap(
-                new Location(getWorld(), -100, 71, -100),
-                new Location[]{new Location(getWorld(), -114, 75, -213), new Location(getWorld(), -109, 75, -207)},
+                l, new Location[]{new Location(getWorld(), -114, 75, -213), new Location(getWorld(), -109, 75, -207)},
                60
         );
     }

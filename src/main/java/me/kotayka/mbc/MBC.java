@@ -182,9 +182,9 @@ public class MBC implements Listener {
      * Until this ever becomes a feature in a game
      */
     @EventHandler
-    public void onPlayerDamage(EntityDamageByEntityEvent e) {
-        // players should never get damaged by fireworks
-        if (e.getDamager() instanceof Firework && e.getEntity() instanceof Player) {
+    public void onDamage(EntityDamageByEntityEvent e) {
+        // players or chickens should never get damaged by fireworks
+        if (e.getDamager() instanceof Firework) {
             e.setCancelled(true);
         }
     }

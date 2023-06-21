@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Skydive extends TGTTOSMap {
     public Skydive() {
-        super("Skydive", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), TGTTOS.getShears(), new ItemStack(Material.SNOWBALL, 6)});
+        super("Skydive", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.SHEARS), new ItemStack(Material.SNOWBALL, 6), new ItemStack(Material.LEATHER_BOOTS)});
         super.loadMap(
                 new Location(getWorld(), -300, 120, 300),
                 new Location[]{new Location(getWorld(), -399, 50, 297), new Location(getWorld(), -394, 50, 302)},
@@ -24,7 +24,7 @@ public class Skydive extends TGTTOSMap {
         Material block = (barriers) ? Material.BARRIER : Material.AIR;
         for (int y = 120; y <= 123; y++) {
             for (int z = 293; z <= 306; z++) {
-                getWorld().getBlockAt(-303, y, z).setType(block);
+                getWorld().getBlockAt(-302, y, z).setType(block);
             }
         }
     }

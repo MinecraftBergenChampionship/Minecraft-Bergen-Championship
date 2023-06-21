@@ -6,10 +6,7 @@ import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.tgttosMap.TGTTOSMap;
 import me.kotayka.mbc.gameMaps.tgttosMap.*;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -27,9 +24,7 @@ import org.bukkit.util.Vector;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class TGTTOS extends Game {
     private int roundNum = 0;
@@ -43,7 +38,13 @@ public class TGTTOS extends Game {
 
     private List<Participant> finishedParticipants;
     private String[] deathMessages = new String[39];
-    private static final ItemStack SHEARS = new ItemStack(Material.SHEARS);
+    private List<Location> placedBlocks = new ArrayList<Location>(20);
+    private boolean teamBonus = false;  // determine whether or not a full team has completed yet
+
+    // Scoring
+    public static int PLACEMENT_POINTS = 1; // awarded multiplied by the amount of players who havent finished yet
+    public static int COMPLETION_POINTS = 1; // awarded for completing the course
+    public static int TEAM_BONUS = 5; // awarded per player on team
 
     public TGTTOS() {
         super(2, "TGTTOS");
@@ -97,6 +98,9 @@ public class TGTTOS extends Game {
                 roundOverGraphics();
             }
         } else if (getState().equals(GameState.END_GAME)) {
+            if (timeRemaining == 0) {
+                removePlacedBlocks();
+            }
             gameEndEvents();
         }
     }
@@ -104,16 +108,12 @@ public class TGTTOS extends Game {
     public void start() {
         super.start();
 
-        ItemMeta meta = SHEARS.getItemMeta();
-        meta.setUnbreakable(true);
-        SHEARS.setItemMeta(meta);
-
         setDeathMessages();
         //setGameState(GameState.TUTORIAL);
         setGameState(GameState.STARTING);
 
         for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 30, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
         }
 
         startRound();
@@ -147,13 +147,20 @@ public class TGTTOS extends Game {
 
             if (map.getItems() == null) continue;
 
-            Bukkit.broadcastMessage("Map items: " + map.getItems().toString());
             for (ItemStack i : map.getItems()) {
                 if (i.getType().equals(Material.WHITE_WOOL)) {
                     ItemStack wool = p.getTeam().getColoredWool();
                     wool.setAmount(64);
                     p.getInventory().addItem(wool);
-                    p.getInventory().addItem(new ItemStack(Material.SHEARS));
+                } else if (i.getType().equals(Material.SHEARS)) {
+                    ItemMeta meta = i.getItemMeta();
+                    meta.setUnbreakable(true);
+                    i.setItemMeta(meta);
+                    p.getInventory().addItem(i);
+                } else if (i.getType().equals(Material.LEATHER_BOOTS)) {
+                    p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(i));
+                } else {
+                    p.getInventory().addItem(i);
                 }
             }
         }
@@ -172,13 +179,15 @@ public class TGTTOS extends Game {
             roundNum++;
         }
 
+        teamBonus = false;
+
         finishedParticipants = new ArrayList<>(MBC.getInstance().players.size());
         TGTTOSMap newMap = maps.get((int) (Math.random()*maps.size()));
         map = newMap;
         maps.remove(newMap);
         map.Barriers(true);
 
-        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Round: "+ roundNum+"/6: " + ChatColor.WHITE + map.getName());
+        createLine(22, ChatColor.AQUA + "" + ChatColor.BOLD + "Round: "+ roundNum+"/6: " + ChatColor.WHITE + map.getName());
 
         if (map != null) {
             loadPlayers();
@@ -225,12 +234,12 @@ public class TGTTOS extends Game {
         }
     }
 
-    /**
-     * Custom Shears for unbreaking
-     * @return unbreakable shears
-     */
-    public static ItemStack getShears() {
-        return SHEARS;
+    private void removePlacedBlocks() {
+        for (Location l : placedBlocks) {
+            if (!l.getBlock().getType().equals(Material.AIR)) {
+                l.getBlock().setType(Material.AIR);
+            }
+        }
     }
 
     @EventHandler
@@ -251,14 +260,33 @@ public class TGTTOS extends Game {
 
         if (!(event.getBlock().getType().toString().endsWith("WOOL"))) {
             event.setCancelled(true);
+            return;
         }
 
         event.setDropItems(false);
+
+        if (placedBlocks.contains(event.getBlock().getLocation())) placedBlocks.remove(event.getBlock().getLocation());
+    }
+
+    private void checkTeamFinish(Participant p) {
+        int count = 0;
+        for (Participant teammate : p.getTeam().getPlayers()) {
+            if (teammate.getPlayer().getGameMode().equals(GameMode.SPECTATOR))
+                count++;
+        }
+        if (count == p.getTeam().getPlayers().size()) {
+            Bukkit.broadcastMessage(ChatColor.BOLD + p.getTeam().teamNameFormat() + ChatColor.GREEN+" was the first full team to complete!");
+            for (Participant teammate : p.getTeam().getPlayers()) {
+                teammate.addRoundScore(5);
+                teammate.getPlayer().sendMessage(ChatColor.GREEN+"Your team got the team bonus!");
+            }
+            teamBonus = true;
+        }
     }
 
     public void chickenClick(Participant p, Entity chicken) {
-        p.addRoundScore(MBC.getInstance().getPlayers().size()-finishedParticipants.size());
         finishedParticipants.add(p);
+        p.addRoundScore(PLACEMENT_POINTS*(MBC.getInstance().getPlayers().size()-finishedParticipants.size())+COMPLETION_POINTS);
         String place = getPlace(finishedParticipants.size());
         chicken.remove();
         Bukkit.broadcastMessage(p.getTeam().getChatColor()+p.getPlayerName()+ChatColor.WHITE+" finished in "+ChatColor.AQUA+place+"!");
@@ -266,12 +294,16 @@ public class TGTTOS extends Game {
         p.getPlayer().setGameMode(GameMode.SPECTATOR);
         p.getPlayer().sendMessage(ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GREEN+" place!");
 
+        // check if all players on a team finished
+        if (!teamBonus)
+            checkTeamFinish(p);
+
+
         if (finishedParticipants.size() == MBC.getInstance().getPlayers().size()) {
             setGameState(GameState.END_ROUND);
             timeRemaining = 5;
         }
     }
-
     @EventHandler
     public void chickenLeftClick(EntityDamageByEntityEvent event) {
         if (!isGameActive()) return;
@@ -308,13 +340,36 @@ public class TGTTOS extends Game {
     }
 
     @EventHandler
-    public void blockPlaceEvent(BlockPlaceEvent event) {
+    public void blockPlaceEvent(BlockPlaceEvent e) {
         if (!isGameActive()) return;
 
-        if (event.getBlock().getType().toString().endsWith("WOOL")) {
-            ItemStack i = new ItemStack(event.getItemInHand());
-            i.setAmount(1);
-            MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().plugin, () -> event.getPlayer().getInventory().addItem(i), 20);
+        Player p = e.getPlayer();
+
+        if (e.getBlock().getType().toString().endsWith("WOOL")) {
+            // add to placed blocks
+            placedBlocks.add(e.getBlock().getLocation());
+            // if block was wool, give appropriate amount back
+            String wool = e.getBlock().getType().toString();
+            // check item slot
+            assert wool != null;
+            int index = p.getInventory().getHeldItemSlot();
+            if (Objects.requireNonNull(p.getInventory().getItem(index)).getType().toString().equals(wool)) {
+                int amt = Objects.requireNonNull(p.getInventory().getItem(index)).getAmount();
+                p.getInventory().setItem(index, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
+                return;
+            }
+            if (p.getInventory().getItem(40) != null) {
+                if (Objects.requireNonNull(p.getInventory().getItem(40)).getType().toString().equals(wool)) {
+                    int amt;
+                    // "some wacky bullshit prevention" - me several months ago
+                    if (Objects.requireNonNull(p.getInventory().getItem(40)).getAmount() + 63 > 100) {
+                        amt = 64;
+                    } else {
+                        amt = Objects.requireNonNull(p.getInventory().getItem(40)).getAmount() + 63;
+                    }
+                    p.getInventory().setItem(40, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
+                }
+            }
         }
     }
 }
