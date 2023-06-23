@@ -49,9 +49,8 @@ public class AceRace extends Game {
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
 
-        teamRounds();
-        updateTeamRoundScore(p.getTeam());
-        updatePlayerRoundScore(p);
+        updateInGameTeamScoreboard();
+        updatePlayerCurrentScoreDisplay(p);
     }
 
     public void start() {

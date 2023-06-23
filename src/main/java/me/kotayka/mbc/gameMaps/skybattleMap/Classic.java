@@ -173,6 +173,7 @@ public class Classic extends SkybattleMap {
     }
 
     public void Overtime() {
+        Border();
         reduceBorderHeight(HEIGHT_SHRINK_AMOUNT);
         reduceBorderRadius(RADIUS_SHRINK_AMOUNT);
     }

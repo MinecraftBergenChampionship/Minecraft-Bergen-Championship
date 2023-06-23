@@ -31,9 +31,9 @@ public class BSABM extends Game {
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
 
-        teamRounds();
-        updateTeamRoundScore(p.getTeam());
-        updatePlayerRoundScore(p);
+        updateInGameTeamScoreboard();
+        displayTeamCurrentScore(p.getTeam());
+        updatePlayerCurrentScoreDisplay(p);
     }
 
     public void events() {

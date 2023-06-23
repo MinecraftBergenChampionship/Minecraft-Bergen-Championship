@@ -1,6 +1,5 @@
 package me.kotayka.mbc;
 
-import me.kotayka.mbc.games.Lobby;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -14,10 +13,12 @@ import java.util.Objects;
 
 public class Participant implements Comparable<Participant> {
 
-    private int unmultipliedScore = 0;
-    private int score = 0;
-    private int roundScore = 0;
-    private int roundUnMultipliedScore = 0;
+    // Player's un-multiplied individual score; updates between games
+    private int rawTotalScore = 0;
+    private int multipliedTotalScore = 0;
+    // Player's current score in game; used for display
+    private int rawCurrentScore = 0;
+    private int multipliedCurrentScore = 0;
     private Team team;
     private final Player player;
 
@@ -49,13 +50,14 @@ public class Participant implements Comparable<Participant> {
         return player;
     }
 
-    public int getUnMultipliedScore() {
-        return unmultipliedScore;
+    /* Return unmultiplied total score */
+    public int getRawTotalScore() {
+        return rawTotalScore;
     }
 
-    /* Returns the multiplied score of a participant */
-    public int getScore() {
-        return score;
+    /* Returns the multiplied total score*/
+    public int getMultipliedTotalScore() {
+        return multipliedTotalScore;
     }
 
     /**
@@ -73,53 +75,41 @@ public class Participant implements Comparable<Participant> {
         return (ChatColor.WHITE + "" + getTeam().getIcon() + " " + getTeam().getChatColor() + getPlayer().getName()) + ChatColor.WHITE;
     }
 
-    public int getRoundScore() {
-        return roundScore;
+    public int getRawCurrentScore() {
+        return rawCurrentScore;
     }
-    public int getUnmultipliedRoundScore() { return roundUnMultipliedScore; }
+    public int getMultipliedCurrentScore() { return multipliedCurrentScore; }
 
 
     /**
-     * Takes each round (minigame) scores and adds to Participant's stat totals.
-     * Adds score to team, and resets the round variables for the next minigame.
-     * @see Participant addGameScore()
+     * Takes each current (game) scores and adds to Participant's stat totals.
+     * Adds score to team, and resets the round variables for the next game.
+     * @see Team addCurrentScoreToTotal()
      * @see Game gameEndEvents()
      */
-    public void addRoundScoreToGame() {
-        addGameScore(getRoundScore());
-        roundScore = 0;
-        roundUnMultipliedScore = 0;
+    public void addCurrentScoreToTotal() {
+        int amount = getRawCurrentScore();
+        team.addCurrentScoreToTotal();
+        rawTotalScore += amount;
+        multipliedTotalScore += amount * MBC.getInstance().multiplier;
+        resetCurrentScores();
     }
 
     /**
      * Called inbetween games to reset scores for each game to 0
      * Does not check whether or not game scores have been added to total event score.
      */
-    public void resetGameScores() {
-        roundUnMultipliedScore = 0;
-        roundScore = 0;
+    public void resetCurrentScores() {
+        multipliedCurrentScore = 0;
+        rawCurrentScore = 0;
     }
 
-    /**
-     * Helper function for addRoundScoreToGame().
-     * Adds score to team and player's stats.
-     * @see Participant addRoundScoreToGame()
-     * @param amount player's (unmultiplied) score
-     */
-    public void addGameScore(int amount) {
-        team.addGameScore(amount);
-        unmultipliedScore += amount;
-        score += amount*MBC.getInstance().multiplier;
+    public void addCurrentScore(int amount) {
+        multipliedCurrentScore += amount;
+        rawCurrentScore += amount*MBC.getInstance().multiplier;
+        team.addCurrentTeamScore(amount);
 
-        MBC.getInstance().currentGame.updatePlayerGameScore(this);
-    }
-
-    public void addRoundScore(int amount) {
-        roundUnMultipliedScore += amount;
-        roundScore += amount*MBC.getInstance().multiplier;
-        team.addRoundScore(amount);
-
-        MBC.getInstance().currentGame.updatePlayerRoundScore(this);
+        MBC.getInstance().currentGame.updatePlayerCurrentScoreDisplay(this);
     }
 
     public Team getTeam() {
@@ -169,6 +159,6 @@ public class Participant implements Comparable<Participant> {
      */
     @Override
     public int compareTo(@NotNull Participant o) {
-        return (this.unmultipliedScore - o.unmultipliedScore);
+        return (this.rawTotalScore - o.rawTotalScore);
     }
 }

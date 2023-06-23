@@ -3,25 +3,22 @@ package me.kotayka.mbc;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.material.Wool;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
 public abstract class Team {
-
     protected String name;
     protected String fullName;
     protected Character icon;
     protected ChatColor chatColor;
     protected Color color;
 
-    private int unMultipliedScore = 0;
-    private int score = 0;
-    private int roundScore = 0;
-    private int roundUnMultipliedScore = 0;
+    private int rawTotalScore = 0;
+    private int multipliedTotalScore = 0;
+    private int rawCurrentScore = 0;
+    private int multipliedCurrentScore = 0;
 
     public Team(String name, String fullName, Character icon, ChatColor chatColor) {
         this.name = name;
@@ -53,18 +50,18 @@ public abstract class Team {
         }
     }
 
-    public List<Participant> teamPlayers = new ArrayList<>(4);
+    public List<Participant>teamPlayers = new ArrayList<>(4);
 
-    public int getScore() {
-        return score;
+    public int getMultipliedTotalScore() {
+        return multipliedTotalScore;
     }
 
-    public int getUnMultipliedScore() {
-        return unMultipliedScore;
+    public int getRawTotalScore() {
+        return rawTotalScore;
     }
 
-    public int getRoundScore() {
-        return roundScore;
+    public int getMultipliedCurrentScore() {
+        return multipliedCurrentScore;
     }
 
     public String getTeamName() {
@@ -178,16 +175,43 @@ public abstract class Team {
         }
     }
 
-    public void addRoundScore(int score) {
-        roundScore+=score;
-        roundUnMultipliedScore+=score*MBC.getInstance().multiplier;
-        MBC.getInstance().currentGame.updateTeamRoundScore(this);
+    /**
+     * Adds specified amount to current team score
+     * Calls updateInGameTeamScoreboard()
+     * @param score amount to increment team's score
+     * @see Game updateInGameTeamScoreboard()
+     */
+    public void addCurrentTeamScore(int score) {
+        rawCurrentScore +=score;
+        multipliedCurrentScore +=score*MBC.getInstance().multiplier;
+        MBC.getInstance().currentGame.updateInGameTeamScoreboard();
     }
 
-    public void addGameScore(int score) {
-        this.score+=score;
-        unMultipliedScore+=score*MBC.getInstance().multiplier;
-        MBC.getInstance().currentGame.updateTeamGameScore(this);
+    /**
+     * Adds specified amount to total team score; called per player
+     * @param score amount to increment team's score
+     * @see Game updateTeamStandings()
+     * @see Team addCurrentScoreToTotal()
+     */
+    private void addTotalTeamScore(int score) {
+        this.rawTotalScore +=score;
+        multipliedTotalScore +=score*MBC.getInstance().multiplier;
+        MBC.getInstance().currentGame.updateTeamStandings();
+    }
+
+    /**
+     * Transfers the current raw score to total score, resets total score after.
+     * Called per player.
+     * @see Game updateTeamStandings()
+     */
+    public void addCurrentScoreToTotal() {
+        addTotalTeamScore(rawCurrentScore);
+        resetCurrentScores();
+    }
+
+    private void resetCurrentScores() {
+        rawCurrentScore = 0;
+        multipliedCurrentScore = 0;
     }
 
     /**
@@ -217,7 +241,7 @@ class TeamUnMultipliedScoreSorter implements Comparator<Team> {
 
     public int compare(Team a, Team b)
     {
-        return a.getUnMultipliedScore() - b.getUnMultipliedScore();
+        return a.getRawTotalScore() - b.getRawTotalScore();
     }
 }
 
@@ -226,7 +250,7 @@ class TeamScoreSorter implements Comparator<Team> {
 
     public int compare(Team a, Team b)
     {
-        return a.getScore() - b.getScore();
+        return a.getMultipliedTotalScore() - b.getMultipliedTotalScore();
     }
 }
 
@@ -235,6 +259,6 @@ class TeamRoundSorter implements Comparator<Team> {
 
     public int compare(Team a, Team b)
     {
-        return a.getRoundScore() - b.getRoundScore();
+        return a.getMultipliedCurrentScore() - b.getMultipliedCurrentScore();
     }
 }

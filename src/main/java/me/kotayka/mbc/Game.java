@@ -167,6 +167,19 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     /**
+     * Resets both playersAlive and teamsAlive;
+     * Best used for multi-round survival-type games
+     * Might need a better name
+     */
+    public void resetAliveLists() {
+        playersAlive.clear();
+        teamsAlive.clear();
+
+        playersAlive.addAll(MBC.getInstance().getPlayers());
+        teamsAlive.addAll(getValidTeams());
+    }
+
+    /**
      * Makes use of teamsAlive and playersAlive lists.
      * @return true if the team has been fully eliminated (there are no players on that team alive).
      * @see Game checkIfDead
@@ -237,26 +250,43 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     /**
+     * Updates display of team's current score on bottom of player's scoreboard;
+     * Note: may be redundant
+     * @param t Team for which to update for each player
+     */
+    public void displayTeamCurrentScore(Team t) {
+        for (Participant p : t.teamPlayers) {
+            createLine(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getMultipliedCurrentScore(), p);
+        }
+    }
+
+    public void displayTeamTotalScore(Team t) {
+        for (Participant p : t.teamPlayers) {
+            createLine(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getMultipliedTotalScore(), p);
+        }
+    }
+
+    /**
      * Sorts teams by their current round score to place onto scoreboard.
      */
-    public void teamRounds() {
+    public void updateInGameTeamScoreboard() {
         List<Team> teamRoundsScores = new ArrayList<>(getValidTeams());
         teamRoundsScores.sort(new TeamRoundSorter());
 
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
             Team t = teamRoundsScores.get(14-i);
-            createLine(i,String.format("%-15s %s%5d", t.teamNameFormat(), ChatColor.WHITE, t.getRoundScore()));
+            createLine(i,String.format("%-15s %s%5d", t.teamNameFormat(), ChatColor.WHITE, t.getMultipliedCurrentScore()));
         }
     }
 
-    public void teamGames() {
+    public void updateTeamStandings() {
         List<Team> teamRoundsScores = new ArrayList<>(getValidTeams());
         teamRoundsScores.sort(new TeamScoreSorter());
         Collections.reverse(teamRoundsScores);
 
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
             Team t = teamRoundsScores.get(14-i);
-            createLine(i,String.format("%c %s%s %s%5d", t.getIcon(), t.getChatColor(), t.getTeamFullName(), ChatColor.WHITE, t.getScore()));
+            createLine(i,String.format("%-15s %s%5d", t.teamNameFormat(), ChatColor.WHITE, t.getMultipliedTotalScore()));
         }
     }
 
@@ -292,26 +322,9 @@ public abstract class Game implements Scoreboard, Listener {
         createLine(1, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS, p);
     }
 
-    public void updatePlayerRoundScore(Participant p) {
-        createLine(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getRoundScore(), p);
-    }
-
-    public void updatePlayerGameScore(Participant p) {
-        createLine(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getScore(), p);
-    }
-
-    public void updateTeamRoundScore(Team t) {
-        for (Participant p : t.teamPlayers) {
-            createLine(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getRoundScore(), p);
-        }
-        teamRounds();
-    }
-
-    public void updateTeamGameScore(Team t) {
-        for (Participant p : t.teamPlayers) {
-            createLine(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getScore(), p);
-        }
-        teamGames();
+    /* Display player's multiplied score during game */
+    public void updatePlayerCurrentScoreDisplay(Participant p) {
+        createLine(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
     }
 
     public boolean isGameActive() {
@@ -320,7 +333,7 @@ public abstract class Game implements Scoreboard, Listener {
         // if lobby, return true no matter what
         if (MBC.getInstance().getGameID() == 0) { return true; }
 
-        return (this.getState().equals(GameState.ACTIVE));
+        return (this.getState().equals(GameState.ACTIVE) || this.getState().equals(GameState.OVERTIME));
         // return (this.getState().equals(GameState.ACTIVE) || this.getState().equals(GameState.PAUSED)); <- might be dependent on event? gonna hold off
     }
 
@@ -355,11 +368,12 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public String getPlace(int place) {
-        if (place > 10) {
-            place = place % 10;
+        int temp = place;
+        if (temp > 10) {
+            temp %= 10;
         }
 
-        switch (place) {
+        switch (temp) {
             case 1:
                 return "1st";
             case 2:
@@ -466,12 +480,12 @@ public abstract class Game implements Scoreboard, Listener {
         int lastScore = -1;
         int counter = 0;
 
-        for (GamePlayer p : gamePlayers) {
-            gameIndividual.put(p.getParticipant(), p.getParticipant().getUnmultipliedRoundScore());
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            gameIndividual.put(p, p.getRawCurrentScore());
         }
 
         for (Participant p : gameIndividual.keySet()) {
-            if (p.getUnmultipliedRoundScore() != lastScore) {
+            if (p.getRawCurrentScore() != lastScore) {
                 num++;
                 if (counter == 4) {
                     counter--; // keep going until no ties
@@ -480,12 +494,12 @@ public abstract class Game implements Scoreboard, Listener {
 
             if (counter < 5) {
                 topFive.append(String.format(
-                        (num) + ". %-18s %5d (%d x %.2f)\n", p.getFormattedName(), p.getRoundScore(), p.getUnmultipliedRoundScore(), MBC.getInstance().multiplier)
+                        (num) + ". %-18s %5d (%d x %.2f)\n", p.getFormattedName(), p.getRawCurrentScore(), p.getMultipliedCurrentScore(), MBC.getInstance().multiplier)
                 );
-                lastScore = p.getUnMultipliedScore();
+                lastScore = p.getRawCurrentScore();
                 counter++;
             }
-            p.addRoundScoreToGame();
+            p.addCurrentScoreToTotal();
         }
         Bukkit.broadcastMessage(topFive.toString());
     }
@@ -499,7 +513,7 @@ public abstract class Game implements Scoreboard, Listener {
         for (int i = 0; i < gameScores.size(); i++) {
             str.append(String.format(
                     ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". %-18s %5d\n",
-                    gameScores.get(i).teamNameFormat(), gameScores.get(i).getScore())
+                    gameScores.get(i).teamNameFormat(), gameScores.get(i).getMultipliedTotalScore())
             );
         }
         Bukkit.broadcastMessage(str.toString());
@@ -514,7 +528,7 @@ public abstract class Game implements Scoreboard, Listener {
         for (int i = 0; i < teamRoundsScores.size(); i++) {
             teamString.append(String.format(
                     ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". %-18s %5d\n",
-                    teamRoundsScores.get(i).teamNameFormat(), teamRoundsScores.get(i).getRoundScore())
+                    teamRoundsScores.get(i).teamNameFormat(), teamRoundsScores.get(i).getMultipliedCurrentScore())
             );
         }
 
@@ -525,18 +539,18 @@ public abstract class Game implements Scoreboard, Listener {
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
         MBC.getInstance().gameID = 0;
-        for (GamePlayer p : gamePlayers) {
+        for (Participant p : MBC.getInstance().getPlayers()) {
             if (p.getPlayer().getAllowFlight()) {
-                removeWinEffect(p.getParticipant());
+                removeWinEffect(p);
             }
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().getInventory().clear();
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
-            updateTeamRoundScore(p.getParticipant().getTeam());
-            updatePlayerRoundScore(p.getParticipant());
+
+            updatePlayerCurrentScoreDisplay(p);
+            p.resetCurrentScores();
             p.getPlayer().teleport(Lobby.LOBBY);
-            p.getParticipant().resetGameScores();
         }
         MBC.getInstance().lobby.start();
     }
@@ -591,7 +605,7 @@ public abstract class Game implements Scoreboard, Listener {
      */
     public void gameOverGraphics() {
         Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!");
-        for (GamePlayer p : gamePlayers) {
+        for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!","",0, 60, 20);
         }
     }
@@ -610,7 +624,7 @@ public abstract class Game implements Scoreboard, Listener {
      */
     public void roundOverGraphics() {
         Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!");
-        for (GamePlayer p : gamePlayers) {
+        for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!", "", 0, 60, 20);
         }
     }

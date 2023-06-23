@@ -3,15 +3,11 @@ package me.kotayka.mbc.games;
 import me.kotayka.mbc.Game;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
-import me.kotayka.mbc.gamePlayers.AceRacePlayer;
-import me.kotayka.mbc.gamePlayers.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -36,11 +32,11 @@ public class Lobby extends Game {
         createLine(16, ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.GREEN+"Game Scores", p);
         createLine(3, ChatColor.RESET.toString()+ChatColor.RESET.toString(), p);
-        updatePlayerGameScore(p);
+        updatePlayerTotalScoreDisplay(p);
 
         p.getPlayer().sendMessage(p.getTeam().teamPlayers.toString());
-        updateTeamGameScore(p.getTeam());
-        teamGames();
+        displayTeamTotalScore(p.getTeam());
+        updateTeamStandings();
     }
 
     public void changeTeam(Participant p) {
@@ -56,17 +52,6 @@ public class Lobby extends Game {
     }
 
     @EventHandler
-    public void blockBreak(BlockBreakEvent e) {
-        //if (!isGameActive()) return;
-        if (e.getBlock().getType() == Material.DIAMOND_BLOCK) {
-            Participant p = Participant.getParticipant(e.getPlayer());
-            assert p != null;
-            p.addGameScore(5);
-            MBC.spawnFirework(p);
-        }
-    }
-
-    @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if (e.getPlayer().getLocation().getY() < -45){
             e.getPlayer().teleport(LOBBY);
@@ -75,7 +60,6 @@ public class Lobby extends Game {
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
             e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(4));
             e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.65, e.getPlayer().getVelocity().getZ()));
-            ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).setCheckpoint();
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
@@ -97,6 +81,15 @@ public class Lobby extends Game {
         createScoreboard();
         stopTimer();
         setTimer(120);
+    }
+
+    /**
+     * Updates the player's total score in lobby
+     * Your Coins: {COIN_AMOUNT}
+     * @param p Participant whose scoreboard to update
+     */
+    public void updatePlayerTotalScoreDisplay(Participant p) {
+        createLine(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getRawTotalScore(), p);
     }
 
     @Override

@@ -53,7 +53,7 @@ public class Skybattle extends Game {
         updatePlayersAliveScoreboard();
         createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
 
-        teamRounds();
+        updateInGameTeamScoreboard();
     }
 
     public void loadPlayers() {
@@ -71,8 +71,7 @@ public class Skybattle extends Game {
                 skybattlePlayerList.add(new SkybattlePlayer(p));
                 playersAlive.add(p);
             } else {
-                if (!playersAlive.contains(p))
-                    playersAlive.add(p);
+                resetAliveLists();
             }
             // reset scoreboard after each round
             updatePlayersAliveScoreboard(p);
@@ -177,7 +176,7 @@ public class Skybattle extends Game {
                 roundOverGraphics();
                 roundWinners();
                 for (Participant p : playersAlive) {
-                    p.addRoundScore(WIN_POINTS);
+                    p.addCurrentScore(WIN_POINTS);
                 }
             } else if (timeRemaining == 1) {
                 roundNum++;
@@ -408,7 +407,7 @@ public class Skybattle extends Game {
         } else {
             Bukkit.broadcastMessage("[Debug] normal death");
             SkybattlePlayer killer = (SkybattlePlayer) SkybattlePlayer.getGamePlayer(e.getPlayer().getKiller());
-            Participant.getParticipant(e.getPlayer()).addRoundScore(KILL_POINTS);
+            Participant.getParticipant(e.getPlayer()).addCurrentScore(KILL_POINTS);
             killer.kills++;
             createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills);
             playerDeathEffects(e); // if there was a killer, just send over to default
@@ -416,7 +415,7 @@ public class Skybattle extends Game {
 
         for (Participant p : playersAlive) {
             Bukkit.broadcastMessage("[Debug] p.getName() == " + p.getFormattedName());
-            p.addRoundScore(SURVIVAL_POINTS);
+            p.addCurrentScore(SURVIVAL_POINTS);
         }
 
         // may require testing due to concurrency
@@ -448,7 +447,7 @@ public class Skybattle extends Game {
             createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills);
             killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
-            killer.getParticipant().addRoundScore(KILL_POINTS);
+            killer.getParticipant().addCurrentScore(KILL_POINTS);
 
             switch (damageCause) {
                 case CUSTOM:

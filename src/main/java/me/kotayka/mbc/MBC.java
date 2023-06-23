@@ -30,6 +30,7 @@ public class MBC implements Listener {
     public static final int MAX_PLAYERS_PER_TEAM = 4;
     public static final int MAX_TEAMS = 6;
     public static final int MAX_PLAYERS = MAX_PLAYERS_PER_TEAM * MAX_TEAMS;
+    public static final int GAME_COUNT = 6;
 
     public List<Participant> players = new ArrayList<>(16);
 

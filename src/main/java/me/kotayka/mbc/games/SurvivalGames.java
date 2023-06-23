@@ -313,7 +313,7 @@ public class SurvivalGames extends Game {
         updatePlayersAliveScoreboard();
         createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
 
-        teamRounds();
+        updateInGameTeamScoreboard();
     }
 
     /**

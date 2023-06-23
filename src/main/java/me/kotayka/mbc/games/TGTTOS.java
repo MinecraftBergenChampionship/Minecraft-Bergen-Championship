@@ -57,9 +57,16 @@ public class TGTTOS extends Game {
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
 
-        teamRounds();
-        updateTeamRoundScore(p.getTeam());
-        updatePlayerRoundScore(p);
+        updateInGameTeamScoreboard();
+    }
+
+    /**
+     * Update scoreboard display on how many players have finished the round
+     */
+    public void updateFinishedPlayers() {
+        for (Participant p : MBC.getInstance().getPlayers()){
+            createLine(2, ChatColor.YELLOW + "Finished: " + ChatColor.WHITE + finishedParticipants.size()+"/"+MBC.MAX_PLAYERS, p);
+        }
     }
 
     public void events() {
@@ -187,7 +194,9 @@ public class TGTTOS extends Game {
         maps.remove(newMap);
         map.Barriers(true);
 
-        createLine(22, ChatColor.AQUA + "" + ChatColor.BOLD + "Round: "+ roundNum+"/6: " + ChatColor.WHITE + map.getName());
+        createLine(22, ChatColor.AQUA+""+ChatColor.BOLD+"Map: "+map.getName());
+        createLine(21, ChatColor.GREEN +  "Round: "+ ChatColor.RESET+roundNum+"/6");
+        updateFinishedPlayers();
 
         if (map != null) {
             loadPlayers();
@@ -277,7 +286,7 @@ public class TGTTOS extends Game {
         if (count == p.getTeam().getPlayers().size()) {
             Bukkit.broadcastMessage(ChatColor.BOLD + p.getTeam().teamNameFormat() + ChatColor.GREEN+" was the first full team to complete!");
             for (Participant teammate : p.getTeam().getPlayers()) {
-                teammate.addRoundScore(5);
+                teammate.addCurrentScore(5);
                 teammate.getPlayer().sendMessage(ChatColor.GREEN+"Your team got the team bonus!");
             }
             teamBonus = true;
@@ -286,10 +295,10 @@ public class TGTTOS extends Game {
 
     public void chickenClick(Participant p, Entity chicken) {
         finishedParticipants.add(p);
-        p.addRoundScore(PLACEMENT_POINTS*(MBC.getInstance().getPlayers().size()-finishedParticipants.size())+COMPLETION_POINTS);
+        p.addCurrentScore(PLACEMENT_POINTS*(MBC.getInstance().getPlayers().size()-finishedParticipants.size())+COMPLETION_POINTS);
         String place = getPlace(finishedParticipants.size());
         chicken.remove();
-        Bukkit.broadcastMessage(p.getTeam().getChatColor()+p.getPlayerName()+ChatColor.WHITE+" finished in "+ChatColor.AQUA+place+"!");
+        Bukkit.broadcastMessage(p.getFormattedName()+ChatColor.WHITE+" finished in "+ChatColor.AQUA+place+"!");
         MBC.spawnFirework(p);
         p.getPlayer().setGameMode(GameMode.SPECTATOR);
         p.getPlayer().sendMessage(ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GREEN+" place!");
@@ -298,6 +307,7 @@ public class TGTTOS extends Game {
         if (!teamBonus)
             checkTeamFinish(p);
 
+        updateFinishedPlayers();
 
         if (finishedParticipants.size() == MBC.getInstance().getPlayers().size()) {
             setGameState(GameState.END_ROUND);

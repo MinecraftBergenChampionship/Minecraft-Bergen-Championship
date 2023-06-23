@@ -125,15 +125,15 @@ public class AceRacePlayer extends GamePlayer {
     private void updateScore(Participant p) {
         int beatPlayers = ACE_RACE.aceRacePlayerList.size() - ACE_RACE.finishedPlayersByLap[lap-1];
         if (lap < 3) {
-            p.addRoundScore(beatPlayers * AceRace.PLACEMENT_LAP_POINTS);
+            p.addCurrentScore(beatPlayers * AceRace.PLACEMENT_LAP_POINTS);
         } else {
             // final points are worth more
-            p.addRoundScore(beatPlayers * AceRace.PLACEMENT_FINAL_LAP_POINTS);
-            p.addRoundScore(AceRace.FINISH_RACE_POINTS);
+            p.addCurrentScore(beatPlayers * AceRace.PLACEMENT_FINAL_LAP_POINTS);
+            p.addCurrentScore(AceRace.FINISH_RACE_POINTS);
 
             // final placement bonuses
             if (placement < 9) {
-                p.addRoundScore(AceRace.PLACEMENT_BONUSES[placement-1]);
+                p.addCurrentScore(AceRace.PLACEMENT_BONUSES[placement-1]);
             }
         }
     }
