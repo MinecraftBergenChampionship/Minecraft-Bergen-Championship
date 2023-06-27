@@ -56,24 +56,6 @@ public class Lobby extends Game {
         if (e.getPlayer().getLocation().getY() < -45){
             e.getPlayer().teleport(LOBBY);
         }
-
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
-            e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(4));
-            e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.65, e.getPlayer().getVelocity().getZ()));
-            return;
-        }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
-            e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(2));
-            e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
-            return;
-        }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
-            e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
-            return;
-        }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
-            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
-        }
     }
 
     public void start() {

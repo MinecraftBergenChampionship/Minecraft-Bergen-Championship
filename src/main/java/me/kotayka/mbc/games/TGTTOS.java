@@ -65,7 +65,7 @@ public class TGTTOS extends Game {
      */
     public void updateFinishedPlayers() {
         for (Participant p : MBC.getInstance().getPlayers()){
-            createLine(2, ChatColor.YELLOW + "Finished: " + ChatColor.WHITE + finishedParticipants.size()+"/"+MBC.MAX_PLAYERS, p);
+            createLine(2, ChatColor.YELLOW + "Finished: " + ChatColor.WHITE + finishedParticipants.size()+"/"+MBC.getInstance().getPlayers().size(), p);
         }
     }
 
@@ -284,10 +284,9 @@ public class TGTTOS extends Game {
                 count++;
         }
         if (count == p.getTeam().getPlayers().size()) {
-            Bukkit.broadcastMessage(ChatColor.BOLD + p.getTeam().teamNameFormat() + ChatColor.GREEN+" was the first full team to complete!");
+            Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN+ "" +ChatColor.BOLD+" was the first full team to finish!");
             for (Participant teammate : p.getTeam().getPlayers()) {
                 teammate.addCurrentScore(5);
-                teammate.getPlayer().sendMessage(ChatColor.GREEN+"Your team got the team bonus!");
             }
             teamBonus = true;
         }
