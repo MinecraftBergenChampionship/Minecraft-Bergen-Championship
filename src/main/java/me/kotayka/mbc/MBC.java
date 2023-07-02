@@ -6,7 +6,6 @@ import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -47,7 +46,7 @@ public class MBC implements Listener {
     public Pink pink = new Pink();
     public Spectator spectator = new Spectator();
 
-    public List<Team> teams = new ArrayList<>(Arrays.asList(red, yellow, green, blue, purple, pink, spectator));
+    public List<MBCTeam> teams = new ArrayList<>(Arrays.asList(red, yellow, green, blue, purple, pink, spectator));
     public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets", "Spectator"));
     public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets", "Spectator"));
     public ScoreboardManager manager =  Bukkit.getScoreboardManager();
@@ -158,8 +157,8 @@ public class MBC implements Listener {
     /**
      * @return List of all non-spectator teams with at least one player
      */
-    public static List<Team> getValidTeams() {
-        List<Team> newTeams = new ArrayList<>();
+    public static List<MBCTeam> getValidTeams() {
+        List<MBCTeam> newTeams = new ArrayList<>();
         for (int i = 0; i < MBC.teamNames.size(); i++) {
             if (!Objects.equals(MBC.getInstance().teams.get(i).fullName, "Spectator") && MBC.getInstance().teams.get(i).teamPlayers.size() > 0) {
                 newTeams.add(MBC.getInstance().teams.get(i));

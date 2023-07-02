@@ -31,7 +31,7 @@ public abstract class Game implements Scoreboard, Listener {
     public static int taskID = -1;
 
     public List<Participant> playersAlive = new ArrayList<>();
-    public List<Team> teamsAlive = new ArrayList<>();
+    public List<MBCTeam> teamsAlive = new ArrayList<>();
 
     public int timeRemaining = -1;
 
@@ -147,7 +147,7 @@ public abstract class Game implements Scoreboard, Listener {
      * If only one team remains,
      * @param t
      */
-    private void checkLastTeam(Team t) {
+    private void checkLastTeam(MBCTeam t) {
         if (checkTeamEliminated(t)) {
             teamsAlive.remove(t);
             t.announceTeamDeath();
@@ -184,7 +184,7 @@ public abstract class Game implements Scoreboard, Listener {
      * @return true if the team has been fully eliminated (there are no players on that team alive).
      * @see Game checkIfDead
      */
-    public boolean checkTeamEliminated(Team team) {
+    public boolean checkTeamEliminated(MBCTeam team) {
         int deadPlayers = 0;
         for (Participant p : team.teamPlayers) {
             if (checkIfDead(p)) {
@@ -238,8 +238,8 @@ public abstract class Game implements Scoreboard, Listener {
         }
     }
 
-    public List<Team> getValidTeams() {
-        List<Team> newTeams = new ArrayList<>();
+    public List<MBCTeam> getValidTeams() {
+        List<MBCTeam> newTeams = new ArrayList<>();
         for (int i = 0; i < MBC.teamNames.size(); i++) {
             if (!Objects.equals(MBC.getInstance().teams.get(i).fullName, "Spectator") && MBC.getInstance().teams.get(i).teamPlayers.size() > 0) {
                 newTeams.add(MBC.getInstance().teams.get(i));
@@ -254,13 +254,13 @@ public abstract class Game implements Scoreboard, Listener {
      * Note: may be redundant
      * @param t Team for which to update for each player
      */
-    public void displayTeamCurrentScore(Team t) {
+    public void displayTeamCurrentScore(MBCTeam t) {
         for (Participant p : t.teamPlayers) {
             createLine(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getMultipliedCurrentScore(), p);
         }
     }
 
-    public void displayTeamTotalScore(Team t) {
+    public void displayTeamTotalScore(MBCTeam t) {
         for (Participant p : t.teamPlayers) {
             createLine(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getMultipliedTotalScore(), p);
         }
@@ -270,22 +270,22 @@ public abstract class Game implements Scoreboard, Listener {
      * Sorts teams by their current round score to place onto scoreboard.
      */
     public void updateInGameTeamScoreboard() {
-        List<Team> teamRoundsScores = new ArrayList<>(getValidTeams());
+        List<MBCTeam> teamRoundsScores = new ArrayList<>(getValidTeams());
         teamRoundsScores.sort(new TeamRoundSorter());
 
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
-            Team t = teamRoundsScores.get(14-i);
+            MBCTeam t = teamRoundsScores.get(14-i);
             createLine(i,String.format("%-15s %s%5d", t.teamNameFormat(), ChatColor.WHITE, t.getMultipliedCurrentScore()));
         }
     }
 
     public void updateTeamStandings() {
-        List<Team> teamRoundsScores = new ArrayList<>(getValidTeams());
+        List<MBCTeam> teamRoundsScores = new ArrayList<>(getValidTeams());
         teamRoundsScores.sort(new TeamScoreSorter());
         Collections.reverse(teamRoundsScores);
 
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
-            Team t = teamRoundsScores.get(14-i);
+            MBCTeam t = teamRoundsScores.get(14-i);
             createLine(i,String.format("%-15s %s%5d", t.teamNameFormat(), ChatColor.WHITE, t.getMultipliedTotalScore()));
         }
     }
@@ -505,7 +505,7 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public void printEventScores() {
-        List<Team> gameScores = new ArrayList<>(getValidTeams());
+        List<MBCTeam> gameScores = new ArrayList<>(getValidTeams());
         gameScores.sort(new TeamScoreSorter());
         Collections.reverse(gameScores);
         StringBuilder str = new StringBuilder();
@@ -520,7 +520,7 @@ public abstract class Game implements Scoreboard, Listener {
     }
 
     public void printRoundScores() {
-        List<Team> teamRoundsScores = new ArrayList<>(getValidTeams());
+        List<MBCTeam> teamRoundsScores = new ArrayList<>(getValidTeams());
         teamRoundsScores.sort(new TeamRoundSorter());
         Collections.reverse(teamRoundsScores);
         StringBuilder teamString = new StringBuilder();

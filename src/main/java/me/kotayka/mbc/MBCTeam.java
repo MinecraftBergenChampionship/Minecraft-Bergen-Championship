@@ -3,24 +3,26 @@ package me.kotayka.mbc;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public abstract class Team {
+public abstract class MBCTeam {
     protected String name;
     protected String fullName;
     protected Character icon;
     protected ChatColor chatColor;
     protected Color color;
+    protected Team scoreboardTeam;
 
     private int rawTotalScore = 0;
     private int multipliedTotalScore = 0;
     private int rawCurrentScore = 0;
     private int multipliedCurrentScore = 0;
 
-    public Team(String name, String fullName, Character icon, ChatColor chatColor) {
+    public MBCTeam(String name, String fullName, Character icon, ChatColor chatColor) {
         this.name = name;
         this.fullName = fullName;
         this.icon = icon;
@@ -28,26 +30,37 @@ public abstract class Team {
         switch(chatColor) {
             case RED:
                 this.color = Color.RED;
+                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Red Rabbits");
                 break;
             case GREEN:
                 this.color = Color.GREEN;
+                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Green Guardians");
                 break;
             case YELLOW:
                 this.color = Color.YELLOW;
+                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Yellow Yaks");
                 break;
             case BLUE:
                 this.color = Color.BLUE;
+                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Blue Bats");
                 break;
             case DARK_PURPLE:
                 this.color = Color.PURPLE;
+                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Purple Pandas");
                 break;
             case LIGHT_PURPLE:
                 this.color = Color.fromRGB(243, 139, 170);
+                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Pink Piglets");
                 break;
             default:
                 this.color = Color.WHITE;
+                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Spectators");
                 break;
         }
+        scoreboardTeam.setAllowFriendlyFire(false);
+        scoreboardTeam.setPrefix(icon+"");
+        scoreboardTeam.setDisplayName(icon+" " + chatColor+fullName);
+        scoreboardTeam.setColor(chatColor);
     }
 
     public List<Participant>teamPlayers = new ArrayList<>(4);
@@ -84,10 +97,12 @@ public abstract class Team {
 
     public void addPlayer(Participant p) {
         teamPlayers.add(p);
+        scoreboardTeam.addEntity(p.getPlayer());
     }
     public List<Participant> getPlayers() { return teamPlayers; }
     public void removePlayer(Participant p) {
         teamPlayers.remove(p);
+        scoreboardTeam.removeEntity(p.getPlayer());
     }
 
     /**
@@ -140,7 +155,7 @@ public abstract class Team {
         };
     }
 
-    public static Team getTeam(String team) {
+    public static MBCTeam getTeam(String team) {
         switch (team.toLowerCase()) {
             case "redrabbits":
             case "redrabbit":
@@ -191,7 +206,7 @@ public abstract class Team {
      * Adds specified amount to total team score; called per player
      * @param score amount to increment team's score
      * @see Game updateTeamStandings()
-     * @see Team addCurrentScoreToTotal()
+     * @see MBCTeam addCurrentScoreToTotal()
      */
     private void addTotalTeamScore(int score) {
         this.rawTotalScore +=score;
@@ -237,27 +252,27 @@ public abstract class Team {
     }
 }
 
-class TeamUnMultipliedScoreSorter implements Comparator<Team> {
+class TeamUnMultipliedScoreSorter implements Comparator<MBCTeam> {
 
-    public int compare(Team a, Team b)
+    public int compare(MBCTeam a, MBCTeam b)
     {
         return a.getRawTotalScore() - b.getRawTotalScore();
     }
 }
 
-class TeamScoreSorter implements Comparator<Team> {
+class TeamScoreSorter implements Comparator<MBCTeam> {
     public TeamScoreSorter() {}
 
-    public int compare(Team a, Team b)
+    public int compare(MBCTeam a, MBCTeam b)
     {
         return a.getMultipliedTotalScore() - b.getMultipliedTotalScore();
     }
 }
 
-class TeamRoundSorter implements Comparator<Team> {
+class TeamRoundSorter implements Comparator<MBCTeam> {
     public TeamRoundSorter() {}
 
-    public int compare(Team a, Team b)
+    public int compare(MBCTeam a, MBCTeam b)
     {
         return a.getMultipliedCurrentScore() - b.getMultipliedCurrentScore();
     }

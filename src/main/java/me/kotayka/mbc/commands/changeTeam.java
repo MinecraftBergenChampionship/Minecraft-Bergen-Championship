@@ -1,7 +1,7 @@
 package me.kotayka.mbc.commands;
 
 import me.kotayka.mbc.Participant;
-import me.kotayka.mbc.Team;
+import me.kotayka.mbc.MBCTeam;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,7 +19,7 @@ public class changeTeam implements CommandExecutor {
                 return false;
             }
             if (args.length == 1) {
-                Team team = Team.getTeam(args[0]);
+                MBCTeam team = MBCTeam.getTeam(args[0]);
                 if (team == null) {
                     p.sendMessage(ChatColor.RED + "Please Provide a valid team name");
                 }
@@ -27,14 +27,14 @@ public class changeTeam implements CommandExecutor {
             }
             if (args.length == 2) {
                 Participant x = Participant.getParticipant(args[1]);
-                Team team = Team.getTeam(args[0]);
+                MBCTeam team = MBCTeam.getTeam(args[0]);
                 if (x == null) {
                     p.sendMessage(ChatColor.RED + "Please Provide a valid player name");
                 }
                 if (team == null) {
                     p.sendMessage(ChatColor.RED + "Please Provide a valid team name");
                 }
-                x.changeTeam(Team.getTeam(args[0]));
+                x.changeTeam(MBCTeam.getTeam(args[0]));
             }
         }
         return true;

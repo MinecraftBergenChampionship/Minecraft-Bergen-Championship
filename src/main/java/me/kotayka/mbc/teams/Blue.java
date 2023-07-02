@@ -1,9 +1,9 @@
 package me.kotayka.mbc.teams;
 
-import me.kotayka.mbc.Team;
+import me.kotayka.mbc.MBCTeam;
 import org.bukkit.ChatColor;
 
-public class Blue extends Team {
+public class Blue extends MBCTeam {
 
     public Blue() {
         super("BlueBats", "Blue Bats", 'Ⓑ', ChatColor.BLUE);

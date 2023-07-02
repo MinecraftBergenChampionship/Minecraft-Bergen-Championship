@@ -1,6 +1,6 @@
 package me.kotayka.mbc.gameTeams;
 
-import me.kotayka.mbc.Team;
+import me.kotayka.mbc.MBCTeam;
 import me.kotayka.mbc.gameMaps.bsabmMaps.BSABMPlot;
 import org.bukkit.Location;
 
@@ -14,7 +14,7 @@ public class bsabmTeam extends gameTeam {
 
     private final Location spawnLoc;
 
-    public bsabmTeam(Team team, Location spawnLoc) {
+    public bsabmTeam(MBCTeam team, Location spawnLoc) {
         super(team);
         this.spawnLoc = spawnLoc;
     }

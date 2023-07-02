@@ -1,12 +1,12 @@
 package me.kotayka.mbc.gameTeams;
 
-import me.kotayka.mbc.Team;
+import me.kotayka.mbc.MBCTeam;
 
 public class gameTeam {
 
-    private final Team team;
+    private final MBCTeam team;
 
-    public gameTeam(Team team) {
+    public gameTeam(MBCTeam team) {
         this.team = team;
     }
 }

@@ -26,7 +26,7 @@ public interface Scoreboard {
      * Note: since team scoreboard is always active, this may be redundant.
      * @param t Team whose coin count to display
      */
-    void displayTeamCurrentScore(Team t);
+    void displayTeamCurrentScore(MBCTeam t);
 
     /**
      * Displays team's total score in lobby
@@ -34,5 +34,5 @@ public interface Scoreboard {
      * Note: Since team scoreboard is always active in lobby, this may be redundant.
      * @param t Team whose coin count to display
      */
-    void displayTeamTotalScore(Team t);
+    void displayTeamTotalScore(MBCTeam t);
 }

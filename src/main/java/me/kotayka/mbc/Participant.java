@@ -19,7 +19,7 @@ public class Participant implements Comparable<Participant> {
     // Player's current score in game; used for display
     private int rawCurrentScore = 0;
     private int multipliedCurrentScore = 0;
-    private Team team;
+    private MBCTeam team;
     private final Player player;
 
     public final Scoreboard board = MBC.getInstance().manager.getNewScoreboard();
@@ -34,7 +34,7 @@ public class Participant implements Comparable<Participant> {
         changeTeam(MBC.getInstance().spectator);
     }
 
-    public void changeTeam(Team t) {
+    public void changeTeam(MBCTeam t) {
         if (t==null) {return;}
         if (team != null) {
             team.removePlayer(this);
@@ -84,7 +84,7 @@ public class Participant implements Comparable<Participant> {
     /**
      * Takes each current (game) scores and adds to Participant's stat totals.
      * Adds score to team, and resets the round variables for the next game.
-     * @see Team addCurrentScoreToTotal()
+     * @see MBCTeam addCurrentScoreToTotal()
      * @see Game gameEndEvents()
      */
     public void addCurrentScoreToTotal() {
@@ -112,7 +112,7 @@ public class Participant implements Comparable<Participant> {
         MBC.getInstance().currentGame.updatePlayerCurrentScoreDisplay(this);
     }
 
-    public Team getTeam() {
+    public MBCTeam getTeam() {
         return team;
     }
 

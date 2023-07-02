@@ -2,7 +2,7 @@ package me.kotayka.mbc.gameMaps.skybattleMap;
 
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
-import me.kotayka.mbc.Team;
+import me.kotayka.mbc.MBCTeam;
 import me.kotayka.mbc.games.Skybattle;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -150,7 +150,7 @@ public class Classic extends SkybattleMap {
 
         initSpawnItems();
 
-        for (Team t : MBC.getValidTeams()) {
+        for (MBCTeam t : MBC.getValidTeams()) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
             for (Participant p : t.teamPlayers) {
                 p.getPlayer().teleport(tempSpawns.get(randomNum));
