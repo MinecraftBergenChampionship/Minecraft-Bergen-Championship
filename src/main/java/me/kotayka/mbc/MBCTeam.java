@@ -57,10 +57,8 @@ public abstract class MBCTeam {
                 scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Spectators");
                 break;
         }
-        scoreboardTeam.setAllowFriendlyFire(false);
-        scoreboardTeam.setPrefix(icon+"");
-        scoreboardTeam.setDisplayName(icon+" " + chatColor+fullName);
-        scoreboardTeam.setColor(chatColor);
+        scoreboardTeam.setAllowFriendlyFire(false); // keeping scoreboard teams in just for this for now
+                                                    // other possibilities like glowing for the future
     }
 
     public List<Participant>teamPlayers = new ArrayList<>(4);

@@ -8,6 +8,7 @@ import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
 import me.kotayka.mbc.gameMaps.aceRaceMap.Biomes;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
 import me.kotayka.mbc.gamePlayers.GamePlayer;
+import me.kotayka.mbc.teams.Spectator;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
@@ -150,6 +151,7 @@ public class AceRace extends Game {
     @EventHandler
     public void PlayerMoveEvent(PlayerMoveEvent e) {
         if (MBC.getInstance().getGameID() != this.gameID) return;
+        if (Participant.getParticipant(e.getPlayer()).getTeam() instanceof Spectator) return;
 
         if (map.checkDeath(e.getPlayer().getLocation())) {
             AceRacePlayer player = ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer()));

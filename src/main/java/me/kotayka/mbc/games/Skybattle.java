@@ -57,6 +57,7 @@ public class Skybattle extends Game {
     }
 
     public void loadPlayers() {
+        setPVP(false);
         teamsAlive.addAll(getValidTeams());
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().getInventory().clear();
@@ -73,7 +74,7 @@ public class Skybattle extends Game {
             } else {
                 resetAliveLists();
             }
-            // reset scoreboard after each round
+            // reset scoreboard & variables after each round
             updatePlayersAliveScoreboard(p);
             createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+((SkybattlePlayer) (Objects.requireNonNull(SkybattlePlayer.getGamePlayer(p.getPlayer())))).kills);
         }
@@ -122,6 +123,7 @@ public class Skybattle extends Game {
             } else {
                 setGameState(GameState.ACTIVE);
                 map.removeBarriers();
+                setPVP(true);
                 for (GamePlayer p : gamePlayers) {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }

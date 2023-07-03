@@ -6,6 +6,7 @@ import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -211,6 +212,10 @@ public class MBC implements Listener {
     public void onDamage(EntityDamageByEntityEvent e) {
         // players or chickens should never get damaged by fireworks
         if (e.getDamager() instanceof Firework) {
+            e.setCancelled(true);
+        }
+
+        if (!currentGame.PVP() && e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
             e.setCancelled(true);
         }
     }

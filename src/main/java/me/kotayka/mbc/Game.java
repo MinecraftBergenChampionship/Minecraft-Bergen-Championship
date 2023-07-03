@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -19,6 +20,9 @@ public abstract class Game implements Scoreboard, Listener {
     public int gameID;
     public String gameName;
     private GameState gameState = GameState.INACTIVE;
+
+    // TRUE = pvp is on ; FALSE = pvp is off
+    private boolean PVP_ENABLED = false;
 
     public SortedMap<Participant, Integer> gameIndividual = new TreeMap<>(Collections.reverseOrder());
 
@@ -426,6 +430,14 @@ public abstract class Game implements Scoreboard, Listener {
     public void start() {
         HandlerList.unregisterAll(MBC.getInstance().lobby); // unregister lobby temporarily
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
+
+        // standards
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+        }
+
         loadPlayers();
         createScoreboard();
     }
@@ -544,6 +556,7 @@ public abstract class Game implements Scoreboard, Listener {
                 removeWinEffect(p);
             }
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().getInventory().clear();
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
@@ -655,4 +668,11 @@ public abstract class Game implements Scoreboard, Listener {
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
     }
+
+    public void setPVP(boolean b) {
+        String s = b ? "[Debug] PVP now enabled. " : "[Debug] PVP now disabled.";
+        Bukkit.broadcastMessage(s);
+        PVP_ENABLED = b;
+    }
+    public boolean PVP() { return PVP_ENABLED; }
 }

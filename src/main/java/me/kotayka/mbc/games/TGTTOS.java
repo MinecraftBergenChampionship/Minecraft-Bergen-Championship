@@ -76,6 +76,7 @@ public class TGTTOS extends Game {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                }
                map.Barriers(false);
+               setPVP(true);
                setGameState(GameState.ACTIVE);
                timeRemaining = 120;
            } else {
@@ -131,6 +132,7 @@ public class TGTTOS extends Game {
      * repurpose loadPlayers() however is best needed for tgttos
      */
     public void loadPlayers() {
+        setPVP(false);
         if (map == null) {
             return;
         }

@@ -72,6 +72,7 @@ public class SurvivalGames extends Game {
     public void loadPlayers() {
         teamsAlive.addAll(getValidTeams());
         map.setBarriers(true);
+        setPVP(false);
         for (Participant p : MBC.getInstance().getPlayers()) {
             playersAlive.add(p);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -101,7 +102,6 @@ public class SurvivalGames extends Game {
                 map.setBarriers(false);
                 for (GamePlayer p : gamePlayers) {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
-                    p.getPlayer().setInvulnerable(true);
                 }
                 setGameState(GameState.ACTIVE);
                 Bukkit.broadcastMessage(ChatColor.RED+"Grace ends in 1 minute!");
@@ -138,10 +138,9 @@ public class SurvivalGames extends Game {
             if (timeRemaining == 660) {
                 event = SurvivalGamesEvent.SUPPLY_CRATE;
                 for (Participant p : MBC.getInstance().getPlayers()) {
-                    p.getPlayer().setInvulnerable(false);
-                    p.getPlayer().setGameMode(GameMode.SURVIVAL);
                     p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
                 }
+                setPVP(true);
                 Bukkit.broadcastMessage(ChatColor.DARK_RED+"Grace period is now over.");
                 map.startBorder();
                 Bukkit.broadcastMessage(ChatColor.RED+"Border will continue to shrink!");
