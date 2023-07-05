@@ -2,6 +2,7 @@ package me.kotayka.mbc.games;
 
 import me.kotayka.mbc.Game;
 import me.kotayka.mbc.MBC;
+import me.kotayka.mbc.Minigame;
 import me.kotayka.mbc.Participant;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,11 +14,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-public class Lobby extends Game {
+public class Lobby extends Minigame {
     public static final Location LOBBY = new Location(Bukkit.getWorld("world"), 0, 1, 0);
 
     public Lobby() {
-        super(0, "Lobby");
+        super("Lobby");
     }
 
     public void createScoreboard(Participant p) {
@@ -59,7 +60,7 @@ public class Lobby extends Game {
     }
 
     public void start() {
-        MBC.getInstance().currentGame = this;
+        MBC.getInstance().setCurrentGame(this);
         createScoreboard();
         stopTimer();
         setTimer(120);

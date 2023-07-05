@@ -34,12 +34,12 @@ public class Skybattle extends Game {
     public Map<Entity, Player> TNTPlacers = new HashMap<Entity, Player>(5);
     // Creeper Entity, Player (that spawned them); used for determining kills by creeper explosion
     public Map<Entity, Player> creeperSpawners = new HashMap<Entity, Player>(5);
-    public final int KILL_POINTS = 15;
-    public final int SURVIVAL_POINTS = 1;
-    public final int WIN_POINTS = 15;
+    private final int KILL_POINTS = 15;
+    private final int SURVIVAL_POINTS = 1;
+    private final int WIN_POINTS = 15;
 
     public Skybattle() {
-        super(4, "Skybattle");
+        super("Skybattle");
     }
     private int roundNum = 1;
 
@@ -61,7 +61,6 @@ public class Skybattle extends Game {
         teamsAlive.addAll(getValidTeams());
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().getInventory().clear();
-            p.getPlayer().setGameMode(GameMode.ADVENTURE);
             p.getPlayer().setFlying(false);
             p.getPlayer().setAllowFlight(false);
             p.getPlayer().setInvulnerable(false);
@@ -204,8 +203,6 @@ public class Skybattle extends Game {
      */
     @EventHandler
     public void blockPlaceEvent(BlockPlaceEvent e) {
-        if (!isGameActive()) { return; }
-
         Block b = e.getBlock();
         Player p = e.getPlayer();
 

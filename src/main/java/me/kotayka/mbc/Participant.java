@@ -1,5 +1,6 @@
 package me.kotayka.mbc;
 
+import me.kotayka.mbc.games.Lobby;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -42,7 +43,7 @@ public class Participant implements Comparable<Participant> {
         team = t;
         team.addPlayer(this);
         Bukkit.broadcastMessage(getFormattedName()+ChatColor.WHITE+" has joined the "+team.getChatColor()+team.getTeamFullName());
-        if (MBC.getInstance().gameID == 0 && MBC.getInstance().currentGame != null) {
+        if (MBC.getInstance().getMinigame() != null && MBC.getInstance().getMinigame() instanceof Lobby) {
             MBC.getInstance().lobby.changeTeam(this);
         }
     }
@@ -109,7 +110,7 @@ public class Participant implements Comparable<Participant> {
         rawCurrentScore += amount*MBC.getInstance().multiplier;
         team.addCurrentTeamScore(amount);
 
-        MBC.getInstance().currentGame.updatePlayerCurrentScoreDisplay(this);
+        MBC.getInstance().getGame().updatePlayerCurrentScoreDisplay(this);
     }
 
     public MBCTeam getTeam() {

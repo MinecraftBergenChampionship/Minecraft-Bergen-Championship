@@ -41,7 +41,7 @@ public class AceRace extends Game {
     public static final int[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
 
     public AceRace() {
-        super(1, "Ace Race");
+        super("Ace Race");
     }
 
     public void createScoreboard(Participant p) {
@@ -150,7 +150,6 @@ public class AceRace extends Game {
 
     @EventHandler
     public void PlayerMoveEvent(PlayerMoveEvent e) {
-        if (MBC.getInstance().getGameID() != this.gameID) return;
         if (Participant.getParticipant(e.getPlayer()).getTeam() instanceof Spectator) return;
 
         if (map.checkDeath(e.getPlayer().getLocation())) {

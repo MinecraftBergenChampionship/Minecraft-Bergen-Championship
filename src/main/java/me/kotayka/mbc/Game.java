@@ -7,37 +7,30 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
 
 import java.util.*;
 
-public abstract class Game implements Scoreboard, Listener {
-    public int gameID;
-    public String gameName;
-    private GameState gameState = GameState.INACTIVE;
-
+/**
+ * @see Minigame for non-point scoring games
+ */
+public abstract class Game extends Minigame {
     // TRUE = pvp is on ; FALSE = pvp is off
     private boolean PVP_ENABLED = false;
 
     public SortedMap<Participant, Integer> gameIndividual = new TreeMap<>(Collections.reverseOrder());
 
-    public Game(int gameID, String gameName) {
-        this.gameID = gameID;
-        this.gameName = gameName;
+    public Game(String gameName) {
+        super(gameName);
     }
 
     public List<GamePlayer> gamePlayers = new ArrayList<GamePlayer>();
-    public static int taskID = -1;
 
     public List<Participant> playersAlive = new ArrayList<>();
     public List<MBCTeam> teamsAlive = new ArrayList<>();
 
-    public int timeRemaining = -1;
 
     public void createScoreboard() {
         for (Participant p : MBC.getInstance().players) {
@@ -46,12 +39,6 @@ public abstract class Game implements Scoreboard, Listener {
         }
     }
 
-    // added templates
-    /**
-     * Should load players into appropriate spots after/during introduction
-     * Could/should handle stuff like: clearing inventory, applying potion effects, etc
-     */
-    public abstract void loadPlayers();
 
     /**
      * Provide game explanation
@@ -199,101 +186,6 @@ public abstract class Game implements Scoreboard, Listener {
         return deadPlayers == team.teamPlayers.size();
     }
 
-    public void newObjective(Participant p) {
-        if (p.objective != null) {
-            p.objective.unregister();
-        }
-
-        p.gameObjective = gameName;
-        Objective obj = p.board.registerNewObjective("Objective", "dummy", ChatColor.BOLD + "" + ChatColor.YELLOW + "MCC");
-        p.lines = new HashMap<>();
-
-        p.objective = obj;
-        obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-    }
-
-    public void newObjective() {
-        for (Participant p : MBC.getInstance().players) {
-            newObjective(p);
-        }
-    }
-
-    public void resetLine(Participant p, int line) {
-        if (p.lines.containsKey(line)) {
-            p.objective.getScoreboard().resetScores(p.lines.get(line));
-        }
-    }
-
-    public void createLine(int score, String line, Participant p) {
-        if (p.objective == null || !Objects.equals(p.gameObjective, gameName)) {
-            p.gameObjective = gameName;
-            MBC.getInstance().currentGame.createScoreboard(p);
-        }
-
-        resetLine(p, score);
-
-        p.objective.getScore(line).setScore(score);
-        p.lines.put(score, line);
-    }
-
-    public void createLine(int score, String line) {
-        for (Participant p : MBC.getInstance().players) {
-            createLine(score, line, p);
-        }
-    }
-
-    public List<MBCTeam> getValidTeams() {
-        List<MBCTeam> newTeams = new ArrayList<>();
-        for (int i = 0; i < MBC.teamNames.size(); i++) {
-            if (!Objects.equals(MBC.getInstance().teams.get(i).fullName, "Spectator") && MBC.getInstance().teams.get(i).teamPlayers.size() > 0) {
-                newTeams.add(MBC.getInstance().teams.get(i));
-            }
-        }
-
-        return newTeams;
-    }
-
-    /**
-     * Updates display of team's current score on bottom of player's scoreboard;
-     * Note: may be redundant
-     * @param t Team for which to update for each player
-     */
-    public void displayTeamCurrentScore(MBCTeam t) {
-        for (Participant p : t.teamPlayers) {
-            createLine(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getMultipliedCurrentScore(), p);
-        }
-    }
-
-    public void displayTeamTotalScore(MBCTeam t) {
-        for (Participant p : t.teamPlayers) {
-            createLine(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getMultipliedTotalScore(), p);
-        }
-    }
-
-    /**
-     * Sorts teams by their current round score to place onto scoreboard.
-     */
-    public void updateInGameTeamScoreboard() {
-        List<MBCTeam> teamRoundsScores = new ArrayList<>(getValidTeams());
-        teamRoundsScores.sort(new TeamRoundSorter());
-
-        for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
-            MBCTeam t = teamRoundsScores.get(14-i);
-            createLine(i,String.format("%-15s %s%5d", t.teamNameFormat(), ChatColor.WHITE, t.getMultipliedCurrentScore()));
-        }
-    }
-
-    public void updateTeamStandings() {
-        List<MBCTeam> teamRoundsScores = new ArrayList<>(getValidTeams());
-        teamRoundsScores.sort(new TeamScoreSorter());
-        Collections.reverse(teamRoundsScores);
-
-        for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
-            MBCTeam t = teamRoundsScores.get(14-i);
-            createLine(i,String.format("%-15s %s%5d", t.teamNameFormat(), ChatColor.WHITE, t.getMultipliedTotalScore()));
-        }
-    }
-
     /**
      * Updates each player's scoreboards to match that of playersAlive and teamsAlive.
      * Does not do any computation and assumes playersAlive and teamsAlive has been properly
@@ -326,49 +218,13 @@ public abstract class Game implements Scoreboard, Listener {
         createLine(1, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS, p);
     }
 
-    /* Display player's multiplied score during game */
+    /**
+     * Updates the player's current coin count in-game on the scoreboard
+     * Your Coins: {COIN_AMOUNT}
+     * @param p Participant whose scoreboard to update
+     */
     public void updatePlayerCurrentScoreDisplay(Participant p) {
         createLine(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
-    }
-
-    public boolean isGameActive() {
-        if (MBC.getInstance().getGameID() != this.gameID) { return false; }
-
-        // if lobby, return true no matter what
-        if (MBC.getInstance().getGameID() == 0) { return true; }
-
-        return (this.getState().equals(GameState.ACTIVE) || this.getState().equals(GameState.OVERTIME));
-        // return (this.getState().equals(GameState.ACTIVE) || this.getState().equals(GameState.PAUSED)); <- might be dependent on event? gonna hold off
-    }
-
-    public void setTimer(int time) {
-        if (timeRemaining != -1) {
-            timeRemaining = time;
-            return;
-        }
-
-        timeRemaining = time;
-
-        taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
-            if (!gameState.equals(GameState.OVERTIME)) {
-                createLine(20, ChatColor.RED+""+ChatColor.BOLD + "Time left: "+ChatColor.WHITE+getFormattedTime(--timeRemaining));
-            } else {
-                createLine(20, ChatColor.RED+""+ChatColor.BOLD+"Overtime: " +ChatColor.WHITE+getFormattedTime(--timeRemaining));
-            }
-            if (timeRemaining < 0) {
-                stopTimer();
-            }
-            MBC.getInstance().currentGame.events();
-        }, 20, 20);
-    }
-
-    public void stopTimer() {
-        Bukkit.broadcastMessage("Stopping timer!");
-        MBC.getInstance().cancelEvent(taskID);
-    }
-
-    public String getFormattedTime(int seconds) {
-        return String.format("%02d", seconds/60) +":"+String.format("%02d", seconds%60);
     }
 
     public String getPlace(int place) {
@@ -427,30 +283,17 @@ public abstract class Game implements Scoreboard, Listener {
         return placementColor;
     }
 
-    public void start() {
-        HandlerList.unregisterAll(MBC.getInstance().lobby); // unregister lobby temporarily
-        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
+   public void start() {
+        super.start();
+   }
 
-        // standards
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-            p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
-            p.getPlayer().setGameMode(GameMode.ADVENTURE);
-        }
-
-        loadPlayers();
-        createScoreboard();
-    }
-
-    public abstract void events();
-
-    /**
-     * Called at the end of games
-     * Handles formatting and reveals of team and individual scores
-     *
-     * NOTE: games with additional information, (ex: Ace Race and lap times)
-     * must implement a separate function for those stats.
-     */
+   /**
+    * Called at the end of games
+    * Handles formatting and reveals of team and individual scores
+    *
+    * NOTE: games with additional information, (ex: Ace Race and lap times)
+    * must implement a separate function for those stats.
+    */
     public void gameEndEvents() {
         // GAME_END should have 35 seconds by default
         switch(timeRemaining) {
@@ -550,7 +393,6 @@ public abstract class Game implements Scoreboard, Listener {
     public void returnToLobby() {
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
-        MBC.getInstance().gameID = 0;
         for (Participant p : MBC.getInstance().getPlayers()) {
             if (p.getPlayer().getAllowFlight()) {
                 removeWinEffect(p);
@@ -649,24 +491,6 @@ public abstract class Game implements Scoreboard, Listener {
     public void roundOverGraphics(GamePlayer p) {
         p.getPlayer().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!");
         p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!","",0, 60, 20);
-    }
-
-    /**
-     * Accessor for current game's state
-     * @see GameState
-     * @return Enum GameState representing the current state of the game
-     */
-    public GameState getState() {
-        return gameState;
-    }
-
-    /**
-     * Mutator for current game's state
-     * @see GameState
-     * @param gameState the state which the game will change to
-     */
-    public void setGameState(GameState gameState) {
-        this.gameState = gameState;
     }
 
     public void setPVP(boolean b) {

@@ -48,7 +48,7 @@ public class SurvivalGames extends Game {
     private int crateNum = 0;
 
     public SurvivalGames() {
-        super(5, "SurvivalGames");
+        super("SurvivalGames");
 
         try {
             readItems();

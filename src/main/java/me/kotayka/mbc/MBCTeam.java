@@ -190,26 +190,25 @@ public abstract class MBCTeam {
 
     /**
      * Adds specified amount to current team score
+     * Assumes is called from game, not minigame
      * Calls updateInGameTeamScoreboard()
      * @param score amount to increment team's score
-     * @see Game updateInGameTeamScoreboard()
+     * @see Minigame updateInGameTeamScoreboard()
      */
     public void addCurrentTeamScore(int score) {
         rawCurrentScore +=score;
         multipliedCurrentScore +=score*MBC.getInstance().multiplier;
-        MBC.getInstance().currentGame.updateInGameTeamScoreboard();
+        MBC.getInstance().getGame().updateInGameTeamScoreboard();
     }
 
     /**
      * Adds specified amount to total team score; called per player
      * @param score amount to increment team's score
-     * @see Game updateTeamStandings()
      * @see MBCTeam addCurrentScoreToTotal()
      */
     private void addTotalTeamScore(int score) {
         this.rawTotalScore +=score;
         multipliedTotalScore +=score*MBC.getInstance().multiplier;
-        MBC.getInstance().currentGame.updateTeamStandings();
     }
 
     /**

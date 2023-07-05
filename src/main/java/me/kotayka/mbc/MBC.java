@@ -52,12 +52,11 @@ public class MBC implements Listener {
     public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets", "Spectator"));
     public ScoreboardManager manager =  Bukkit.getScoreboardManager();
 
-    public int gameID = 0;
-    public Game currentGame;
+    private Minigame currentGame;
     public int gameNum = 0;
 
     public Plugin plugin;
-    public Lobby lobby = new Lobby();
+    public final Lobby lobby = new Lobby();
     public AceRace aceRace = null;
     public TGTTOS tgttos = null;
     public BSABM bsabm = null;
@@ -95,36 +94,31 @@ public class MBC implements Listener {
         return Objects.requireNonNull(mbc);
     }
 
-    public Game gameInstance(int gameNum) {
+    public Minigame gameInstance(int gameNum) {
         switch(gameNameList.get(gameNum)) {
             case "AceRace":
                 if (aceRace == null) {
                     aceRace = new AceRace();
-                    this.gameID = 1;
                 }
                 return aceRace;
             case "TGTTOS":
                 if (tgttos == null) {
                     tgttos = new TGTTOS();
-                    this.gameID = 2;
                 }
                 return tgttos;
             case "BSABM":
                 if (bsabm == null) {
                     bsabm = new BSABM();
-                    this.gameID = 3;
                 }
                 return bsabm;
             case "Skybattle":
                 if (skybattle == null) {
                     skybattle = new Skybattle();
-                    this.gameID = 4;
                 }
                 return skybattle;
             case "SurvivalGames":
                 if (sg == null) {
                     sg = new SurvivalGames();
-                    this.gameID = 5;
                 }
                 return sg;
             default:
@@ -132,6 +126,29 @@ public class MBC implements Listener {
         }
     }
 
+    /**
+     * Access to current event activity
+     * @return Minigame currentGame
+     */
+    public Minigame getMinigame() {
+        return currentGame;
+    }
+
+    /**
+     * For use exclusively if there is no minigame active
+     * @return Game currentGame
+     */
+    public Game getGame() {
+        if (!(currentGame instanceof Game)) {
+            System.err.print("Tried to access Game when no game was active!");
+            return null;
+        }
+        return (Game) currentGame;
+    }
+
+    public void setCurrentGame(Minigame game) {
+       currentGame = game;
+    }
 
     private MBC() {}
 
@@ -215,17 +232,16 @@ public class MBC implements Listener {
             e.setCancelled(true);
         }
 
-        if (!currentGame.PVP() && e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
+        if (!(currentGame instanceof Game)) return;
+        if (!getGame().PVP() && e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
             e.setCancelled(true);
         }
     }
 
-    public int getGameID() {
-        return this.gameID;
-    }
-
-    public void startGame(Game game) {
-        gameNum++;
+    public void startGame(Minigame game) {
+        if (game instanceof Game) {
+            gameNum++;
+        }
         Bukkit.broadcastMessage(ChatColor.GOLD + game.gameName + ChatColor.WHITE + " has started");
         currentGame = game;
         currentGame.start();
@@ -233,8 +249,8 @@ public class MBC implements Listener {
 
     public void startGame(int game) {
         // prevent another game from starting if a non-lobby game is active
-        if (gameID != 0) { // TODO: decision dome may have another gameID, so add that here
-            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: Another game with MBC.gameID " + gameID + " is in progress!");
+        if (currentGame instanceof Game) {
+            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: " + currentGame.gameName + " is in progress!");
             return;
         }
 

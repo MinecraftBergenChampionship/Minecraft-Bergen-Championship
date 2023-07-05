@@ -47,7 +47,7 @@ public class TGTTOS extends Game {
     public static int TEAM_BONUS = 5; // awarded per player on team
 
     public TGTTOS() {
-        super(2, "TGTTOS");
+        super("TGTTOS");
     }
 
     public void createScoreboard(Participant p) {
@@ -196,7 +196,7 @@ public class TGTTOS extends Game {
         maps.remove(newMap);
         map.Barriers(true);
 
-        createLine(22, ChatColor.AQUA+""+ChatColor.BOLD+"Map: "+map.getName());
+        createLine(22, ChatColor.AQUA+""+ChatColor.BOLD+"Map: "+ChatColor.RESET+map.getName());
         createLine(21, ChatColor.GREEN +  "Round: "+ ChatColor.RESET+roundNum+"/6");
         updateFinishedPlayers();
 

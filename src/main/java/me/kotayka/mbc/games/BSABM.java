@@ -21,7 +21,7 @@ public class BSABM extends Game {
     public bsabmTeam pink = new bsabmTeam(MBC.getInstance().pink, new Location(map.getWorld(), 89, 1, 150, -90, 0));
 
     public BSABM() {
-        super(3, "BSABM");
+        super("BSABM");
 
     }
 
