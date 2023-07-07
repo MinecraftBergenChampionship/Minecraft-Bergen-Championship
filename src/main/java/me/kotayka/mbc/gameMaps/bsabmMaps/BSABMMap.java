@@ -1,6 +1,6 @@
 package me.kotayka.mbc.gameMaps.bsabmMaps;
 
-import me.kotayka.mbc.gameMaps.Map;
+import me.kotayka.mbc.gameMaps.MBCMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class BSABMMap extends Map {
+public abstract class BSABMMap extends MBCMap {
 
     private HashMap<String, BSABMBlueprint> plots = new HashMap<>();
     private List<String> gameOrder = new ArrayList<>();

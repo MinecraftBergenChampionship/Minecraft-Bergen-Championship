@@ -1,6 +1,6 @@
 package me.kotayka.mbc.gameMaps.aceRaceMap;
 
-import me.kotayka.mbc.gameMaps.Map;
+import me.kotayka.mbc.gameMaps.MBCMap;
 import me.kotayka.mbc.games.AceRace;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -16,7 +16,7 @@ import java.util.List;
  *           or else the current code will not track laps correctly. The first checkpoint / finish line should be
  *           marked by carpet.
  */
-public abstract class AceRaceMap extends Map {
+public abstract class AceRaceMap extends MBCMap {
     public World world = AceRace.world;
     public List<Location> respawns;
     public List<Location> checkpoints;

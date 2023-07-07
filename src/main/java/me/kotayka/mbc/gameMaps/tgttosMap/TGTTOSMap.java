@@ -1,6 +1,6 @@
 package me.kotayka.mbc.gameMaps.tgttosMap;
 
-import me.kotayka.mbc.gameMaps.Map;
+import me.kotayka.mbc.gameMaps.MBCMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class TGTTOSMap extends Map {
+public abstract class TGTTOSMap extends MBCMap {
     // changed from Location[] to just Location; let's just spawn everyone at one square, at least for now
     private Location spawn;
     private Location[] end;

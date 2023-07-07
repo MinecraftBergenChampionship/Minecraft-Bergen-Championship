@@ -1,13 +1,13 @@
 package me.kotayka.mbc.gameMaps.skybattleMap;
 
-import me.kotayka.mbc.gameMaps.Map;
+import me.kotayka.mbc.gameMaps.MBCMap;
 import me.kotayka.mbc.games.Skybattle;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 
 // not sure if inheriting from Map is really necessary since theres only one commonality but just in case
-public abstract class SkybattleMap extends Map {
+public abstract class SkybattleMap extends MBCMap {
     protected final Skybattle SKYBATTLE;
     private Location center;
     private int voidHeight;

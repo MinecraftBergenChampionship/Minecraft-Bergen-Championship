@@ -21,6 +21,7 @@ public abstract class MBCTeam {
     private int multipliedTotalScore = 0;
     private int rawCurrentScore = 0;
     private int multipliedCurrentScore = 0;
+    private int currentPlace = 1;
 
     public MBCTeam(String name, String fullName, Character icon, ChatColor chatColor) {
         this.name = name;
@@ -246,6 +247,13 @@ public abstract class MBCTeam {
                 Bukkit.broadcastMessage(teamNameFormat() + " have been eliminated!");
             }
         }, 10L);
+    }
+
+    public void setPlace(int place) {
+       currentPlace = place;
+    }
+    public int getPlace() {
+       return currentPlace;
     }
 }
 

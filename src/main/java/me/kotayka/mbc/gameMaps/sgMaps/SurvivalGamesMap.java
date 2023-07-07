@@ -3,7 +3,7 @@ package me.kotayka.mbc.gameMaps.sgMaps;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.MBCTeam;
-import me.kotayka.mbc.gameMaps.Map;
+import me.kotayka.mbc.gameMaps.MBCMap;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -11,7 +11,7 @@ import org.bukkit.block.Chest;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class SurvivalGamesMap extends Map {
+public abstract class SurvivalGamesMap extends MBCMap {
     public int[][] spawns;
     private Location center;
     public java.util.Map<Location, Block> blocks = new HashMap<Location, Block>();
@@ -42,7 +42,7 @@ public abstract class SurvivalGamesMap extends Map {
             tempSpawns.add(new Location(getWorld(), spawn[0], 2, spawn[1]));
         }
 
-        for (MBCTeam t : MBC.getValidTeams()) {
+        for (MBCTeam t : MBC.getInstance().getValidTeams()) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
             for (Participant p : t.teamPlayers) {
                 p.getPlayer().teleport(tempSpawns.get(randomNum));

@@ -284,7 +284,20 @@ public abstract class Game extends Minigame {
     }
 
    public void start() {
-        super.start();
+       // unregister both lobby and decision dome to prepare for games
+       HandlerList.unregisterAll(MBC.getInstance().lobby);
+       HandlerList.unregisterAll(MBC.getInstance().decisionDome);
+       MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
+
+       // standards
+       for (Participant p : MBC.getInstance().getPlayers()) {
+           p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+           p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
+           p.getPlayer().setGameMode(GameMode.ADVENTURE);
+       }
+
+       loadPlayers();
+       createScoreboard();
    }
 
    /**
@@ -360,6 +373,8 @@ public abstract class Game extends Minigame {
     }
 
     public void printEventScores() {
+        // each player's scores are added to event total in
+        // getScores() by calling p.addCurrentScoreToTotal()
         List<MBCTeam> gameScores = new ArrayList<>(getValidTeams());
         gameScores.sort(new TeamScoreSorter());
         Collections.reverse(gameScores);

@@ -138,7 +138,7 @@ public class SurvivalGames extends Game {
             if (timeRemaining == 660) {
                 event = SurvivalGamesEvent.SUPPLY_CRATE;
                 for (Participant p : MBC.getInstance().getPlayers()) {
-                    p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
                 }
                 setPVP(true);
                 Bukkit.broadcastMessage(ChatColor.DARK_RED+"Grace period is now over.");

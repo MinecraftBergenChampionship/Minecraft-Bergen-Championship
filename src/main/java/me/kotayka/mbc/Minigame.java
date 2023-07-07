@@ -2,10 +2,7 @@ package me.kotayka.mbc;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 
@@ -26,25 +23,19 @@ public abstract class Minigame implements Scoreboard, Listener {
 
     public Minigame(String name) {
         gameName = name;
+        Bukkit.broadcastMessage("gameName == " + gameName);
     }
 
-    public void start() {
-        HandlerList.unregisterAll(MBC.getInstance().lobby); // unregister lobby temporarily
-        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
-
-        // standards
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-            p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
-            p.getPlayer().setGameMode(GameMode.ADVENTURE);
-        }
-
-        loadPlayers();
-        createScoreboard();
-    }
+    /**
+     * @see Game start()
+     * all games should call a super.start()
+     * minigames may have their own implementation
+     * since they require less
+     */
+    public abstract void start();
 
     public boolean isGameActive() {
-        if (MBC.getInstance().getMinigame() instanceof Game) {
+        if (!(MBC.getInstance().getMinigame() instanceof Game)) {
             return false;
         }
 
@@ -69,10 +60,14 @@ public abstract class Minigame implements Scoreboard, Listener {
         timeRemaining = time;
 
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
-            if (!gameState.equals(GameState.OVERTIME)) {
-                createLine(20, ChatColor.RED + "" + ChatColor.BOLD + "Time left: " + ChatColor.WHITE + getFormattedTime(--timeRemaining));
+            if (MBC.getInstance().getMinigame() instanceof Game) {
+                if (!gameState.equals(GameState.OVERTIME)) {
+                    createLine(20, ChatColor.RED + "" + ChatColor.BOLD + "Time left: " + ChatColor.WHITE + getFormattedTime(--timeRemaining));
+                } else {
+                    createLine(20, ChatColor.RED + "" + ChatColor.BOLD + "Overtime: " + ChatColor.WHITE + getFormattedTime(--timeRemaining));
+                }
             } else {
-                createLine(20, ChatColor.RED + "" + ChatColor.BOLD + "Overtime: " + ChatColor.WHITE + getFormattedTime(--timeRemaining));
+                createLine(20, getFormattedTime(--timeRemaining));
             }
             if (timeRemaining < 0) {
                 stopTimer();
@@ -82,7 +77,7 @@ public abstract class Minigame implements Scoreboard, Listener {
     }
 
     public void stopTimer() {
-        Bukkit.broadcastMessage("Stopping timer!");
+        Bukkit.broadcastMessage("[Debug] Stopping timer!");
         MBC.getInstance().cancelEvent(taskID);
     }
 
@@ -146,9 +141,24 @@ public abstract class Minigame implements Scoreboard, Listener {
         teamRoundsScores.sort(new TeamScoreSorter());
         Collections.reverse(teamRoundsScores);
 
+        int lastScore = -1;
+        int ties = 0;
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
             MBCTeam t = teamRoundsScores.get(14-i);
             createLine(i,String.format("%-15s %s%5d", t.teamNameFormat(), ChatColor.WHITE, t.getMultipliedTotalScore()));
+
+            if (MBC.getInstance().gameNum == 1) continue;
+
+            // if after first game, determine placement
+            if (lastScore == t.getMultipliedTotalScore()) {
+                ties++;
+                t.setPlace((14-i)+ties);
+            } else {
+                ties = 0;
+                t.setPlace(14-i);
+            }
+
+            lastScore = t.getMultipliedTotalScore();
         }
     }
 

@@ -31,7 +31,6 @@ public class MBC implements Listener {
     public static MBC mbc = null;
 
     // event specifics
-
     public static final int MAX_PLAYERS_PER_TEAM = 4;
     public static final int MAX_TEAMS = 6;
     public static final int MAX_PLAYERS = MAX_PLAYERS_PER_TEAM * MAX_TEAMS;
@@ -57,13 +56,14 @@ public class MBC implements Listener {
 
     public Plugin plugin;
     public final Lobby lobby = new Lobby();
+    public DecisionDome decisionDome = null;
     public AceRace aceRace = null;
     public TGTTOS tgttos = null;
     public BSABM bsabm = null;
     public Skybattle skybattle = null;
     public SurvivalGames sg = null;
 
-    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("AceRace","TGTTOS","BSABM","Skybattle", "SurvivalGames"));
+    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BSABM","Skybattle", "SurvivalGames"));
     public final List<Game> gameList = new ArrayList<Game>(6);
 
     // Define Special Blocks
@@ -96,6 +96,11 @@ public class MBC implements Listener {
 
     public Minigame gameInstance(int gameNum) {
         switch(gameNameList.get(gameNum)) {
+            case "DecisionDome":
+                if (decisionDome == null) {
+                    decisionDome = new DecisionDome();
+                }
+                return decisionDome;
             case "AceRace":
                 if (aceRace == null) {
                     aceRace = new AceRace();
@@ -124,6 +129,11 @@ public class MBC implements Listener {
             default:
                 return lobby;
         }
+    }
+
+    // todo: this is kinda lazy and using enums would probably be way better if possible down the line
+    public Minigame gameInstance(String gameName) {
+        return gameInstance(gameNameList.indexOf(gameName));
     }
 
     /**
@@ -175,7 +185,7 @@ public class MBC implements Listener {
     /**
      * @return List of all non-spectator teams with at least one player
      */
-    public static List<MBCTeam> getValidTeams() {
+    public List<MBCTeam> getValidTeams() {
         List<MBCTeam> newTeams = new ArrayList<>();
         for (int i = 0; i < MBC.teamNames.size(); i++) {
             if (!Objects.equals(MBC.getInstance().teams.get(i).fullName, "Spectator") && MBC.getInstance().teams.get(i).teamPlayers.size() > 0) {
@@ -239,6 +249,11 @@ public class MBC implements Listener {
     }
 
     public void startGame(Minigame game) {
+        if (currentGame instanceof Game) {
+            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: " + currentGame.gameName + " is in progress!");
+            return;
+        }
+
         if (game instanceof Game) {
             gameNum++;
         }
@@ -255,6 +270,11 @@ public class MBC implements Listener {
         }
 
         startGame(gameInstance(game));
+    }
+
+    public void startGame(String gameName) {
+        gameName = gameName.replaceAll("\\s", "");
+        startGame(gameInstance(gameName));
     }
 
     public void cancelEvent(int taskID) {
