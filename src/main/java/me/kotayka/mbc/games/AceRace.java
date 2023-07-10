@@ -45,7 +45,7 @@ public class AceRace extends Game {
     }
 
     public void createScoreboard(Participant p) {
-        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game: "+MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Ace Race", p);
+        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Ace Race", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
@@ -57,7 +57,7 @@ public class AceRace extends Game {
     public void start() {
         super.start();
         setGameState(GameState.TUTORIAL);
-        setTimer(10); //debug
+        setTimer(30); //debug
         //setTimer(180);
 
         Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
@@ -77,6 +77,8 @@ public class AceRace extends Game {
             } else if (timeRemaining <= 0) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.YELLOW + "Practice Over!");
                 for (AceRacePlayer p : aceRacePlayerList) {
+                    p.getPlayer().setVelocity(new Vector(0,0,0));
+                    p.getPlayer().removePotionEffect(PotionEffectType.SPEED);
                     p.getPlayer().sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "Practice Over!", "", 0, 60, 20);
                 }
                 setGameState(GameState.END_ROUND);
@@ -87,6 +89,7 @@ public class AceRace extends Game {
                 map.setBarriers(true);
                 for (AceRacePlayer p : aceRacePlayerList) {
                     p.getPlayer().teleport(new Location(map.getWorld(), 2, 26, 150, 90, 0));
+                    p.checkpoint = 0;
                 }
                 setGameState(GameState.STARTING);
                 timeRemaining = 20;
@@ -105,10 +108,10 @@ public class AceRace extends Game {
                 Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "30 seconds remaining!");
                 // TODO: play overtime music (or if there are like 2 players still racing: tbd)
             } else if (timeRemaining <= 0) {
+                gameOverGraphics();
                 for (AceRacePlayer p : aceRacePlayerList) {
-                    gameOverGraphics(p);
                     if (!(p.getPlayer().getGameMode().equals(GameMode.SPECTATOR))) {
-                        winEffects(p.getParticipant()); // this is just for the effects. players not in spectator by the end of the round have lost.
+                        flightEffects(p.getParticipant());
                         p.getPlayer().sendMessage(ChatColor.RED + "Better luck next time!");
                     }
                 }
@@ -186,6 +189,7 @@ public class AceRace extends Game {
    public void topLaps() {
         StringBuilder topFive = new StringBuilder();
         int counter = 0;
+        Bukkit.broadcastMessage("[Debug] fastestLaps.keySet().size() == " + fastestLaps.keySet().size());
         for (Long l : fastestLaps.keySet()) {
             for (int i = 0; i < fastestLaps.get(l).size(); i++) {
                 topFive.append(String.format((counter+1) + ". %-18s %-9s\n", fastestLaps.get(l).get(i), new SimpleDateFormat("m:ss.S").format(new Date(l))));

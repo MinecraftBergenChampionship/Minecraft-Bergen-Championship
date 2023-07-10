@@ -8,9 +8,10 @@ import org.bukkit.inventory.ItemStack;
 public class Skydive extends TGTTOSMap {
     public Skydive() {
         super("Skydive", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.SHEARS), new ItemStack(Material.SNOWBALL, 6), new ItemStack(Material.LEATHER_BOOTS)});
+        Location l = new Location(getWorld(), -300, 120, 300);
+        l.setYaw((float) 90);
         super.loadMap(
-                new Location(getWorld(), -300, 120, 300),
-                new Location[]{new Location(getWorld(), -399, 50, 297), new Location(getWorld(), -394, 50, 302)},
+                l, new Location[]{new Location(getWorld(), -399, 50, 297), new Location(getWorld(), -394, 50, 302)},
                 45
         );
     }

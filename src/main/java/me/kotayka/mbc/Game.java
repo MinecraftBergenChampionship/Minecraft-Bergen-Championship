@@ -20,7 +20,7 @@ public abstract class Game extends Minigame {
     // TRUE = pvp is on ; FALSE = pvp is off
     private boolean PVP_ENABLED = false;
 
-    public SortedMap<Participant, Integer> gameIndividual = new TreeMap<>(Collections.reverseOrder());
+    public SortedMap<Participant, Integer> gameIndividual = new TreeMap<>();
 
     public Game(String gameName) {
         super(gameName);
@@ -112,7 +112,7 @@ public abstract class Game extends Minigame {
         if (killer != null) {
             killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayerName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
-            String health = String.format("["+ChatColor.RED+"♥ %.2f"+ChatColor.RESET+"]", killer.getPlayer().getHealth());
+            String health = String.format(" ["+ChatColor.RED+"♥ %.2f"+ChatColor.RESET+"]", killer.getPlayer().getHealth());
             deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName()+health);
         }
 
@@ -124,19 +124,19 @@ public abstract class Game extends Minigame {
 
     /**
      * Removes player from playersAlive list
-     * WIP: likely needs more docs, this is kind of important
-     * Optional: Additional restructure TBD
+     * Updates display for players alive
+     * Checks if last team is remaining
      * @param p Participant to be removed
      */
     public void updatePlayersAlive(Participant p) {
         playersAlive.remove(p);
-
+        updatePlayersAliveScoreboard();
         checkLastTeam(p.getTeam());
     }
 
     /**
-     * If only one team remains,
-     * @param t
+     * If only one team remains, "cancel" game by setting timeRemaining to 1
+     * @param t Team to check whether any players remain.
      */
     private void checkLastTeam(MBCTeam t) {
         if (checkTeamEliminated(t)) {
@@ -272,15 +272,16 @@ public abstract class Game extends Minigame {
         }
     }
 
-    public ChatColor getPlacementColor(int place) {
-        ChatColor placementColor;
-        placementColor = switch (place) {
-            case 1 -> ChatColor.GOLD;
-            case 2 -> ChatColor.GRAY;
-            case 3 -> ChatColor.getByChar("#CD7F32"); // idk if this works yet tbh
-            default -> ChatColor.YELLOW;
+    public String getColorStringFromPlacement(int place) {
+        String colorStr = switch (place) {
+            case 1 -> ChatColor.GOLD.toString();
+            case 2 -> ChatColor.GRAY.toString();
+            case 3 -> ChatColor.DARK_RED.toString();
+            case 4, 5 -> ChatColor.RED.toString();
+            default -> ChatColor.YELLOW.toString();
         };
-        return placementColor;
+        if (place < 9) { colorStr = colorStr + ChatColor.BOLD; }
+        return colorStr;
     }
 
    public void start() {
@@ -289,8 +290,14 @@ public abstract class Game extends Minigame {
        HandlerList.unregisterAll(MBC.getInstance().decisionDome);
        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
 
+       // if timer hasn't reached 1, stop it
+       if (timeRemaining > 0) {
+           stopTimer();
+       }
+
        // standards
        for (Participant p : MBC.getInstance().getPlayers()) {
+           p.getPlayer().removePotionEffect(PotionEffectType.LEVITATION);
            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
            p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
            p.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -351,6 +358,7 @@ public abstract class Game extends Minigame {
         for (Participant p : MBC.getInstance().getPlayers()) {
             gameIndividual.put(p, p.getRawCurrentScore());
         }
+        Bukkit.broadcastMessage("[Debug] individual size == " + gameIndividual.keySet().size());
 
         for (Participant p : gameIndividual.keySet()) {
             if (p.getRawCurrentScore() != lastScore) {
@@ -362,10 +370,11 @@ public abstract class Game extends Minigame {
 
             if (counter < 5) {
                 topFive.append(String.format(
-                        (num) + ". %-18s %5d (%d x %.2f)\n", p.getFormattedName(), p.getRawCurrentScore(), p.getMultipliedCurrentScore(), MBC.getInstance().multiplier)
+                        (num) + ". %s%5d (%d x %.2f)\n", p.getFormattedNamePadding(), p.getRawCurrentScore(), p.getMultipliedCurrentScore(), MBC.getInstance().multiplier)
                 );
                 lastScore = p.getRawCurrentScore();
                 counter++;
+                Bukkit.broadcastMessage("[Debug] counter == " + counter);
             }
             p.addCurrentScoreToTotal();
         }
@@ -377,14 +386,14 @@ public abstract class Game extends Minigame {
         // getScores() by calling p.addCurrentScoreToTotal()
         List<MBCTeam> gameScores = new ArrayList<>(getValidTeams());
         gameScores.sort(new TeamScoreSorter());
-        Collections.reverse(gameScores);
         StringBuilder str = new StringBuilder();
 
         for (int i = 0; i < gameScores.size(); i++) {
-            str.append(String.format(
-                    ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". %-18s %5d\n",
-                    gameScores.get(i).teamNameFormat(), gameScores.get(i).getMultipliedTotalScore())
-            );
+            MBCTeam t = gameScores.get(i);
+            str.append(ChatColor.BOLD+""+(i+1)+". ")
+               .append(String.format(
+                   "%s%s%5d\n", t.teamNameFormatPadding(), ChatColor.WHITE, t.getMultipliedTotalScore()
+            ));
         }
         Bukkit.broadcastMessage(str.toString());
     }
@@ -392,14 +401,14 @@ public abstract class Game extends Minigame {
     public void printRoundScores() {
         List<MBCTeam> teamRoundsScores = new ArrayList<>(getValidTeams());
         teamRoundsScores.sort(new TeamRoundSorter());
-        Collections.reverse(teamRoundsScores);
         StringBuilder teamString = new StringBuilder();
 
         for (int i = 0; i < teamRoundsScores.size(); i++) {
-            teamString.append(String.format(
-                    ChatColor.BOLD + "" + (i+1) + ChatColor.RESET + ". %-18s %5d\n",
-                    teamRoundsScores.get(i).teamNameFormat(), teamRoundsScores.get(i).getMultipliedCurrentScore())
-            );
+            MBCTeam t = teamRoundsScores.get(i);
+            teamString.append(ChatColor.BOLD+""+(i+1)+". ")
+                .append(String.format(
+                    "%s%5d\n", t.teamNameFormatPadding(), t.getMultipliedCurrentScore()
+            ));
         }
 
         Bukkit.broadcastMessage(teamString.toString());
@@ -413,6 +422,7 @@ public abstract class Game extends Minigame {
                 removeWinEffect(p);
             }
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().getInventory().clear();
             p.getPlayer().setExp(0);
@@ -422,6 +432,11 @@ public abstract class Game extends Minigame {
             p.resetCurrentScores();
             p.getPlayer().teleport(Lobby.LOBBY);
         }
+        if (MBC.getInstance().decisionDome == null) {
+            Bukkit.broadcastMessage("[Debug] Decision Dome has not been loaded, you may need to start another game manually or reload!");
+        }
+
+        MBC.getInstance().gameNum++;
         MBC.getInstance().lobby.start();
     }
 
@@ -451,6 +466,20 @@ public abstract class Game extends Minigame {
      * @param p GamePlayer that has won a round/game.
      */
     public void winEffects(Participant p) {
+        MBC.spawnFirework(p);
+        p.getPlayer().setGameMode(GameMode.ADVENTURE);
+        p.getPlayer().setAllowFlight(true);
+        p.getPlayer().setFlying(true);
+        p.getPlayer().setInvulnerable(true);
+    }
+
+    /**
+     * Emulate win effects (flight, invulnerability, etc)
+     * without the firework; example usage by not completing
+     * Ace Race or a TGTTOS map.
+     * @param p Participant to give effects.
+     */
+    public void flightEffects(Participant p) {
         p.getPlayer().setGameMode(GameMode.ADVENTURE);
         p.getPlayer().setAllowFlight(true);
         p.getPlayer().setFlying(true);
@@ -478,15 +507,6 @@ public abstract class Game extends Minigame {
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!","",0, 60, 20);
         }
-    }
-
-    /**
-     * Custom version of above function if other player-specific events are to be triggered
-     * within loops not handled by raw forEach loop
-     */
-    public void gameOverGraphics(GamePlayer p) {
-        p.getPlayer().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!");
-        p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!","",0, 60, 20);
     }
 
     /**

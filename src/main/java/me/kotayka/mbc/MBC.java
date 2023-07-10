@@ -52,7 +52,7 @@ public class MBC implements Listener {
     public ScoreboardManager manager =  Bukkit.getScoreboardManager();
 
     private Minigame currentGame;
-    public int gameNum = 0;
+    public int gameNum = 1;
 
     public Plugin plugin;
     public final Lobby lobby = new Lobby();
@@ -98,7 +98,8 @@ public class MBC implements Listener {
         switch(gameNameList.get(gameNum)) {
             case "DecisionDome":
                 if (decisionDome == null) {
-                    decisionDome = new DecisionDome();
+                    Bukkit.broadcastMessage("Making new decisiondome!");
+                    decisionDome = new DecisionDome(gameNum > 1); // NOTE: if we get > 8 games available per event, this must change.
                 }
                 return decisionDome;
             case "AceRace":
@@ -254,9 +255,6 @@ public class MBC implements Listener {
             return;
         }
 
-        if (game instanceof Game) {
-            gameNum++;
-        }
         Bukkit.broadcastMessage(ChatColor.GOLD + game.gameName + ChatColor.WHITE + " has started");
         currentGame = game;
         currentGame.start();

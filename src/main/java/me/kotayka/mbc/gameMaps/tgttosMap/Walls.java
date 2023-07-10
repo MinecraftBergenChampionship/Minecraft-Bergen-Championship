@@ -8,9 +8,10 @@ import org.bukkit.inventory.ItemStack;
 public class Walls extends TGTTOSMap {
     public Walls() {
         super("Walls", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.SHEARS), new ItemStack(Material.SNOWBALL, 6), new ItemStack(Material.LEATHER_BOOTS)});
+        Location l = new Location(getWorld(), 100, 72, -98);
+        l.setYaw((float) 180);
         super.loadMap(
-                new Location(getWorld(), 100, 72, -98),
-                new Location[]{new Location(getWorld(), 94, 83, -182), new Location(getWorld(), 108, 83, -186)},
+                l, new Location[]{new Location(getWorld(), 94, 83, -182), new Location(getWorld(), 108, 83, -186)},
                 57
         );
     }

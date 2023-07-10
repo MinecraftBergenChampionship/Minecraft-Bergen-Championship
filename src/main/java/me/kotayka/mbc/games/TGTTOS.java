@@ -51,7 +51,7 @@ public class TGTTOS extends Game {
     }
 
     public void createScoreboard(Participant p) {
-        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game: "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " TGTTOS", p);
+        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " TGTTOS", p);
 
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
@@ -86,7 +86,7 @@ public class TGTTOS extends Game {
             if (timeRemaining == 0) {
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     if (!finishedParticipants.contains(p)) {
-                        winEffects(p); // just for the flying
+                        flightEffects(p);
                         p.getPlayer().sendMessage(ChatColor.RED+"You didn't finish in time!");
                     }
                 }
@@ -203,7 +203,9 @@ public class TGTTOS extends Game {
         if (map != null) {
             loadPlayers();
         }
-        map.getWorld().spawnEntity(map.getEndLocation(), EntityType.CHICKEN);
+        for (int i = 0; i < MBC.getInstance().getPlayers().size(); i++) {
+            map.getWorld().spawnEntity(map.getEndLocation(), EntityType.CHICKEN);
+        }
 
         setGameState(GameState.STARTING);
         setTimer(20);
