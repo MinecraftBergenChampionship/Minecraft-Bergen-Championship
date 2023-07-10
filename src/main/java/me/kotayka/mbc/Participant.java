@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -28,10 +29,19 @@ public class Participant implements Comparable<Participant> {
     public String gameObjective;
 
     public HashMap<Integer, String> lines = new HashMap<>();
+    public HashMap<String, Team> scoreboardTeams = new HashMap<>();
 
     public Participant(Player p) {
         player=p;
         p.setScoreboard(board);
+
+        for (MBCTeam team : MBC.getInstance().teams) {
+            Team x = board.registerNewTeam(team.fullName);
+            x.setColor(team.chatColor);
+            x.setPrefix(team.getIcon()+" ");
+            scoreboardTeams.put(team.getTeamName(), x);
+        }
+
         changeTeam(MBC.getInstance().spectator);
     }
 
@@ -40,6 +50,9 @@ public class Participant implements Comparable<Participant> {
         if (team != null) {
             team.removePlayer(this);
         }
+
+        addPlayerToTeamScoreboard(this, t);
+
         team = t;
         team.addPlayer(this);
         Bukkit.broadcastMessage(getFormattedName()+ChatColor.WHITE+" has joined the "+team.getChatColor()+team.getTeamFullName());
@@ -47,6 +60,7 @@ public class Participant implements Comparable<Participant> {
             MBC.getInstance().lobby.changeTeam(this);
         }
     }
+
     public Player getPlayer() {
         return player;
     }
@@ -153,6 +167,12 @@ public class Participant implements Comparable<Participant> {
 
     public PlayerInventory getInventory() {
         return getPlayer().getInventory();
+    }
+
+    public static void addPlayerToTeamScoreboard(Participant participant, MBCTeam t) {
+        for (Participant p : MBC.getInstance().players) {
+            p.scoreboardTeams.get(t.getTeamName()).addPlayer(participant.getPlayer());
+        }
     }
 
     /**
