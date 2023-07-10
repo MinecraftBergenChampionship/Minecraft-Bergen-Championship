@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
-    private boolean revealedGames = false;
+    private boolean revealedGames;
     private List<String> gameNames = new LinkedList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
@@ -30,8 +30,9 @@ public class DecisionDome extends Minigame {
     private Section winner;
     private boolean tie = false;
 
-    public DecisionDome() {
+    public DecisionDome(boolean revealedGames) {
         super("DecisionDome");
+        this.revealedGames = revealedGames;
         initSections();
     }
 
@@ -41,20 +42,40 @@ public class DecisionDome extends Minigame {
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
 
         // Initialize variables and map
+        Bukkit.broadcastMessage("[Debug] bool revealedGames == " + revealedGames);
         removeEntities();
         initSections();
         tie = false;
+        winner = null;
 
         // Deal with players
         loadPlayers();
         createScoreboard();
-        setGameState(GameState.STARTING);
-        stopTimer();
-        if (revealedGames) {
-            setTimer(10);
+
+        Bukkit.broadcastMessage("[Debug] Sections.size() == " + sections.size());
+        if (sections.size() == 1) {
+            Bukkit.broadcastMessage("[Debug] Path of size 1");
+            // start only game
+            for (Section s : sections.values()) {
+                winner = s;
+            }
+            createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Warping to game: ");
+            setGameState(GameState.END_GAME);
+            setTimer(13);
         } else {
-            setSectionsRed();
-            setTimer(48);
+            Bukkit.broadcastMessage("[Debug] Path of size != 1");
+            setGameState(GameState.STARTING);
+            stopTimer();
+            Bukkit.broadcastMessage("[Debug] Revealed Games == " + revealedGames);
+            if (revealedGames) {
+                Bukkit.broadcastMessage("[Debug] Reached here!");
+                setTimer(10);
+                Bukkit.broadcastMessage("[Debug] Reached here 2!");
+            } else {
+                Bukkit.broadcastMessage("[Debug] Path of NO REVEALED GAMES");
+                setSectionsRed();
+                setTimer(48);
+            }
         }
     }
 
@@ -92,6 +113,7 @@ public class DecisionDome extends Minigame {
             for (Participant p : t.getPlayers()) {
                 //p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_CAT, 1, 1); // DEBUG: THIS IS TEMPORARY
                 p.getPlayer().teleport(l);
+                p.getPlayer().getInventory().clear();
             }
         }
     }
@@ -101,6 +123,7 @@ public class DecisionDome extends Minigame {
         if (getState().equals(GameState.STARTING)) {
             if (timeRemaining == 0) {
                 timeRemaining = 45;
+                // if (!revealedGames) revealedGames = true; the old object doesn't seem to persist but i can't exactly prove that
                 setGameState(GameState.ACTIVE);
             }
 
@@ -131,6 +154,7 @@ public class DecisionDome extends Minigame {
             switch (timeRemaining) {
                 case 9 -> {
                     Bukkit.broadcastMessage(ChatColor.GREEN + "Counting votes...");
+                    createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Chosen game revealed: ");
                     winner = countVotes();
                 }
                 case 6 -> {
@@ -163,8 +187,10 @@ public class DecisionDome extends Minigame {
                 case 0 -> {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.sendTitle(winner.game, "", 0, 20, 20);
+                        p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
                     }
                     Bukkit.broadcastMessage(ChatColor.BOLD + winner.game + "!");
+                    createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Warping to game: ");
                     setGameState(GameState.END_GAME);
                     timeRemaining = 13;
                 }
@@ -216,6 +242,7 @@ public class DecisionDome extends Minigame {
      */
     public void startVoting() {
         Bukkit.broadcastMessage(ChatColor.GREEN+"Time to vote!");
+        createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Voting ends:");
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().getInventory().addItem(new ItemStack(Material.EGG, 1));
             p.getPlayer().sendTitle(p.getTeam().getChatColor() + "" + ChatColor.BOLD + "Vote!", "", 20, 60, 20);
@@ -244,31 +271,37 @@ public class DecisionDome extends Minigame {
         loadSection(section, randomGame);
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.sendTitle(randomGame, "", 20, 60, 20);
-            p.playSound(p, Sound.BLOCK_END_PORTAL_SPAWN, 1, (int) (Math.random() * 3)-3);
+            p.playSound(p, Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 1, (int) (Math.random() * 5));
         }
         gameNames.remove(randomGame);
     }
 
     public void loadSection(int section, String game) {
-        for (Map.Entry<Material, Section> entry : sections.entrySet()) {
-            if (entry.getValue().num != section) continue;
-            entry.getValue().setGame(game);
-            for (Location l : entry.getValue().sectionLocs) {
+        for (Section s : sections.values()) {
+            if (s.num != section) continue;
+            s.setGame(game);
+            for (Location l : s.sectionLocs) {
                 l.getBlock().setType(Material.WHITE_GLAZED_TERRACOTTA);
             }
             return;
         }
     }
 
-    public void removeSection(Section s) {
-        for (Map.Entry<Material, Section> entry : sections.entrySet()) {
-            if (entry.getValue().equals(s)) {
-                for (Location l : entry.getValue().sectionLocs) {
+    public void removeSection(Section section) {
+        Material key = null;
+        for (Section s : sections.values()) {
+            if (section.equals(s)) {
+                for (Location l : s.sectionLocs) {
                     l.getBlock().setType(Material.RED_GLAZED_TERRACOTTA);
+                    if (key == null) {
+                        key = world.getBlockAt(new Location(world, l.getBlockX(), l.getBlockY()-1, l.getBlockZ())).getType();
+                    }
                 }
-                sections.remove(entry.getKey(), s);
+                break;
             }
         }
+        // avoid concurrent modification exception
+        sections.remove(key, section);
     }
 
     /**
@@ -292,13 +325,14 @@ public class DecisionDome extends Minigame {
 
         // do full loop to determine ties
         List<Section> mostVotes = new ArrayList<>(1);
-        for (Map.Entry<Material, Section> entry : sections.entrySet()) {
-           if (entry.getValue().votes.size() == currentMax && entry.getValue().game != null) {
-               mostVotes.add(entry.getValue());
+        for (Section s : sections.values()) {
+           if (s.votes.size() == currentMax && s.game != null) {
+               mostVotes.add(s);
            }
         }
 
         if (mostVotes.size() == 1) {
+            if (mostVotes.get(0) == null) Bukkit.broadcastMessage("[Debug] Null 1");
             return mostVotes.get(0);
         } else if (mostVotes.size() > 1) {
             tie = true;
@@ -341,6 +375,7 @@ public class DecisionDome extends Minigame {
         }
 
         List<Section> stillTied = new ArrayList<>();
+        Bukkit.broadcastMessage("[Debug] tiedSections.size() == " + tiedSections.size());
         for (Section s : tiedSections) {
             if (s.tiebreakerScore == maxScore) {
                stillTied.add(s);
@@ -370,15 +405,20 @@ public class DecisionDome extends Minigame {
             world.getBlockAt(coord[0], -38, coord[1]).setType(block);
             if (!b) {
                 world.getBlockAt(coord[0], -34, coord[1]).setType(Material.AIR);
-                world.getBlockAt(coord[0], -35, coord[1]).setType(Material.POLISHED_BLACKSTONE_SLAB);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        world.getBlockAt(coord[0], -35, coord[1]).setType(Material.POLISHED_BLACKSTONE_SLAB);
+                    }
+                }, 5L);
             }
         }
     }
 
     public void setSectionsRed() {
         if (!sections.isEmpty()) {
-            for (Map.Entry<Material, Section> entry : sections.entrySet()) {
-                for (Location l : entry.getValue().sectionLocs) {
+            for (Section s : sections.values()) {
+                for (Location l : s.sectionLocs) {
                     l.getBlock().setType(Material.RED_GLAZED_TERRACOTTA);
                 }
             }
@@ -427,7 +467,7 @@ public class DecisionDome extends Minigame {
 
     public void WarpEffects() {
         for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 90, 1, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 110, 1, false, false));
             p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_PORTAL_TRAVEL, 1, 1);
         }
     }
@@ -471,7 +511,6 @@ public class DecisionDome extends Minigame {
         }
         raiseWalls(false);
         removeSection(winner);
-        winner = null;
     }
 }
 

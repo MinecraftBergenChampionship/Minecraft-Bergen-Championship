@@ -22,6 +22,7 @@ public abstract class MBCTeam {
     private int rawCurrentScore = 0;
     private int multipliedCurrentScore = 0;
     private int currentPlace = 1;
+    private int sortID;
 
     public MBCTeam(String name, String fullName, Character icon, ChatColor chatColor) {
         this.name = name;
@@ -32,30 +33,37 @@ public abstract class MBCTeam {
             case RED:
                 this.color = Color.RED;
                 scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Red Rabbits");
+                sortID = 6;
                 break;
             case GREEN:
                 this.color = Color.GREEN;
                 scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Green Guardians");
+                sortID = 5;
                 break;
             case YELLOW:
                 this.color = Color.YELLOW;
                 scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Yellow Yaks");
+                sortID = 4;
                 break;
             case BLUE:
                 this.color = Color.BLUE;
                 scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Blue Bats");
+                sortID = 3;
                 break;
             case DARK_PURPLE:
                 this.color = Color.PURPLE;
                 scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Purple Pandas");
+                sortID = 2;
                 break;
             case LIGHT_PURPLE:
                 this.color = Color.fromRGB(243, 139, 170);
                 scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Pink Piglets");
+                sortID = 1;
                 break;
             default:
                 this.color = Color.WHITE;
                 scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Spectators");
+                sortID = 0;
                 break;
         }
         scoreboardTeam.setAllowFriendlyFire(false); // keeping scoreboard teams in just for this for now
@@ -232,7 +240,18 @@ public abstract class MBCTeam {
      * No hanging space.
      */
     public String teamNameFormat() {
-        return getIcon() + " " + this.chatColor + getTeamFullName() + ChatColor.WHITE;
+        return String.format(getIcon() + " " + this.chatColor + getTeamFullName() + ChatColor.WHITE);
+    }
+
+    /**
+     * Used for formatting with built-in padding.
+     * @return String fully formatted with padding.
+     */
+    public String teamNameFormatPadding() {
+        return String.format(
+                "%s%c %s%-17s%s", ChatColor.WHITE, getIcon(), getChatColor(),
+                getTeamFullName(), ChatColor.WHITE
+        );
     }
 
     /**
@@ -246,7 +265,7 @@ public abstract class MBCTeam {
             public void run() {
                 Bukkit.broadcastMessage(teamNameFormat() + " have been eliminated!");
             }
-        }, 10L);
+        }, 5L);
     }
 
     public void setPlace(int place) {
@@ -254,6 +273,15 @@ public abstract class MBCTeam {
     }
     public int getPlace() {
        return currentPlace;
+    }
+
+
+    /**
+     * Purely used for sorting
+     * @return ID based on color
+     */
+    public int getSortID() {
+        return sortID;
     }
 }
 
@@ -270,7 +298,11 @@ class TeamScoreSorter implements Comparator<MBCTeam> {
 
     public int compare(MBCTeam a, MBCTeam b)
     {
-        return a.getMultipliedTotalScore() - b.getMultipliedTotalScore();
+        if (a.getMultipliedTotalScore() == b.getMultipliedTotalScore()) {
+            // compare colors
+            return a.getSortID() - b.getSortID();
+        }
+        return b.getMultipliedTotalScore() - a.getMultipliedTotalScore(); // reverse so bigger numbers are at the top when sorted
     }
 }
 
@@ -279,6 +311,9 @@ class TeamRoundSorter implements Comparator<MBCTeam> {
 
     public int compare(MBCTeam a, MBCTeam b)
     {
-        return a.getMultipliedCurrentScore() - b.getMultipliedCurrentScore();
+        if (a.getMultipliedCurrentScore() == b.getMultipliedCurrentScore()) {
+            return a.getSortID() - b.getSortID();
+        }
+        return b.getMultipliedCurrentScore() - a.getMultipliedCurrentScore(); // reverse so bigger numbers are at the top when sorted
     }
 }

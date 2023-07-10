@@ -90,6 +90,10 @@ public class Participant implements Comparable<Participant> {
         return (ChatColor.WHITE + "" + getTeam().getIcon() + " " + getTeam().getChatColor() + getPlayer().getName()) + ChatColor.WHITE;
     }
 
+    public String getFormattedNamePadding() {
+        return String.format("%s%c %s%-18s%s", ChatColor.WHITE, getTeam().getIcon(), team.getChatColor(), getPlayer().getName(), ChatColor.RESET);
+    }
+
     public int getRawCurrentScore() {
         return rawCurrentScore;
     }

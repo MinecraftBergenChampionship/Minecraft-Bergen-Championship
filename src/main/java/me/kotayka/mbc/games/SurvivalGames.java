@@ -29,9 +29,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class SurvivalGames extends Game {
     private final SurvivalGamesMap map = new BCA();
@@ -44,8 +42,14 @@ public class SurvivalGames extends Game {
     private SurvivalGamesEvent event = SurvivalGamesEvent.GRACE_OVER;
     private final List<Location> chestLocations = new ArrayList<Location>(50);
     private final List<SupplyCrate> crates = new ArrayList<SupplyCrate>(3);
+    private Map<Player, Integer> playerKills = new HashMap<>();
     private boolean dropLocation = false;
     private int crateNum = 0;
+
+    // SCORING
+    public final int KILL_POINTS = 45;
+    public final int SURVIVAL_POINTS = 3;
+    public final int WIN_POINTS = 45;
 
     public SurvivalGames() {
         super("SurvivalGames");
@@ -94,6 +98,19 @@ public class SurvivalGames extends Game {
     }
 
     @Override
+    public void createScoreboard(Participant p) {
+        createLine(24, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Survival Games", p);
+        createLine(21, ChatColor.AQUA+""+ChatColor.BOLD+"Map: " + ChatColor.RESET+ map.mapName);
+        createLine(19, ChatColor.RESET.toString(), p);
+        createLine(15, ChatColor.AQUA + "Game Coins:", p);
+        createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
+        updatePlayersAliveScoreboard();
+        createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
+
+        updateInGameTeamScoreboard();
+    }
+
+    @Override
     public void events() {
         if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
@@ -128,7 +145,10 @@ public class SurvivalGames extends Game {
                     timeRemaining = 45;
                 } else {
                     setGameState(GameState.END_GAME);
+                    gameOverGraphics();
+                    roundWinners();
                     for (Participant p : playersAlive) {
+                        p.addCurrentScore(WIN_POINTS);
                         winEffects(p);
                     }
                     timeRemaining = 37;
@@ -166,12 +186,18 @@ public class SurvivalGames extends Game {
         } else if (getState().equals(GameState.OVERTIME)) {
             if (timeRemaining == 0) {
                 setGameState(GameState.END_GAME);
+                gameOverGraphics();
+                roundWinners();
                 for (Participant p : playersAlive) {
+                    p.addCurrentScore(WIN_POINTS);
                     winEffects(p);
                 }
                 timeRemaining = 37;
             }
         } else if (getState().equals(GameState.END_GAME)) {
+            if (timeRemaining == 35) {
+                map.resetMap();
+            }
             gameEndEvents();
         }
     }
@@ -226,11 +252,12 @@ public class SurvivalGames extends Game {
      * @see SurvivalGames crateLocation()
      */
     public void spawnSupplyCrate() {
+        // delete this once it is final
         double totalWeight = 0;
         for (SurvivalGamesItem item : supply_items) {
             totalWeight += item.getWeight();
         }
-        Bukkit.broadcastMessage("Total Supply Weight == " + totalWeight);
+        Bukkit.broadcastMessage("[Debug] Total Supply Weight == " + totalWeight);
 
         Location l = crates.get(crateNum).getLocation();
         l.getBlock().setType(Material.BLACK_SHULKER_BOX);
@@ -245,7 +272,6 @@ public class SurvivalGames extends Game {
                 if (r <= 0.0) break;
             }
 
-            //int lootNum = rand.nextInt(items.size());
             crate.getInventory().setItem((int) (Math.random()*27), supply_items.get(idx).getItem());
         }
     }
@@ -257,8 +283,8 @@ public class SurvivalGames extends Game {
         for (SupplyCrate crate : crates) {
             if (!crate.beenOpened()) {
                 Location l = crate.getLocation();
-                map.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, l.getX(), l.getBlockY() + 1, l.getZ(), 5);
-                map.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, l.getX(), l.getBlockY() + 1, l.getZ(), 5);
+                map.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, l.getX() + Math.random()*0.5-0.5, l.getBlockY() + 1, l.getZ() + Math.random()*0.5-0.5, 5);
+                map.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, l.getX() + Math.random()*0.5-0.5, l.getBlockY() + Math.random(), l.getZ() + Math.random()*0.5-0.5, 5);
             }
         }
     }
@@ -268,11 +294,12 @@ public class SurvivalGames extends Game {
      * If empty, updates list of eligible Super Chests.
      */
     public void regenChest() {
+        // delete when final.
         double totalWeight = 0;
         for (SurvivalGamesItem item : items) {
             totalWeight += item.getWeight();
         }
-        Bukkit.broadcastMessage("Total Weight == " + totalWeight);
+        Bukkit.broadcastMessage("[Debug] Total Weight == " + totalWeight);
 
         Random rand = new Random();
         Chunk[] c = map.getWorld().getLoadedChunks();
@@ -300,19 +327,6 @@ public class SurvivalGames extends Game {
                 }
             }
         }
-    }
-
-    @Override
-    public void createScoreboard(Participant p) {
-        createLine(24, ChatColor.AQUA + "" + ChatColor.BOLD + "Game: "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Survival Games", p);
-        createLine(21, ChatColor.AQUA+""+ChatColor.BOLD+"Map: " + ChatColor.RESET+ map.mapName);
-        createLine(19, ChatColor.RESET.toString(), p);
-        createLine(15, ChatColor.AQUA + "Game Coins:", p);
-        createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
-        updatePlayersAliveScoreboard();
-        createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
-
-        updateInGameTeamScoreboard();
     }
 
     /**
@@ -353,7 +367,24 @@ public class SurvivalGames extends Game {
      */
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
+        Participant killer = Participant.getParticipant(e.getPlayer().getKiller());
+        if (killer != null) {
+            killer.addCurrentScore(KILL_POINTS);
+            if (playerKills.get(e.getPlayer().getKiller()) == null) {
+                playerKills.put(e.getPlayer().getKiller(), 1);
+                createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your Kills: "+ChatColor.RESET+"1", killer);
+            } else {
+                int kills = playerKills.get(e.getPlayer().getKiller());
+                playerKills.put(e.getPlayer().getKiller(), kills++);
+                createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
+            }
+        }
+
         deathEffectsWithHealth(e);
+        // may require testing due to concurrency
+        for (Participant p : playersAlive) {
+            p.addCurrentScore(SURVIVAL_POINTS);
+        }
     }
 
     /**

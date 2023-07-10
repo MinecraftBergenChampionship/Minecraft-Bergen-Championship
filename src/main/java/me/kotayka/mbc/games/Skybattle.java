@@ -45,7 +45,7 @@ public class Skybattle extends Game {
 
     @Override
     public void createScoreboard(Participant p) {
-        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game: "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Sky Battle", p);
+        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Sky Battle", p);
         createLine(22, ChatColor.GREEN+""+ChatColor.BOLD+"Round: " + ChatColor.RESET+roundNum+"/3", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
@@ -183,6 +183,7 @@ public class Skybattle extends Game {
                 roundNum++;
                 map.resetMap();
                 loadPlayers();
+                createLine(22, ChatColor.GREEN+""+ChatColor.BOLD+"Round: " + ChatColor.RESET+roundNum+"/3");
                 timeRemaining = 20;
                 setGameState(GameState.STARTING);
             }
@@ -406,20 +407,19 @@ public class Skybattle extends Game {
         } else {
             Bukkit.broadcastMessage("[Debug] normal death");
             SkybattlePlayer killer = (SkybattlePlayer) SkybattlePlayer.getGamePlayer(e.getPlayer().getKiller());
-            Participant.getParticipant(e.getPlayer()).addCurrentScore(KILL_POINTS);
+            killer.getParticipant().addCurrentScore(KILL_POINTS);
             killer.kills++;
-            createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills);
+            createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
             playerDeathEffects(e); // if there was a killer, just send over to default
         }
 
         for (Participant p : playersAlive) {
-            Bukkit.broadcastMessage("[Debug] p.getName() == " + p.getFormattedName());
             p.addCurrentScore(SURVIVAL_POINTS);
         }
 
         // may require testing due to concurrency
-        updatePlayersAliveScoreboard();
         player.getPlayer().teleport(map.getWorld().getSpawnLocation());
+        player.getPlayer().setGameMode(GameMode.SPECTATOR);
     }
 
     /**
@@ -443,7 +443,7 @@ public class Skybattle extends Game {
             SkybattlePlayer killer = (SkybattlePlayer) SkybattlePlayer.getGamePlayer(victim.lastDamager);
             killer.kills++;
 
-            createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills);
+            createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
             killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
             killer.getParticipant().addCurrentScore(KILL_POINTS);
@@ -486,7 +486,6 @@ public class Skybattle extends Game {
         e.setDeathMessage(deathMessage);
 
         updatePlayersAlive(victim.getParticipant());
-        updatePlayersAliveScoreboard();
     }
 
     /**

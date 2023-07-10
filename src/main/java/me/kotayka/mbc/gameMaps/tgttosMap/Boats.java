@@ -7,9 +7,10 @@ import org.bukkit.inventory.ItemStack;
 public class Boats extends TGTTOSMap {
     public Boats() {
         super("Boats", new ItemStack[]{new ItemStack(Material.OAK_BOAT), new ItemStack(Material.SNOWBALL, 6), new ItemStack(Material.LEATHER_BOOTS)});
+        Location l = new Location(getWorld(), 300, 70, -300);
+        l.setYaw((float) -90);
         super.loadMap(
-                new Location(getWorld(), 300, 70, -300),
-                new Location[]{new Location(getWorld(), 462, 65, -262), new Location(getWorld(), 467, 65, -269)},
+                l, new Location[]{new Location(getWorld(), 462, 65, -262), new Location(getWorld(), 467, 65, -269)},
                55
         );
     }

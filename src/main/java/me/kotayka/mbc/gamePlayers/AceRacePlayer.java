@@ -39,7 +39,7 @@ public class AceRacePlayer extends GamePlayer {
         long lapTime;
         ACE_RACE.finishedPlayersByLap[lap - 1]++;  // increment amount of players that have finished
         placement = ACE_RACE.finishedPlayersByLap[lap - 1];
-        ChatColor placementColor = ACE_RACE.getPlacementColor(placement);
+        String placementColor = ACE_RACE.getColorStringFromPlacement(placement);
         String placementString = ACE_RACE.getPlace(placement);
 
         updateScore(this.getParticipant());
@@ -83,15 +83,15 @@ public class AceRacePlayer extends GamePlayer {
             Bukkit.broadcastMessage(
                     this.getParticipant().getFormattedName() + ChatColor.GRAY + " has finished Lap " + lap + " in " +
                             placementColor + placementString + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ")");
-            this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Completed Lap " + lap + "!", placementColor + "#" + placement + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
+            this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Completed Lap " + lap + "!", placementColor + placementString + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
             lap++;
         } else {
             String totalTimeFormat = ChatColor.YELLOW + new SimpleDateFormat("m:ss.S").format(new Date(totalTime));
             this.getParticipant().getPlayer().setGameMode(GameMode.SPECTATOR);
-            this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Finished!", placementColor + "#" + placement + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
+            this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Finished!", placementColor +  placementString + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
             Bukkit.broadcastMessage(
-                    this.getParticipant().getFormattedName() + ChatColor.GRAY + "" + ChatColor.BOLD + " has finished " + ACE_RACE.map.mapName + " in " +
-                            placementColor + placementString + ChatColor.GRAY + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ")");
+                    this.getParticipant().getFormattedName() + " finished " +ChatColor.BOLD+ ACE_RACE.map.mapName + ChatColor.RESET+" in " +
+                            placementColor + placementString + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.RESET + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ChatColor.RESET+ ")");
             MBC.spawnFirework(this.getParticipant());
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");
             this.getParticipant().getPlayer().sendMessage("                                ");
