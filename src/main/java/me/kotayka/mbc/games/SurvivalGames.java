@@ -144,9 +144,9 @@ public class SurvivalGames extends Game {
                     setGameState(GameState.OVERTIME);
                     timeRemaining = 45;
                 } else {
-                    setGameState(GameState.END_GAME);
                     gameOverGraphics();
                     roundWinners(WIN_POINTS);
+                    setGameState(GameState.END_GAME);
                     timeRemaining = 37;
                 }
             }
@@ -181,9 +181,9 @@ public class SurvivalGames extends Game {
             UpdateEvent();
         } else if (getState().equals(GameState.OVERTIME)) {
             if (timeRemaining == 0) {
-                setGameState(GameState.END_GAME);
                 gameOverGraphics();
                 roundWinners(WIN_POINTS);
+                setGameState(GameState.END_GAME);
                 timeRemaining = 37;
             }
         } else if (getState().equals(GameState.END_GAME)) {
@@ -387,7 +387,7 @@ public class SurvivalGames extends Game {
     public void onBlockBreak(BlockBreakEvent e) {
         // this solution might be temporary, not sure if other maps or other blocks are necessary to add.
         String brokenBlock = e.getBlock().getType().toString();
-        if (!brokenBlock.endsWith("GLASS"))  e.setCancelled(true);
+        if (!brokenBlock.contains("GLASS"))  e.setCancelled(true);
 
         map.brokenBlocks.put(e.getBlock().getLocation(), e.getBlock().getType());
     }

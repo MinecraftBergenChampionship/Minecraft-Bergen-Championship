@@ -264,6 +264,7 @@ public class Skybattle extends Game {
             // Add each creeper spawned to a map, use to check kill credit
             Location spawn = p.getTargetBlock(null, 5).getLocation();
             BlockFace blockFace = e.getBlockFace();
+            Bukkit.broadcastMessage("[Debug] blockFace == " + blockFace);
             // west -x east +x south +z north -z
             switch (blockFace) {
                 case EAST -> spawn.add(1.5, 0, 0);

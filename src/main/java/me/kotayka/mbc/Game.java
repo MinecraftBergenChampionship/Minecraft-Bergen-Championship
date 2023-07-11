@@ -259,14 +259,15 @@ public abstract class Game extends Minigame {
                 p.getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
 
                 if (i == playersAlive.size()-1) {
-                    survivors.append("and ").append(playersAlive.get(i).getFormattedName());
+                    survivors.append("and ").append(p.getFormattedName());
                 } else {
-                    survivors.append(playersAlive.get(i).getFormattedName()).append(", ");
+                    survivors.append(p.getFormattedName()).append(", ");
                 }
             }
             Bukkit.broadcastMessage(survivors.toString()+ChatColor.WHITE+"!");
         } else if (playersAlive.size() == 1) {
             playersAlive.get(0).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
+            playersAlive.get(0).addCurrentScore(points);
             winEffects(playersAlive.get(0));
             Bukkit.broadcastMessage("The winner of this round is " + playersAlive.get(0).getFormattedName()+"!");
         } else {

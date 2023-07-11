@@ -116,8 +116,9 @@ public class Participant implements Comparable<Participant> {
     }
 
     public void addCurrentScore(int amount) {
-        multipliedCurrentScore += amount;
-        rawCurrentScore += amount*MBC.getInstance().multiplier;
+        Bukkit.broadcastMessage("[Debug] in add current score!");
+        rawCurrentScore += amount;
+        multipliedCurrentScore += amount*MBC.getInstance().multiplier;
         team.addCurrentTeamScore(amount);
 
         MBC.getInstance().getGame().updatePlayerCurrentScoreDisplay(this);
