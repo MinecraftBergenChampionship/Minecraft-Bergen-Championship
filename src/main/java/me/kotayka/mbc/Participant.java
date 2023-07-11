@@ -29,18 +29,10 @@ public class Participant implements Comparable<Participant> {
     public String gameObjective;
 
     public HashMap<Integer, String> lines = new HashMap<>();
-    public HashMap<String, Team> scoreboardTeams = new HashMap<>();
 
     public Participant(Player p) {
         player=p;
         p.setScoreboard(board);
-
-        for (MBCTeam team : MBC.getInstance().teams) {
-            Team x = board.registerNewTeam(team.fullName);
-            x.setColor(team.chatColor);
-            x.setPrefix(team.getIcon()+" ");
-            scoreboardTeams.put(team.getTeamName(), x);
-        }
 
         changeTeam(MBC.getInstance().spectator);
     }
@@ -51,7 +43,7 @@ public class Participant implements Comparable<Participant> {
             team.removePlayer(this);
         }
 
-        addPlayerToTeamScoreboard(this, t);
+        addPlayerToTeamScoreboard(t);
 
         team = t;
         team.addPlayer(this);
@@ -173,9 +165,19 @@ public class Participant implements Comparable<Participant> {
         return getPlayer().getInventory();
     }
 
-    public static void addPlayerToTeamScoreboard(Participant participant, MBCTeam t) {
-        for (Participant p : MBC.getInstance().players) {
-            p.scoreboardTeams.get(t.getTeamName()).addPlayer(participant.getPlayer());
+    /**
+     * Adds player to scoreboard team, and initializes the team if uninitialized.
+     * @param t Team of Participant to be added to
+     */
+    public void addPlayerToTeamScoreboard(MBCTeam t) {
+        if (t.scoreboardTeam == null) {
+            t.scoreboardTeam = board.registerNewTeam(t.fullName);
+            t.scoreboardTeam.setColor(t.getChatColor());
+            t.scoreboardTeam.setPrefix(String.format("%s%c ", ChatColor.WHITE, t.getIcon()));
+            t.scoreboardTeam.setAllowFriendlyFire(false);
+            t.scoreboardTeam.addPlayer(player);
+        } else {
+            t.scoreboardTeam.addPlayer(player);
         }
     }
 

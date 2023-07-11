@@ -15,7 +15,7 @@ public abstract class MBCTeam {
     protected Character icon;
     protected ChatColor chatColor;
     protected Color color;
-    protected Team scoreboardTeam;
+    protected Team scoreboardTeam = null;
 
     private int rawTotalScore = 0;
     private int multipliedTotalScore = 0;
@@ -32,42 +32,33 @@ public abstract class MBCTeam {
         switch(chatColor) {
             case RED:
                 this.color = Color.RED;
-                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Red Rabbits");
                 sortID = 6;
                 break;
             case GREEN:
                 this.color = Color.GREEN;
-                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Green Guardians");
                 sortID = 5;
                 break;
             case YELLOW:
                 this.color = Color.YELLOW;
-                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Yellow Yaks");
                 sortID = 4;
                 break;
             case BLUE:
                 this.color = Color.BLUE;
-                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Blue Bats");
                 sortID = 3;
                 break;
             case DARK_PURPLE:
                 this.color = Color.PURPLE;
-                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Purple Pandas");
                 sortID = 2;
                 break;
             case LIGHT_PURPLE:
                 this.color = Color.fromRGB(243, 139, 170);
-                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Pink Piglets");
                 sortID = 1;
                 break;
             default:
                 this.color = Color.WHITE;
-                scoreboardTeam = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam("Spectators");
                 sortID = 0;
                 break;
         }
-        scoreboardTeam.setAllowFriendlyFire(false); // keeping scoreboard teams in just for this for now
-                                                    // other possibilities like glowing for the future
     }
 
     public List<Participant>teamPlayers = new ArrayList<>(4);

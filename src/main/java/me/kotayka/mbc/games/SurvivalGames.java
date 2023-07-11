@@ -146,11 +146,7 @@ public class SurvivalGames extends Game {
                 } else {
                     setGameState(GameState.END_GAME);
                     gameOverGraphics();
-                    roundWinners();
-                    for (Participant p : playersAlive) {
-                        p.addCurrentScore(WIN_POINTS);
-                        winEffects(p);
-                    }
+                    roundWinners(WIN_POINTS);
                     timeRemaining = 37;
                 }
             }
@@ -187,11 +183,7 @@ public class SurvivalGames extends Game {
             if (timeRemaining == 0) {
                 setGameState(GameState.END_GAME);
                 gameOverGraphics();
-                roundWinners();
-                for (Participant p : playersAlive) {
-                    p.addCurrentScore(WIN_POINTS);
-                    winEffects(p);
-                }
+                roundWinners(WIN_POINTS);
                 timeRemaining = 37;
             }
         } else if (getState().equals(GameState.END_GAME)) {

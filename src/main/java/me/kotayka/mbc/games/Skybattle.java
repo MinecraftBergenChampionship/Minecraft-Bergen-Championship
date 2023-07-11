@@ -51,7 +51,13 @@ public class Skybattle extends Game {
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
         updatePlayersAliveScoreboard();
-        createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
+        if (skybattlePlayerList.size() < 1) {
+            createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
+        } else {
+            for (SkybattlePlayer pl : skybattlePlayerList) {
+                createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+pl.kills);
+            }
+        }
 
         updateInGameTeamScoreboard();
     }
@@ -175,10 +181,7 @@ public class Skybattle extends Game {
         } else if (getState().equals(GameState.END_ROUND)) {
             if (timeRemaining == 8) {
                 roundOverGraphics();
-                roundWinners();
-                for (Participant p : playersAlive) {
-                    p.addCurrentScore(WIN_POINTS);
-                }
+                roundWinners(WIN_POINTS);
             } else if (timeRemaining == 1) {
                 roundNum++;
                 map.resetMap();
@@ -190,7 +193,7 @@ public class Skybattle extends Game {
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 37) {
                 gameOverGraphics();
-                roundWinners();
+                roundWinners(WIN_POINTS);
             } else if (timeRemaining <= 35) {
                 gameEndEvents();
             }

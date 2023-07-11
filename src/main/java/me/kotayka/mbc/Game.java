@@ -247,14 +247,16 @@ public abstract class Game extends Minigame {
 
     /**
      * General formatting function to get winners of a round and broadcast text.
-     * Does not handle scoring.
+     * Adds scoring if specified.
      */
-    public void roundWinners() {
+    public void roundWinners(int points) {
         if (playersAlive.size() > 1) {
             StringBuilder survivors = new StringBuilder("The winners of this round are: ");
             for (int i = 0; i < playersAlive.size(); i++) {
-                winEffects(playersAlive.get(i));
-                playersAlive.get(i).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
+                Participant p = playersAlive.get(i);
+                winEffects(p);
+                p.addCurrentScore(points);
+                p.getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
 
                 if (i == playersAlive.size()-1) {
                     survivors.append("and ").append(playersAlive.get(i).getFormattedName());
