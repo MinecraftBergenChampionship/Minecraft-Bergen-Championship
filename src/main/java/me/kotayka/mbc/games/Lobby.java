@@ -1,5 +1,6 @@
 package me.kotayka.mbc.games;
 
+import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Minigame;
 import me.kotayka.mbc.Participant;
@@ -9,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class Lobby extends Minigame {
     public static final Location LOBBY = new Location(Bukkit.getWorld("world"), 0, 1, 0);
@@ -27,7 +29,7 @@ public class Lobby extends Minigame {
         createLine(17, p.getTeam().getChatColor()+p.getTeam().getTeamFullName(), p);
         createLine(16, ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.GREEN+"Game Scores", p);
-        createLine(3, ChatColor.RESET.toString()+ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET.toString()+ChatColor.RESET.toString(), p);
         updatePlayerTotalScoreDisplay(p);
 
         p.getPlayer().sendMessage(p.getTeam().teamPlayers.toString());
@@ -70,7 +72,9 @@ public class Lobby extends Minigame {
         createScoreboard();
         stopTimer();
         setTimer(120);
+        setGameState(GameState.ACTIVE);
     }
+
 
     /**
      * Updates the player's total score in lobby

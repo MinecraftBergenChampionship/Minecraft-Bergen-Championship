@@ -1,9 +1,11 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.commands.changeTeam;
+import me.kotayka.mbc.commands.pause;
 import me.kotayka.mbc.commands.start;
 import me.kotayka.mbc.commands.tab.changeTeamTabCompletion;
 import me.kotayka.mbc.commands.tab.startTabCompletion;
+import me.kotayka.mbc.commands.unpause;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -19,7 +21,6 @@ public class Plugin extends JavaPlugin implements Listener {
         for (Player p : Bukkit.getOnlinePlayers()) {
             MBC.getInstance().players.add(new Participant(p));
         }
-
         Bukkit.getLogger().info("MBC enabled");
 
         getServer().getPluginManager().registerEvents(MBC.getInstance(), this);
@@ -34,6 +35,9 @@ public class Plugin extends JavaPlugin implements Listener {
 
         getCommand("start").setExecutor(new start());
         getCommand("start").setTabCompleter(new startTabCompletion());
+
+        getCommand("pause").setExecutor(new pause());
+        getCommand("unpause").setExecutor(new unpause());
     }
 
     @Override

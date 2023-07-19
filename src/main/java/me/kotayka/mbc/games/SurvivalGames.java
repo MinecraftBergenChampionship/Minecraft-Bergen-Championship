@@ -103,9 +103,9 @@ public class SurvivalGames extends Game {
         createLine(21, ChatColor.AQUA+""+ChatColor.BOLD+"Map: " + ChatColor.RESET+ map.mapName);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
-        createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
         updatePlayersAliveScoreboard();
-        createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
+        createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
 
         updateInGameTeamScoreboard();
     }
@@ -364,11 +364,11 @@ public class SurvivalGames extends Game {
             killer.addCurrentScore(KILL_POINTS);
             if (playerKills.get(e.getPlayer().getKiller()) == null) {
                 playerKills.put(e.getPlayer().getKiller(), 1);
-                createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your Kills: "+ChatColor.RESET+"1", killer);
+                createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your Kills: "+ChatColor.RESET+"1", killer);
             } else {
                 int kills = playerKills.get(e.getPlayer().getKiller());
                 playerKills.put(e.getPlayer().getKiller(), kills++);
-                createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
+                createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
             }
         }
 

@@ -9,6 +9,8 @@ import me.kotayka.mbc.gameTeams.bsabmTeam;
 import me.kotayka.mbc.gameMaps.bsabmMaps.BuildMart;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class BSABM extends Game {
 
@@ -29,7 +31,7 @@ public class BSABM extends Game {
         createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " TGTTOS", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
-        createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
 
         updateInGameTeamScoreboard();
         displayTeamCurrentScore(p.getTeam());

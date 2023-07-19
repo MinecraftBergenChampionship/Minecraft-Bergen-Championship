@@ -2,10 +2,14 @@ name: MBC
 version: '${project.version}'
 main: me.kotayka.mbc.Plugin
 api-version: 1.18
-authors: [ Kotayka, R_RR ]
+authors: [ Kotayka, rspacerr ]
 description: Minecraft Bruh Championship Mini games
 commands:
   changeTeam:
     description: Changing a team
   start:
     description: start a game
+  pause:
+    description: pause game/event
+  unpause:
+    description: unpause game/event

@@ -32,27 +32,27 @@ public abstract class MBCTeam {
         switch(chatColor) {
             case RED:
                 this.color = Color.RED;
-                sortID = 6;
+                sortID = 1;
                 break;
             case GREEN:
                 this.color = Color.GREEN;
-                sortID = 5;
+                sortID = 2;
                 break;
             case YELLOW:
                 this.color = Color.YELLOW;
-                sortID = 4;
+                sortID = 3;
                 break;
             case BLUE:
                 this.color = Color.BLUE;
-                sortID = 3;
+                sortID = 4;
                 break;
             case DARK_PURPLE:
                 this.color = Color.PURPLE;
-                sortID = 2;
+                sortID = 5;
                 break;
             case LIGHT_PURPLE:
                 this.color = Color.fromRGB(243, 139, 170);
-                sortID = 1;
+                sortID = 6;
                 break;
             default:
                 this.color = Color.WHITE;
@@ -231,18 +231,7 @@ public abstract class MBCTeam {
      * No hanging space.
      */
     public String teamNameFormat() {
-        return String.format(getIcon() + " " + this.chatColor + getTeamFullName() + ChatColor.WHITE);
-    }
-
-    /**
-     * Used for formatting with built-in padding.
-     * @return String fully formatted with padding.
-     */
-    public String teamNameFormatPadding() {
-        return String.format(
-                "%s%c %s%-17s%s", ChatColor.WHITE, getIcon(), getChatColor(),
-                getTeamFullName(), ChatColor.WHITE
-        );
+        return String.format("%s%c %s%s%s", ChatColor.WHITE, getIcon(), getChatColor(), getTeamFullName(), ChatColor.WHITE);
     }
 
     /**

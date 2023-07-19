@@ -10,10 +10,11 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class Participant implements Comparable<Participant> {
+public class Participant {
 
     // Player's un-multiplied individual score; updates between games
     private int rawTotalScore = 0;
@@ -24,16 +25,24 @@ public class Participant implements Comparable<Participant> {
     private MBCTeam team;
     private final Player player;
 
-    public final Scoreboard board = MBC.getInstance().manager.getNewScoreboard();
+    //public final Scoreboard board = MBC.getInstance().manager.getNewScoreboard();
     public Objective objective;
     public String gameObjective;
 
     public HashMap<Integer, String> lines = new HashMap<>();
 
+    // COMPARATORS
+    public static final Comparator<Participant> rawTotalScoreComparator =
+            Comparator.comparingInt(Participant::getRawTotalScore);
+
+    public static final Comparator<Participant> multipliedCurrentScoreComparator =
+            Comparator.comparingInt(Participant::getMultipliedCurrentScore);
+
     public Participant(Player p) {
         player=p;
-        p.setScoreboard(board);
+        p.setScoreboard(MBC.getInstance().board);
 
+        Bukkit.broadcastMessage("[Debug] assigning team");
         changeTeam(MBC.getInstance().spectator);
     }
 
@@ -80,10 +89,6 @@ public class Participant implements Comparable<Participant> {
      */
     public String getFormattedName() {
         return (ChatColor.WHITE + "" + getTeam().getIcon() + " " + getTeam().getChatColor() + getPlayer().getName()) + ChatColor.WHITE;
-    }
-
-    public String getFormattedNamePadding() {
-        return String.format("%s%c %s%-18s%s", ChatColor.WHITE, getTeam().getIcon(), team.getChatColor(), getPlayer().getName(), ChatColor.RESET);
     }
 
     public int getRawCurrentScore() {
@@ -134,7 +139,7 @@ public class Participant implements Comparable<Participant> {
 
     public static boolean contains(Player p) {
         for (Participant x : MBC.getInstance().players) {
-            if (Objects.equals(x.getPlayer(), p)) {
+            if (Objects.equals(x.getPlayer().getName(), p.getName())) {
                 return true;
             }
         }
@@ -144,7 +149,7 @@ public class Participant implements Comparable<Participant> {
 
     public static Participant getParticipant(Player p) {
         for (Participant x : MBC.getInstance().players) {
-            if (Objects.equals(x.getPlayer(), p)) {
+            if (Objects.equals(x.getPlayer().getName(), p.getName())) {
                 return x;
             }
         }
@@ -172,7 +177,7 @@ public class Participant implements Comparable<Participant> {
      */
     public void addPlayerToTeamScoreboard(MBCTeam t) {
         if (t.scoreboardTeam == null) {
-            t.scoreboardTeam = board.registerNewTeam(t.fullName);
+            t.scoreboardTeam = MBC.getInstance().board.registerNewTeam(t.fullName);
             t.scoreboardTeam.setColor(t.getChatColor());
             t.scoreboardTeam.setPrefix(String.format("%s%c ", ChatColor.WHITE, t.getIcon()));
             t.scoreboardTeam.setAllowFriendlyFire(false);
@@ -180,13 +185,5 @@ public class Participant implements Comparable<Participant> {
         } else {
             t.scoreboardTeam.addPlayer(player);
         }
-    }
-
-    /**
-     * Comparison of players is based off unmultiplied total score.
-     */
-    @Override
-    public int compareTo(@NotNull Participant o) {
-        return (this.rawTotalScore - o.rawTotalScore);
     }
 }

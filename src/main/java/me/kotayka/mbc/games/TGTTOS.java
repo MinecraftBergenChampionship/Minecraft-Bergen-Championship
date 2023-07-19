@@ -55,7 +55,7 @@ public class TGTTOS extends Game {
 
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
-        createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
 
         updateInGameTeamScoreboard();
     }

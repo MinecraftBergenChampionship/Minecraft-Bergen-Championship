@@ -48,7 +48,7 @@ public class AceRace extends Game {
         createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Ace Race", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
-        createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
 
         updateInGameTeamScoreboard();
         updatePlayerCurrentScoreDisplay(p);
@@ -143,7 +143,6 @@ public class AceRace extends Game {
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000, 10, false, false)); // can probably use scoreboard teams but until then
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
 

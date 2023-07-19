@@ -5,6 +5,7 @@ import me.kotayka.mbc.games.Lobby;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -20,7 +21,7 @@ public abstract class Game extends Minigame {
     // TRUE = pvp is on ; FALSE = pvp is off
     private boolean PVP_ENABLED = false;
 
-    public SortedMap<Participant, Integer> gameIndividual = new TreeMap<>();
+    public List<Participant> gameIndividual = new ArrayList<Participant>(MBC.getInstance().getPlayers().size());
 
     public Game(String gameName) {
         super(gameName);
@@ -30,6 +31,9 @@ public abstract class Game extends Minigame {
 
     public List<Participant> playersAlive = new ArrayList<>();
     public List<MBCTeam> teamsAlive = new ArrayList<>();
+
+    // Used to signal whether or not there has been a disconnect when moving from tutorial -> starting; if so, pause
+    public boolean disconnect = false;
 
 
     public void createScoreboard() {
@@ -130,8 +134,8 @@ public abstract class Game extends Minigame {
      */
     public void updatePlayersAlive(Participant p) {
         playersAlive.remove(p);
-        updatePlayersAliveScoreboard();
         checkLastTeam(p.getTeam());
+        updatePlayersAliveScoreboard();
     }
 
     /**
@@ -198,8 +202,8 @@ public abstract class Game extends Minigame {
      *  Loops for all players by default.
      */
     public void updatePlayersAliveScoreboard() {
-        createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS);
-        createLine(1, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
+        createLine(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS);
+        createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
     }
 
     /**
@@ -214,8 +218,8 @@ public abstract class Game extends Minigame {
      * @param p Specific participant to update scoreboard
      */
     public void updatePlayersAliveScoreboard(Participant p) {
-        createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS, p);
-        createLine(1, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS, p);
+        createLine(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS, p);
+        createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS, p);
     }
 
     /**
@@ -319,31 +323,22 @@ public abstract class Game extends Minigame {
     */
     public void gameEndEvents() {
         // GAME_END should have 35 seconds by default
-        switch(timeRemaining) {
-            case 30:
-                Bukkit.broadcastMessage(ChatColor.BOLD+"Each team scored this game:");
-                break;
-            case 28:
-                printRoundScores();
-                break;
-            case 22:
-                Bukkit.broadcastMessage(ChatColor.BOLD+"Top 5 players this game:");
-                break;
-            case 20:
-                getScores();
-                break;
-            case 14:
-                Bukkit.broadcastMessage(ChatColor.BOLD+"Current event standings:");
-                break;
-            case 12:
-                printEventScores();
-                break;
-            case 1:
-                Bukkit.broadcastMessage(ChatColor.RED + "Returning to lobby...");
-                break;
-            case 0:
-                returnToLobby();
-                break;
+        switch (timeRemaining) {
+            case 30 -> {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
+                TO_PRINT = printRoundScores();
+            }
+            case 22 -> {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "Top 5 players this game:");
+                TO_PRINT = getScores();
+            }
+            case 14 -> {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "Current event standings:");
+                TO_PRINT = printEventScores();
+            }
+            case 1 -> Bukkit.broadcastMessage(ChatColor.RED + "Returning to lobby...");
+            case 28, 20, 12 -> Bukkit.broadcastMessage(TO_PRINT);
+            case 0 -> returnToLobby();
         }
     }
 
@@ -352,18 +347,17 @@ public abstract class Game extends Minigame {
      * Calls addRoundScoreToGame() to load stats from this game to overall MBC.
      * @see Participant addRoundScoreToGame()
      */
-    public void getScores() {
+    public String getScores() {
         int num = 0; // separate var incase there is an absurd amount of ties
         StringBuilder topFive = new StringBuilder();
         int lastScore = -1;
         int counter = 0;
 
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            gameIndividual.put(p, p.getRawCurrentScore());
-        }
-        Bukkit.broadcastMessage("[Debug] individual size == " + gameIndividual.keySet().size());
+        gameIndividual.addAll(MBC.getInstance().getPlayers());
+        gameIndividual.sort(Participant.multipliedCurrentScoreComparator);
 
-        for (Participant p : gameIndividual.keySet()) {
+        for (Participant p : gameIndividual) {
+            Bukkit.broadcastMessage("[Debug] p == " + p);
             if (p.getRawCurrentScore() != lastScore) {
                 num++;
                 if (counter == 4) {
@@ -373,7 +367,7 @@ public abstract class Game extends Minigame {
 
             if (counter < 5) {
                 topFive.append(String.format(
-                        (num) + ". %s%5d (%d x %.2f)\n", p.getFormattedNamePadding(), p.getRawCurrentScore(), p.getMultipliedCurrentScore(), MBC.getInstance().multiplier)
+                        (num) + ". %s: %5d (%d x %.2f)\n", p.getFormattedName(), p.getRawCurrentScore(), p.getMultipliedCurrentScore(), MBC.getInstance().multiplier)
                 );
                 lastScore = p.getRawCurrentScore();
                 counter++;
@@ -381,10 +375,10 @@ public abstract class Game extends Minigame {
             }
             p.addCurrentScoreToTotal();
         }
-        Bukkit.broadcastMessage(topFive.toString());
+        return topFive.toString();
     }
 
-    public void printEventScores() {
+    public String printEventScores() {
         // each player's scores are added to event total in
         // getScores() by calling p.addCurrentScoreToTotal()
         List<MBCTeam> gameScores = new ArrayList<>(getValidTeams());
@@ -395,13 +389,13 @@ public abstract class Game extends Minigame {
             MBCTeam t = gameScores.get(i);
             str.append(ChatColor.BOLD+""+(i+1)+". ")
                .append(String.format(
-                   "%s%s%5d\n", t.teamNameFormatPadding(), ChatColor.WHITE, t.getMultipliedTotalScore()
+                   "%s: %d", t.teamNameFormat(), t.getMultipliedTotalScore()
             ));
         }
-        Bukkit.broadcastMessage(str.toString());
+        return str.toString();
     }
 
-    public void printRoundScores() {
+    public String printRoundScores() {
         List<MBCTeam> teamRoundsScores = new ArrayList<>(getValidTeams());
         teamRoundsScores.sort(new TeamRoundSorter());
         StringBuilder teamString = new StringBuilder();
@@ -410,11 +404,10 @@ public abstract class Game extends Minigame {
             MBCTeam t = teamRoundsScores.get(i);
             teamString.append(ChatColor.BOLD+""+(i+1)+". ")
                 .append(String.format(
-                    "%s%5d\n", t.teamNameFormatPadding(), t.getMultipliedCurrentScore()
+                    "%s: %d", t.teamNameFormat(), t.getMultipliedCurrentScore()
             ));
         }
-
-        Bukkit.broadcastMessage(teamString.toString());
+        return teamString.toString();
     }
 
     public void returnToLobby() {
@@ -466,7 +459,7 @@ public abstract class Game extends Minigame {
     /**
      * Apply win effects to player
      * Does NOT check if player won, logic must be implemented before call
-     * @param p GamePlayer that has won a round/game.
+     * @param p Participant that has won a round/game.
      */
     public void winEffects(Participant p) {
         MBC.spawnFirework(p);
@@ -536,5 +529,12 @@ public abstract class Game extends Minigame {
         Bukkit.broadcastMessage(s);
         PVP_ENABLED = b;
     }
+
+    /**
+     * General rules for handling a disconnected player
+     * @param p Participant
+     */
+    public void handleDisconnect(Participant p) {} // TODO
+
     public boolean PVP() { return PVP_ENABLED; }
 }

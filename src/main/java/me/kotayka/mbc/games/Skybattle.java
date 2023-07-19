@@ -49,13 +49,13 @@ public class Skybattle extends Game {
         createLine(22, ChatColor.GREEN+""+ChatColor.BOLD+"Round: " + ChatColor.RESET+roundNum+"/3", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
-        createLine(3, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
         updatePlayersAliveScoreboard();
         if (skybattlePlayerList.size() < 1) {
-            createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
+            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
         } else {
             for (SkybattlePlayer pl : skybattlePlayerList) {
-                createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+pl.kills);
+                createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+pl.kills);
             }
         }
 
@@ -81,7 +81,7 @@ public class Skybattle extends Game {
             }
             // reset scoreboard & variables after each round
             updatePlayersAliveScoreboard(p);
-            createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+((SkybattlePlayer) (Objects.requireNonNull(SkybattlePlayer.getGamePlayer(p.getPlayer())))).kills);
+            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+((SkybattlePlayer) (Objects.requireNonNull(SkybattlePlayer.getGamePlayer(p.getPlayer())))).kills);
         }
         map.spawnPlayers();
     }
@@ -213,7 +213,18 @@ public class Skybattle extends Game {
         // auto-ignite TNT
         if (e.getBlock().getType().equals(Material.TNT)) {
             b.setType(Material.AIR);
-            TNTPlacers.put(map.getWorld().spawnEntity(b.getLocation(), EntityType.PRIMED_TNT), p);
+            BlockFace blockFace = e.getBlockAgainst().getFace(b);
+            Location spawn = getLocationToSpawnEntity(p.getTargetBlock(null, 5), blockFace);
+            TNTPlacers.put(map.getWorld().spawnEntity(spawn, EntityType.PRIMED_TNT), p);
+        } else if (e.getBlock().getType().equals(Material.TNT_MINECART)) {
+            Block against = e.getBlockAgainst();
+            if (against.getType().toString().contains("RAIL")) {
+                Location spawn = p.getTargetBlock(null, 5).getLocation();
+                spawn.add(0.5, 1.5, 0.5);
+                TNTPlacers.put(map.getWorld().spawnEntity(spawn, EntityType.MINECART_TNT), p);
+            } else {
+                e.setCancelled(true);
+            }
         } else if (e.getBlock().getType().toString().matches(".*CONCRETE$")) {
             // if block was concrete, give appropriate amount back
             String concrete = e.getBlock().getType().toString();
@@ -262,19 +273,39 @@ public class Skybattle extends Game {
             }
 
             // Add each creeper spawned to a map, use to check kill credit
-            Location spawn = p.getTargetBlock(null, 5).getLocation();
-            BlockFace blockFace = e.getBlockFace();
-            Bukkit.broadcastMessage("[Debug] blockFace == " + blockFace);
-            // west -x east +x south +z north -z
-            switch (blockFace) {
-                case EAST -> spawn.add(1.5, 0, 0);
-                case WEST -> spawn.add(-1.5, 0, 0);
-                case SOUTH -> spawn.add(0, 0, 1.5);
-                case NORTH -> spawn.add(0, 0, -1.5);
-                default -> spawn.add(0, 1.5, 0);
-            }
+            Location spawn = getLocationToSpawnEntity(p.getTargetBlock(null, 5), e.getBlockFace());
             creeperSpawners.put(p.getWorld().spawn(spawn, Creeper.class), p);
         }
+    }
+
+    /**
+     * Arithmetic to
+     * @param target Block to be placed on
+     * @param blockFace Corresponding blockFace the new entity will spawn on or next to
+     * @return The Location to spawn the entity
+     */
+    private Location getLocationToSpawnEntity(Block target, BlockFace blockFace) {
+        Bukkit.broadcastMessage("[Debug] blockFace == " + blockFace);
+        Location l = target.getLocation();
+        l.add(0.5, 0, 0.5);
+        // west -x east +x south +z north -z
+        switch (blockFace) {
+            case EAST:
+                l.add(1, 0, 0);
+                break;
+            case WEST:
+                l.add(-1.5, 0, 0);
+                break;
+            case SOUTH:
+                l.add(0, 0, 1.5);
+                break;
+            case NORTH:
+                l.add(0, 0, -1.5);
+                break;
+            default: // UP
+                l.add(0, 1, 0);
+        }
+        return l;
     }
 
     /**
@@ -337,10 +368,11 @@ public class Skybattle extends Game {
     public void onProjectileHit(ProjectileHitEvent e) {
         if (!isGameActive()) return;
 
+        /* temp
         if(e.getEntityType() != EntityType.SNOWBALL) return;
         if(!(e.getEntity().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
         if (e.getHitEntity() == null) return;
-
+        */
         SkybattlePlayer player = null;
         for (SkybattlePlayer p : skybattlePlayerList) {
             if (e.getEntity().getName().equals(p.getPlayer().getName())) {
@@ -413,7 +445,7 @@ public class Skybattle extends Game {
             SkybattlePlayer killer = (SkybattlePlayer) SkybattlePlayer.getGamePlayer(e.getPlayer().getKiller());
             killer.getParticipant().addCurrentScore(KILL_POINTS);
             killer.kills++;
-            createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
+            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
             playerDeathEffects(e); // if there was a killer, just send over to default
         }
 
@@ -447,7 +479,7 @@ public class Skybattle extends Game {
             SkybattlePlayer killer = (SkybattlePlayer) SkybattlePlayer.getGamePlayer(victim.lastDamager);
             killer.kills++;
 
-            createLine(0, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
+            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
             killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
             killer.getParticipant().addCurrentScore(KILL_POINTS);

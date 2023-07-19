@@ -1,8 +1,12 @@
 package me.kotayka.mbc;
 
+import me.kotayka.mbc.games.Lobby;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 
@@ -20,6 +24,9 @@ public abstract class Minigame implements Scoreboard, Listener {
     private GameState gameState = GameState.INACTIVE;
     public int timeRemaining = -1;
     public static int taskID = -1;
+
+    // GLOBAL STRING STORAGE FOR STORING STRINGS TO PRINT WHILE PERFORMING TASKS (ie sorting through game scores)
+    protected String TO_PRINT = "";
 
     public Minigame(String name) {
         gameName = name;
@@ -76,6 +83,28 @@ public abstract class Minigame implements Scoreboard, Listener {
         }, 20, 20);
     }
 
+    public void Pause() {
+        if (!(gameState == GameState.STARTING) || this instanceof DecisionDome || this instanceof Lobby) {
+            // don't pause if game has started or minigame
+            return;
+        }
+
+        Bukkit.broadcastMessage("Event Paused!");
+        gameState = GameState.PAUSED;
+        stopTimer();
+        createLine(20, "EVENT PAUSED");
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.sendTitle("PAUSED", "", 20, 60, 20);
+        }
+    }
+
+    public void Unpause() {
+        Bukkit.broadcastMessage("Starting!");
+        if (timeRemaining < 5) timeRemaining = 5;
+        gameState = GameState.STARTING;
+        setTimer(timeRemaining);
+    }
+
     public void stopTimer() {
         Bukkit.broadcastMessage("[Debug] Stopping timer!");
         MBC.getInstance().cancelEvent(taskID);
@@ -109,6 +138,7 @@ public abstract class Minigame implements Scoreboard, Listener {
             createLine(score, line, p);
         }
     }
+
     /**
      * Updates display of team's current score on bottom of player's scoreboard;
      * Note: may be redundant
@@ -129,7 +159,7 @@ public abstract class Minigame implements Scoreboard, Listener {
 
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
             MBCTeam t = teamRoundsScores.get(14-i);
-            createLine(i,String.format("%s%5d", t.teamNameFormatPadding(), t.getMultipliedCurrentScore()));
+            createLine(i,String.format("%s: %d", t.teamNameFormat(), t.getMultipliedCurrentScore()));
         }
     }
 
@@ -144,7 +174,7 @@ public abstract class Minigame implements Scoreboard, Listener {
         int ties = 0;
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
             MBCTeam t = teamRoundsScores.get(14-i);
-            createLine(i,String.format("%s%5d", t.teamNameFormatPadding(), t.getMultipliedTotalScore()));
+            createLine(i,String.format("%s: %d", t.teamNameFormat(), t.getMultipliedTotalScore()));
 
             if (MBC.getInstance().gameNum == 1) continue;
 
@@ -172,7 +202,6 @@ public abstract class Minigame implements Scoreboard, Listener {
             createLine(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getMultipliedTotalScore(), p);
         }
     }
-
 
     public void newObjective() {
         for (Participant p : MBC.getInstance().players) {
@@ -214,7 +243,15 @@ public abstract class Minigame implements Scoreboard, Listener {
      * @see GameState
      */
     public void setGameState(GameState gameState) {
-        this.gameState = gameState;
+        if (gameState == GameState.TUTORIAL && this instanceof Game) {
+            if (((Game) this).disconnect) {
+                this.gameState = GameState.STARTING;
+                Pause();
+                ((Game) this).disconnect = false;
+            }
+        } else {
+            this.gameState = gameState;
+        }
     }
 
     public void newObjective(Participant p) {
@@ -223,7 +260,19 @@ public abstract class Minigame implements Scoreboard, Listener {
         }
 
         p.gameObjective = gameName;
-        Objective obj = p.board.registerNewObjective("Objective", "dummy", ChatColor.BOLD + "" + ChatColor.YELLOW + "MCC");
+        Objective obj;
+
+        // this somehow works to get teams to display names properly.
+        // some of it is probably redundant but idc
+        try {
+            obj = MBC.getInstance().board.registerNewObjective("Objective", "dummy", ChatColor.BOLD + "" + ChatColor.YELLOW + "MCC");
+        } catch (IllegalArgumentException e) {
+            obj = MBC.getInstance().board.getObjective("Objective");
+        }
+        if (obj == null) {
+            obj = MBC.getInstance().board.registerNewObjective("Objective", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+        }
+
         p.lines = new HashMap<>();
 
         p.objective = obj;

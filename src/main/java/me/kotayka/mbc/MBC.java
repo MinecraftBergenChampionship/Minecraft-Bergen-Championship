@@ -10,14 +10,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.util.Vector;
 
@@ -36,6 +34,11 @@ public class MBC implements Listener {
     public static final int MAX_PLAYERS = MAX_PLAYERS_PER_TEAM * MAX_TEAMS;
     public static final int GAME_COUNT = 6;
 
+    /**
+     * `players` represents all current active players.
+     * Players are added to the list when they join a team, if that team is not Spectator.
+     * Players are removed from the list when they log off.
+     */
     public List<Participant> players = new ArrayList<>(16);
 
     public Red red = new Red();
@@ -50,6 +53,7 @@ public class MBC implements Listener {
     public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets", "Spectator"));
     public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets", "Spectator"));
     public ScoreboardManager manager =  Bukkit.getScoreboardManager();
+    public final Scoreboard board = manager.getNewScoreboard();
 
     private Minigame currentGame;
     public int gameNum = 1;
@@ -68,13 +72,11 @@ public class MBC implements Listener {
 
     // Define Special Blocks
     // NOTE: ALWAYS USE `getBlock().getRelative(BlockFace.DOWN)` or equivalent
-    // ALSO NOTE: may move to more general class since these are likely ubiquitous
     public static final Material SPEED_PAD = Material.OBSERVER;
     public static final Material BOOST_PAD = Material.WAXED_EXPOSED_CUT_COPPER;
     public static final Material MEGA_BOOST_PAD = Material.WAXED_WEATHERED_CUT_COPPER;
     public static final Material JUMP_PAD = Material.WAXED_WEATHERED_COPPER;
     public double multiplier = 1;
-
 
     private MBC(Plugin plugin) {
         this.plugin = plugin;
@@ -170,10 +172,31 @@ public class MBC implements Listener {
         }
 
         Participant p = Participant.getParticipant(event.getPlayer());
+        event.getPlayer().setScoreboard(MBC.getInstance().board);
 
         if (p.objective == null || !Objects.equals(p.gameObjective, currentGame.gameName)) {
             currentGame.createScoreboard(p);
             p.gameObjective = currentGame.gameName;
+        }
+    }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent e) {
+        Participant p = Participant.getParticipant(e.getPlayer());
+
+        // no need to pause for non-full games
+        if (currentGame instanceof Game) {
+            switch (currentGame.getState()) {
+                case TUTORIAL:
+                    ((Game) currentGame).disconnect = true;
+                    break;
+                case STARTING:
+                    currentGame.Pause();
+                    break;
+                case ACTIVE:
+                case OVERTIME:
+                    ((Game) currentGame).handleDisconnect(p);
+            }
         }
     }
 
@@ -276,9 +299,9 @@ public class MBC implements Listener {
     }
 
     public void cancelEvent(int taskID) {
-        if (Bukkit.getScheduler().isCurrentlyRunning(taskID)) {
-            Bukkit.getScheduler().cancelTask(taskID);
-        }
+        // for some reason this was not cancelling the event so i commented it out for now, probably worth another look in the future
+        //if (Bukkit.getScheduler().isCurrentlyRunning(taskID)) {
+        Bukkit.getScheduler().cancelTask(taskID);
     }
 
     /**
@@ -298,10 +321,8 @@ public class MBC implements Listener {
     }
 
     /**
-     * Linear search through all players, returns list of
-     * players not on Team Spectator, including those in
-     * spectator mode.
-     * @return List of participants not on Team Spectator.
+     * ArrayList of all Participants not on Team Spectator.
+     * @return Copy of list of current players without spectators.
      */
     public List<Participant> getPlayers() {
         List<Participant> newList = new ArrayList<>();

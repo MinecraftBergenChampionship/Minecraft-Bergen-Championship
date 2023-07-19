@@ -22,6 +22,7 @@ public class changeTeam implements CommandExecutor {
                 MBCTeam team = MBCTeam.getTeam(args[0]);
                 if (team == null) {
                     p.sendMessage(ChatColor.RED + "Please Provide a valid team name");
+                    return false;
                 }
                 Participant.getParticipant(p).changeTeam(team);
             }
@@ -30,9 +31,11 @@ public class changeTeam implements CommandExecutor {
                 MBCTeam team = MBCTeam.getTeam(args[0]);
                 if (x == null) {
                     p.sendMessage(ChatColor.RED + "Please Provide a valid player name");
+                    return false;
                 }
                 if (team == null) {
                     p.sendMessage(ChatColor.RED + "Please Provide a valid team name");
+                    return false;
                 }
                 x.changeTeam(MBCTeam.getTeam(args[0]));
             }
