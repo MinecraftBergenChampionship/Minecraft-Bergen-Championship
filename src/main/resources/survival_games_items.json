@@ -27,8 +27,8 @@
   { "material": "CHAINMAIL_BOOTS", "stack_max": 1, "weight": 3},
 
   { "material": "IRON_HELMET", "stack_max": 1, "weight": 3},
-  { "material": "IRON_CHESTPLATE", "stack_max": 1, "weight": 2.5},
-  { "material": "IRON_LEGGINGS", "stack_max": 1, "weight": 2.5},
+  { "material": "IRON_CHESTPLATE", "stack_max": 1, "weight": 2},
+  { "material": "IRON_LEGGINGS", "stack_max": 1, "weight": 2},
   { "material": "IRON_BOOTS", "stack_max": 1, "weight": 3},
 
   { "material": "MUSHROOM_STEW", "stack_max": 1, "weight": 2},
@@ -41,7 +41,6 @@
   { "material": "APPLE", "stack_max": 2, "weight": 2},
   { "material": "GOLDEN_APPLE", "stack_max": 1, "weight": 1},
 
-  { "material": "LAPIS_LAZULI", "stack_max": 2, "weight": 3},
   { "material": "IRON_INGOT", "stack_max": 2, "weight": 3},
   { "material": "GOLD_INGOT", "stack_max": 2, "weight": 2.5},
   { "material": "DIAMOND", "stack_max": 1, "weight": 1},

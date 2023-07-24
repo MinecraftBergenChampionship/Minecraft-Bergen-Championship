@@ -21,7 +21,6 @@
   { "material": "COOKED_CHICKEN", "stack_max": 3, "weight": 2},
   { "material": "GOLDEN_APPLE", "stack_max": 1, "weight": 1},
 
-  { "material": "LAPIS_LAZULI", "stack_max": 2, "weight": 4},
   { "material": "IRON_INGOT", "stack_max": 2, "weight": 3},
   { "material": "GOLD_INGOT", "stack_max": 2, "weight": 3},
   { "material": "DIAMOND", "stack_max": 1, "weight": 2},

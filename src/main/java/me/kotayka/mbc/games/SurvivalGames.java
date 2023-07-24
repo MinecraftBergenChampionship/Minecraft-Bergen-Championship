@@ -12,14 +12,20 @@ import me.kotayka.mbc.gamePlayers.GamePlayer;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.json.simple.parser.ParseException;
@@ -45,6 +51,9 @@ public class SurvivalGames extends Game {
     private Map<Player, Integer> playerKills = new HashMap<>();
     private boolean dropLocation = false;
     private int crateNum = 0;
+
+    // Enchantment
+    private final GUIItem[] guiItems = setupGUIItems();
 
     // SCORING
     public final int KILL_POINTS = 45;
@@ -81,6 +90,8 @@ public class SurvivalGames extends Game {
             playersAlive.add(p);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
             p.getPlayer().getInventory().clear();
+            p.getPlayer().setExp(0);
+            p.getPlayer().setLevel(0);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 30, 10, false, false));
             map.spawnPlayers();
         }
@@ -147,6 +158,7 @@ public class SurvivalGames extends Game {
                     gameOverGraphics();
                     roundWinners(WIN_POINTS);
                     setGameState(GameState.END_GAME);
+                    createLine(23, "");
                     timeRemaining = 37;
                 }
             }
@@ -184,6 +196,7 @@ public class SurvivalGames extends Game {
                 gameOverGraphics();
                 roundWinners(WIN_POINTS);
                 setGameState(GameState.END_GAME);
+                createLine(23, "");
                 timeRemaining = 37;
             }
         } else if (getState().equals(GameState.END_GAME)) {
@@ -199,14 +212,11 @@ public class SurvivalGames extends Game {
      */
     private void UpdateEvent() {
         for (Participant p : MBC.getInstance().getPlayers()) {
-            // display coordinates of last unopened supply drop separately
+            // display coordinates of each drop separately
             if (dropLocation && crates.size() > 0) {
                 Location l = crates.get(crateNum).getLocation();
                 createLine(22, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Supply drop: " + ChatColor.RESET + "(" + l.getX() + ", " + l.getY() + ", " + l.getZ() + ")", p);
-            } else {
-                if (event.equals(SurvivalGamesEvent.SUPPLY_CRATE) || event.equals(SurvivalGamesEvent.CHEST_REFILL) && crates.size() > 0) {
-                    dropLocation = true;
-                }
+                dropLocation = false;
             }
 
             switch (event) {
@@ -274,6 +284,7 @@ public class SurvivalGames extends Game {
     private void crateParticles() {
         for (SupplyCrate crate : crates) {
             if (!crate.beenOpened()) {
+                // TODO ? the particles are kind of bad looking LOL
                 Location l = crate.getLocation();
                 map.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, l.getX() + Math.random()*0.5-0.5, l.getBlockY() + 1, l.getZ() + Math.random()*0.5-0.5, 5);
                 map.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, l.getX() + Math.random()*0.5-0.5, l.getBlockY() + Math.random(), l.getZ() + Math.random()*0.5-0.5, 5);
@@ -321,23 +332,8 @@ public class SurvivalGames extends Game {
         }
     }
 
-    /**
-     * Handles event where player eats stew; may account for
-     * other things if other custom items are added.
-     */
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent e) {
-        if (!(e.getAction().isRightClick())) return;
-        Player p = e.getPlayer();
-
-
-        if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.BLACK_SHULKER_BOX)) {
-            crates.get(crateNum).setOpened(true);
-            dropLocation = false;
-            crateNum++;
-            return;
-        }
-
+    // Apply regeneration when eating mushroom stew
+    private void eatMushroomStew(Player p) {
         if (p.getInventory().getItemInMainHand().getType() != Material.MUSHROOM_STEW && p.getInventory().getItemInMainHand().getType() != Material.MUSHROOM_STEW) {
             return;
         }
@@ -351,6 +347,42 @@ public class SurvivalGames extends Game {
             p.getInventory().setItemInMainHand(null);
         } else {
             p.getInventory().setItemInOffHand(null);
+        }
+    }
+
+    /**
+     * Handles Custom Inventory for Enchanting, Tracking opened loot boxes, and mushroom stew.
+     */
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent e) {
+        if (!(e.getAction().isRightClick())) return;
+        Player p = e.getPlayer();
+
+        if (p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW || p.getInventory().getItemInOffHand().getType() == Material.MUSHROOM_STEW) {
+            eatMushroomStew(p);
+            return;
+        }
+
+        // Custom GUI for Enchanting
+        if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.ENCHANTING_TABLE)) {
+            e.setCancelled(true);
+            setupGUI(e.getPlayer());
+            return;
+        }
+
+        // Track opened crates
+        if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.BLACK_SHULKER_BOX)) {
+            crates.get(crateNum).setOpened(true);
+            dropLocation = false;
+            createLine(22, "");
+            crateNum++;
+            return;
+        }
+
+        // prevent stripping trees :p
+        if (e.getClickedBlock() == null) return;
+        if (e.getClickedBlock().getType().toString().endsWith("LOG") && p.getInventory().getItemInMainHand().getType().toString().endsWith("AXE")) {
+            e.setCancelled(true);
         }
     }
 
@@ -400,6 +432,185 @@ public class SurvivalGames extends Game {
         if (e.getRightClicked().getType().equals(EntityType.ITEM_FRAME)) e.setCancelled(true);
     }
 
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        if (e.getView().getTitle().equals("Enchanting")) {
+            // handle custom enchants;
+            handleEnchantGUI(e);
+            return;
+        }
+        Player p = (Player) e.getWhoClicked();
+        ItemStack book = e.getCursor();
+        if (book == null || book.getType() != Material.ENCHANTED_BOOK) return;
+        ItemStack tool = e.getCurrentItem();
+        if (tool == null) return;
+        if (tool.getEnchantments().size() > 0) {
+            p.playSound(p, Sound.ENTITY_ITEM_BREAK, 1, 1);
+            p.sendMessage(ChatColor.RED+"Cannot enchant enchanted item!");
+        }
+
+        String toolName = tool.getType().toString();
+        boolean armorNotBoots = toolName.contains("CHESTPLATE") || toolName.contains("HELMET") || toolName.contains("LEGGINGS");
+
+        // ALLOWED ENCHANTMENTS:
+        // SWORD: SHARPNESS 1 OR KNOCKBACK 1
+        // AXE: NONE
+        // BOW: POWER; (note: this may be too OP)
+        // CROSSBOW: QUICK CHARGE 1 OR MULTISHOT
+        // ARMOR: Protection 1
+        // BOOTS: Feather Falling 1
+
+        if (!(book.getItemMeta() instanceof EnchantmentStorageMeta)) {
+            p.sendMessage("Book has no enchants!");
+        }
+        EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
+        Map<Enchantment, Integer> enchantments = meta.getStoredEnchants();
+
+        if (enchantments.size() > 1) {
+            p.playSound(p, Sound.ENTITY_ITEM_BREAK, 1, 1);
+            p.sendMessage(ChatColor.RED+"Cannot enchant, too many enchantments on book!");
+            return;
+        }
+
+        Enchantment ench = null;
+        for (Enchantment e2 : enchantments.keySet()) {
+            ench = e2;
+        }
+
+        if (ench == null) return;
+
+        // TODO ? this can probably be rewritten a lot prettier using switches or something else
+        if (toolName.contains("SWORD") && (ench.equals(Enchantment.KNOCKBACK) || ench.equals(Enchantment.DAMAGE_ALL))) {
+            p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
+            tool.addEnchantment(ench, 1);
+            e.setCursor(null);
+        } else if (tool.getType().equals(Material.CROSSBOW) && (ench.equals(Enchantment.QUICK_CHARGE) || ench.equals(Enchantment.MULTISHOT))) {
+            p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP,1, 2);
+            tool.addEnchantment(ench, 1);
+            e.setCursor(null);
+        } else if (toolName.contains("BOOTS") && (ench.equals(Enchantment.PROTECTION_FALL) || ench.equals(Enchantment.PROTECTION_ENVIRONMENTAL))) {
+            p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
+            tool.addEnchantment(ench, 1);
+            e.setCursor(null);
+        } else if (armorNotBoots && ench.equals(Enchantment.PROTECTION_ENVIRONMENTAL)) {
+            p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
+            tool.addEnchantment(ench, 1);
+            e.setCursor(null);
+        } else if (tool.getType().equals(Material.BOW) && ench.equals(Enchantment.ARROW_DAMAGE)){
+            p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
+            tool.addEnchantment(ench, 1);
+            e.setCursor(null);
+        } else {
+            p.playSound(p, Sound.ENTITY_ITEM_BREAK, 1, 1);
+            p.sendMessage(ChatColor.RED + "Cannot apply this enchantment to this item!");
+            e.setCancelled(true);
+        }
+    }
+
+    private void setupGUI(Player p) {
+        Inventory gui = Bukkit.createInventory(p, 9, "Enchanting");
+
+        for (int i = 0; i < guiItems.length; i++) {
+            gui.setItem(i, guiItems[i].item);
+        }
+
+        p.openInventory(gui);
+    }
+
+    // TODO
+    private void handleEnchantGUI(InventoryClickEvent e) {
+        Material type = e.getCurrentItem().getType();
+        if (type == null) return;
+
+        Player p = (Player) e.getWhoClicked();
+        GUIItem item = null;
+
+        for (GUIItem guiItem : guiItems) {
+            if (guiItem.item.getType().equals(type)) {
+                item = guiItem;
+                break;
+            }
+        }
+
+        if (item == null) return;
+
+        ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
+        int level = p.getLevel();
+        if (level < item.cost) {
+            p.playSound(p, Sound.ENTITY_ITEM_BREAK, 1, 1);
+            p.sendMessage(ChatColor.RED+"Not enough levels!");
+        } else {
+            EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
+            meta.addStoredEnchant(item.enchantment, 1, true);
+            book.setItemMeta(meta);
+            p.getInventory().addItem(book);
+            p.setLevel(level-item.cost);
+            p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
+            p.closeInventory();
+            //p.updateInventory();
+        }
+        // prevent taking items (bad)
+        e.setCancelled(true);
+    }
+
+    private GUIItem[] setupGUIItems() {
+        GUIItem[] items = new GUIItem[6];
+
+        ItemStack sharpness = new ItemStack(Material.DIAMOND_SWORD);
+        sharpness.addEnchantment(Enchantment.DAMAGE_ALL, 1);
+        ItemMeta sharpnessMeta = sharpness.getItemMeta();
+        sharpnessMeta.setDisplayName(ChatColor.RED+"Sharpness I");
+        sharpness.setItemMeta(sharpnessMeta);
+        sharpness.setLore(List.of("Cost: 3 XP"));
+        items[0] = new GUIItem(sharpness, Enchantment.DAMAGE_ALL, 3);
+
+        ItemStack knockback = new ItemStack(Material.IRON_SWORD);
+        knockback.addEnchantment(Enchantment.KNOCKBACK, 1);
+        ItemMeta knockMeta = knockback.getItemMeta();
+        knockMeta.setDisplayName(ChatColor.RED+"Knockback I");
+        knockback.setItemMeta(sharpnessMeta);
+        knockback.setLore(List.of("Cost: 1 XP"));
+        items[1] = new GUIItem(knockback, Enchantment.KNOCKBACK, 1);
+
+        ItemStack protection = new ItemStack(Material.DIAMOND_CHESTPLATE);
+        protection.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+        ItemMeta protMeta = protection.getItemMeta();
+        protMeta.setDisplayName(ChatColor.GREEN+"Protection I");
+        protMeta.setLore(List.of("Cost: 2 XP"));
+        protection.setItemMeta(protMeta);
+        items[2] = new GUIItem(protection, Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+
+        ItemStack featherFalling = new ItemStack(Material.IRON_BOOTS);
+        featherFalling.addEnchantment(Enchantment.PROTECTION_FALL, 1);
+        ItemMeta ffMeta = featherFalling.getItemMeta();
+        ffMeta.setDisplayName(ChatColor.GREEN+"Feather Falling I");
+        featherFalling.setItemMeta(ffMeta);
+        featherFalling.setLore(List.of("Cost: 1 XP"));
+        items[3] = new GUIItem(featherFalling, Enchantment.PROTECTION_FALL, 1);
+
+        ItemStack power = new ItemStack(Material.BOW);
+        power.addEnchantment(Enchantment.ARROW_DAMAGE, 1);
+        ItemMeta powerMeta = power.getItemMeta();
+        powerMeta.setDisplayName(ChatColor.RED+"Power I");
+        power.setItemMeta(powerMeta);
+        power.setLore(List.of("Cost: 3 XP"));
+        items[4] = new GUIItem(power, Enchantment.ARROW_DAMAGE, 3);
+
+        ItemStack quickCharge = new ItemStack(Material.CROSSBOW);
+        quickCharge.addEnchantment(Enchantment.QUICK_CHARGE, 1);
+        ItemMeta qcMeta = quickCharge.getItemMeta();
+        qcMeta.setDisplayName(ChatColor.BLUE+"Quick Charge I");
+        quickCharge.setItemMeta(qcMeta);
+        quickCharge.setLore(List.of("Cost: 1 XP"));
+        items[5] = new GUIItem(quickCharge, Enchantment.QUICK_CHARGE, 1);
+
+        //ItemStack multishot = new ItemStack(Material.ARROW, 3);
+        //multishot.addEnchantment(Enchantment.MULTISHOT, 1); unfortunately arrows cannot get multishot
+        //items[6] = new GUIItem(multishot, Enchantment.MULTISHOT, 2);
+
+        return items;
+    }
+
     /**
      * Reset all transformed crates
      */
@@ -414,11 +625,22 @@ class SurvivalGamesItem {
     private Material material;
     private int stack_max;
     private double weight;
+    String[] unbreakable = {"HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS", "SWORD", "AXE", "BOW"};
 
     public SurvivalGamesItem() {}
 
     public ItemStack getItem() {
-        return new ItemStack(material, (int) (Math.random() * stack_max) +1);
+        ItemStack it = new ItemStack(material, (int) (Math.random() * stack_max) +1);
+        String s = it.getType().toString();
+        for (String value : unbreakable) {
+            if (s.contains(value)) {
+                ItemMeta meta = it.getItemMeta();
+                meta.setUnbreakable(true);
+                it.setItemMeta(meta);
+                break;
+            }
+        }
+        return it;
     }
     public double getWeight() { return weight; }
 }
@@ -441,4 +663,16 @@ enum SurvivalGamesEvent {
     SUPPLY_CRATE,
     CHEST_REFILL,
     DEATHMATCH
+}
+
+class GUIItem {
+    public final ItemStack item;
+    public final Enchantment enchantment;
+    public final int cost;
+
+    public GUIItem(ItemStack item, Enchantment enchantment, int cost) {
+        this.item = item;
+        this.enchantment = enchantment;
+        this.cost = cost;
+    }
 }
