@@ -113,7 +113,7 @@ public abstract class Minigame implements Scoreboard, Listener {
     }
 
     public void createScoreboard() {
-        for (Participant p : MBC.getInstance().players) {
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             newObjective(p);
             createScoreboard(p);
         }
@@ -263,12 +263,12 @@ public abstract class Minigame implements Scoreboard, Listener {
         // this somehow works to get teams to display names properly.
         // some of it is probably redundant but idc
         try {
-            obj = MBC.getInstance().board.registerNewObjective("Objective", "dummy", ChatColor.BOLD + "" + ChatColor.YELLOW + "MCC");
+            obj = MBC.getInstance().board.registerNewObjective("Objective", "dummy", ChatColor.YELLOW + "" + ChatColor.BOLD + "MCC");
         } catch (IllegalArgumentException e) {
             obj = MBC.getInstance().board.getObjective("Objective");
         }
         if (obj == null) {
-            obj = MBC.getInstance().board.registerNewObjective("Objective", "dummy", ChatColor.BOLD+""+ChatColor.YELLOW+"MCC");
+            obj = MBC.getInstance().board.registerNewObjective("Objective", "dummy", ChatColor.YELLOW + "" +ChatColor.BOLD +"MCC");
         }
 
         p.lines = new HashMap<>();

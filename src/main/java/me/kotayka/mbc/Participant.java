@@ -44,6 +44,7 @@ public class Participant {
 
         Bukkit.broadcastMessage("[Debug] assigning team");
         changeTeam(MBC.getInstance().spectator);
+        MBC.getInstance().participants.add(this);
     }
 
     public void changeTeam(MBCTeam t) {
@@ -121,7 +122,6 @@ public class Participant {
     }
 
     public void addCurrentScore(int amount) {
-        Bukkit.broadcastMessage("[Debug] in add current score!");
         rawCurrentScore += amount;
         multipliedCurrentScore += amount*MBC.getInstance().multiplier;
         team.addCurrentTeamScore(amount);

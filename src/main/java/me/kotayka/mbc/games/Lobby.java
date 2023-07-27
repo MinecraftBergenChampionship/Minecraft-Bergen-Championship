@@ -82,7 +82,7 @@ public class Lobby extends Minigame {
      * @param p Participant whose scoreboard to update
      */
     public void updatePlayerTotalScoreDisplay(Participant p) {
-        createLine(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getRawTotalScore(), p);
+        createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getRawTotalScore(), p);
     }
 
     @Override

@@ -37,14 +37,16 @@ public class TGTTOS extends Game {
             ));
 
     private List<Participant> finishedParticipants;
-    private String[] deathMessages = new String[39];
+    private String[] deathMessages = new String[40];
     private List<Location> placedBlocks = new ArrayList<Location>(20);
-    private boolean teamBonus = false;  // determine whether or not a full team has completed yet
+    private boolean firstTeamBonus = false;  // determine whether or not a full team has completed yet
+    private boolean secondTeamBonus = false;
 
     // Scoring
     public static int PLACEMENT_POINTS = 1; // awarded multiplied by the amount of players who havent finished yet
     public static int COMPLETION_POINTS = 1; // awarded for completing the course
-    public static int TEAM_BONUS = 5; // awarded per player on team
+    public static int FIRST_TEAM_BONUS = 5; // awarded per player on team
+    public static int SECOND_TEAM_BONUS = 3; // awarded per player on team
 
     public TGTTOS() {
         super("TGTTOS");
@@ -188,12 +190,12 @@ public class TGTTOS extends Game {
             roundNum++;
         }
 
-        teamBonus = false;
+        firstTeamBonus = false;
+        secondTeamBonus = false;
 
         finishedParticipants = new ArrayList<>(MBC.getInstance().players.size());
-        TGTTOSMap newMap = maps.get((int) (Math.random()*maps.size()));
-        map = newMap;
-        maps.remove(newMap);
+        map = maps.get((int) (Math.random()*maps.size()));
+        maps.remove(map);
         map.Barriers(true);
 
         createLine(22, ChatColor.AQUA+""+ChatColor.BOLD+"Map: "+ChatColor.RESET+map.getName());
@@ -289,10 +291,17 @@ public class TGTTOS extends Game {
         }
         if (count == p.getTeam().getPlayers().size()) {
             Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN+ "" +ChatColor.BOLD+" was the first full team to finish!");
-            for (Participant teammate : p.getTeam().getPlayers()) {
-                teammate.addCurrentScore(5);
+            if (firstTeamBonus) {
+                for (Participant teammate : p.getTeam().getPlayers()) {
+                    teammate.addCurrentScore(FIRST_TEAM_BONUS);
+                }
+                firstTeamBonus = true;
+            } else {
+                for (Participant teammate : p.getTeam().getPlayers()) {
+                    teammate.addCurrentScore(SECOND_TEAM_BONUS);
+                }
+                secondTeamBonus = true;
             }
-            teamBonus = true;
         }
     }
 
@@ -307,14 +316,19 @@ public class TGTTOS extends Game {
         p.getPlayer().sendMessage(ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GREEN+" place!");
 
         // check if all players on a team finished
-        if (!teamBonus)
+        if (!firstTeamBonus || !secondTeamBonus)
             checkTeamFinish(p);
 
         updateFinishedPlayers();
 
         if (finishedParticipants.size() == MBC.getInstance().getPlayers().size()) {
-            setGameState(GameState.END_ROUND);
-            timeRemaining = 5;
+            if (roundNum != MAX_ROUNDS) {
+                setGameState(GameState.END_ROUND);
+                timeRemaining = 5;
+            } else {
+                setGameState(GameState.END_GAME);
+                timeRemaining = 37;
+            }
         }
     }
     @EventHandler

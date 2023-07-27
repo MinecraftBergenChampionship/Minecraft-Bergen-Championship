@@ -13,3 +13,5 @@ commands:
     description: pause game/event
   unpause:
     description: unpause game/event
+  ping:
+    description: gets player's ping

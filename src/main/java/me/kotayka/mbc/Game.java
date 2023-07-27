@@ -5,7 +5,6 @@ import me.kotayka.mbc.games.Lobby;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -27,8 +26,6 @@ public abstract class Game extends Minigame {
         super(gameName);
     }
 
-    public List<GamePlayer> gamePlayers = new ArrayList<GamePlayer>();
-
     public List<Participant> playersAlive = new ArrayList<>();
     public List<MBCTeam> teamsAlive = new ArrayList<>();
 
@@ -37,7 +34,7 @@ public abstract class Game extends Minigame {
 
 
     public void createScoreboard() {
-        for (Participant p : MBC.getInstance().players) {
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             newObjective(p);
             createScoreboard(p);
         }
@@ -111,6 +108,7 @@ public abstract class Game extends Minigame {
 
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
+        MBC.spawnFirework(victim);
         deathMessage = deathMessage.replace(victim.getPlayerName(), victim.getFormattedName());
 
         if (killer != null) {
@@ -228,7 +226,7 @@ public abstract class Game extends Minigame {
      * @param p Participant whose scoreboard to update
      */
     public void updatePlayerCurrentScoreDisplay(Participant p) {
-        createLine(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
+        createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
     }
 
     public String getPlace(int place) {
@@ -252,6 +250,7 @@ public abstract class Game extends Minigame {
     /**
      * General formatting function to get winners of a round and broadcast text.
      * Adds scoring if specified.
+     * @param points Amount of points to give. Specify 0 for no points.
      */
     public void roundWinners(int points) {
         if (playersAlive.size() > 1) {
@@ -259,8 +258,10 @@ public abstract class Game extends Minigame {
             for (int i = 0; i < playersAlive.size(); i++) {
                 Participant p = playersAlive.get(i);
                 winEffects(p);
-                p.addCurrentScore(points);
                 p.getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
+                if (points > 0) {
+                    p.addCurrentScore(points);
+                }
 
                 if (i == playersAlive.size()-1) {
                     survivors.append("and ").append(p.getFormattedName());
@@ -355,6 +356,7 @@ public abstract class Game extends Minigame {
 
         gameIndividual.addAll(MBC.getInstance().getPlayers());
         gameIndividual.sort(Participant.multipliedCurrentScoreComparator);
+        Collections.reverse(gameIndividual);
 
         for (Participant p : gameIndividual) {
             Bukkit.broadcastMessage("[Debug] p == " + p);
@@ -367,7 +369,7 @@ public abstract class Game extends Minigame {
 
             if (counter < 5) {
                 topFive.append(String.format(
-                        (num) + ". %s: %5d (%d x %.2f)\n", p.getFormattedName(), p.getRawCurrentScore(), p.getMultipliedCurrentScore(), MBC.getInstance().multiplier)
+                        (num) + ". %s: %d (%d x %.2f)\n", p.getFormattedName(), p.getRawCurrentScore(), p.getMultipliedCurrentScore(), MBC.getInstance().multiplier)
                 );
                 lastScore = p.getRawCurrentScore();
                 counter++;
@@ -389,7 +391,7 @@ public abstract class Game extends Minigame {
             MBCTeam t = gameScores.get(i);
             str.append(ChatColor.BOLD+""+(i+1)+". ")
                .append(String.format(
-                   "%s: %d", t.teamNameFormat(), t.getMultipliedTotalScore()
+                   "%s: %d\n", t.teamNameFormat(), t.getMultipliedTotalScore()
             ));
         }
         return str.toString();
@@ -404,7 +406,7 @@ public abstract class Game extends Minigame {
             MBCTeam t = teamRoundsScores.get(i);
             teamString.append(ChatColor.BOLD+""+(i+1)+". ")
                 .append(String.format(
-                    "%s: %d", t.teamNameFormat(), t.getMultipliedCurrentScore()
+                    "%s: %d\n", t.teamNameFormat(), t.getMultipliedCurrentScore()
             ));
         }
         return teamString.toString();
@@ -500,7 +502,7 @@ public abstract class Game extends Minigame {
      */
     public void gameOverGraphics() {
         Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!");
-        for (Participant p : MBC.getInstance().getPlayers()) {
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!","",0, 60, 20);
         }
     }
@@ -510,7 +512,7 @@ public abstract class Game extends Minigame {
      */
     public void roundOverGraphics() {
         Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!");
-        for (Participant p : MBC.getInstance().getPlayers()) {
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!", "", 0, 60, 20);
         }
     }

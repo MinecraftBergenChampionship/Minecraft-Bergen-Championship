@@ -7,11 +7,11 @@ import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
 import me.kotayka.mbc.gameMaps.aceRaceMap.Biomes;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
-import me.kotayka.mbc.gamePlayers.GamePlayer;
 import me.kotayka.mbc.teams.Spectator;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -38,7 +38,7 @@ public class AceRace extends Game {
     public static final int FINISH_RACE_POINTS = 8;           // points for finishing the race
     public static final int PLACEMENT_LAP_POINTS = 1;         // points for placement for first laps
     public static final int PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
-    public static final int[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
+    public static final int[] PLACEMENT_BONUSES = {20, 15, 10, 10, 10, 5, 5, 5}; // points for Top 8 finishers
 
     public AceRace() {
         super("Ace Race");
@@ -154,8 +154,9 @@ public class AceRace extends Game {
     public void PlayerMoveEvent(PlayerMoveEvent e) {
         if (Participant.getParticipant(e.getPlayer()).getTeam() instanceof Spectator) return;
 
+        AceRacePlayer player = getGamePlayer(e.getPlayer());
+
         if (map.checkDeath(e.getPlayer().getLocation())) {
-            AceRacePlayer player = ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer()));
             int checkpoint = player.checkpoint;
             e.getPlayer().teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength-1 : checkpoint-1));
             e.getPlayer().setFireTicks(0);
@@ -164,7 +165,7 @@ public class AceRace extends Game {
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
             e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(4));
             e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.65, e.getPlayer().getVelocity().getZ()));
-            ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).setCheckpoint();
+            player.setCheckpoint();
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
@@ -181,8 +182,17 @@ public class AceRace extends Game {
             return;
         }
         if (e.getTo().getBlock().getType().toString().toLowerCase().contains("carpet")) {
-            ((AceRacePlayer) GamePlayer.getGamePlayer(e.getPlayer())).setCheckpoint();
+            player.setCheckpoint();
         }
+    }
+
+    public AceRacePlayer getGamePlayer(Player p) {
+        for (AceRacePlayer x : aceRacePlayerList) {
+            if (x.getPlayer().getName().equals(p.getName())) {
+                return x;
+            }
+        }
+        return null;
     }
 
    public void topLaps() {

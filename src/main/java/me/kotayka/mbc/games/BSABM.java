@@ -12,8 +12,11 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class BSABM extends Game {
+import java.util.ArrayList;
+import java.util.List;
 
+public class BSABM extends Game {
+    public List<BSABMPlayer> buildMartPlayers = new ArrayList<BSABMPlayer>();
     public BSABMMap map = new BuildMart();
     public bsabmTeam red = new bsabmTeam(MBC.getInstance().red, new Location(map.getWorld(), -107, 1, 150, -90, 0));
     public bsabmTeam yellow = new bsabmTeam(MBC.getInstance().yellow, new Location(map.getWorld(), -68, 1, 150, -90, 0));
@@ -50,7 +53,7 @@ public class BSABM extends Game {
     public void loadPlayers() {
         for (Participant p : MBC.getInstance().getPlayers()) {
             BSABMPlayer bsabmPlayer = new BSABMPlayer(p, this);
-            gamePlayers.add(bsabmPlayer);
+            buildMartPlayers.add(bsabmPlayer);
             bsabmPlayer.respawn();
             p.getPlayer().teleport(new Location(map.getWorld(), 10, 1, 0, -90, 0));
         }

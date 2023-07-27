@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 public abstract class SurvivalGamesMap extends MBCMap {
     public int[][] spawns;
-    private Location center;
+    public Location CENTER;
     public java.util.Map<Location, Block> blocks = new HashMap<Location, Block>();
     public Location[] middleChests;
     public java.util.Map<Location, Material> brokenBlocks = new HashMap<Location, Material>();
@@ -61,6 +61,8 @@ public abstract class SurvivalGamesMap extends MBCMap {
 
         MBC.getInstance().sg.resetCrates();
     }
+
+    public Location Center() { return CENTER; }
 
     /**
      * Check a given chest whether it is within the given range

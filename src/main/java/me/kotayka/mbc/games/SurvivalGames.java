@@ -8,7 +8,6 @@ import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.sgMaps.BCA;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
-import me.kotayka.mbc.gamePlayers.GamePlayer;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
 import org.bukkit.block.ShulkerBox;
@@ -17,7 +16,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -56,9 +54,9 @@ public class SurvivalGames extends Game {
     private final GUIItem[] guiItems = setupGUIItems();
 
     // SCORING
-    public final int KILL_POINTS = 45;
-    public final int SURVIVAL_POINTS = 3;
-    public final int WIN_POINTS = 45;
+    public final int KILL_POINTS = 30;
+    public final int SURVIVAL_POINTS = 2;
+    public final int WIN_POINTS = 30;
 
     public SurvivalGames() {
         super("SurvivalGames");
@@ -116,7 +114,7 @@ public class SurvivalGames extends Game {
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
         updatePlayersAliveScoreboard();
-        createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0");
+        createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0", p);
 
         updateInGameTeamScoreboard();
     }
@@ -128,7 +126,7 @@ public class SurvivalGames extends Game {
                 startingCountdown();
             } else {
                 map.setBarriers(false);
-                for (GamePlayer p : gamePlayers) {
+                for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
                 setGameState(GameState.ACTIVE);
@@ -355,6 +353,11 @@ public class SurvivalGames extends Game {
      */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
+        if (e.getAction().isLeftClick() && e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.PAINTING)) {
+            e.setCancelled(true);
+            return;
+        }
+
         if (!(e.getAction().isRightClick())) return;
         Player p = e.getPlayer();
 
@@ -391,20 +394,26 @@ public class SurvivalGames extends Game {
      */
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
-        Participant killer = Participant.getParticipant(e.getPlayer().getKiller());
+        Player victim = e.getPlayer();
+        Participant killer = Participant.getParticipant(victim.getKiller());
         if (killer != null) {
             killer.addCurrentScore(KILL_POINTS);
-            if (playerKills.get(e.getPlayer().getKiller()) == null) {
-                playerKills.put(e.getPlayer().getKiller(), 1);
+            if (playerKills.get(victim.getKiller()) == null) {
+                playerKills.put(victim.getKiller(), 1);
                 createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your Kills: "+ChatColor.RESET+"1", killer);
             } else {
-                int kills = playerKills.get(e.getPlayer().getKiller());
+                int kills = playerKills.get(victim.getKiller());
                 playerKills.put(e.getPlayer().getKiller(), kills++);
                 createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
             }
         }
 
         deathEffectsWithHealth(e);
+
+        Bukkit.broadcastMessage(e.getDeathMessage());
+        e.setCancelled(true);
+        victim.setGameMode(GameMode.SPECTATOR);
+
         // may require testing due to concurrency
         for (Participant p : playersAlive) {
             p.addCurrentScore(SURVIVAL_POINTS);
@@ -417,6 +426,8 @@ public class SurvivalGames extends Game {
      */
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
+        if (!e.getBlock().getLocation().getWorld().equals(map.getWorld())) return;
+
         // this solution might be temporary, not sure if other maps or other blocks are necessary to add.
         String brokenBlock = e.getBlock().getType().toString();
         if (!brokenBlock.contains("GLASS"))  e.setCancelled(true);

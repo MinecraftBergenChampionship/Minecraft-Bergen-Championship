@@ -17,7 +17,7 @@ import java.util.*;
 public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
     private boolean revealedGames;
-    private List<String> gameNames = new LinkedList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle"));
+    private List<String> gameNames = new LinkedList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle", "Spleef"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
     private final int[][] coordsForBorder = {
@@ -233,7 +233,7 @@ public class DecisionDome extends Minigame {
      * @see me.kotayka.mbc.games.Lobby updatePlayerTotalScoreDisplay
      */
     public void updatePlayerTotalScoreDisplay(Participant p) {
-        createLine(1, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getRawTotalScore(), p);
+        createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getRawTotalScore(), p);
     }
 
     /**

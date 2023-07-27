@@ -37,3 +37,4 @@ Well, {player}? What did you think was gonna happen?
 Legends say {player} is still falling.
 {player} just got #colonized.
 {player} suffered a worse fate than being in Bevan's zoo.
+{player} didn't thank the boosters.

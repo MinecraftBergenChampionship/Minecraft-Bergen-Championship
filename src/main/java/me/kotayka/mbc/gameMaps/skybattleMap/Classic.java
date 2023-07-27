@@ -60,7 +60,6 @@ public class Classic extends SkybattleMap {
         for (int mapX = -225; mapX <= -87; mapX++) {
             for (int mapY = 63; mapY <= 96; mapY++) {
                 for (int mapZ = -325; mapZ <= -207; mapZ++) {
-                    assert world != null;
                     Block originalBlock = world.getBlockAt(x, y, z);
                     Block possiblyChangedBlock = world.getBlockAt(mapX, mapY, mapZ);
                     if (!(originalBlock.getType().name().equals(possiblyChangedBlock.getType().name()))) {

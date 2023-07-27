@@ -26,6 +26,7 @@ public class BCA extends SurvivalGamesMap {
         super.spawns = this.spawns;
         super.middleChests = this.middleChests;
         super.mapName = "BCA";
+        super.CENTER = new Location(getWorld(), 0, 10, 0);
         //super.airdrops = false;
 
         resetBorder();

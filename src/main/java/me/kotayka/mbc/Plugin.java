@@ -1,11 +1,8 @@
 package me.kotayka.mbc;
 
-import me.kotayka.mbc.commands.changeTeam;
-import me.kotayka.mbc.commands.pause;
-import me.kotayka.mbc.commands.start;
+import me.kotayka.mbc.commands.*;
 import me.kotayka.mbc.commands.tab.changeTeamTabCompletion;
 import me.kotayka.mbc.commands.tab.startTabCompletion;
-import me.kotayka.mbc.commands.unpause;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -38,6 +35,8 @@ public class Plugin extends JavaPlugin implements Listener {
 
         getCommand("pause").setExecutor(new pause());
         getCommand("unpause").setExecutor(new unpause());
+
+        getCommand("ping").setExecutor(new ping());
     }
 
     @Override

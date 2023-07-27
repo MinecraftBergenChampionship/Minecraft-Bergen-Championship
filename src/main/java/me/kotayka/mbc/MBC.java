@@ -39,7 +39,8 @@ public class MBC implements Listener {
      * Players are added to the list when they join a team, if that team is not Spectator.
      * Players are removed from the list when they log off.
      */
-    public List<Participant> players = new ArrayList<>(16);
+    public List<Participant> players = new ArrayList<>(16); // every player
+    public List<Participant> participants = new ArrayList<>(16); // every player + spectators
 
     public Red red = new Red();
     public Yellow yellow = new Yellow();
@@ -66,8 +67,9 @@ public class MBC implements Listener {
     public BSABM bsabm = null;
     public Skybattle skybattle = null;
     public SurvivalGames sg = null;
+    public Spleef spleef = null;
 
-    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BSABM","Skybattle", "SurvivalGames"));
+    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BSABM","Skybattle", "SurvivalGames", "Spleef"));
     public final List<Game> gameList = new ArrayList<Game>(6);
 
     // Define Special Blocks
@@ -129,6 +131,11 @@ public class MBC implements Listener {
                     sg = new SurvivalGames();
                 }
                 return sg;
+            case "Spleef":
+                if (spleef == null) {
+                    spleef = new Spleef();
+                }
+                return spleef;
             default:
                 return lobby;
         }
@@ -333,5 +340,13 @@ public class MBC implements Listener {
         }
 
         return newList;
+    }
+
+    /**
+     * ArrayList of all Participants including Spectators.
+     * @return Copy of list of current players with spectators.
+     */
+    public List<Participant> getPlayersAndSpectators() {
+        return new ArrayList<>(getInstance().participants);
     }
 }
