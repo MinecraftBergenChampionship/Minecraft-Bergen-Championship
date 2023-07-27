@@ -246,6 +246,8 @@ public abstract class Minigame implements Scoreboard, Listener {
                 this.gameState = GameState.STARTING;
                 Pause();
                 ((Game) this).disconnect = false;
+            } else {
+                this.gameState = gameState;
             }
         } else {
             this.gameState = gameState;

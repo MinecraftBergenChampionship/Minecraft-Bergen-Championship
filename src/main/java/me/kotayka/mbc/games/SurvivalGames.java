@@ -56,7 +56,7 @@ public class SurvivalGames extends Game {
     // SCORING
     public final int KILL_POINTS = 30;
     public final int SURVIVAL_POINTS = 2;
-    public final int WIN_POINTS = 30;
+    public final int WIN_POINTS = 36; // shared amongst all remaining players
 
     public SurvivalGames() {
         super("SurvivalGames");
@@ -154,7 +154,7 @@ public class SurvivalGames extends Game {
                     timeRemaining = 45;
                 } else {
                     gameOverGraphics();
-                    roundWinners(WIN_POINTS);
+                    roundWinners(WIN_POINTS / playersAlive.size());
                     setGameState(GameState.END_GAME);
                     createLine(23, "");
                     timeRemaining = 37;
@@ -192,7 +192,7 @@ public class SurvivalGames extends Game {
         } else if (getState().equals(GameState.OVERTIME)) {
             if (timeRemaining == 0) {
                 gameOverGraphics();
-                roundWinners(WIN_POINTS);
+                roundWinners(WIN_POINTS / playersAlive.size());
                 setGameState(GameState.END_GAME);
                 createLine(23, "");
                 timeRemaining = 37;

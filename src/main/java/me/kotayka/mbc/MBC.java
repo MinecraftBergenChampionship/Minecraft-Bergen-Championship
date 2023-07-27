@@ -196,6 +196,7 @@ public class MBC implements Listener {
             switch (currentGame.getState()) {
                 case TUTORIAL:
                     ((Game) currentGame).disconnect = true;
+                    Bukkit.broadcastMessage("[Debug] disconnect during tutorial!");
                     break;
                 case STARTING:
                     currentGame.Pause();

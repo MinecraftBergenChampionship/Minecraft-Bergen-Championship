@@ -17,7 +17,7 @@ import java.util.*;
 public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
     private boolean revealedGames;
-    private List<String> gameNames = new LinkedList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle", "Spleef"));
+    private List<String> gameNames = new ArrayList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle", "Spleef"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
     private final int[][] coordsForBorder = {
@@ -63,14 +63,14 @@ public class DecisionDome extends Minigame {
             setGameState(GameState.END_GAME);
             setTimer(13);
         } else {
-            Bukkit.broadcastMessage("[Debug] Path of size != 1");
+            Bukkit.broadcastMessage("[Debug] Path of size " + sections.size());
             setGameState(GameState.STARTING);
             stopTimer();
             Bukkit.broadcastMessage("[Debug] Revealed Games == " + revealedGames);
             if (revealedGames) {
-                Bukkit.broadcastMessage("[Debug] Reached here!");
+                Bukkit.broadcastMessage("[Debug] before setting timer!");
                 setTimer(10);
-                Bukkit.broadcastMessage("[Debug] Reached here 2!");
+                Bukkit.broadcastMessage("[Debug] set timer!");
             } else {
                 Bukkit.broadcastMessage("[Debug] Path of NO REVEALED GAMES");
                 setSectionsRed();
@@ -186,7 +186,7 @@ public class DecisionDome extends Minigame {
                 }
                 case 0 -> {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.sendTitle(winner.game, "", 0, 20, 20);
+                        p.sendTitle(winner.game, "", 0, 15, 15);
                         p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
                     }
                     Bukkit.broadcastMessage(ChatColor.BOLD + winner.game + "!");
@@ -199,7 +199,7 @@ public class DecisionDome extends Minigame {
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining > 5 && timeRemaining % 2 != 0) {
                 for (Player p : Bukkit.getOnlinePlayers())
-                    p.sendTitle(winner.game,"", 20, 20, 20);
+                    p.sendTitle(winner.game,"", 15, 15, 15);
             }
             switch (timeRemaining) {
                 case 0 -> {
