@@ -1,6 +1,6 @@
 [
   { "material": "WOODEN_SWORD", "stack_max": 1, "weight": 4},
-  { "material": "GOLDEN_SWORD", "stack_max": 1, "weight": 4},
+  { "material": "GOLDEN_SWORD", "stack_max": 1, "weight": 3},
   { "material": "STONE_SWORD", "stack_max": 1, "weight": 3},
   { "material": "IRON_SWORD", "stack_max": 1, "weight": 2.5},
 
@@ -11,10 +11,10 @@
   { "material": "CROSSBOW", "stack_max": 1, "weight": 3},
   { "material": "ARROW", "stack_max": 4, "weight": 3},
 
-  { "material": "LEATHER_HELMET", "stack_max": 1, "weight": 4},
-  { "material": "LEATHER_CHESTPLATE", "stack_max": 1, "weight": 4},
-  { "material": "LEATHER_LEGGINGS", "stack_max": 1, "weight": 4},
-  { "material": "LEATHER_BOOTS", "stack_max": 1, "weight": 4},
+  { "material": "LEATHER_HELMET", "stack_max": 1, "weight": 3.5},
+  { "material": "LEATHER_CHESTPLATE", "stack_max": 1, "weight": 3.5},
+  { "material": "LEATHER_LEGGINGS", "stack_max": 1, "weight": 3.5},
+  { "material": "LEATHER_BOOTS", "stack_max": 1, "weight": 3},
 
   { "material": "GOLDEN_HELMET", "stack_max": 1, "weight": 3},
   { "material": "GOLDEN_CHESTPLATE", "stack_max": 1, "weight": 3},
@@ -46,7 +46,7 @@
   { "material": "DIAMOND", "stack_max": 1, "weight": 1},
 
   { "material": "EXPERIENCE_BOTTLE", "stack_max": 3, "weight": 3},
-  { "material": "STICK", "stack_max": 2, "weight": 2},
+  { "material": "STICK", "stack_max": 2, "weight": 3},
   { "material": "FEATHER", "stack_max": 3, "weight": 2.5},
   { "material": "FLINT", "stack_max": 2, "weight": 2.5},
   { "material": "STRING", "stack_max": 2, "weight": 2.5}

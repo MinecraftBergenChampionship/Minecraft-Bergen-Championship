@@ -226,6 +226,7 @@ public abstract class Game extends Minigame {
      * @param p Participant whose scoreboard to update
      */
     public void updatePlayerCurrentScoreDisplay(Participant p) {
+        Bukkit.broadcastMessage("CurrentScore: " + p.getMultipliedCurrentScore() + " for " + p.getPlayerName());
         createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
     }
 

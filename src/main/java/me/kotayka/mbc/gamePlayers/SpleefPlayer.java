@@ -5,7 +5,7 @@ import me.kotayka.mbc.Participant;
 public class SpleefPlayer extends GamePlayer {
     private Participant lastDamager = null;
     private int kills = 0;
-    private int resetTime = 0;
+    private int resetTime = -1;
     private int placement = -1;
 
     public SpleefPlayer(Participant p) {

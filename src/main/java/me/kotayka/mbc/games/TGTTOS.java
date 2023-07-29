@@ -6,12 +6,15 @@ import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.tgttosMap.TGTTOSMap;
 import me.kotayka.mbc.gameMaps.tgttosMap.*;
+import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
@@ -297,6 +300,7 @@ public class TGTTOS extends Game {
                 }
                 firstTeamBonus = true;
             } else {
+                Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN+ "" +ChatColor.BOLD+" was the second full team to finish!");
                 for (Participant teammate : p.getTeam().getPlayers()) {
                     teammate.addCurrentScore(SECOND_TEAM_BONUS);
                 }
@@ -397,6 +401,20 @@ public class TGTTOS extends Game {
                     p.getInventory().setItem(40, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onProjectileHit(ProjectileHitEvent e) {
+        if (!(e.getEntity() instanceof Snowball)) return;
+        if (!(e.getEntity().getShooter() instanceof Player)) return;
+
+        // deal slight knockback to other players
+        if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
+            Player p = (Player) e.getHitEntity();
+            Vector snowballVelocity = e.getEntity().getVelocity();
+            p.damage(0.5);
+            p.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
         }
     }
 }

@@ -45,6 +45,7 @@ public class DecisionDome extends Minigame {
         Bukkit.broadcastMessage("[Debug] bool revealedGames == " + revealedGames);
         removeEntities();
         initSections();
+        chickens.clear();
         tie = false;
         winner = null;
 
@@ -191,6 +192,7 @@ public class DecisionDome extends Minigame {
                     }
                     Bukkit.broadcastMessage(ChatColor.BOLD + winner.game + "!");
                     createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Warping to game: ");
+                    if (!revealedGames) revealedGames = true;
                     setGameState(GameState.END_GAME);
                     timeRemaining = 13;
                 }
@@ -339,6 +341,7 @@ public class DecisionDome extends Minigame {
             return Tiebreaker(mostVotes);
         } else {
             tie = true;
+            Bukkit.broadcastMessage("mostVotes.size() == " + mostVotes.size());
             Bukkit.broadcastMessage("[Debug] I'm pretty sure this isn't supposed to happen...?");
             return TiebreakerRandom(mostVotes); // this will error but hopefully we don't get there
         }
@@ -451,6 +454,9 @@ public class DecisionDome extends Minigame {
            Participant p = Participant.getParticipant(((Player) e.getEntity().getShooter()));
            Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
            chickens.add(new VoteChicken(p.getTeam(), chicken));
+           egg.remove();
+
+           e.setCancelled(true);
         }
     }
 

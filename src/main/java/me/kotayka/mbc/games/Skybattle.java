@@ -366,14 +366,17 @@ public class Skybattle extends Game {
 
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent e) {
+        // TODO this isn't registering for some reason
         if (!isGameActive()) return;
         if (e.getHitEntity() == null) return;
+        if (!(e.getEntity().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
 
         /* temp
         if(e.getEntityType() != EntityType.SNOWBALL) return;
         if(!(e.getEntity().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
-        if (e.getHitEntity() == null) return;
         */
+
+        Bukkit.broadcastMessage("[Debug] " + e.getHitEntity().getName() + " was hit by " + e.getEntity().getShooter() + " using " + e.getEntity());
         SkybattlePlayer player = null;
         for (SkybattlePlayer p : skybattlePlayerList) {
             if (e.getEntity().getName().equals(p.getPlayer().getName())) {
@@ -384,7 +387,6 @@ public class Skybattle extends Game {
         if (player == null) return;
 
         if (e.getEntityType().equals(EntityType.SNOWBALL)) {
-            Bukkit.broadcastMessage("[Debug] " + e.getHitEntity().getName() + " was hit by " + e.getEntity().getShooter() + " using " + e.getEntity());
             Vector snowballVelocity = e.getEntity().getVelocity();
             player.lastDamager = (Player) e.getEntity().getShooter();
             player.getPlayer().damage(0.1);

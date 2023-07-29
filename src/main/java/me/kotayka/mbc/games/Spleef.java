@@ -26,13 +26,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Spleef extends Game {
-    private SpleefMap map;
-    private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
+    private SpleefMap map = new Classic();
+    //private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
     public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
-    private int roundNum = 1;
+    private int roundNum = 0;
     private final Location lobby;
     private final Location spawnpoint;
-    private final int resetDamageTime = 8;
+    private final int RESET_DAMAGE_TIME = 8;
 
     // scoring
     private final int SURVIVAL_POINTS = 2;
@@ -48,7 +48,6 @@ public class Spleef extends Game {
 
     @Override
     public void createScoreboard(Participant p) {
-        createLine(24, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Spleef", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
@@ -75,10 +74,11 @@ public class Spleef extends Game {
     @Override
     public void loadPlayers() {
         setPVP(false);
-        if (roundNum == 1)
+        if (roundNum == 0)
             teamsAlive.addAll(getValidTeams());
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().getInventory().clear();
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
             p.getPlayer().setFlying(false);
             p.getPlayer().setAllowFlight(false);
             p.getPlayer().setInvulnerable(false);
@@ -87,7 +87,7 @@ public class Spleef extends Game {
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
-            if (roundNum == 1) {
+            if (roundNum == 0) {
                 spleefPlayers.add(new SpleefPlayer(p));
                 playersAlive.add(p);
             } else {
@@ -110,13 +110,13 @@ public class Spleef extends Game {
 
         resetSpleefers();
 
-        map = maps.get((int) (Math.random()*maps.size()));
+        //map = maps.get((int) (Math.random()*maps.size()));
         //maps.remove(map);
         map.pasteMap();
 
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             createLine(22, ChatColor.AQUA+""+ChatColor.BOLD+"Map: "+ChatColor.RESET+map.Name(), p);
-            createLine(21, ChatColor.GREEN +  "Round: "+ ChatColor.RESET+roundNum+"/6", p);
+            createLine(21, ChatColor.GREEN +  "Round: "+ ChatColor.RESET+roundNum+"/3", p);
         }
 
         setGameState(GameState.STARTING);
@@ -164,6 +164,7 @@ public class Spleef extends Game {
             if (timeRemaining == 0) {
                 openFloor(false);
                 loadPlayers();
+                startRound();
                 setGameState(GameState.STARTING);
                 timeRemaining = 20;
             }
@@ -203,27 +204,29 @@ public class Spleef extends Game {
             Bukkit.broadcastMessage(victim.getParticipant().getFormattedName()+" fell into the void.");
         } else {
             SpleefPlayer killer = getSpleefPlayer(victim.getLastDamager().getPlayer());
+            killer.incrementKills();
             killer.getParticipant().addCurrentScore(KILL_POINTS);
             killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + victim.getPlayer().getName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
             Bukkit.broadcastMessage(victim.getParticipant().getFormattedName()+" was spleefed by " + killer.getParticipant().getFormattedName());
         }
+        updatePlayersAlive(victim.getParticipant());
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 20);
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
         MBC.spawnFirework(victim.getParticipant());
-        victim.setPlacement(playersAlive.size()+1);
         victim.getPlayer().teleport(spawnpoint);
+        victim.setPlacement(playersAlive.size()+1);
 
         for (Participant p : playersAlive) {
             p.addCurrentScore(SURVIVAL_POINTS);
         }
-
-        updatePlayersAlive(victim.getParticipant());
     }
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
+        if (!(getState().equals(GameState.ACTIVE))) return;
+
         Player p = e.getPlayer();
         if (!p.getGameMode().equals(GameMode.SURVIVAL)) return;
 
@@ -235,6 +238,7 @@ public class Spleef extends Game {
 
     @EventHandler
     public void onBlockBreak(BlockDamageEvent e) {
+        if (!(getState().equals(GameState.ACTIVE))) return;
         if (!e.getBlock().getLocation().getWorld().equals(map.getWorld())) return;
 
         Block b = e.getBlock();
@@ -245,6 +249,7 @@ public class Spleef extends Game {
 
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent e) {
+        if (!(getState().equals(GameState.ACTIVE))) return;
         if (!(e.getEntity() instanceof Snowball)) return;
         if (!(e.getEntity().getShooter() instanceof Player)) return;
 
@@ -257,10 +262,9 @@ public class Spleef extends Game {
             // temp variable until debug is gone
             SpleefPlayer s = getSpleefPlayer(p);
             s.setLastDamager(shooter);
-            Bukkit.broadcastMessage("[Debug] last hit: " + s.getLastDamager());
             p.damage(0.5);
             p.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
-            s.setResetTime(timeRemaining+5);
+            s.setResetTime(timeRemaining-RESET_DAMAGE_TIME);
         }
 
         // destroy map blocks (not gold blocks) in contact with snowballs
@@ -277,13 +281,20 @@ public class Spleef extends Game {
     public void onPunch(EntityDamageByEntityEvent e) {
         if (!(e.getDamager() instanceof Player) || !(e.getEntity() instanceof Player)) return;
 
+        SpleefPlayer hit = getSpleefPlayer((Player) e.getEntity());
+        Vector velocity = e.getEntity().getVelocity();
 
+        hit.getPlayer().setVelocity(new Vector(velocity.getX()*0.1, 0.1, velocity.getZ()*0.1));
+        hit.setLastDamager(Participant.getParticipant((Player) e.getDamager()));
+        hit.setResetTime(timeRemaining - RESET_DAMAGE_TIME);
+        e.setCancelled(true);
     }
 
     public void resetSpleefers() {
         for (SpleefPlayer p : spleefPlayers) {
             p.resetKiller();
             p.setPlacement(-1);
+            p.setResetTime(-1);
         }
     }
 
