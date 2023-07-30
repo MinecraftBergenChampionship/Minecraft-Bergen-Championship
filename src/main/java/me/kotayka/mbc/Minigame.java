@@ -121,6 +121,8 @@ public abstract class Minigame implements Scoreboard, Listener {
 
     public void createLine(int score, String line, Participant p) {
         if (p.objective == null || !Objects.equals(p.gameObjective, gameName)) {
+            Bukkit.broadcastMessage("[Debug] p.objective == " + p.objective);
+            Bukkit.broadcastMessage("[Debug] gameObjective == " + p.gameObjective);
             p.gameObjective = gameName;
             MBC.getInstance().getMinigame().createScoreboard(p);
         }

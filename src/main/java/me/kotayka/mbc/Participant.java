@@ -105,10 +105,9 @@ public class Participant {
      * @see Game gameEndEvents()
      */
     public void addCurrentScoreToTotal() {
-        int amount = getRawCurrentScore();
         team.addCurrentScoreToTotal();
-        rawTotalScore += amount;
-        multipliedTotalScore += amount * MBC.getInstance().multiplier;
+        rawTotalScore += rawCurrentScore;
+        multipliedTotalScore += multipliedCurrentScore;
         resetCurrentScores();
     }
 

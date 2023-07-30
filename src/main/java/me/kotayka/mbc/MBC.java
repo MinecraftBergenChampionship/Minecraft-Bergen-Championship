@@ -167,6 +167,21 @@ public class MBC implements Listener {
         return (Game) currentGame;
     }
 
+    public void incrementMultiplier() {
+        /*
+         * Game 1: 1x
+         * Game 2, 3: 1.5x
+         * Game 4, 5: 2x
+         * Game 6: 2.5x
+         */
+        Bukkit.broadcastMessage("[Debug] Current Game: " + gameNum);
+        Bukkit.broadcastMessage("[Debug] multiplier: " + multiplier);
+        if (gameNum % 2 == 0) {
+            Bukkit.broadcastMessage("The point multiplier has increased from " + multiplier + " to " + (multiplier+0.5) + "!");
+            multiplier+=0.5;
+        }
+    }
+
     public void setCurrentGame(Minigame game) {
        currentGame = game;
     }
@@ -196,8 +211,9 @@ public class MBC implements Listener {
         if (currentGame instanceof Game) {
             switch (currentGame.getState()) {
                 case TUTORIAL:
+                case END_ROUND:
                     ((Game) currentGame).disconnect = true;
-                    Bukkit.broadcastMessage("[Debug] disconnect during tutorial!");
+                    Bukkit.broadcastMessage("[Debug] disconnect during transition state!");
                     break;
                 case STARTING:
                     currentGame.Pause();
@@ -236,7 +252,7 @@ public class MBC implements Listener {
     public void onPlayerChat(PlayerChatEvent e) {
         String msg = e.getMessage();
         for (Participant p : players) {
-            if (e.getPlayer() == p.getPlayer()) {
+            if (e.getPlayer().getName().equals(p.getPlayer().getName())) {
                 e.setFormat(p.getFormattedName() + ": " + msg);
                 break;
             }

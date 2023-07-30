@@ -74,6 +74,7 @@ public class Spleef extends Game {
     @Override
     public void loadPlayers() {
         setPVP(false);
+        openFloor(false);
         if (roundNum == 0)
             teamsAlive.addAll(getValidTeams());
         for (Participant p : MBC.getInstance().getPlayers()) {
@@ -115,6 +116,7 @@ public class Spleef extends Game {
         map.pasteMap();
 
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " TGTTOS", p);
             createLine(22, ChatColor.AQUA+""+ChatColor.BOLD+"Map: "+ChatColor.RESET+map.Name(), p);
             createLine(21, ChatColor.GREEN +  "Round: "+ ChatColor.RESET+roundNum+"/3", p);
         }
@@ -194,6 +196,7 @@ public class Spleef extends Game {
     public void placementPoints() {
         for (SpleefPlayer p : spleefPlayers) {
             if (p.getPlacement() > 0 && p.getPlacement() <= BONUS_POINTS.length) {
+                Bukkit.broadcastMessage("[Debug] doing placement for " + p.getPlacement());
                 p.getParticipant().addCurrentScore(BONUS_POINTS[p.getPlacement()-1]);
             }
         }

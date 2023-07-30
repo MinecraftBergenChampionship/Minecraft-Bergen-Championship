@@ -4,6 +4,7 @@ import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -44,7 +45,9 @@ public class DecisionDome extends Minigame {
         // Initialize variables and map
         Bukkit.broadcastMessage("[Debug] bool revealedGames == " + revealedGames);
         removeEntities();
-        initSections();
+        if (!revealedGames) {
+            initSections();
+        }
         chickens.clear();
         tie = false;
         winner = null;
@@ -65,13 +68,16 @@ public class DecisionDome extends Minigame {
             setTimer(13);
         } else {
             Bukkit.broadcastMessage("[Debug] Path of size " + sections.size());
+            // debug
+            for (Section s : sections.values()) {
+                Bukkit.broadcastMessage("[Debug] s.game == " + s.game);
+            }
             setGameState(GameState.STARTING);
             stopTimer();
             Bukkit.broadcastMessage("[Debug] Revealed Games == " + revealedGames);
             if (revealedGames) {
                 Bukkit.broadcastMessage("[Debug] before setting timer!");
                 setTimer(10);
-                Bukkit.broadcastMessage("[Debug] set timer!");
             } else {
                 Bukkit.broadcastMessage("[Debug] Path of NO REVEALED GAMES");
                 setSectionsRed();
@@ -138,8 +144,10 @@ public class DecisionDome extends Minigame {
                     currentSection++;
                 }
             } else {
-                if (timeRemaining == 9)
+                if (timeRemaining == 9) {
+                    MBC.getInstance().incrementMultiplier();
                     Powerups();
+                }
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             switch (timeRemaining) {
@@ -225,7 +233,7 @@ public class DecisionDome extends Minigame {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(18, ChatColor.GREEN + "" + ChatColor.BOLD + "Your Team:", p);
         createLine(17, p.getTeam().getChatColor() + p.getTeam().getTeamFullName(), p);
-        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         updatePlayerTotalScoreDisplay(p);
 
         displayTeamTotalScore(p.getTeam());
@@ -328,9 +336,9 @@ public class DecisionDome extends Minigame {
         // do full loop to determine ties
         List<Section> mostVotes = new ArrayList<>(1);
         for (Section s : sections.values()) {
-           if (s.votes.size() == currentMax && s.game != null) {
-               mostVotes.add(s);
-           }
+            if (s.votes.size() == currentMax && s.game != null) {
+                mostVotes.add(s);
+            }
         }
 
         if (mostVotes.size() == 1) {
@@ -450,14 +458,18 @@ public class DecisionDome extends Minigame {
             return; // remove if powerup spawns a chicken turret or something
         }
         if (e.getEntity().getType().equals(EntityType.EGG)) {
-           Egg egg = (Egg) e.getEntity();
-           Participant p = Participant.getParticipant(((Player) e.getEntity().getShooter()));
-           Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
-           chickens.add(new VoteChicken(p.getTeam(), chicken));
-           egg.remove();
-
-           e.setCancelled(true);
+            Egg egg = (Egg) e.getEntity();
+            Participant p = Participant.getParticipant(((Player) e.getEntity().getShooter()));
+            Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
+            chickens.add(new VoteChicken(p.getTeam(), chicken));
+            egg.remove();
         }
+    }
+
+    @EventHandler
+    public void chickenHatch(PlayerEggThrowEvent e) {
+        e.setHatching(false);
+        e.setNumHatches((byte) 0);
     }
 
     public void removeEntities() {
@@ -512,11 +524,21 @@ public class DecisionDome extends Minigame {
     }
 
     private void resetSections() {
-        for (Map.Entry<Material, Section> entry : sections.entrySet()) {
-           entry.getValue().reset();
+        List<Section> toRemove = new ArrayList<Section>(1);
+        for (Section s : sections.values()) {
+            if (s.game == null || s == winner) {
+                toRemove.add(s);
+            } else {
+                s.reset();
+            }
         }
         raiseWalls(false);
-        removeSection(winner);
+
+        Bukkit.broadcastMessage("[Debug] before: sections.size() == " + sections.size());
+        for (Section s : toRemove) {
+            removeSection(s);
+        }
+        Bukkit.broadcastMessage("[Debug] after: sections.size() == " + sections.size());
     }
 }
 

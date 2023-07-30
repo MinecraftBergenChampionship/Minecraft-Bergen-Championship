@@ -29,7 +29,7 @@ public abstract class Game extends Minigame {
     public List<Participant> playersAlive = new ArrayList<>();
     public List<MBCTeam> teamsAlive = new ArrayList<>();
 
-    // Used to signal whether or not there has been a disconnect when moving from tutorial -> starting; if so, pause
+    // Used to signal whether or not there has been a disconnect when moving from any state -> starting; if so, pause
     public boolean disconnect = false;
 
 
@@ -370,7 +370,7 @@ public abstract class Game extends Minigame {
 
             if (counter < 5) {
                 topFive.append(String.format(
-                        (num) + ". %s: %d (%d x %.2f)\n", p.getFormattedName(), p.getRawCurrentScore(), p.getMultipliedCurrentScore(), MBC.getInstance().multiplier)
+                        (num) + ". %s: %d (%d x %.2f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier)
                 );
                 lastScore = p.getRawCurrentScore();
                 counter++;
@@ -415,6 +415,7 @@ public abstract class Game extends Minigame {
 
     public void returnToLobby() {
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
+        setGameState(GameState.INACTIVE);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
         for (Participant p : MBC.getInstance().getPlayers()) {
             if (p.getPlayer().getAllowFlight()) {
@@ -422,6 +423,7 @@ public abstract class Game extends Minigame {
             }
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+            p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().getInventory().clear();
             p.getPlayer().setExp(0);

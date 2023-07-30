@@ -60,7 +60,7 @@ public class TGTTOS extends Game {
 
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(15, ChatColor.AQUA + "Game Coins:", p);
-        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
 
         updateInGameTeamScoreboard();
     }
@@ -293,8 +293,8 @@ public class TGTTOS extends Game {
                 count++;
         }
         if (count == p.getTeam().getPlayers().size()) {
-            Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN+ "" +ChatColor.BOLD+" was the first full team to finish!");
-            if (firstTeamBonus) {
+            if (!firstTeamBonus) {
+                Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN+ "" +ChatColor.BOLD+" was the first full team to finish!");
                 for (Participant teammate : p.getTeam().getPlayers()) {
                     teammate.addCurrentScore(FIRST_TEAM_BONUS);
                 }
