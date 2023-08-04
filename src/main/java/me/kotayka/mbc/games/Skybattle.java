@@ -436,6 +436,9 @@ public class Skybattle extends Game {
             }
         }
 
+        player.getPlayer().teleport(map.getWorld().getSpawnLocation());
+        player.getPlayer().setGameMode(GameMode.SPECTATOR);
+
         if (e.getEntity().getKiller() == null || e.getPlayer().getLastDamageCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
             // used to determine the death message (ie, void, fall damage, or border?)
             @Nullable EntityDamageEvent damageCause = e.getPlayer().getLastDamageCause();
@@ -453,10 +456,6 @@ public class Skybattle extends Game {
         for (Participant p : playersAlive) {
             p.addCurrentScore(SURVIVAL_POINTS);
         }
-
-        // may require testing due to concurrency
-        player.getPlayer().teleport(map.getWorld().getSpawnLocation());
-        player.getPlayer().setGameMode(GameMode.SPECTATOR);
     }
 
     /**

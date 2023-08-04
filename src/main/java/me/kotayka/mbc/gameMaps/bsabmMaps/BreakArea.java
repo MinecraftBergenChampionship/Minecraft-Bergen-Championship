@@ -34,8 +34,8 @@ public class BreakArea {
         this.world = lowNW.getWorld();
         this.TYPE = type;
         this.DISLOCATE_LOCATION = dislocateLocation;
-        VOLUME = (Math.abs(highSE.getBlockY() - lowNW.getBlockY())+1) * (Math.abs(highSE.getBlockX() - lowNW.getBlockX())+1) * (Math.abs(highSE.getBlockZ() - lowNW.getBlockZ())+1)-1;
         map = ((BuildMart) MBC.getInstance().getGame()).map;
+        VOLUME = map.getVolume(type);
     }
 
     public void Replace() {
@@ -64,8 +64,12 @@ public class BreakArea {
                         Block copy = world.getBlockAt(copyX, copyY, copyZ);
                         if (!copy.getType().equals(Material.AIR)) {
                             Block b = world.getBlockAt(x,y,z);
-                            b.setType(MATERIAL);
-                            b.setBlockData(copy.getBlockData());
+                            // this is bad form but keeping it for now
+                            if (TYPE.toString().contains("LOGS")) {
+                                b.setBlockData(copy.getBlockData());
+                            } else {
+                                b.setType(MATERIAL);
+                            }
                         }
                         copyZ++;
                     }
@@ -121,8 +125,8 @@ public class BreakArea {
             }
         }
 
-        Bukkit.broadcastMessage("[Debug] count == " + count);
-        Bukkit.broadcastMessage("[Debug] VOLUME == " + VOLUME);
+        //Bukkit.broadcastMessage("[Debug] count == " + count);
+        //Bukkit.broadcastMessage("[Debug] VOLUME == " + VOLUME);
         return count == VOLUME;
     }
 

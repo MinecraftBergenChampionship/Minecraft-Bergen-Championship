@@ -19,10 +19,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class MBC implements Listener {
     // singleton for event
@@ -371,6 +368,19 @@ public class MBC implements Listener {
         }
 
         return newList;
+    }
+
+    public void getScores(Player sender) {
+        List<Participant> scores = new ArrayList<>(getInstance().participants);
+        scores.sort(Participant.rawTotalScoreComparator);
+
+        StringBuilder msg = new StringBuilder(ChatColor.AQUA.toString()+ChatColor.BOLD+"Player scores: \n");
+        int count = 1;
+        for (Participant p : scores) {
+            msg.append(count).append(". ").append(p.getFormattedName()).append(": ").append(p.getRawTotalScore()).append("\n");
+            count++;
+        }
+        sender.sendMessage(msg.toString());
     }
 
     /**

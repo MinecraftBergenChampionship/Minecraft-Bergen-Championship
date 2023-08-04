@@ -42,6 +42,7 @@ public class Plugin extends JavaPlugin implements Listener {
 
         getCommand("ping").setExecutor(new ping());
         getCommand("checkbuild").setExecutor(new checkbuild());
+        getCommand("placement").setExecutor(new placement());
 
         // prevent crafting wooden axes (worldedit)
         Iterator<Recipe> it = getServer().recipeIterator();

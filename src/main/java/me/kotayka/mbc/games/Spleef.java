@@ -115,7 +115,6 @@ public class Spleef extends Game {
         map.pasteMap();
 
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
-            createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " TGTTOS", p);
             createLine(22, ChatColor.AQUA+""+ChatColor.BOLD+"Map: "+ChatColor.RESET+map.Name(), p);
             createLine(21, ChatColor.GREEN +  "Round: "+ ChatColor.RESET+roundNum+"/3", p);
         }

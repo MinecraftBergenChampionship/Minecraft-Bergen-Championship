@@ -46,6 +46,18 @@ public abstract class AbstractBuildMartMap extends MBCMap {
     public abstract void loadTeamPlots(BuildMartTeam[] teams);
 
     /**
+     * Resets all break areas of the map
+     */
+    public void resetBreakAreas() {
+        for (List<BreakArea> l : breakAreas.values()) {
+            for (BreakArea area : l) {
+                area.Replace();
+            }
+        }
+    }
+
+
+    /**
      * Load all breaking areas
      */
     public abstract void loadBreakAreas();
@@ -66,6 +78,9 @@ public abstract class AbstractBuildMartMap extends MBCMap {
      * Reset chests and furnaces
      */
     public abstract void resetBlockInventories();
+
+
+    public abstract int getVolume(BreakAreaType type);
 
     public HashMap<Material, List<BreakArea>> BreakAreas() { return breakAreas; }
 }

@@ -178,6 +178,10 @@ public class SurvivalGames extends Game {
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests will refill in one minute!");
             } else if (timeRemaining == 420) {
                 spawnSupplyCrate();
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    player.sendTitle("", ChatColor.RED+"Chests refilled!", 20, 60, 20);
+                    player.playSound(player, Sound.BLOCK_CHEST_OPEN, 1, 1);
+                }
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 regenChest();
                 event = SurvivalGamesEvent.SUPPLY_CRATE;

@@ -2,6 +2,7 @@ package me.kotayka.mbc;
 
 import me.kotayka.mbc.gamePlayers.GamePlayer;
 import me.kotayka.mbc.games.Lobby;
+import me.kotayka.mbc.games.Spleef;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -226,7 +227,9 @@ public abstract class Game extends Minigame {
      * @param p Participant whose scoreboard to update
      */
     public void updatePlayerCurrentScoreDisplay(Participant p) {
-        Bukkit.broadcastMessage("CurrentScore: " + p.getMultipliedCurrentScore() + " for " + p.getPlayerName());
+        if (this instanceof Spleef) { // for DEBUG! un-import spleef later
+            Bukkit.broadcastMessage("CurrentScore: " + p.getMultipliedCurrentScore() + " for " + p.getPlayerName());
+        }
         createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
     }
 
@@ -236,16 +239,12 @@ public abstract class Game extends Minigame {
             temp %= 10;
         }
 
-        switch (temp) {
-            case 1:
-                return "1st";
-            case 2:
-                return "2nd";
-            case 3:
-                return "3rd";
-            default:
-                return place+"th";
-        }
+        return switch (temp) {
+            case 1 -> place + "st";
+            case 2 -> place + "nd";
+            case 3 -> place + "rd";
+            default -> place + "th";
+        };
     }
 
     /**

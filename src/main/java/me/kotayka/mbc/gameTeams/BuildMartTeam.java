@@ -1,13 +1,18 @@
 package me.kotayka.mbc.gameTeams;
 
 import me.kotayka.mbc.MBCTeam;
+import me.kotayka.mbc.gameMaps.bsabmMaps.Build;
 import me.kotayka.mbc.gameMaps.bsabmMaps.BuildPlot;
 import me.kotayka.mbc.games.BuildMart;
 import org.bukkit.Location;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BuildMartTeam extends gameTeam {
-    private BuildPlot[][] plots = new BuildPlot[BuildMart.NUM_PLOTS_PER_TEAM][2];
+    private final BuildPlot[][] plots = new BuildPlot[BuildMart.NUM_PLOTS_PER_TEAM][2];
     private final Location SPAWN;
+    private final Map<Build, Integer> completions = new HashMap<>();
     private int buildsCompleted = 0;
 
     public BuildMartTeam(MBCTeam team, Location spawnLoc) {
@@ -39,4 +44,5 @@ public class BuildMartTeam extends gameTeam {
     }
     public int getBuildsCompleted() { return buildsCompleted; }
     public void incrementBuildsCompleted() { buildsCompleted++; }
+    public Map<Build, Integer> getCompletions() { return completions; }
 }

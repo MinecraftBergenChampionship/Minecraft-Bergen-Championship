@@ -54,8 +54,6 @@ public class TGTTOS extends Game {
     }
 
     public void createScoreboard(Participant p) {
-        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " TGTTOS", p);
-
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
 

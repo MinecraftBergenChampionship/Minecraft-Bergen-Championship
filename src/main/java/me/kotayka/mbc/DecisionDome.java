@@ -18,7 +18,7 @@ import java.util.*;
 public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
     private boolean revealedGames;
-    private List<String> gameNames = new ArrayList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle", "Spleef"));
+    private List<String> gameNames = new ArrayList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle", "Spleef","BuildMart"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
     private final int[][] coordsForBorder = {
@@ -152,16 +152,16 @@ public class DecisionDome extends Minigame {
         } else if (getState().equals(GameState.ACTIVE)) {
             switch (timeRemaining) {
                 case 0 -> {
-                    raiseWalls(true);
                     for (Participant p : MBC.getInstance().getPlayers()) p.getPlayer().getInventory().clear();
                     setGameState(GameState.END_ROUND);
-                    timeRemaining = 10;
+                    timeRemaining = 20;
                 }
                 case 44 -> startVoting();
             }
         } else if (getState().equals(GameState.END_ROUND)) {
             switch (timeRemaining) {
                 case 9 -> {
+                    raiseWalls(true);
                     Bukkit.broadcastMessage(ChatColor.GREEN + "Counting votes...");
                     createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Chosen game revealed: ");
                     winner = countVotes();

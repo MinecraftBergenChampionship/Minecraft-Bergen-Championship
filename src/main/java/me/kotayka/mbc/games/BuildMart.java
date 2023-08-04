@@ -23,6 +23,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -61,13 +62,14 @@ public class BuildMart extends Game {
         super.start();
 
         map.openPortals(false);
-        map.resetBlockInventories();
         loadBuilds();
 
         map.loadTeamPlots(teams);
         map.loadBreakAreas();
 
         placeBuilds();
+        map.resetBlockInventories();
+        map.resetBreakAreas();
 
         setGameState(GameState.STARTING);
         setTimer(30);
@@ -147,13 +149,12 @@ public class BuildMart extends Game {
             if ((plot.getBuild().checkBuild(plot.getMIDPOINT()))) {
                 completeBuild(t, plot);
             }
-            map.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(b.getType()));
+            breakBlock(e.getPlayer(), b);
             return;
         }
 
         List<BreakArea> breakAreas = map.BreakAreas().get(e.getBlock().getType());
-        if (breakAreas == null) {
-            Bukkit.broadcastMessage("No break areas!"); e.setCancelled(true); return; }
+        if (breakAreas == null) { e.setCancelled(true); return; }
 
         if (breakAreas.size() > 1) {
             for (BreakArea area : breakAreas) {
@@ -162,7 +163,7 @@ public class BuildMart extends Game {
                 if (area.lastBlock()) {
                     area.Replace();
                 }
-                map.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(b.getType()));
+                breakBlock(e.getPlayer(), b);
                 return;
             }
         } else {
@@ -174,10 +175,23 @@ public class BuildMart extends Game {
             if (area.lastBlock()) {
                 area.Replace();
             }
-            map.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(b.getType()));
+            breakBlock(e.getPlayer(), b);
             return;
         }
         e.setCancelled(true);
+    }
+
+    private void breakBlock(Player p, Block b) {
+        ItemStack tool = p.getInventory().getItemInMainHand();
+        if (tool.getEnchantments().size() > 0 && tool.getEnchantments().containsKey(Enchantment.SILK_TOUCH)) {
+            map.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(b.getType()));
+            return;
+        }
+
+        Collection<ItemStack> drops = b.getDrops(tool);
+        for (ItemStack i : drops) {
+            map.getWorld().dropItemNaturally(b.getLocation(), i);
+        }
     }
 
     @EventHandler
@@ -198,15 +212,30 @@ public class BuildMart extends Game {
 
     public void completeBuild(BuildMartTeam team, BuildPlot plot) {
         // Firework & scoring
+        int placement = 1;
+        for (BuildMartTeam t : teams) {
+            if (!team.getTeam().getTeamName().equals(t.getTeam().getTeamName()) && t.getCompletions().get(plot.getBuild()) != null) {
+                placement++;
+            }
+        }
+        team.getCompletions().put(plot.getBuild(), placement);
+
         Location fwLoc = new Location(map.getWorld(), plot.getMIDPOINT().getX(), plot.getMIDPOINT().getY()+3, plot.getMIDPOINT().getZ());
         MBC.spawnFirework(fwLoc, team.getTeam().getColor());
+        team.incrementBuildsCompleted();
         for (Participant p : team.getTeam().teamPlayers) {
             MBC.spawnFirework(p);
             p.addCurrentScoreNoDisplay(BUILD_COMPLETION_POINTS);
+            p.addCurrentScoreNoDisplay(BUILD_PLACEMENT_POINTS * (MBC.getInstance().getValidTeams().size() - placement));
+            createLine(3, ChatColor.GREEN.toString()+ChatColor.BOLD+"Builds Completed: " + ChatColor.RESET+team.getBuildsCompleted());
         }
 
+        Bukkit.broadcastMessage(
+                String.format("%s completed [%s%s%s] in %s%s%s place!", team.getTeam().teamNameFormat(), ChatColor.BOLD, plot.getBuild().getName(),
+                               ChatColor.RESET, getColorStringFromPlacement(placement), getPlace(placement), ChatColor.RESET)
+        );
+
         // Next Build
-        team.incrementBuildsCompleted();
         int id = plot.getID();
         Build nextBuild = GAME_ORDER.get((NUM_PLOTS_PER_TEAM+team.getBuildsCompleted()) % GAME_ORDER.size());
         BuildPlot example = team.getPlots()[id][0];
@@ -232,7 +261,7 @@ public class BuildMart extends Game {
         }
         Collections.shuffle(GAME_ORDER);
 
-        Bukkit.broadcastMessage("[Debug] GAME_ORDER.size() == " + GAME_ORDER.size());
+        //Bukkit.broadcastMessage("[Debug] GAME_ORDER.size() == " + GAME_ORDER.size());
     }
 
     @EventHandler
