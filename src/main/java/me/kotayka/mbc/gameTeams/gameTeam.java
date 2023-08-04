@@ -9,4 +9,6 @@ public class gameTeam {
     public gameTeam(MBCTeam team) {
         this.team = team;
     }
+
+    public MBCTeam getTeam() { return team; }
 }

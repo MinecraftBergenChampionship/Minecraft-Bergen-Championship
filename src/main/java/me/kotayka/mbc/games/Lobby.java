@@ -27,9 +27,9 @@ public class Lobby extends Minigame {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team:", p);
         createLine(17, p.getTeam().getChatColor()+p.getTeam().getTeamFullName(), p);
-        createLine(16, ChatColor.RESET.toString()+ChatColor.RESET.toString()+ChatColor.RESET.toString(), p);
-        createLine(15, ChatColor.GREEN+"Game Scores", p);
-        createLine(4, ChatColor.RESET.toString()+ChatColor.RESET.toString(), p);
+        createLine(16, ChatColor.RESET+ChatColor.RESET.toString()+ChatColor.RESET, p);
+        createLine(15, ChatColor.GREEN+"Team Leaderboard: ", p);
+        createLine(4, ChatColor.RESET.toString()+ChatColor.RESET, p);
         updatePlayerTotalScoreDisplay(p);
 
         p.getPlayer().sendMessage(p.getTeam().teamPlayers.toString());

@@ -38,17 +38,15 @@ public class AceRace extends Game {
     public static final int FINISH_RACE_POINTS = 8;           // points for finishing the race
     public static final int PLACEMENT_LAP_POINTS = 1;         // points for placement for first laps
     public static final int PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
-    public static final int[] PLACEMENT_BONUSES = {20, 15, 10, 10, 10, 5, 5, 5}; // points for Top 8 finishers
+    public static final int[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
 
     public AceRace() {
         super("Ace Race");
     }
 
     public void createScoreboard(Participant p) {
-        createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Ace Race", p);
         createLine(19, ChatColor.RESET.toString(), p);
-        createLine(15, ChatColor.AQUA + "Game Coins:", p);
-        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
 
         updateInGameTeamScoreboard();
         updatePlayerCurrentScoreDisplay(p);

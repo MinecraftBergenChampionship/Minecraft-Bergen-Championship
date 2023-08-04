@@ -12,6 +12,10 @@ public class unpause implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player) {
+            if (!(sender.isOp())) {
+                sender.sendMessage("You do not have permission to execute this command!");
+                return true;
+            }
             MBC.getInstance().getMinigame().Unpause();
         }
         return true;

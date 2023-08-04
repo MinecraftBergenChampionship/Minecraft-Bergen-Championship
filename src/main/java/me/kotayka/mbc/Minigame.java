@@ -146,7 +146,7 @@ public abstract class Minigame implements Scoreboard, Listener {
      */
     public void displayTeamCurrentScore(MBCTeam t) {
         for (Participant p : t.teamPlayers) {
-            createLine(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getMultipliedCurrentScore(), p);
+            createLine(1, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getMultipliedCurrentScore(), p);
         }
     }
 
@@ -199,7 +199,7 @@ public abstract class Minigame implements Scoreboard, Listener {
      */
     protected void displayTeamTotalScore(MBCTeam t) {
         for (Participant p : t.teamPlayers) {
-            createLine(2, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getMultipliedTotalScore(), p);
+            createLine(1, ChatColor.GREEN + "Team Coins: " + ChatColor.WHITE + t.getMultipliedTotalScore(), p);
         }
     }
 

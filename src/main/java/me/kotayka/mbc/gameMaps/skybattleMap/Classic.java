@@ -81,7 +81,6 @@ public class Classic extends SkybattleMap {
                 z = 322;
                 y++;
             }
-            z = 322;
             y = -16;
             x++;
         }

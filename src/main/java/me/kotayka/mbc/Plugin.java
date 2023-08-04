@@ -4,16 +4,20 @@ import me.kotayka.mbc.commands.*;
 import me.kotayka.mbc.commands.tab.changeTeamTabCompletion;
 import me.kotayka.mbc.commands.tab.startTabCompletion;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.java.JavaPlugin;
-import java.util.logging.Logger;
+
+import java.util.Iterator;
 
 public class Plugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
         MBC.getInstance(this);
+
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             MBC.getInstance().players.add(new Participant(p));
@@ -37,6 +41,16 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("unpause").setExecutor(new unpause());
 
         getCommand("ping").setExecutor(new ping());
+        getCommand("checkbuild").setExecutor(new checkbuild());
+
+        // prevent crafting wooden axes (worldedit)
+        Iterator<Recipe> it = getServer().recipeIterator();
+        Recipe recipe;
+        while (it.hasNext()) {
+            recipe = it.next();
+            if (recipe != null && recipe.getResult().getType() == Material.WOODEN_AXE)
+                it.remove();
+        }
     }
 
     @Override

@@ -49,7 +49,6 @@ public class Spleef extends Game {
     @Override
     public void createScoreboard(Participant p) {
         createLine(19, ChatColor.RESET.toString(), p);
-        createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         updatePlayersAliveScoreboard();
 

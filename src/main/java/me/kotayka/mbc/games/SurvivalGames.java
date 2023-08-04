@@ -108,11 +108,9 @@ public class SurvivalGames extends Game {
 
     @Override
     public void createScoreboard(Participant p) {
-        createLine(24, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " Survival Games", p);
         createLine(21, ChatColor.AQUA+""+ChatColor.BOLD+"Map: " + ChatColor.RESET+ map.mapName);
         createLine(19, ChatColor.RESET.toString(), p);
-        createLine(15, ChatColor.AQUA + "Game Coins:", p);
-        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         updatePlayersAliveScoreboard();
         createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0", p);
 
@@ -579,7 +577,7 @@ public class SurvivalGames extends Game {
         knockback.addEnchantment(Enchantment.KNOCKBACK, 1);
         ItemMeta knockMeta = knockback.getItemMeta();
         knockMeta.setDisplayName(ChatColor.RED+"Knockback I");
-        knockback.setItemMeta(sharpnessMeta);
+        knockback.setItemMeta(knockMeta);
         knockback.setLore(List.of("Cost: 1 XP"));
         items[1] = new GUIItem(knockback, Enchantment.KNOCKBACK, 1);
 

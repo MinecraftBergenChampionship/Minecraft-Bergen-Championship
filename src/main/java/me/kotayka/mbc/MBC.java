@@ -64,12 +64,12 @@ public class MBC implements Listener {
     public DecisionDome decisionDome = null;
     public AceRace aceRace = null;
     public TGTTOS tgttos = null;
-    public BSABM bsabm = null;
+    public BuildMart bsabm = null;
     public Skybattle skybattle = null;
     public SurvivalGames sg = null;
     public Spleef spleef = null;
 
-    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BSABM","Skybattle", "SurvivalGames", "Spleef"));
+    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef"));
     public final List<Game> gameList = new ArrayList<Game>(6);
 
     // Define Special Blocks
@@ -117,9 +117,9 @@ public class MBC implements Listener {
                     tgttos = new TGTTOS();
                 }
                 return tgttos;
-            case "BSABM":
+            case "BuildMart":
                 if (bsabm == null) {
-                    bsabm = new BSABM();
+                    bsabm = new BuildMart();
                 }
                 return bsabm;
             case "Skybattle":
@@ -341,6 +341,19 @@ public class MBC implements Listener {
 
         fwm.addEffect(FireworkEffect.builder().withColor(p.getTeam().getColor()).build());
 
+        fw.setFireworkMeta(fwm);
+        fw.detonate();
+    }
+
+    /**
+     * Spawn Firework at a given location with a given color
+     * @param l Location to spawn the firework
+     * @param c Color for the firework to have
+     */
+    public static void spawnFirework(Location l, Color c) {
+        org.bukkit.entity.Firework fw = (org.bukkit.entity.Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK);
+        FireworkMeta fwm = fw.getFireworkMeta();
+        fwm.addEffect(FireworkEffect.builder().withColor(c).build());
         fw.setFireworkMeta(fwm);
         fw.detonate();
     }

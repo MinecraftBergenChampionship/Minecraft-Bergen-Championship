@@ -6,9 +6,7 @@ import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.tgttosMap.TGTTOSMap;
 import me.kotayka.mbc.gameMaps.tgttosMap.*;
-import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -59,7 +57,6 @@ public class TGTTOS extends Game {
         createLine(23, ChatColor.AQUA + "" + ChatColor.BOLD + "Game "+ MBC.getInstance().gameNum+"/6:" + ChatColor.WHITE + " TGTTOS", p);
 
         createLine(19, ChatColor.RESET.toString(), p);
-        createLine(15, ChatColor.AQUA + "Game Coins:", p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
 
         updateInGameTeamScoreboard();

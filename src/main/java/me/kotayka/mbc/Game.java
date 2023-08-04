@@ -310,10 +310,14 @@ public abstract class Game extends Minigame {
            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
            p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+           p.getPlayer().setLevel(0);
+           p.getPlayer().setExp(0);
        }
 
        loadPlayers();
        createScoreboard();
+       createLine(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, gameName));
+       createLine(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET));
    }
 
    /**
@@ -345,6 +349,28 @@ public abstract class Game extends Minigame {
     }
 
     /**
+     * Called at the end of team games-skips print out individual scores
+     * Should have at least 25 seconds when switching to GAME_END
+     */
+    public void teamGameEndEvents() {
+        // Team Games should leave at least 25 seconds for GAME_END
+        switch (timeRemaining) {
+            case 20 -> {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
+                TO_PRINT = printRoundScores();
+            }
+            case 16 -> getScoresNoPrint();
+            case 14 -> {
+                Bukkit.broadcastMessage(ChatColor.BOLD+"Current event standings:");
+                TO_PRINT = printEventScores();
+            }
+            case 1 -> Bukkit.broadcastMessage(ChatColor.RED+"Returning to lobby...");
+            case 18, 12 -> Bukkit.broadcastMessage(TO_PRINT);
+            case 0 -> returnToLobby();
+        }
+    }
+
+    /**
      * Prints out top 5 players (or more if there is a tie).
      * Calls addRoundScoreToGame() to load stats from this game to overall MBC.
      * @see Participant addRoundScoreToGame()
@@ -370,7 +396,7 @@ public abstract class Game extends Minigame {
 
             if (counter < 5) {
                 topFive.append(String.format(
-                        (num) + ". %s: %d (%d x %.2f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier)
+                        (num) + ". %s: %d (%d x %.1f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier)
                 );
                 lastScore = p.getRawCurrentScore();
                 counter++;
@@ -411,6 +437,12 @@ public abstract class Game extends Minigame {
             ));
         }
         return teamString.toString();
+    }
+
+    public void getScoresNoPrint() {
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.addCurrentScoreToTotal();
+        }
     }
 
     public void returnToLobby() {

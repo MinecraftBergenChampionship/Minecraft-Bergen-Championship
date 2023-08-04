@@ -128,6 +128,12 @@ public class Participant {
         MBC.getInstance().getGame().updatePlayerCurrentScoreDisplay(this);
     }
 
+    public void addCurrentScoreNoDisplay(int amount) {
+        rawCurrentScore += amount;
+        multipliedCurrentScore += amount*MBC.getInstance().multiplier;
+        team.addCurrentTeamScore(amount);
+    }
+
     public MBCTeam getTeam() {
         return team;
     }

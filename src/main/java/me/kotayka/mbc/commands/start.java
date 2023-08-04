@@ -11,6 +11,11 @@ public class start implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
+            if (!(sender.isOp())) {
+                sender.sendMessage("You do not have permission to execute this command!");
+                return true;
+            }
+
             if (args.length != 1) {
                 sender.sendMessage("Please provide 1 argument");
                 return false;
