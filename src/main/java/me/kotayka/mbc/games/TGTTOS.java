@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -362,6 +363,14 @@ public class TGTTOS extends Game {
             ItemStack boatItem = new ItemStack(Material.OAK_BOAT);
             Player p = (Player) event.getExited();
             p.getInventory().addItem(boatItem);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        // Check if the interaction is placing a boat
+        if (event.getItem() != null && event.getItem().getType() == Material.OAK_BOAT && !getState().equals(GameState.ACTIVE)) {
+            event.setCancelled(true);
         }
     }
 
