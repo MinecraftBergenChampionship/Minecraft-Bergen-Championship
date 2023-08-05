@@ -39,7 +39,7 @@ public class TGTTOS extends Game {
             ));
 
     private List<Participant> finishedParticipants;
-    private String[] deathMessages = new String[40];
+    private String[] deathMessages = new String[44];
     private List<Location> placedBlocks = new ArrayList<Location>(20);
     private boolean firstTeamBonus = false;  // determine whether or not a full team has completed yet
     private boolean secondTeamBonus = false;

@@ -106,13 +106,14 @@ public class BuildMart extends Game {
     public void loadPlayers() {
         ItemStack[] items = getItemsForBuildMart();
         for (Participant p : MBC.getInstance().getPlayers()) {
+            BuildMartPlayer buildMartPlayer = new BuildMartPlayer(p, this);
+            buildMartPlayers.add(buildMartPlayer);
+            buildMartPlayer.respawn();
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().setAllowFlight(true);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-            BuildMartPlayer buildMartPlayer = new BuildMartPlayer(p, this);
-            buildMartPlayers.add(buildMartPlayer);
-            buildMartPlayer.respawn();
             for (ItemStack i : items) {
                 if (i.getType().equals(Material.ELYTRA)) {
                     p.getPlayer().getInventory().setChestplate(i);
@@ -228,7 +229,7 @@ public class BuildMart extends Game {
             MBC.spawnFirework(p);
             p.addCurrentScoreNoDisplay(BUILD_COMPLETION_POINTS);
             p.addCurrentScoreNoDisplay(BUILD_PLACEMENT_POINTS * (MBC.getInstance().getValidTeams().size() - placement));
-            createLine(3, ChatColor.GREEN.toString()+ChatColor.BOLD+"Builds Completed: " + ChatColor.RESET+team.getBuildsCompleted());
+            createLine(3, ChatColor.GREEN.toString()+ChatColor.BOLD+"Builds Completed: " + ChatColor.RESET+team.getBuildsCompleted(), p);
         }
 
         Bukkit.broadcastMessage(

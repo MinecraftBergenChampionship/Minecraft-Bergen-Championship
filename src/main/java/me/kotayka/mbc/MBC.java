@@ -373,6 +373,7 @@ public class MBC implements Listener {
     public void getScores(Player sender) {
         List<Participant> scores = new ArrayList<>(getInstance().participants);
         scores.sort(Participant.rawTotalScoreComparator);
+        Collections.reverse(scores);
 
         StringBuilder msg = new StringBuilder(ChatColor.AQUA.toString()+ChatColor.BOLD+"Player scores: \n");
         int count = 1;

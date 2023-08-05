@@ -385,9 +385,9 @@ public abstract class Game extends Minigame {
         Collections.reverse(gameIndividual);
 
         for (Participant p : gameIndividual) {
-            Bukkit.broadcastMessage("[Debug] p == " + p);
-            if (p.getRawCurrentScore() != lastScore) {
-                num++;
+            num++;
+            if (p.getRawCurrentScore() == lastScore) {
+                num--;
                 if (counter == 4) {
                     counter--; // keep going until no ties
                 }
@@ -399,7 +399,6 @@ public abstract class Game extends Minigame {
                 );
                 lastScore = p.getRawCurrentScore();
                 counter++;
-                Bukkit.broadcastMessage("[Debug] counter == " + counter);
             }
             p.addCurrentScoreToTotal();
         }

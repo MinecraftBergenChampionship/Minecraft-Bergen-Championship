@@ -81,17 +81,17 @@ public class SurvivalGames extends Game {
 
     @Override
     public void loadPlayers() {
+        setPVP(false);
         teamsAlive.addAll(getValidTeams());
         map.setBarriers(true);
-        setPVP(false);
+        map.spawnPlayers();
         for (Participant p : MBC.getInstance().getPlayers()) {
             playersAlive.add(p);
-            p.getPlayer().setGameMode(GameMode.ADVENTURE);
             p.getPlayer().getInventory().clear();
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 30, 10, false, false));
-            map.spawnPlayers();
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
         }
         regenChest();
     }

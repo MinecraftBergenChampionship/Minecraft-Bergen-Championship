@@ -78,13 +78,13 @@ public class Spleef extends Game {
         if (roundNum == 0)
             teamsAlive.addAll(getValidTeams());
         for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().teleport(lobby);
             p.getPlayer().getInventory().clear();
-            p.getPlayer().setGameMode(GameMode.ADVENTURE);
             p.getPlayer().setFlying(false);
             p.getPlayer().setAllowFlight(false);
             p.getPlayer().setInvulnerable(false);
             p.getPlayer().setHealth(20);
-            p.getPlayer().teleport(lobby);
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
@@ -306,7 +306,6 @@ public class Spleef extends Game {
 
             if (p.getResetTime() >= timeRemaining) {
                 p.resetKiller();
-                Bukkit.broadcastMessage("[Debug] killer reset for " + p.getPlayer().getName());
                 p.setResetTime(-1);
             }
         }
