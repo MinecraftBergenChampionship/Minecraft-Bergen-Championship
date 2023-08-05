@@ -3,6 +3,8 @@ package me.kotayka.mbc.gamePlayers;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameTeams.BuildMartTeam;
 import me.kotayka.mbc.games.BuildMart;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 public class BuildMartPlayer extends GamePlayer {
 
@@ -26,5 +28,15 @@ public class BuildMartPlayer extends GamePlayer {
     public void respawn() {
         getParticipant().getInventory().clear();
         getParticipant().getPlayer().teleport(team.getSPAWN());
+
+        ItemStack[] items = BuildMart.getItemsForBuildMart();
+
+        for (ItemStack i : items) {
+            if (i.getType().equals(Material.ELYTRA)) {
+                getParticipant().getPlayer().getInventory().setChestplate(i);
+            } else {
+                getParticipant().getPlayer().getInventory().addItem(i);
+            }
+        }
     }
 }

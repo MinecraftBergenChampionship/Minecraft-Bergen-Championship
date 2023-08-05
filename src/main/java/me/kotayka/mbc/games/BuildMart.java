@@ -104,7 +104,7 @@ public class BuildMart extends Game {
     }
 
     public void loadPlayers() {
-        ItemStack[] items = getItems();
+        ItemStack[] items = getItemsForBuildMart();
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().setAllowFlight(true);
@@ -309,7 +309,7 @@ public class BuildMart extends Game {
     }
 
     // Get items for players
-    private ItemStack[] getItems() {
+    public static ItemStack[] getItemsForBuildMart() {
         ItemStack pick = new ItemStack(Material.DIAMOND_PICKAXE);
 
         ItemStack silk = new ItemStack(Material.DIAMOND_PICKAXE);
