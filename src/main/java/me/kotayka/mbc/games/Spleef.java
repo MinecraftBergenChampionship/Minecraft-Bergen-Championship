@@ -65,6 +65,7 @@ public class Spleef extends Game {
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
         }
 
         startRound();
