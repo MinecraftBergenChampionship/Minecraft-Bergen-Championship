@@ -7,6 +7,8 @@ import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.bsabmMaps.*;
 import me.kotayka.mbc.gamePlayers.BuildMartPlayer;
 import me.kotayka.mbc.gameTeams.BuildMartTeam;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -22,10 +24,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class BuildMart extends Game {
     public AbstractBuildMartMap map = new BuildMartMap(this);
@@ -43,6 +42,8 @@ public class BuildMart extends Game {
     public static final int NUM_PLOTS_PER_TEAM = 3;
     public static final int BUILD_COMPLETION_POINTS = 3; // points are per player
     public static final int BUILD_PLACEMENT_POINTS = 3; // points are per player
+
+    private Map<Participant, Material> hotbarSelector = new HashMap<Participant, Material>();
 
     public BuildMart() {
         super("BuildMart");
@@ -264,9 +265,36 @@ public class BuildMart extends Game {
         //Bukkit.broadcastMessage("[Debug] GAME_ORDER.size() == " + GAME_ORDER.size());
     }
 
+    public StringBuilder createActionBarString (String material) {
+        String[] strs = material.split("_");
+        StringBuilder finalString = new StringBuilder();
+        for (String str : strs) {
+            str = str.toLowerCase();
+            finalString.append(str.substring(0, 1).toUpperCase()).append(str.substring(1));
+            finalString.append(" ");
+        }
+        return finalString;
+    }
+
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         map.onMove(e);
+        Participant p = Participant.getParticipant(e.getPlayer());
+        if (hotbarSelector.containsKey(p)) {
+            if (e.getPlayer().getTargetBlock(null, 5).getType() != hotbarSelector.get(p)) {
+                hotbarSelector.put(p, e.getPlayer().getTargetBlock(null, 5).getType());
+                if (e.getPlayer().getTargetBlock(null, 5).getType() != Material.AIR) {
+                    e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+ "" + ChatColor.BOLD+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(p))))));
+                }
+                else {
+                    e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
+                }
+            }
+        }
+        else {
+            hotbarSelector.put(p, e.getPlayer().getTargetBlock(null, 5).getType());
+            e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+ "" + ChatColor.BOLD+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(p))))));
+        }
     }
 
     @EventHandler
