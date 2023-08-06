@@ -63,7 +63,7 @@ public class DecisionDome extends Minigame {
             for (Section s : sections.values()) {
                 winner = s;
             }
-            createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Warping to game: ");
+            createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Warping to game: ");
             setGameState(GameState.END_GAME);
             setTimer(13);
         } else {
@@ -163,7 +163,7 @@ public class DecisionDome extends Minigame {
                 case 9 -> {
                     raiseWalls(true);
                     Bukkit.broadcastMessage(ChatColor.GREEN + "Counting votes...");
-                    createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Chosen game revealed: ");
+                    createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Chosen game revealed: ");
                     winner = countVotes();
                 }
                 case 6 -> {
@@ -199,7 +199,7 @@ public class DecisionDome extends Minigame {
                         p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
                     }
                     Bukkit.broadcastMessage(ChatColor.BOLD + winner.game + "!");
-                    createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Warping to game: ");
+                    createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Warping to game: ");
                     if (!revealedGames) revealedGames = true;
                     setGameState(GameState.END_GAME);
                     timeRemaining = 13;
@@ -252,7 +252,7 @@ public class DecisionDome extends Minigame {
      */
     public void startVoting() {
         Bukkit.broadcastMessage(ChatColor.GREEN+"Time to vote!");
-        createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Voting ends:");
+        createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Voting ends:");
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().getInventory().addItem(new ItemStack(Material.EGG, 1));
             p.getPlayer().sendTitle(p.getTeam().getChatColor() + "" + ChatColor.BOLD + "Vote!", "", 20, 60, 20);

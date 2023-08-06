@@ -108,7 +108,7 @@ public class SurvivalGames extends Game {
 
     @Override
     public void createScoreboard(Participant p) {
-        createLine(21, ChatColor.AQUA+""+ChatColor.BOLD+"Map: " + ChatColor.RESET+ map.mapName);
+        createLineAll(21, ChatColor.AQUA+""+ChatColor.BOLD+"Map: " + ChatColor.RESET+ map.mapName);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         updatePlayersAliveScoreboard();
@@ -154,7 +154,7 @@ public class SurvivalGames extends Game {
                     gameOverGraphics();
                     roundWinners(WIN_POINTS / playersAlive.size());
                     setGameState(GameState.END_GAME);
-                    createLine(23, "");
+                    createLineAll(23, "");
                     timeRemaining = 37;
                 }
             }
@@ -196,7 +196,7 @@ public class SurvivalGames extends Game {
                 gameOverGraphics();
                 roundWinners(WIN_POINTS / playersAlive.size());
                 setGameState(GameState.END_GAME);
-                createLine(23, "");
+                createLineAll(23, "");
                 timeRemaining = 37;
             }
         } else if (getState().equals(GameState.END_GAME)) {
@@ -223,13 +223,13 @@ public class SurvivalGames extends Game {
                 case GRACE_OVER ->
                         createLine(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Grace ends in: " + ChatColor.RESET + getFormattedTime(timeRemaining - 660), p);
                 case CHEST_REFILL ->
-                        createLine(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Chest refill: " + ChatColor.RESET + getFormattedTime(timeRemaining - 420));
+                        createLineAll(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Chest refill: " + ChatColor.RESET + getFormattedTime(timeRemaining - 420));
                 case DEATHMATCH ->
-                        createLine(23, ChatColor.RED + "" + ChatColor.BOLD + "Deathmatch: " + ChatColor.WHITE + "Active");
+                        createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD + "Deathmatch: " + ChatColor.WHITE + "Active");
                 case SUPPLY_CRATE -> {
                     // hard coded times; the 2nd supply drop coincides with chest refill
                     int nextTime = (timeRemaining > 540) ? timeRemaining - 540 : timeRemaining - 360;
-                    createLine(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Next supply crate: " + ChatColor.RESET + getFormattedTime(nextTime));
+                    createLineAll(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Next supply crate: " + ChatColor.RESET + getFormattedTime(nextTime));
                 }
             }
         }
@@ -379,7 +379,7 @@ public class SurvivalGames extends Game {
         if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.BLACK_SHULKER_BOX)) {
             crates.get(crateNum).setOpened(true);
             dropLocation = false;
-            createLine(22, "");
+            createLineAll(22, "");
             crateNum++;
             return;
         }

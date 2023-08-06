@@ -8,7 +8,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,14 +17,14 @@ public class Participant {
 
     // Player's un-multiplied individual score; updates between games
     private int rawTotalScore = 0;
-    private int multipliedTotalScore = 0;
+    private double multipliedTotalScore = 0;
     // Player's current score in game; used for display
     private int rawCurrentScore = 0;
-    private int multipliedCurrentScore = 0;
+    private double multipliedCurrentScore = 0;
     private MBCTeam team;
     private final Player player;
 
-    //public final Scoreboard board = MBC.getInstance().manager.getNewScoreboard();
+    public final Scoreboard board = MBC.getInstance().manager.getNewScoreboard();
     public Objective objective;
     public String gameObjective;
 
@@ -36,11 +35,11 @@ public class Participant {
             Comparator.comparingInt(Participant::getRawTotalScore);
 
     public static final Comparator<Participant> multipliedCurrentScoreComparator =
-            Comparator.comparingInt(Participant::getMultipliedCurrentScore);
+            Comparator.comparingDouble(Participant::getMultipliedCurrentScore);
 
     public Participant(Player p) {
         player=p;
-        p.setScoreboard(MBC.getInstance().board);
+        p.setScoreboard(board);
 
         Bukkit.broadcastMessage("[Debug] assigning team");
         changeTeam(MBC.getInstance().spectator);
@@ -53,7 +52,7 @@ public class Participant {
             team.removePlayer(this);
         }
 
-        addPlayerToTeamScoreboard(t);
+        setupScoreboardTeams();
 
         team = t;
         team.addPlayer(this);
@@ -73,7 +72,7 @@ public class Participant {
     }
 
     /* Returns the multiplied total score*/
-    public int getMultipliedTotalScore() {
+    public double getMultipliedTotalScore() {
         return multipliedTotalScore;
     }
 
@@ -95,7 +94,7 @@ public class Participant {
     public int getRawCurrentScore() {
         return rawCurrentScore;
     }
-    public int getMultipliedCurrentScore() { return multipliedCurrentScore; }
+    public double getMultipliedCurrentScore() { return multipliedCurrentScore; }
 
 
     /**
@@ -177,18 +176,33 @@ public class Participant {
     }
 
     /**
-     * Adds player to scoreboard team, and initializes the team if uninitialized.
-     * @param t Team of Participant to be added to
+     * Adds player to own scoreboard
+     * Add this new participant to everyone else's scoreboard
      */
-    public void addPlayerToTeamScoreboard(MBCTeam t) {
-        if (t.scoreboardTeam == null) {
-            t.scoreboardTeam = MBC.getInstance().board.registerNewTeam(t.fullName);
-            t.scoreboardTeam.setColor(t.getChatColor());
-            t.scoreboardTeam.setPrefix(String.format("%s%c ", ChatColor.WHITE, t.getIcon()));
-            t.scoreboardTeam.setAllowFriendlyFire(false);
-            t.scoreboardTeam.addPlayer(player);
-        } else {
-            t.scoreboardTeam.addPlayer(player);
+    private void setupScoreboardTeams() {
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            // add everyone else to this player's scoreboard
+            if (board.getTeam(p.getTeam().fullName) == null) {
+                Team scoreboardTeam = board.registerNewTeam(p.getTeam().fullName);
+                scoreboardTeam.setColor(p.getTeam().getChatColor());
+                scoreboardTeam.setPrefix(String.format("%$s%c ", ChatColor.WHITE, p.getTeam().getIcon()));
+                scoreboardTeam.setAllowFriendlyFire(false);
+                scoreboardTeam.addPlayer(p.getPlayer());
+            } else {
+                board.getTeam(p.getTeam().fullName).addPlayer(p.getPlayer());
+            }
+
+            // adds this player to everyone else's teams
+            if (p.board.getTeam(team.fullName) == null) {
+                Team scoreboardTeam = p.board.registerNewTeam(team.fullName);
+                scoreboardTeam.setColor(team.getChatColor());
+                scoreboardTeam.setPrefix(String.format("%s%c ", ChatColor.WHITE, team.getIcon()));
+                scoreboardTeam.setAllowFriendlyFire(false);
+                scoreboardTeam.addPlayer(player);
+            } else {
+                // add player to team
+                p.board.getTeam(team.fullName).addPlayer(player);
+            }
         }
     }
 }

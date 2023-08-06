@@ -15,12 +15,11 @@ public abstract class MBCTeam {
     protected Character icon;
     protected ChatColor chatColor;
     protected Color color;
-    protected Team scoreboardTeam = null;
 
     private int rawTotalScore = 0;
-    private int multipliedTotalScore = 0;
+    private double multipliedTotalScore = 0;
     private int rawCurrentScore = 0;
-    private int multipliedCurrentScore = 0;
+    private double multipliedCurrentScore = 0;
     private int currentPlace = 1;
     private int sortID;
 
@@ -63,7 +62,7 @@ public abstract class MBCTeam {
 
     public List<Participant>teamPlayers = new ArrayList<>(4);
 
-    public int getMultipliedTotalScore() {
+    public double getMultipliedTotalScore() {
         return multipliedTotalScore;
     }
 
@@ -71,7 +70,7 @@ public abstract class MBCTeam {
         return rawTotalScore;
     }
 
-    public int getMultipliedCurrentScore() {
+    public double getMultipliedCurrentScore() {
         return multipliedCurrentScore;
     }
 
@@ -95,12 +94,10 @@ public abstract class MBCTeam {
 
     public void addPlayer(Participant p) {
         teamPlayers.add(p);
-        scoreboardTeam.addEntity(p.getPlayer());
     }
     public List<Participant> getPlayers() { return teamPlayers; }
     public void removePlayer(Participant p) {
         teamPlayers.remove(p);
-        scoreboardTeam.removeEntity(p.getPlayer());
     }
 
     /**
@@ -282,7 +279,7 @@ class TeamScoreSorter implements Comparator<MBCTeam> {
             // compare colors
             return a.getSortID() - b.getSortID();
         }
-        return b.getMultipliedTotalScore() - a.getMultipliedTotalScore(); // reverse so bigger numbers are at the top when sorted
+        return (int) (b.getMultipliedTotalScore() - a.getMultipliedTotalScore()); // reverse so bigger numbers are at the top when sorted
     }
 }
 
@@ -294,6 +291,6 @@ class TeamRoundSorter implements Comparator<MBCTeam> {
         if (a.getMultipliedCurrentScore() == b.getMultipliedCurrentScore()) {
             return a.getSortID() - b.getSortID();
         }
-        return b.getMultipliedCurrentScore() - a.getMultipliedCurrentScore(); // reverse so bigger numbers are at the top when sorted
+        return (int) (b.getMultipliedCurrentScore() - a.getMultipliedCurrentScore()); // reverse so bigger numbers are at the top when sorted
     }
 }

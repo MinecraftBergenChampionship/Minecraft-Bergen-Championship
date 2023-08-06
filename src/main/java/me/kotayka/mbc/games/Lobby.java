@@ -7,6 +7,7 @@ import me.kotayka.mbc.Participant;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -20,8 +21,6 @@ public class Lobby extends Minigame {
     }
 
     public void createScoreboard(Participant p) {
-        Bukkit.broadcastMessage("This is a test");
-
         newObjective(p);
         createLine(21, ChatColor.RED+""+ChatColor.BOLD + "Event begins in:", p);
         createLine(19, ChatColor.RESET.toString(), p);
@@ -42,13 +41,8 @@ public class Lobby extends Minigame {
     }
 
     public void events() {
-        switch (timeRemaining) {
-            case 10:
-                Bukkit.broadcastMessage(ChatColor.RED+"10 seconds left");
-                break;
-            case 0:
-               toVoting();
-               break;
+        if (timeRemaining == 0) {
+            toVoting();
         }
     }
 
@@ -87,6 +81,16 @@ public class Lobby extends Minigame {
 
     @Override
     public void loadPlayers() {
-        // tbd
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.teleport(LOBBY);
+        }
+    }
+
+    public void prepareFinale() {
+        MBC.getInstance().setCurrentGame(this);
+        createScoreboard();
+        stopTimer();
+        setTimer(60);
+        setGameState(GameState.END_ROUND);
     }
 }

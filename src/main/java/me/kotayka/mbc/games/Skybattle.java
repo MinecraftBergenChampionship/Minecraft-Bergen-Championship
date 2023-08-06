@@ -184,7 +184,7 @@ public class Skybattle extends Game {
                 roundNum++;
                 map.resetMap();
                 loadPlayers();
-                createLine(22, ChatColor.GREEN+""+ChatColor.BOLD+"Round: " + ChatColor.RESET+roundNum+"/3");
+                createLineAll(22, ChatColor.GREEN+""+ChatColor.BOLD+"Round: " + ChatColor.RESET+roundNum+"/3");
                 timeRemaining = 20;
                 setGameState(GameState.STARTING);
             }

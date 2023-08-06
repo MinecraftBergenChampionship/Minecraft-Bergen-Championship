@@ -67,12 +67,12 @@ public abstract class Minigame implements Scoreboard, Listener {
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
             if (MBC.getInstance().getMinigame() instanceof Game) {
                 if (!gameState.equals(GameState.OVERTIME)) {
-                    createLine(20, ChatColor.RED + "" + ChatColor.BOLD + "Time left: " + ChatColor.WHITE + getFormattedTime(--timeRemaining));
+                    createLineAll(20, ChatColor.RED + "" + ChatColor.BOLD + "Time left: " + ChatColor.WHITE + getFormattedTime(--timeRemaining));
                 } else {
-                    createLine(20, ChatColor.RED + "" + ChatColor.BOLD + "Overtime: " + ChatColor.WHITE + getFormattedTime(--timeRemaining));
+                    createLineAll(20, ChatColor.RED + "" + ChatColor.BOLD + "Overtime: " + ChatColor.WHITE + getFormattedTime(--timeRemaining));
                 }
             } else {
-                createLine(20, getFormattedTime(--timeRemaining));
+                createLineAll(20, getFormattedTime(--timeRemaining));
             }
             if (timeRemaining < 0) {
                 stopTimer();
@@ -90,7 +90,7 @@ public abstract class Minigame implements Scoreboard, Listener {
         Bukkit.broadcastMessage("Event Paused!");
         gameState = GameState.PAUSED;
         stopTimer();
-        createLine(20, "EVENT PAUSED");
+        createLineAll(20, "EVENT PAUSED");
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.sendTitle("PAUSED", "", 20, 60, 20);
         }
@@ -133,7 +133,7 @@ public abstract class Minigame implements Scoreboard, Listener {
         p.lines.put(score, line);
     }
 
-    public void createLine(int score, String line) {
+    public void createLineAll(int score, String line) {
         for (Participant p : MBC.getInstance().players) {
             createLine(score, line, p);
         }
@@ -159,7 +159,7 @@ public abstract class Minigame implements Scoreboard, Listener {
 
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
             MBCTeam t = teamRoundsScores.get(14-i);
-            createLine(i,String.format("%s: %d", t.teamNameFormat(), t.getMultipliedCurrentScore()));
+            createLineAll(i,String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedCurrentScore()));
         }
     }
 
@@ -170,11 +170,11 @@ public abstract class Minigame implements Scoreboard, Listener {
         List<MBCTeam> teamRoundsScores = new ArrayList<>(getValidTeams());
         teamRoundsScores.sort(new TeamScoreSorter());
 
-        int lastScore = -1;
+        double lastScore = -1;
         int ties = 0;
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
             MBCTeam t = teamRoundsScores.get(14-i);
-            createLine(i,String.format("%s: %d", t.teamNameFormat(), t.getMultipliedTotalScore()));
+            createLineAll(i,String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedTotalScore()));
 
             if (MBC.getInstance().gameNum == 1) continue;
 

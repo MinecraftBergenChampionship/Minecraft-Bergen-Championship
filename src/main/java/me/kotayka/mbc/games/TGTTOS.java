@@ -103,7 +103,7 @@ public class TGTTOS extends Game {
         } else if (getState().equals(GameState.END_ROUND)) {
             if (timeRemaining == 0) {
                 startRound();
-            } else if (timeRemaining == 5) {
+            } else if (timeRemaining == 4) {
                 roundOverGraphics();
             }
         } else if (getState().equals(GameState.END_GAME)) {
@@ -197,8 +197,8 @@ public class TGTTOS extends Game {
         maps.remove(map);
         map.Barriers(true);
 
-        createLine(22, ChatColor.AQUA+""+ChatColor.BOLD+"Map: "+ChatColor.RESET+map.getName());
-        createLine(21, ChatColor.GREEN +  "Round: "+ ChatColor.RESET+roundNum+"/6");
+        createLineAll(22, ChatColor.AQUA+""+ChatColor.BOLD+"Map: "+ChatColor.RESET+map.getName());
+        createLineAll(21, ChatColor.GREEN +  "Round: "+ ChatColor.RESET+roundNum+"/6");
         updateFinishedPlayers();
 
         if (map != null) {
@@ -418,7 +418,7 @@ public class TGTTOS extends Game {
             Player p = (Player) e.getHitEntity();
             Vector snowballVelocity = e.getEntity().getVelocity();
             p.damage(0.5);
-            p.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
+            p.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.1, snowballVelocity.getZ() * 0.1));
         }
     }
 }

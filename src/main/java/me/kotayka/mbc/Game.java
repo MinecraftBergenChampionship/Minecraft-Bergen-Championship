@@ -201,8 +201,8 @@ public abstract class Game extends Minigame {
      *  Loops for all players by default.
      */
     public void updatePlayersAliveScoreboard() {
-        createLine(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS);
-        createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
+        createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS);
+        createLineAll(2, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
     }
 
     /**
@@ -315,8 +315,8 @@ public abstract class Game extends Minigame {
 
        loadPlayers();
        createScoreboard();
-       createLine(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, gameName));
-       createLine(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET));
+       createLineAll(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, gameName));
+       createLineAll(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET));
    }
 
    /**
@@ -395,7 +395,7 @@ public abstract class Game extends Minigame {
 
             if (counter < 5) {
                 topFive.append(String.format(
-                        (num) + ". %s: %d (%d x %.1f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier)
+                        (num) + ". %s: %.1f (%d x %.1f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier)
                 );
                 lastScore = p.getRawCurrentScore();
                 counter++;
@@ -416,7 +416,7 @@ public abstract class Game extends Minigame {
             MBCTeam t = gameScores.get(i);
             str.append(ChatColor.BOLD+""+(i+1)+". ")
                .append(String.format(
-                   "%s: %d\n", t.teamNameFormat(), t.getMultipliedTotalScore()
+                   "%s: %.1f\n", t.teamNameFormat(), t.getMultipliedTotalScore()
             ));
         }
         return str.toString();
@@ -461,14 +461,17 @@ public abstract class Game extends Minigame {
 
             updatePlayerCurrentScoreDisplay(p);
             p.resetCurrentScores();
-            p.getPlayer().teleport(Lobby.LOBBY);
         }
         if (MBC.getInstance().decisionDome == null) {
             Bukkit.broadcastMessage("[Debug] Decision Dome has not been loaded, you may need to start another game manually or reload!");
         }
 
         MBC.getInstance().gameNum++;
-        MBC.getInstance().lobby.start();
+        if (MBC.getInstance().gameNum > MBC.GAME_COUNT) {
+            MBC.getInstance().lobby.prepareFinale();
+        } else {
+            MBC.getInstance().lobby.start();
+        }
     }
 
     /**

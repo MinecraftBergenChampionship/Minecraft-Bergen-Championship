@@ -52,7 +52,7 @@ public class BuildMart extends Game {
     public void createScoreboard(Participant p) {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET + ChatColor.RESET.toString(), p);
-        createLine(3, ChatColor.GREEN.toString()+ChatColor.BOLD+"Builds Completed: " + ChatColor.RESET+"0");
+        createLineAll(3, ChatColor.GREEN.toString()+ChatColor.BOLD+"Builds Completed: " + ChatColor.RESET+"0");
 
         updateInGameTeamScoreboard();
         //displayTeamCurrentScore(p.getTeam());
