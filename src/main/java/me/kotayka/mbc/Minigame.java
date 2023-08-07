@@ -264,15 +264,13 @@ public abstract class Minigame implements Scoreboard, Listener {
         p.gameObjective = gameName;
         Objective obj;
 
-        // this somehow works to get teams to display names properly.
-        // some of it is probably redundant but idc
-        try {
-            obj = MBC.getInstance().board.registerNewObjective("Objective", "dummy", ChatColor.YELLOW + "" + ChatColor.BOLD + "MCC");
-        } catch (IllegalArgumentException e) {
-            obj = MBC.getInstance().board.getObjective("Objective");
+        if (p.board.getObjective("Objective") == null) {
+            obj = p.board.registerNewObjective("Objective", "dummy", ChatColor.YELLOW + "" + ChatColor.BOLD + "MCC");
+        } else {
+            obj = p.board.getObjective("Objective");
         }
         if (obj == null) {
-            obj = MBC.getInstance().board.registerNewObjective("Objective", "dummy", ChatColor.YELLOW + "" +ChatColor.BOLD +"MCC");
+            obj = p.board.registerNewObjective("Objective", "dummy", ChatColor.YELLOW + "" +ChatColor.BOLD +"MCC");
         }
 
         p.lines = new HashMap<>();

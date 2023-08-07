@@ -22,7 +22,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Spleef extends Game {
@@ -210,6 +209,7 @@ public class Spleef extends Game {
             killer.getParticipant().addCurrentScore(KILL_POINTS);
             killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + victim.getPlayer().getName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
+            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+killer.getKills(), killer.getParticipant());
             Bukkit.broadcastMessage(victim.getParticipant().getFormattedName()+" was spleefed by " + killer.getParticipant().getFormattedName());
         }
         updatePlayersAlive(victim.getParticipant());

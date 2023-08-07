@@ -92,11 +92,10 @@ public class BuildMart extends Game {
             if (timeRemaining == 0) {
                 gameOverGraphics();
                 for (Participant p : MBC.getInstance().getPlayers()) {
-                    p.getPlayer().setGameMode(GameMode.ADVENTURE);
                     flightEffects(p);
                 }
                 setGameState(GameState.END_GAME);
-                timeRemaining = 37;
+                timeRemaining = 23;
             }
         } else if (getState().equals(GameState.END_GAME)) {
             teamGameEndEvents();

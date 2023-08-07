@@ -413,6 +413,10 @@ public class SurvivalGames extends Game {
         deathEffectsWithHealth(e);
 
         Bukkit.broadcastMessage(e.getDeathMessage());
+        for (ItemStack i : victim.getPlayer().getInventory()) {
+            if (i == null) continue;
+            map.getWorld().dropItemNaturally(victim.getLocation(), i);
+        }
         e.setCancelled(true);
         victim.setGameMode(GameMode.SPECTATOR);
 

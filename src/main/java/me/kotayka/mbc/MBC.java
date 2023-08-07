@@ -38,6 +38,7 @@ public class MBC implements Listener {
      */
     public List<Participant> players = new ArrayList<>(16); // every player
     public List<Participant> participants = new ArrayList<>(16); // every player + spectators
+    public TreeSet<Participant> individual = new TreeSet<>(Collections.reverseOrder(Participant.rawTotalScoreComparator));
 
     public Red red = new Red();
     public Yellow yellow = new Yellow();
@@ -171,8 +172,6 @@ public class MBC implements Listener {
          * Game 4, 5: 2x
          * Game 6: 2.5x
          */
-        Bukkit.broadcastMessage("[Debug] Current Game: " + gameNum);
-        Bukkit.broadcastMessage("[Debug] multiplier: " + multiplier);
         if (gameNum % 2 == 0) {
             Bukkit.broadcastMessage("The point multiplier has increased from " + multiplier + " to " + (multiplier+0.5) + "!");
             multiplier+=0.5;
@@ -192,7 +191,6 @@ public class MBC implements Listener {
         }
 
         Participant p = Participant.getParticipant(event.getPlayer());
-        event.getPlayer().setScoreboard(MBC.getInstance().board);
 
         if (p.objective == null || !Objects.equals(p.gameObjective, currentGame.gameName)) {
             currentGame.createScoreboard(p);
@@ -370,16 +368,56 @@ public class MBC implements Listener {
         return newList;
     }
 
-    public void getScores(Player sender) {
-        List<Participant> scores = new ArrayList<>(getInstance().participants);
-        scores.sort(Participant.rawTotalScoreComparator);
-        Collections.reverse(scores);
+    public void updatePlacings() {
+        int i = 1;
+        int lastScore = -1;
+        for (Participant p : individual) {
+            if (p.getRawTotalScore() == lastScore) {
+                p.setPlacement(i);
+            } else {
+                p.setPlacement(i++);
+                lastScore = p.getRawTotalScore();
+            }
+        }
+    }
 
-        StringBuilder msg = new StringBuilder(ChatColor.AQUA.toString()+ChatColor.BOLD+"Player scores: \n");
-        int count = 1;
-        for (Participant p : scores) {
-            msg.append(count).append(". ").append(p.getFormattedName()).append(": ").append(p.getRawTotalScore()).append("\n");
-            count++;
+    public void getPlacementInfo(Player sender) {
+        Participant p = Participant.getParticipant(sender);
+
+        if (p == null) return;
+
+        if (p.getTeam() instanceof Spectator) {
+            sender.sendMessage("You are Spectating, and do not have a score!");
+            return;
+        }
+
+        int placement = p.getPlacement();
+        if (placement < 0) {
+            sender.sendMessage("The event has not started yet!");
+            return;
+        }
+
+        StringBuilder msg = new StringBuilder(ChatColor.AQUA+"+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n"+ChatColor.RESET);
+        msg.append(ChatColor.YELLOW+"Your placement: " + Game.getColorStringFromPlacement(placement) + Game.getPlace(placement) + ChatColor.RESET + "\n");
+        msg.append(ChatColor.YELLOW+"Your score: " + ChatColor.RESET+ p.getRawTotalScore()+"\n");
+        if (placement != 1) {
+            List<Participant> aheadPlayers = Participant.getParticipant(placement-1);
+            msg.append("The player one place above you has " + (aheadPlayers.get(0).getRawTotalScore() - p.getRawTotalScore()) + " more coins.");
+        }
+        msg.append(ChatColor.AQUA+"+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
+        sender.sendMessage(msg.toString());
+    }
+
+    public void getTopIndividual(Player sender) {
+        Iterator<Participant> it = individual.iterator();
+        int placement;
+        StringBuilder msg = new StringBuilder(ChatColor.AQUA.toString()+ChatColor.BOLD+"Player scores: \n"+ChatColor.RESET);
+        while (it.hasNext()) {
+            Participant p = it.next();
+            placement = p.getPlacement();
+            if (placement <= 8) {
+                msg.append(placement).append(". ").append(p.getFormattedName()).append(": ").append(p.getRawTotalScore()).append("\n");
+            }
         }
         sender.sendMessage(msg.toString());
     }

@@ -6,12 +6,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class placement implements CommandExecutor {
+public class individual implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player p = (Player) sender;
-            MBC.getInstance().getPlacementInfo(p);
+            MBC.getInstance().getTopIndividual(p);
             return true;
         }
         return false;

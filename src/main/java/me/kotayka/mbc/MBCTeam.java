@@ -3,7 +3,6 @@ package me.kotayka.mbc;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.Comparator;

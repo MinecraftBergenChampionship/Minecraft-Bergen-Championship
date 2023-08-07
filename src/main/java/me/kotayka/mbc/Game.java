@@ -233,7 +233,7 @@ public abstract class Game extends Minigame {
         createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
     }
 
-    public String getPlace(int place) {
+    public static String getPlace(int place) {
         int temp = place;
         if (temp > 10) {
             temp %= 10;
@@ -280,7 +280,7 @@ public abstract class Game extends Minigame {
         }
     }
 
-    public String getColorStringFromPlacement(int place) {
+    public static String getColorStringFromPlacement(int place) {
         String colorStr = switch (place) {
             case 1 -> ChatColor.GOLD.toString();
             case 2 -> ChatColor.GRAY.toString();
@@ -336,6 +336,7 @@ public abstract class Game extends Minigame {
             case 22 -> {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Top 5 players this game:");
                 TO_PRINT = getScores();
+                MBC.getInstance().updatePlacings();
             }
             case 14 -> {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Current event standings:");
@@ -358,7 +359,10 @@ public abstract class Game extends Minigame {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
                 TO_PRINT = printRoundScores();
             }
-            case 16 -> getScoresNoPrint();
+            case 16 -> {
+                getScoresNoPrint();
+                MBC.getInstance().updatePlacings();
+            }
             case 14 -> {
                 Bukkit.broadcastMessage(ChatColor.BOLD+"Current event standings:");
                 TO_PRINT = printEventScores();

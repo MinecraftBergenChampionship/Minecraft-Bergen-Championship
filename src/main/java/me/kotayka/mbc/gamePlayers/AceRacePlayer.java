@@ -39,8 +39,8 @@ public class AceRacePlayer extends GamePlayer {
         long lapTime;
         ACE_RACE.finishedPlayersByLap[lap - 1]++;  // increment amount of players that have finished
         placement = ACE_RACE.finishedPlayersByLap[lap - 1];
-        String placementColor = ACE_RACE.getColorStringFromPlacement(placement);
-        String placementString = ACE_RACE.getPlace(placement);
+        String placementColor = AceRace.getColorStringFromPlacement(placement);
+        String placementString = AceRace.getPlace(placement);
 
         updateScore(this.getParticipant());
 

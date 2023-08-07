@@ -16,6 +16,8 @@ commands:
   ping:
     description: gets player's ping
   placement:
-    description: currently gets all individual scores
+    description: gets player's individual placement information
+  individual:
+    description: gets top 8 individual
   checkbuild:
     description: checks a build during build mart

@@ -21,6 +21,7 @@ public class Lobby extends Minigame {
     }
 
     public void createScoreboard(Participant p) {
+        Bukkit.broadcastMessage("Creating scoreboard for " + p);
         newObjective(p);
         createLine(21, ChatColor.RED+""+ChatColor.BOLD + "Event begins in:", p);
         createLine(19, ChatColor.RESET.toString(), p);

@@ -283,7 +283,6 @@ public class Skybattle extends Game {
      * @return The Location to spawn the entity
      */
     private Location getLocationToSpawnEntity(Block target, BlockFace blockFace) {
-        Bukkit.broadcastMessage("[Debug] blockFace == " + blockFace);
         Location l = target.getLocation();
         l.add(0.5, 0, 0.5);
         // west -x east +x south +z north -z
@@ -451,6 +450,15 @@ public class Skybattle extends Game {
             killer.kills++;
             createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
             playerDeathEffects(e); // if there was a killer, just send over to default
+        }
+
+        e.setCancelled(true);
+        Bukkit.broadcastMessage(e.getDeathMessage());
+        for (ItemStack i : player.getPlayer().getInventory()) {
+            if (i == null) continue;
+            if (i.getType().toString().endsWith("CONCRETE")) continue;
+
+            map.getWorld().dropItemNaturally(player.getPlayer().getLocation(), i);
         }
 
         for (Participant p : playersAlive) {

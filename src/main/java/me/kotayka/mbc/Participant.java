@@ -9,9 +9,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 public class Participant {
 
@@ -29,6 +27,7 @@ public class Participant {
     public String gameObjective;
 
     public HashMap<Integer, String> lines = new HashMap<>();
+    public int totalPlacement = -1;
 
     // COMPARATORS
     public static final Comparator<Participant> rawTotalScoreComparator =
@@ -44,6 +43,7 @@ public class Participant {
         Bukkit.broadcastMessage("[Debug] assigning team");
         changeTeam(MBC.getInstance().spectator);
         MBC.getInstance().participants.add(this);
+        MBC.getInstance().individual.add(this);
     }
 
     public void changeTeam(MBCTeam t) {
@@ -52,10 +52,11 @@ public class Participant {
             team.removePlayer(this);
         }
 
-        setupScoreboardTeams();
-
         team = t;
         team.addPlayer(this);
+
+        setupScoreboardTeams();
+
         Bukkit.broadcastMessage(getFormattedName()+ChatColor.WHITE+" has joined the "+team.getChatColor()+team.getTeamFullName());
         if (MBC.getInstance().getMinigame() != null && MBC.getInstance().getMinigame() instanceof Lobby) {
             MBC.getInstance().lobby.changeTeam(this);
@@ -138,11 +139,11 @@ public class Participant {
     }
 
     public static boolean contains(Participant p) {
-        return MBC.getInstance().players.contains(p);
+        return MBC.getInstance().participants.contains(p);
     }
 
     public static boolean contains(Player p) {
-        for (Participant x : MBC.getInstance().players) {
+        for (Participant x : MBC.getInstance().participants) {
             if (Objects.equals(x.getPlayer().getName(), p.getName())) {
                 return true;
             }
@@ -171,21 +172,52 @@ public class Participant {
         return null;
     }
 
+    // using total unmultiplied placement
+    public static List<Participant> getParticipant(int placement) {
+        List<Participant> players = new ArrayList<>();
+        for (Participant p : MBC.getInstance().individual) {
+            if (p.totalPlacement == placement) {
+               players.add(p);
+            }
+            if (p.totalPlacement > placement) {
+                Bukkit.broadcastMessage("broke at placement" + p.totalPlacement + "when searching for placement " + placement);
+                break;
+            }
+        }
+        return players;
+    }
+
     public PlayerInventory getInventory() {
         return getPlayer().getInventory();
     }
+
+    public void setPlacement(int placement) {
+        this.totalPlacement = placement;
+    }
+    public int getPlacement() { return totalPlacement; }
 
     /**
      * Adds player to own scoreboard
      * Add this new participant to everyone else's scoreboard
      */
     private void setupScoreboardTeams() {
+        // add self to own scoreboard
+        if (board.getTeam(team.fullName) == null) {
+            Team thisScoreboardTeam = board.registerNewTeam(team.fullName);
+            thisScoreboardTeam.setColor(team.getChatColor());
+            thisScoreboardTeam.setPrefix(String.format("%s%c ", ChatColor.WHITE, team.getIcon()));
+            thisScoreboardTeam.setAllowFriendlyFire(false);
+            thisScoreboardTeam.addPlayer(player);
+        } else {
+            board.getTeam(team.fullName).addPlayer(player);
+        }
+
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             // add everyone else to this player's scoreboard
             if (board.getTeam(p.getTeam().fullName) == null) {
                 Team scoreboardTeam = board.registerNewTeam(p.getTeam().fullName);
                 scoreboardTeam.setColor(p.getTeam().getChatColor());
-                scoreboardTeam.setPrefix(String.format("%$s%c ", ChatColor.WHITE, p.getTeam().getIcon()));
+                scoreboardTeam.setPrefix(String.format("%s%c ", ChatColor.WHITE, p.getTeam().getIcon()));
                 scoreboardTeam.setAllowFriendlyFire(false);
                 scoreboardTeam.addPlayer(p.getPlayer());
             } else {
