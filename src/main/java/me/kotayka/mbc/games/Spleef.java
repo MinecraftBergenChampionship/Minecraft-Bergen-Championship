@@ -314,7 +314,7 @@ public class Spleef extends Game {
 
     public SpleefPlayer getSpleefPlayer(Player p) {
         for (SpleefPlayer x : spleefPlayers) {
-            if (x.getPlayer().getName().equals(p.getName())) {
+            if (x.getPlayer().getUniqueId().equals(p.getUniqueId())) {
                 return x;
             }
         }

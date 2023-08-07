@@ -20,9 +20,9 @@ public class Participant {
     private int rawCurrentScore = 0;
     private double multipliedCurrentScore = 0;
     private MBCTeam team;
-    private final Player player;
+    private Player player;
 
-    public final Scoreboard board = MBC.getInstance().manager.getNewScoreboard();
+    public Scoreboard board = MBC.getInstance().manager.getNewScoreboard();
     public Objective objective;
     public String gameObjective;
 
@@ -195,12 +195,13 @@ public class Participant {
         this.totalPlacement = placement;
     }
     public int getPlacement() { return totalPlacement; }
+    public void setPlayer(Player p) { player = p; } // used after relog
 
     /**
      * Adds player to own scoreboard
      * Add this new participant to everyone else's scoreboard
      */
-    private void setupScoreboardTeams() {
+    public void setupScoreboardTeams() {
         // add self to own scoreboard
         if (board.getTeam(team.fullName) == null) {
             Team thisScoreboardTeam = board.registerNewTeam(team.fullName);

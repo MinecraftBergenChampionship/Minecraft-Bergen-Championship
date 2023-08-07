@@ -186,13 +186,22 @@ public class MBC implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        if (!Participant.contains(event.getPlayer())) {
-            players.add(new Participant(event.getPlayer()));
-        }
+        if (!Participant.contains(event.getPlayer())) { // new login this instance
+            Participant newPlayer = new Participant(event.getPlayer());
+            players.add(newPlayer);
 
-        Participant p = Participant.getParticipant(event.getPlayer());
-
-        if (p.objective == null || !Objects.equals(p.gameObjective, currentGame.gameName)) {
+            if (newPlayer.objective == null || !Objects.equals(newPlayer.gameObjective, currentGame.gameName)) {
+                currentGame.createScoreboard(newPlayer);
+                newPlayer.gameObjective = currentGame.gameName;
+            }
+        } else { // relog
+            Participant p = Participant.getParticipant(event.getPlayer());
+            p.setPlayer(event.getPlayer());
+            Scoreboard newBoard = manager.getNewScoreboard();
+            p.board = newBoard;
+            p.getPlayer().setScoreboard(newBoard);
+            p.changeTeam(p.getTeam());
+            p.setupScoreboardTeams();
             currentGame.createScoreboard(p);
             p.gameObjective = currentGame.gameName;
         }
@@ -247,7 +256,7 @@ public class MBC implements Listener {
     public void onPlayerChat(PlayerChatEvent e) {
         String msg = e.getMessage();
         for (Participant p : players) {
-            if (e.getPlayer().getName().equals(p.getPlayer().getName())) {
+            if (e.getPlayer().getUniqueId().equals(p.getPlayer().getUniqueId())) {
                 e.setFormat(p.getFormattedName() + ": " + msg);
                 break;
             }

@@ -328,7 +328,7 @@ public class Skybattle extends Game {
 
         SkybattlePlayer player = null;
         for (SkybattlePlayer p : skybattlePlayerList) {
-            if (e.getEntity().getName().equals(p.getPlayer().getName())) {
+            if (e.getEntity().getUniqueId().equals(p.getPlayer().getUniqueId())) {
                 player = p;
                 break;
             }
@@ -376,7 +376,7 @@ public class Skybattle extends Game {
         Bukkit.broadcastMessage("[Debug] " + e.getHitEntity().getName() + " was hit by " + e.getEntity().getShooter() + " using " + e.getEntity());
         SkybattlePlayer player = null;
         for (SkybattlePlayer p : skybattlePlayerList) {
-            if (e.getEntity().getName().equals(p.getPlayer().getName())) {
+            if (e.getEntity().getUniqueId().equals(p.getPlayer().getUniqueId())) {
                 player = p;
                 break;
             }
@@ -542,7 +542,7 @@ public class Skybattle extends Game {
 
         SkybattlePlayer player = null;
         for (SkybattlePlayer p : skybattlePlayerList) {
-            if (e.getPlayer().getName().equals(p.getPlayer().getName())) {
+            if (e.getPlayer().getUniqueId().equals(p.getPlayer().getUniqueId())) {
                 player = p;
                 break;
             }
@@ -563,7 +563,7 @@ public class Skybattle extends Game {
 
         SkybattlePlayer hooked = null;
         for (SkybattlePlayer p : skybattlePlayerList) {
-            if (e.getCaught().getName().equals(p.getPlayer().getName())) {
+            if (e.getCaught().getUniqueId().equals(p.getPlayer().getUniqueId())) {
                 hooked = p;
                 break;
             }
@@ -575,7 +575,7 @@ public class Skybattle extends Game {
 
     private SkybattlePlayer getSkybattlePlayer(Player p) {
         for (SkybattlePlayer pl : skybattlePlayerList) {
-            if (pl.getPlayer().getName().equals(p.getName())) {
+            if (pl.getPlayer().getUniqueId().equals(p.getUniqueId())) {
                 return pl;
             }
         }

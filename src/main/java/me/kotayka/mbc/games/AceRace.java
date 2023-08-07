@@ -187,7 +187,7 @@ public class AceRace extends Game {
 
     public AceRacePlayer getGamePlayer(Player p) {
         for (AceRacePlayer x : aceRacePlayerList) {
-            if (x.getPlayer().getName().equals(p.getName())) {
+            if (x.getPlayer().getUniqueId().equals(p.getUniqueId())) {
                 return x;
             }
         }

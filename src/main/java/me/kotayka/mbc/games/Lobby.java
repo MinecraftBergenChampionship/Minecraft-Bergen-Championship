@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 public class Lobby extends Minigame {
     public static final Location LOBBY = new Location(Bukkit.getWorld("world"), 0, 1, 0);

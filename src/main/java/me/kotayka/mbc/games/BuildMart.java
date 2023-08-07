@@ -348,7 +348,7 @@ public class BuildMart extends Game {
 
     public BuildMartPlayer getBuildMartPlayer(Player p) {
         for (BuildMartPlayer x : buildMartPlayers) {
-            if (p.getName().equals(x.getPlayer().getName())) {
+            if (p.getUniqueId().equals(x.getPlayer().getUniqueId())) {
                 return x;
             }
         }
