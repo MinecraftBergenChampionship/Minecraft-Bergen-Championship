@@ -2,7 +2,6 @@ package me.kotayka.mbc.gameMaps.spleefMap;
 
 import me.kotayka.mbc.gameMaps.MBCMap;
 import org.bukkit.Bukkit;
-import org.bukkit.inventory.ItemStack;
 
 public abstract class SpleefMap extends MBCMap {
     private final String name;
@@ -20,13 +19,14 @@ public abstract class SpleefMap extends MBCMap {
 
     /**
      * Paste the map represented by the class onto the playing area at (0,0)
+     * Reset any map specific variables
      */
-    public abstract void pasteMap();
+    public abstract void resetMap();
 
     /**
      * Erode border over time
      */
-    public abstract void Border();
+    public abstract void Border(int timeRemaining);
 
     public int getDeathY() { return deathY; }
 }

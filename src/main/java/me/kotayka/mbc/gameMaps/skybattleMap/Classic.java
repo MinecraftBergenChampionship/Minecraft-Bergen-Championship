@@ -151,8 +151,11 @@ public class Classic extends SkybattleMap {
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
             for (Participant p : t.teamPlayers) {
-                p.getPlayer().teleport(tempSpawns.get(randomNum));
+                Location spawn = tempSpawns.get(randomNum);
+                p.getPlayer().teleport(spawn);
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
+                colorBalloon(spawn, t.getChatColor());
+
                 // give spawn items
                 for (ItemStack i : spawnItems) {
                     if (i.getType() == Material.WHITE_CONCRETE) {
@@ -167,6 +170,27 @@ public class Classic extends SkybattleMap {
                 }
             }
             tempSpawns.remove(randomNum);
+        }
+    }
+
+    private void colorBalloon(Location l, ChatColor color) {
+        for (int y = 0; y <= 5; y++) {
+            for (int x = 0; x <= 3; x++) {
+                for (int z = 0; z <= 3; z++) {
+                    Block b = getWorld().getBlockAt(l.getBlockX()+3-x, l.getBlockY()+25-y, l.getBlockZ()+3-z);
+                    if (b.getType().toString().endsWith("CONCRETE")) continue;
+                    Material m = switch (color) {
+                        case RED -> Material.RED_CONCRETE;
+                        case YELLOW -> Material.YELLOW_CONCRETE;
+                        case GREEN -> Material.GREEN_CONCRETE;
+                        case BLUE -> Material.BLUE_CONCRETE;
+                        case DARK_PURPLE -> Material.PURPLE_CONCRETE;
+                        case LIGHT_PURPLE -> Material.PINK_CONCRETE;
+                        default -> Material.WHITE_CONCRETE;
+                    };
+                    b.setType(m);
+                }
+            }
         }
     }
 

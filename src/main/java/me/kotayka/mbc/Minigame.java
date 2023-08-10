@@ -56,7 +56,6 @@ public abstract class Minigame implements Scoreboard, Listener {
     public abstract void events();
 
     public void setTimer(int time) {
-        Bukkit.broadcastMessage("Setting Timer!");
         if (timeRemaining != -1) {
             // if the time hasn't run out yet, stop the time and start it again
             stopTimer();
@@ -104,7 +103,6 @@ public abstract class Minigame implements Scoreboard, Listener {
     }
 
     public void stopTimer() {
-        Bukkit.broadcastMessage("[Debug] Stopping timer!");
         MBC.getInstance().cancelEvent(taskID);
     }
 
@@ -167,28 +165,35 @@ public abstract class Minigame implements Scoreboard, Listener {
      * Sorts teams by their overall score to place onto scoreboard during lobby/after games
      */
     public void updateTeamStandings() {
-        List<MBCTeam> teamRoundsScores = new ArrayList<>(getValidTeams());
-        teamRoundsScores.sort(new TeamScoreSorter());
+        //MBCTeam lastTeam = null;
+        //int ties = 0;
+        int line = 14;
+        int place = 1;
+        for (MBCTeam t : MBC.getInstance().teamScores) {
+            createLineAll(line--, String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedTotalScore()));
 
-        double lastScore = -1;
-        int ties = 0;
-        for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
-            MBCTeam t = teamRoundsScores.get(14-i);
-            createLineAll(i,String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedTotalScore()));
+            // we will handle ties in the future
+            t.setPlace(place++);
 
-            if (MBC.getInstance().gameNum == 1) continue;
-
-            // if after first game, determine placement
-            if (lastScore == t.getMultipliedTotalScore()) {
+            // use past scores to account for ties
+            /*
+            if (lastTeam != null && lastTeam.getMultipliedTotalScore() == t.getMultipliedTotalScore()) {
+                if (lastTeam.getPreviousPlace() > t.getPreviousPlace()) {
+                    lastTeam.setPlace()
+                }
+                t.setPlace(place);
                 ties++;
-                t.setPlace((14-i)+ties);
             } else {
-                ties = 0;
-                t.setPlace(14-i);
+                t.setPlace(place+ties);
+                //ties = 0;
+                place++;
             }
-
-            lastScore = t.getMultipliedTotalScore();
+            //lastScore = t.getMultipliedTotalScore();
+            line--;
+            lastTeam = t;
+             */
         }
+        MBC.getInstance().lobby.colorPodiums();
     }
 
     /**

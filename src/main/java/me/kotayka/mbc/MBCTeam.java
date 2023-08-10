@@ -1,5 +1,6 @@
 package me.kotayka.mbc;
 
+import me.kotayka.mbc.teams.Spectator;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -20,6 +21,7 @@ public abstract class MBCTeam {
     private int rawCurrentScore = 0;
     private double multipliedCurrentScore = 0;
     private int currentPlace = 1;
+    private int previousPlace = 1;
     private int sortID;
 
     public MBCTeam(String name, String fullName, Character icon, ChatColor chatColor) {
@@ -91,12 +93,31 @@ public abstract class MBCTeam {
 
     public Color getColor() { return color; }
 
+    public List<Participant> getPlayers() { return teamPlayers; }
     public void addPlayer(Participant p) {
         teamPlayers.add(p);
+
+        if (!(this instanceof Spectator) && teamPlayers.size() == 1) {
+            MBC.getInstance().teamScores.add(this);
+            Bukkit.broadcastMessage("[Debug] teams.size() == " + MBC.getInstance().teamScores.size());
+        }
+
+        this.multipliedTotalScore += p.getMultipliedTotalScore();
+        this.multipliedCurrentScore += p.getMultipliedCurrentScore();
+        this.rawCurrentScore += p.getRawCurrentScore();
+        this.rawTotalScore += p.getRawTotalScore();
     }
-    public List<Participant> getPlayers() { return teamPlayers; }
     public void removePlayer(Participant p) {
         teamPlayers.remove(p);
+
+        if (!(this instanceof Spectator) && teamPlayers.size() == 0) {
+            MBC.getInstance().teamScores.remove(this);
+        }
+
+        this.multipliedTotalScore -= p.getMultipliedTotalScore();
+        this.multipliedCurrentScore -= p.getMultipliedCurrentScore();
+        this.rawCurrentScore -= p.getRawCurrentScore();
+        this.rawTotalScore -= p.getRawTotalScore();
     }
 
     /**
@@ -245,10 +266,16 @@ public abstract class MBCTeam {
     }
 
     public void setPlace(int place) {
-       currentPlace = place;
+        currentPlace = place;
     }
     public int getPlace() {
        return currentPlace;
+    }
+    public int getPreviousPlace() {
+        return currentPlace;
+    }
+    public void setPreviousPlace(int place) {
+        previousPlace = place;
     }
 
 

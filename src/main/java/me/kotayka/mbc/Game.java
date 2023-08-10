@@ -7,10 +7,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -227,10 +229,13 @@ public abstract class Game extends Minigame {
      * @param p Participant whose scoreboard to update
      */
     public void updatePlayerCurrentScoreDisplay(Participant p) {
-        if (this instanceof Spleef) { // for DEBUG! un-import spleef later
-            Bukkit.broadcastMessage("CurrentScore: " + p.getMultipliedCurrentScore() + " for " + p.getPlayerName());
-        }
         createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
+    }
+
+    public void snowballHit(Snowball proj, Player p) {
+        Vector snowballVelocity = proj.getVelocity();
+        p.damage(0.1);
+        p.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
     }
 
     public static String getPlace(int place) {
@@ -311,6 +316,9 @@ public abstract class Game extends Minigame {
            p.getPlayer().setGameMode(GameMode.ADVENTURE);
            p.getPlayer().setLevel(0);
            p.getPlayer().setExp(0);
+           MBC.getInstance().individual.add(p);
+           Bukkit.broadcastMessage("p == " + p.getPlayer().getName());
+           Bukkit.broadcastMessage("individual == " + MBC.getInstance().individual.size());
        }
 
        loadPlayers();
@@ -369,6 +377,38 @@ public abstract class Game extends Minigame {
             }
             case 1 -> Bukkit.broadcastMessage(ChatColor.RED+"Returning to lobby...");
             case 18, 12 -> Bukkit.broadcastMessage(TO_PRINT);
+            case 0 -> returnToLobby();
+        }
+    }
+
+    private void setGameEnd() {
+        if (MBC.getInstance().finalGame) {
+            timeRemaining = 25;
+        } else {
+            timeRemaining = 37;
+        }
+        setGameState(GameState.END_GAME);
+    }
+
+    private void setTeamGameEnd() {
+        if (MBC.getInstance().finalGame) {
+
+        }
+    }
+
+    public void gameEndEventsFinal() {
+        switch (timeRemaining) {
+            case 23 -> {
+                Bukkit.broadcastMessage(ChatColor.BOLD+"Each team scored this game: ");
+                TO_PRINT = printRoundScores();
+            }
+            case 13 -> {
+                Bukkit.broadcastMessage(ChatColor.BOLD+"Top 5 players this game: ");
+                TO_PRINT = getScores();
+                MBC.getInstance().updatePlacings();
+            }
+            case 20, 10 -> Bukkit.broadcastMessage(TO_PRINT);
+            case 1 -> Bukkit.broadcastMessage(ChatColor.RED+"Preparing finale...");
             case 0 -> returnToLobby();
         }
     }
@@ -435,7 +475,7 @@ public abstract class Game extends Minigame {
             MBCTeam t = teamRoundsScores.get(i);
             teamString.append(ChatColor.BOLD+""+(i+1)+". ")
                 .append(String.format(
-                    "%s: %d\n", t.teamNameFormat(), t.getMultipliedCurrentScore()
+                    "%s: %.1f\n", t.teamNameFormat(), t.getMultipliedCurrentScore()
             ));
         }
         return teamString.toString();
@@ -466,14 +506,20 @@ public abstract class Game extends Minigame {
             updatePlayerCurrentScoreDisplay(p);
             p.resetCurrentScores();
         }
+
         if (MBC.getInstance().decisionDome == null) {
             Bukkit.broadcastMessage("[Debug] Decision Dome has not been loaded, you may need to start another game manually or reload!");
         }
 
         MBC.getInstance().gameNum++;
-        if (MBC.getInstance().gameNum > MBC.GAME_COUNT) {
+
+        if (MBC.getInstance().finalGame) {
             MBC.getInstance().lobby.prepareFinale();
         } else {
+            // if 2nd to last game just ended
+            if (MBC.getInstance().gameNum == MBC.GAME_COUNT) {
+                MBC.getInstance().finalGame = true;
+            }
             MBC.getInstance().lobby.start();
         }
     }
@@ -567,8 +613,8 @@ public abstract class Game extends Minigame {
     }
 
     public void setPVP(boolean b) {
-        String s = b ? "[Debug] PVP now enabled. " : "[Debug] PVP now disabled.";
-        Bukkit.broadcastMessage(s);
+        //String s = b ? "[Debug] PVP now enabled. " : "[Debug] PVP now disabled.";
+        //Bukkit.broadcastMessage(s);
         PVP_ENABLED = b;
     }
 

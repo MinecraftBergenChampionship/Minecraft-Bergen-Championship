@@ -39,6 +39,7 @@ public class MBC implements Listener {
     public List<Participant> players = new ArrayList<>(16); // every player
     public List<Participant> participants = new ArrayList<>(16); // every player + spectators
     public TreeSet<Participant> individual = new TreeSet<>(Collections.reverseOrder(Participant.rawTotalScoreComparator));
+    public TreeSet<MBCTeam> teamScores = new TreeSet<>(Collections.reverseOrder(new TeamScoreSorter()));
 
     public Red red = new Red();
     public Yellow yellow = new Yellow();
@@ -49,7 +50,7 @@ public class MBC implements Listener {
     public Spectator spectator = new Spectator();
 
     public List<MBCTeam> teams = new ArrayList<>(Arrays.asList(red, yellow, green, blue, purple, pink, spectator));
-    public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets", "Spectator"));
+    //public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets", "Spectator"));
     public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets", "Spectator"));
     public ScoreboardManager manager =  Bukkit.getScoreboardManager();
     public final Scoreboard board = manager.getNewScoreboard();
@@ -66,6 +67,7 @@ public class MBC implements Listener {
     public Skybattle skybattle = null;
     public SurvivalGames sg = null;
     public Spleef spleef = null;
+    public boolean finalGame = false;
 
     public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef"));
     public final List<Game> gameList = new ArrayList<Game>(6);
@@ -385,6 +387,7 @@ public class MBC implements Listener {
                 p.setPlacement(i);
             } else {
                 p.setPlacement(i++);
+                Bukkit.broadcastMessage("p.placement == " + p.getPlacement());
                 lastScore = p.getRawTotalScore();
             }
         }
@@ -396,13 +399,18 @@ public class MBC implements Listener {
         if (p == null) return;
 
         if (p.getTeam() instanceof Spectator) {
-            sender.sendMessage("You are Spectating, and do not have a score!");
+            sender.sendMessage(ChatColor.GREEN+"[placement] " + ChatColor.RESET+"You are Spectating, and do not have a score!");
+            return;
+        }
+
+        if (currentGame instanceof Game) {
+            sender.sendMessage(ChatColor.GREEN+"[placement] " + ChatColor.RESET+"Your scores will update after the game has finished!");
             return;
         }
 
         int placement = p.getPlacement();
         if (placement < 0) {
-            sender.sendMessage("The event has not started yet!");
+            sender.sendMessage(ChatColor.GREEN+"[placement] " + ChatColor.RESET+"The event has not started yet!");
             return;
         }
 

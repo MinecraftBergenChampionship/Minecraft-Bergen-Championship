@@ -260,6 +260,7 @@ public class TGTTOS extends Game {
     public void PlayerMoveEvent(PlayerMoveEvent e) {
         if (!isGameActive()) return;
         if (map == null) return;
+        if (!e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) return;
 
         if (e.getPlayer().getLocation().getY() < map.getDeathY()) {
             e.getPlayer().setVelocity(new Vector(0,0,0));
@@ -416,9 +417,7 @@ public class TGTTOS extends Game {
         // deal slight knockback to other players
         if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
             Player p = (Player) e.getHitEntity();
-            Vector snowballVelocity = e.getEntity().getVelocity();
-            p.damage(0.5);
-            p.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.1, snowballVelocity.getZ() * 0.1));
+            snowballHit((Snowball) e.getEntity(), p);
         }
     }
 }

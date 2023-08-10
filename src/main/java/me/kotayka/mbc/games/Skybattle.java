@@ -311,11 +311,12 @@ public class Skybattle extends Game {
     @EventHandler
     public void blockBreakEvent(BlockBreakEvent e) {
         if (!isGameActive()) return;
+        if (!e.getBlock().getLocation().getWorld().equals(map.getWorld())) return;
+        if (e.getBlock().getType().toString().endsWith("CONCRETE")) return;
 
-        if (e.getBlock().getType().toString().endsWith("CONCRETE")) {
-            e.setDropItems(false);
+        for (ItemStack i : e.getBlock().getDrops()) {
+            map.getWorld().dropItemNaturally(e.getBlock().getLocation(), i);
         }
-
     }
 
     /**
@@ -373,21 +374,12 @@ public class Skybattle extends Game {
         if(!(e.getEntity().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
         */
 
-        Bukkit.broadcastMessage("[Debug] " + e.getHitEntity().getName() + " was hit by " + e.getEntity().getShooter() + " using " + e.getEntity());
-        SkybattlePlayer player = null;
-        for (SkybattlePlayer p : skybattlePlayerList) {
-            if (e.getEntity().getUniqueId().equals(p.getPlayer().getUniqueId())) {
-                player = p;
-                break;
-            }
-        }
+        SkybattlePlayer player = getSkybattlePlayer((Player) e.getHitEntity());
         if (player == null) return;
 
-        if (e.getEntityType().equals(EntityType.SNOWBALL)) {
-            Vector snowballVelocity = e.getEntity().getVelocity();
+        if (e.getEntity() instanceof Snowball) {
+            snowballHit((Snowball) e.getEntity(), player.getPlayer());
             player.lastDamager = (Player) e.getEntity().getShooter();
-            player.getPlayer().damage(0.1);
-            player.getPlayer().setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.5, snowballVelocity.getZ() * 0.1));
         }
 
 
@@ -441,10 +433,8 @@ public class Skybattle extends Game {
         if (e.getEntity().getKiller() == null || e.getPlayer().getLastDamageCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
             // used to determine the death message (ie, void, fall damage, or border?)
             @Nullable EntityDamageEvent damageCause = e.getPlayer().getLastDamageCause();
-            Bukkit.broadcastMessage("[Debug] going to: skybattleDeathGraphics");
             skybattleDeathGraphics(e, damageCause.getCause());
         } else {
-            Bukkit.broadcastMessage("[Debug] normal death");
             SkybattlePlayer killer = getSkybattlePlayer(e.getPlayer().getKiller());
             killer.getParticipant().addCurrentScore(KILL_POINTS);
             killer.kills++;
@@ -476,7 +466,6 @@ public class Skybattle extends Game {
         SkybattlePlayer victim = getSkybattlePlayer(e.getPlayer());
         String deathMessage = e.getDeathMessage();
 
-        Bukkit.broadcastMessage("[Debug] Cause of death == " + damageCause);
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);

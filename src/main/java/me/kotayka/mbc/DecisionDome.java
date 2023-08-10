@@ -76,7 +76,6 @@ public class DecisionDome extends Minigame {
             stopTimer();
             Bukkit.broadcastMessage("[Debug] Revealed Games == " + revealedGames);
             if (revealedGames) {
-                Bukkit.broadcastMessage("[Debug] before setting timer!");
                 setTimer(10);
             } else {
                 Bukkit.broadcastMessage("[Debug] Path of NO REVEALED GAMES");

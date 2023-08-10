@@ -31,10 +31,10 @@ public class Participant {
 
     // COMPARATORS
     public static final Comparator<Participant> rawTotalScoreComparator =
-            Comparator.comparingInt(Participant::getRawTotalScore);
+            Comparator.comparingInt(Participant::getRawTotalScore).thenComparing(Participant::getPlayerName);
 
     public static final Comparator<Participant> multipliedCurrentScoreComparator =
-            Comparator.comparingDouble(Participant::getMultipliedCurrentScore);
+            Comparator.comparingDouble(Participant::getMultipliedCurrentScore).thenComparing(Participant::getPlayerName);
 
     public Participant(Player p) {
         player=p;
@@ -43,7 +43,6 @@ public class Participant {
         Bukkit.broadcastMessage("[Debug] assigning team");
         changeTeam(MBC.getInstance().spectator);
         MBC.getInstance().participants.add(this);
-        MBC.getInstance().individual.add(this);
     }
 
     public void changeTeam(MBCTeam t) {
