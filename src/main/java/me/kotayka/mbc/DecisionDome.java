@@ -239,7 +239,7 @@ public class DecisionDome extends Minigame {
     }
 
     /**
-     * @see me.kotayka.mbc.games.Lobby updatePlayerTotalScoreDisplay
+     * @see Lobby updatePlayerTotalScoreDisplay
      */
     public void updatePlayerTotalScoreDisplay(Participant p) {
         createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getRawTotalScore(), p);

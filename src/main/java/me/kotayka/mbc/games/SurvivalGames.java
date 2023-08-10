@@ -203,6 +203,7 @@ public class SurvivalGames extends Game {
             if (timeRemaining == 35) {
                 map.resetMap();
             }
+
             gameEndEvents();
         }
     }

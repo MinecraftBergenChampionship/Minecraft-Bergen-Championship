@@ -215,7 +215,10 @@ public abstract class MBCTeam {
     public void addCurrentTeamScore(int score) {
         rawCurrentScore +=score;
         multipliedCurrentScore +=score*MBC.getInstance().multiplier;
-        MBC.getInstance().getGame().updateInGameTeamScoreboard();
+
+        if (!MBC.getInstance().finalGame) {
+            MBC.getInstance().getGame().updateInGameTeamScoreboard();
+        }
     }
 
     /**

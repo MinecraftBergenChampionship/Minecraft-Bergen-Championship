@@ -1,4 +1,4 @@
-package me.kotayka.mbc.games;
+package me.kotayka.mbc;
 
 import me.kotayka.mbc.*;
 import org.bukkit.*;
@@ -108,6 +108,8 @@ public class Lobby extends Minigame {
         stopTimer();
         setTimer(60);
         setGameState(GameState.END_ROUND);
+
+
     }
 
     public void colorPodiumsWhite() {

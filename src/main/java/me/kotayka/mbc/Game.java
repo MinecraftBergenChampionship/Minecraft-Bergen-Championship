@@ -1,11 +1,10 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.gamePlayers.GamePlayer;
-import me.kotayka.mbc.games.Lobby;
-import me.kotayka.mbc.games.Spleef;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.HandlerList;
@@ -229,7 +228,27 @@ public abstract class Game extends Minigame {
      * @param p Participant whose scoreboard to update
      */
     public void updatePlayerCurrentScoreDisplay(Participant p) {
+        if (MBC.getInstance().finalGame) { finalGamePlayerCurrentScoreDisplay(p); return; }
         createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
+    }
+
+    public void finalGamePlayerCurrentScoreDisplay(Participant p) {
+        createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"???", p);
+    }
+
+    public void finalGameScoreDisplay() {
+        for (Participant p : MBC.getInstance().participants) {
+            List<MBCTeam> teamRoundsScores = getValidTeams();
+            teamRoundsScores.sort(new TeamRoundSorter());
+
+            for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
+                MBCTeam t = teamRoundsScores.get(14-i);
+                createLine(i,String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedCurrentScore()), p);
+            }
+
+            createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
+            p.getPlayer().playSound(p.getPlayer(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
+        }
     }
 
     public void snowballHit(Snowball proj, Player p) {
@@ -330,12 +349,16 @@ public abstract class Game extends Minigame {
    /**
     * Called at the end of games
     * Handles formatting and reveals of team and individual scores
+    * Redirects if last game
     *
     * NOTE: games with additional information, (ex: Ace Race and lap times)
     * must implement a separate function for those stats.
     */
     public void gameEndEvents() {
-        // GAME_END should have 35 seconds by default
+        if (MBC.getInstance().finalGame) {
+            gameEndEventsFinal();
+        }
+        // GAME_END should have ~35 seconds by default
         switch (timeRemaining) {
             case 30 -> {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
@@ -361,6 +384,9 @@ public abstract class Game extends Minigame {
      * Should have at least 25 seconds when switching to GAME_END
      */
     public void teamGameEndEvents() {
+        if (MBC.getInstance().finalGame) {
+            teamGameEndEventsFinal();
+        }
         // Team Games should leave at least 25 seconds for GAME_END
         switch (timeRemaining) {
             case 20 -> {
@@ -381,22 +407,10 @@ public abstract class Game extends Minigame {
         }
     }
 
-    private void setGameEnd() {
-        if (MBC.getInstance().finalGame) {
-            timeRemaining = 25;
-        } else {
-            timeRemaining = 37;
-        }
-        setGameState(GameState.END_GAME);
-    }
-
-    private void setTeamGameEnd() {
-        if (MBC.getInstance().finalGame) {
-
-        }
-    }
-
     public void gameEndEventsFinal() {
+        if (timeRemaining > 26) {
+            timeRemaining = 26;
+        }
         switch (timeRemaining) {
             case 23 -> {
                 Bukkit.broadcastMessage(ChatColor.BOLD+"Each team scored this game: ");
@@ -409,6 +423,26 @@ public abstract class Game extends Minigame {
             }
             case 20, 10 -> Bukkit.broadcastMessage(TO_PRINT);
             case 1 -> Bukkit.broadcastMessage(ChatColor.RED+"Preparing finale...");
+            case 0 -> returnToLobby();
+        }
+    }
+
+    public void teamGameEndEventsFinal() {
+        if (timeRemaining > 12) {
+            timeRemaining = 12;
+        }
+
+        switch (timeRemaining) {
+            case 10 -> {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
+                TO_PRINT = printRoundScores();
+            }
+            case 5 -> {
+                getScoresNoPrint();
+                MBC.getInstance().updatePlacings();
+            }
+            case 1 -> Bukkit.broadcastMessage(ChatColor.RED + "Preparing finale...");
+            case 8 -> Bukkit.broadcastMessage(TO_PRINT);
             case 0 -> returnToLobby();
         }
     }

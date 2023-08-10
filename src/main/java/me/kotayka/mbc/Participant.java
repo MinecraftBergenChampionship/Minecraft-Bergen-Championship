@@ -1,6 +1,5 @@
 package me.kotayka.mbc;
 
-import me.kotayka.mbc.games.Lobby;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -124,7 +123,9 @@ public class Participant {
         multipliedCurrentScore += amount*MBC.getInstance().multiplier;
         team.addCurrentTeamScore(amount);
 
-        MBC.getInstance().getGame().updatePlayerCurrentScoreDisplay(this);
+        if (!MBC.getInstance().finalGame) {
+            MBC.getInstance().getGame().updatePlayerCurrentScoreDisplay(this);
+        }
     }
 
     public void addCurrentScoreNoDisplay(int amount) {

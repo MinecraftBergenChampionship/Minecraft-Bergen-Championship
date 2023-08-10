@@ -1,6 +1,5 @@
 package me.kotayka.mbc;
 
-import me.kotayka.mbc.games.Lobby;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -152,12 +151,24 @@ public abstract class Minigame implements Scoreboard, Listener {
      * Sorts teams by their current round score to place onto scoreboard.
      */
     public void updateInGameTeamScoreboard() {
-        List<MBCTeam> teamRoundsScores = new ArrayList<>(getValidTeams());
+        if (MBC.getInstance().finalGame) { finalGameScoreboard(); return; }
+
+        List<MBCTeam> teamRoundsScores = getValidTeams();
         teamRoundsScores.sort(new TeamRoundSorter());
 
         for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
             MBCTeam t = teamRoundsScores.get(14-i);
             createLineAll(i,String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedCurrentScore()));
+        }
+    }
+
+    public void finalGameScoreboard() {
+        List<MBCTeam> teams = getValidTeams();
+        teams.sort(new TeamRoundSorter());
+        int i = 14;
+        for (MBCTeam t : teams) {
+            createLineAll(i, String.format("%s: ???", t.teamNameFormat()));
+            i--;
         }
     }
 
@@ -248,7 +259,7 @@ public abstract class Minigame implements Scoreboard, Listener {
      * @see GameState
      */
     public void setGameState(GameState gameState) {
-        if (gameState == GameState.TUTORIAL && this instanceof Game) {
+        if (this.gameState == GameState.TUTORIAL && this instanceof Game) {
             if (((Game) this).disconnect) {
                 this.gameState = GameState.STARTING;
                 Pause();
