@@ -27,13 +27,14 @@ public class Participant {
 
     public HashMap<Integer, String> lines = new HashMap<>();
     public int totalPlacement = -1;
+    public boolean winner = false;
 
     // COMPARATORS
     public static final Comparator<Participant> rawTotalScoreComparator =
-            Comparator.comparingInt(Participant::getRawTotalScore).thenComparing(Participant::getPlayerName);
+            Comparator.comparingInt(Participant::getRawTotalScore);
 
     public static final Comparator<Participant> multipliedCurrentScoreComparator =
-            Comparator.comparingDouble(Participant::getMultipliedCurrentScore).thenComparing(Participant::getPlayerName);
+            Comparator.comparingDouble(Participant::getMultipliedCurrentScore);
 
     public Participant(Player p) {
         player=p;
@@ -175,13 +176,10 @@ public class Participant {
     // using total unmultiplied placement
     public static List<Participant> getParticipant(int placement) {
         List<Participant> players = new ArrayList<>();
-        for (Participant p : MBC.getInstance().individual) {
+        MBC.getInstance().participants.sort(new TotalIndividualComparator());
+        for (Participant p : MBC.getInstance().participants) {
             if (p.totalPlacement == placement) {
                players.add(p);
-            }
-            if (p.totalPlacement > placement) {
-                Bukkit.broadcastMessage("broke at placement" + p.totalPlacement + "when searching for placement " + placement);
-                break;
             }
         }
         return players;
@@ -237,5 +235,20 @@ public class Participant {
                 p.board.getTeam(team.fullName).addPlayer(player);
             }
         }
+    }
+}
+
+class TotalIndividualComparator implements Comparator<Participant> {
+    @Override
+    public int compare(Participant o1, Participant o2) {
+        if (o1.getRawTotalScore() == o2.getRawTotalScore()) {
+            if (o1.getMultipliedTotalScore() != o2.getMultipliedTotalScore()) {
+                return (int) (o2.getMultipliedTotalScore() - o1.getMultipliedTotalScore());
+            }
+
+            return o1.getTeam().getSortID() - o2.getTeam().getSortID();
+        }
+
+        return o2.getRawTotalScore() - o1.getRawTotalScore();
     }
 }

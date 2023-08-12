@@ -323,7 +323,6 @@ public class DecisionDome extends Minigame {
             Location chickenLoc = chicken.getChicken().getLocation();
             Location matLoc = new Location(world, chickenLoc.getBlockX(), chickenLoc.getBlockY()-2, chickenLoc.getBlockZ());
             Location secLoc = new Location(world, chickenLoc.getBlockX(), chickenLoc.getBlockY()-1, chickenLoc.getBlockZ());
-            Bukkit.broadcastMessage("[Debug] l.getBlock().getType() == " + matLoc.getBlock().getType());
 
             // if the chicken is not on a section or the section is red, ignore
             if (!matLoc.getBlock().getType().toString().endsWith("WOOL") || !secLoc.getBlock().getType().equals(Material.WHITE_GLAZED_TERRACOTTA)) continue;
@@ -460,7 +459,9 @@ public class DecisionDome extends Minigame {
             Egg egg = (Egg) e.getEntity();
             Participant p = Participant.getParticipant(((Player) e.getEntity().getShooter()));
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
+            Bukkit.broadcastMessage("new chicken! (1)");
             chickens.add(new VoteChicken(p.getTeam(), chicken));
+            Bukkit.broadcastMessage("chickens.size() == " + chickens.size());
             egg.remove();
         }
     }

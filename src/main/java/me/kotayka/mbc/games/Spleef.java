@@ -1,9 +1,6 @@
 package me.kotayka.mbc.games;
 
-import me.kotayka.mbc.Game;
-import me.kotayka.mbc.GameState;
-import me.kotayka.mbc.MBC;
-import me.kotayka.mbc.Participant;
+import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.spleefMap.Classic;
 import me.kotayka.mbc.gameMaps.spleefMap.SpleefMap;
 import me.kotayka.mbc.gamePlayers.SpleefPlayer;
@@ -22,7 +19,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Spleef extends Game {
     private SpleefMap map = new Classic();
@@ -31,11 +30,13 @@ public class Spleef extends Game {
     private int roundNum = 0;
     private final Location lobby;
     private final Location spawnpoint;
-    private final int RESET_DAMAGE_TIME = 8;
+    private final int RESET_DAMAGE_TIME = 5;
+    private List<MBCTeam> fullyAliveTeams = getValidTeams();
 
     // scoring
     private final int SURVIVAL_POINTS = 2;
     private final int KILL_POINTS = 2;
+    private final int LAST_TEAM_BONUS = 5;
     private final int[] BONUS_POINTS = {20, 15, 15, 10, 10, 8, 8, 8, 5, 5, 3, 3}; // 24 player; these numbers are arbitrary
     // NOTE: 16 player bonus is probably different
 
@@ -49,9 +50,12 @@ public class Spleef extends Game {
     public void createScoreboard(Participant p) {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
-        createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+getSpleefPlayer(p.getPlayer()).getKills(), p);
+        if (roundNum == 1) {
+            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+getSpleefPlayer(p.getPlayer()).getKills(), p);
+        } else {
+            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+"0", p);
+        }
         updatePlayersAliveScoreboard();
-
         updateInGameTeamScoreboard();
     }
 
@@ -99,6 +103,9 @@ public class Spleef extends Game {
             // reset scoreboard & variables after each round
             updatePlayersAliveScoreboard(p);
         }
+
+        fullyAliveTeams.clear();
+        fullyAliveTeams = getValidTeams();
     }
 
     public void startRound() {
@@ -199,6 +206,14 @@ public class Spleef extends Game {
                 p.getParticipant().addCurrentScore(BONUS_POINTS[p.getPlacement()-1]);
             }
         }
+
+        // in case multiple teams do not die (??)
+        for (MBCTeam t : fullyAliveTeams) {
+            for (Participant p : t.teamPlayers) {
+                p.getPlayer().sendMessage(ChatColor.GREEN+"Your team earned a bonus for being the last fully alive team!");
+                p.addCurrentScore(LAST_TEAM_BONUS);
+            }
+        }
     }
 
     public void handleDeath(SpleefPlayer victim) {
@@ -223,6 +238,10 @@ public class Spleef extends Game {
 
         for (Participant p : playersAlive) {
             p.addCurrentScore(SURVIVAL_POINTS);
+        }
+
+        if (fullyAliveTeams.size() > 1) {
+            fullyAliveTeams.remove(victim.getParticipant().getTeam());
         }
     }
 
@@ -280,12 +299,13 @@ public class Spleef extends Game {
     @EventHandler
     public void onPunch(EntityDamageByEntityEvent e) {
         if (!(e.getDamager() instanceof Player) || !(e.getEntity() instanceof Player)) return;
+        if (!getState().equals(GameState.ACTIVE)) return;
 
         Player p = (Player) e.getEntity();
         SpleefPlayer hit = getSpleefPlayer(p);
 
-        Vector velocity = p.getLocation().getDirection();
-        p.setVelocity(new Vector(velocity.getX()*-0.1, 0.5, velocity.getZ()*-0.1));
+        Vector velocity = e.getDamager().getLocation().getDirection();
+        p.setVelocity(new Vector(velocity.getX()*0.1, 0.1, velocity.getZ()*0.1));
         p.damage(0.5);
         hit.setLastDamager(Participant.getParticipant((Player) e.getDamager()));
         hit.setResetTime(timeRemaining - RESET_DAMAGE_TIME);

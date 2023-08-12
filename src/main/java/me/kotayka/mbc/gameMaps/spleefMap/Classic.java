@@ -54,8 +54,9 @@ public class Classic extends SpleefMap {
             for (int paste_to_z = -25; paste_to_z <= 25; paste_to_z++) {
                 Block b = getWorld().getBlockAt(copy_from_x, 64, copy_from_z);
                 if (!(b.getType().equals(Material.AIR))) {
-                    b.setType(Material.LIGHT_GRAY_CONCRETE);
-                    fourthLayerDecayingBlocks.add(b);
+                    Block paste_to = getWorld().getBlockAt(paste_to_x, 64, paste_to_z);
+                    paste_to.setType(Material.LIGHT_GRAY_CONCRETE);
+                    fourthLayerDecayingBlocks.add(paste_to);
                 }
                 copy_from_z++;
             }
@@ -102,6 +103,7 @@ public class Classic extends SpleefMap {
     private void erodeLayerRandom(List<Block> decaying) {
         int rand = (int) (Math.random()*decaying.size());
         Block b = decaying.get(rand);
+        // TODO: optimize this, creating a new runnable each time seems irresponsible
         new BukkitRunnable() {
             @Override
             public void run() {

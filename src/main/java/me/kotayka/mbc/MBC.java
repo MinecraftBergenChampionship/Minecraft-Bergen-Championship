@@ -38,8 +38,8 @@ public class MBC implements Listener {
      */
     public List<Participant> players = new ArrayList<>(16); // every player
     public List<Participant> participants = new ArrayList<>(16); // every player + spectators
-    public TreeSet<Participant> individual = new TreeSet<>(Collections.reverseOrder(Participant.rawTotalScoreComparator));
-    public TreeSet<MBCTeam> teamScores = new TreeSet<>(Collections.reverseOrder(new TeamScoreSorter()));
+    //public TreeSet<Participant> individual = new TreeSet<>(Participant.rawTotalScoreComparator);
+    //public TreeSet<MBCTeam> teamScores = new TreeSet<>(new TeamScoreSorter());
 
     public Red red = new Red();
     public Yellow yellow = new Yellow();
@@ -56,7 +56,7 @@ public class MBC implements Listener {
     public final Scoreboard board = manager.getNewScoreboard();
 
     private Minigame currentGame;
-    public int gameNum = 1;
+    public int gameNum = 1; // REVERT THIS AFTER TEST
 
     public Plugin plugin;
     public final Lobby lobby = new Lobby();
@@ -67,9 +67,10 @@ public class MBC implements Listener {
     public Skybattle skybattle = null;
     public SurvivalGames sg = null;
     public Spleef spleef = null;
+    public Dodgebolt dodgebolt = null;
     public boolean finalGame = false;
 
-    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef"));
+    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt"));
     public final List<Game> gameList = new ArrayList<Game>(6);
 
     // Define Special Blocks
@@ -137,6 +138,11 @@ public class MBC implements Listener {
                     spleef = new Spleef();
                 }
                 return spleef;
+            case "Dodgebolt":
+                if (dodgebolt == null) {
+                    dodgebolt = new Dodgebolt();
+                }
+                return dodgebolt;
             default:
                 return lobby;
         }
@@ -242,9 +248,9 @@ public class MBC implements Listener {
      */
     public List<MBCTeam> getValidTeams() {
         List<MBCTeam> newTeams = new ArrayList<>();
-        for (int i = 0; i < MBC.teamNames.size(); i++) {
-            if (!Objects.equals(MBC.getInstance().teams.get(i).fullName, "Spectator") && MBC.getInstance().teams.get(i).teamPlayers.size() > 0) {
-                newTeams.add(MBC.getInstance().teams.get(i));
+        for (MBCTeam t : teams) {
+            if (!(t instanceof Spectator) && t.teamPlayers.size() > 0) {
+                newTeams.add(t);
             }
         }
         return newTeams;
@@ -382,12 +388,21 @@ public class MBC implements Listener {
     public void updatePlacings() {
         int i = 1;
         int lastScore = -1;
+
+        List<Participant> individual = getPlayers();
+        individual.sort(new TotalIndividualComparator());
+
+        for (Participant p : getPlayers()) {
+            Bukkit.broadcastMessage("p.score == " + p.getRawTotalScore());
+        }
+
+        // TODO: using an auto sort ds maybe a set would be better
         for (Participant p : individual) {
             if (p.getRawTotalScore() == lastScore) {
                 p.setPlacement(i);
             } else {
                 p.setPlacement(i++);
-                Bukkit.broadcastMessage("p.placement == " + p.getPlacement());
+                Bukkit.broadcastMessage("p.placement == " + p.getPlacement() + " for " + p.getPlayerName());
                 lastScore = p.getRawTotalScore();
             }
         }
@@ -419,21 +434,23 @@ public class MBC implements Listener {
         msg.append(ChatColor.YELLOW+"Your score: " + ChatColor.RESET+ p.getRawTotalScore()+"\n");
         if (placement != 1) {
             List<Participant> aheadPlayers = Participant.getParticipant(placement-1);
-            msg.append("The player one place above you has " + (aheadPlayers.get(0).getRawTotalScore() - p.getRawTotalScore()) + " more coins.");
+            msg.append("The player one place above you has " + (aheadPlayers.get(0).getRawTotalScore() - p.getRawTotalScore()) + " more coins.\n");
         }
         msg.append(ChatColor.AQUA+"+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
         sender.sendMessage(msg.toString());
     }
 
     public void getTopIndividual(Player sender) {
-        Iterator<Participant> it = individual.iterator();
+        List<Participant> individual = getPlayers();
+        individual.sort(new TotalIndividualComparator());
         int placement;
         StringBuilder msg = new StringBuilder(ChatColor.AQUA.toString()+ChatColor.BOLD+"Player scores: \n"+ChatColor.RESET);
-        while (it.hasNext()) {
-            Participant p = it.next();
+        for (Participant p : individual) {
             placement = p.getPlacement();
-            if (placement <= 8) {
+            if (placement < 9) {
                 msg.append(placement).append(". ").append(p.getFormattedName()).append(": ").append(p.getRawTotalScore()).append("\n");
+            } else {
+                break;
             }
         }
         sender.sendMessage(msg.toString());

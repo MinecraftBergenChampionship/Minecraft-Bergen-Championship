@@ -237,9 +237,9 @@ public abstract class Game extends Minigame {
     }
 
     public void finalGameScoreDisplay() {
-        for (Participant p : MBC.getInstance().participants) {
-            List<MBCTeam> teamRoundsScores = getValidTeams();
-            teamRoundsScores.sort(new TeamRoundSorter());
+        List<MBCTeam> teamRoundsScores = getValidTeams();
+        teamRoundsScores.sort(new TeamRoundSorter());
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
 
             for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
                 MBCTeam t = teamRoundsScores.get(14-i);
@@ -335,9 +335,7 @@ public abstract class Game extends Minigame {
            p.getPlayer().setGameMode(GameMode.ADVENTURE);
            p.getPlayer().setLevel(0);
            p.getPlayer().setExp(0);
-           MBC.getInstance().individual.add(p);
-           Bukkit.broadcastMessage("p == " + p.getPlayer().getName());
-           Bukkit.broadcastMessage("individual == " + MBC.getInstance().individual.size());
+           //MBC.getInstance().individual.add(p);
        }
 
        loadPlayers();
@@ -367,8 +365,8 @@ public abstract class Game extends Minigame {
             case 22 -> {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Top 5 players this game:");
                 TO_PRINT = getScores();
-                MBC.getInstance().updatePlacings();
             }
+            case 18 -> MBC.getInstance().updatePlacings();
             case 14 -> {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Current event standings:");
                 TO_PRINT = printEventScores();
@@ -393,16 +391,14 @@ public abstract class Game extends Minigame {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
                 TO_PRINT = printRoundScores();
             }
-            case 16 -> {
-                getScoresNoPrint();
-                MBC.getInstance().updatePlacings();
-            }
+            case 16 -> getScoresNoPrint();
             case 14 -> {
                 Bukkit.broadcastMessage(ChatColor.BOLD+"Current event standings:");
                 TO_PRINT = printEventScores();
             }
-            case 1 -> Bukkit.broadcastMessage(ChatColor.RED+"Returning to lobby...");
+            case 11 -> MBC.getInstance().updatePlacings();
             case 18, 12 -> Bukkit.broadcastMessage(TO_PRINT);
+            case 1 -> Bukkit.broadcastMessage(ChatColor.RED+"Returning to lobby...");
             case 0 -> returnToLobby();
         }
     }
@@ -419,9 +415,9 @@ public abstract class Game extends Minigame {
             case 13 -> {
                 Bukkit.broadcastMessage(ChatColor.BOLD+"Top 5 players this game: ");
                 TO_PRINT = getScores();
-                MBC.getInstance().updatePlacings();
             }
             case 20, 10 -> Bukkit.broadcastMessage(TO_PRINT);
+            case 8 -> MBC.getInstance().updatePlacings();
             case 1 -> Bukkit.broadcastMessage(ChatColor.RED+"Preparing finale...");
             case 0 -> returnToLobby();
         }
@@ -437,12 +433,10 @@ public abstract class Game extends Minigame {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
                 TO_PRINT = printRoundScores();
             }
-            case 5 -> {
-                getScoresNoPrint();
-                MBC.getInstance().updatePlacings();
-            }
-            case 1 -> Bukkit.broadcastMessage(ChatColor.RED + "Preparing finale...");
             case 8 -> Bukkit.broadcastMessage(TO_PRINT);
+            case 5 -> getScoresNoPrint();
+            case 1 -> Bukkit.broadcastMessage(ChatColor.RED + "Preparing finale...");
+            case 3 -> MBC.getInstance().updatePlacings();
             case 0 -> returnToLobby();
         }
     }
@@ -488,6 +482,7 @@ public abstract class Game extends Minigame {
         // getScores() by calling p.addCurrentScoreToTotal()
         List<MBCTeam> gameScores = new ArrayList<>(getValidTeams());
         gameScores.sort(new TeamScoreSorter());
+        Collections.reverse(gameScores);
         StringBuilder str = new StringBuilder();
 
         for (int i = 0; i < gameScores.size(); i++) {
@@ -555,26 +550,6 @@ public abstract class Game extends Minigame {
                 MBC.getInstance().finalGame = true;
             }
             MBC.getInstance().lobby.start();
-        }
-    }
-
-    /**
-     * Graphics for counting down when a game is about to start.
-     * Should only be called when gameState() is GameState.STARTING
-     * since it directly uses timeRemaining
-     * Does not handle events for when timer hits 0 (countdown finishes).
-     */
-    public void startingCountdown() {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (timeRemaining <= 10 && timeRemaining > 3) {
-                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+timeRemaining+"<", 0,20,0);
-            } else if (timeRemaining == 3) {
-                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.RED+""+ChatColor.BOLD+ timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
-            } else if (timeRemaining == 2) {
-                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.YELLOW+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
-            } else if (timeRemaining == 1) {
-                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">"+ChatColor.GREEN+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
-            }
         }
     }
 

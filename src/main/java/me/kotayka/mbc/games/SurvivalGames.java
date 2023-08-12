@@ -2,10 +2,7 @@ package me.kotayka.mbc.games;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import me.kotayka.mbc.Game;
-import me.kotayka.mbc.GameState;
-import me.kotayka.mbc.MBC;
-import me.kotayka.mbc.Participant;
+import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.sgMaps.BCA;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
 import org.bukkit.*;
@@ -47,19 +44,26 @@ public class SurvivalGames extends Game {
     private final List<Location> chestLocations = new ArrayList<Location>(50);
     private final List<SupplyCrate> crates = new ArrayList<SupplyCrate>(3);
     private Map<Player, Integer> playerKills = new HashMap<>();
+    private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
     private boolean dropLocation = false;
     private int crateNum = 0;
+    private int deadTeams; // just to avoid sync issues w/teamsAlive.size()
 
     // Enchantment
     private final GUIItem[] guiItems = setupGUIItems();
 
     // SCORING
-    public final int KILL_POINTS = 30;
-    public final int SURVIVAL_POINTS = 2;
+    public final int KILL_POINTS = 35;
+    public final int SURVIVAL_POINTS = 3;
+    public final int[] TEAM_BONUSES = {72, 60, 48, 36, 24, 12};
     public final int WIN_POINTS = 36; // shared amongst all remaining players
 
     public SurvivalGames() {
         super("SurvivalGames");
+
+        for (MBCTeam t : getValidTeams()) {
+            teamPlacements.put(t, getValidTeams().size());
+        }
 
         try {
             readItems();
@@ -152,7 +156,12 @@ public class SurvivalGames extends Game {
                     timeRemaining = 45;
                 } else {
                     gameOverGraphics();
-                    roundWinners(WIN_POINTS / playersAlive.size());
+                    roundWinners(0);
+                    for (Participant p : playersAlive) {
+                        MBCTeam t = p.getTeam();
+                        teamPlacements.put(t, 1);
+                    }
+                    placementPoints();
                     setGameState(GameState.END_GAME);
                     createLineAll(23, "");
                     timeRemaining = 37;
@@ -194,7 +203,12 @@ public class SurvivalGames extends Game {
         } else if (getState().equals(GameState.OVERTIME)) {
             if (timeRemaining == 0) {
                 gameOverGraphics();
-                roundWinners(WIN_POINTS / playersAlive.size());
+                roundWinners(0);
+                for (Participant p : playersAlive) {
+                    MBCTeam t = p.getTeam();
+                    teamPlacements.put(t, 1);
+                }
+                placementPoints();
                 setGameState(GameState.END_GAME);
                 createLineAll(23, "");
                 timeRemaining = 37;
@@ -333,6 +347,16 @@ public class SurvivalGames extends Game {
         }
     }
 
+    public void placementPoints() {
+        for (MBCTeam t : getValidTeams()) {
+            for (Participant p : t.getPlayers()) {
+                int placement = teamPlacements.get(t);
+                p.addCurrentScore(TEAM_BONUSES[placement] / getValidTeams().size());
+                p.getPlayer().sendMessage(ChatColor.GREEN+"Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES[placement] * MBC.getInstance().multiplier) + " points!");
+            }
+        }
+    }
+
     // Apply regeneration when eating mushroom stew
     private void eatMushroomStew(Player p) {
         if (p.getInventory().getItemInMainHand().getType() != Material.MUSHROOM_STEW && p.getInventory().getItemInMainHand().getType() != Material.MUSHROOM_STEW) {
@@ -420,6 +444,18 @@ public class SurvivalGames extends Game {
         }
         e.setCancelled(true);
         victim.setGameMode(GameMode.SPECTATOR);
+
+        int count = 0;
+        Participant victimParticipant = Participant.getParticipant(victim);
+        for (Participant p : victimParticipant.getTeam().teamPlayers) {
+            if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
+                count++;
+            }
+        }
+
+        if (count == deadTeams) {
+            teamPlacements.put(victimParticipant.getTeam(), getValidTeams().size() - deadTeams);
+        }
 
         // may require testing due to concurrency
         for (Participant p : playersAlive) {

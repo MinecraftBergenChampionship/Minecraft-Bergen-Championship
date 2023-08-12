@@ -116,10 +116,28 @@ public abstract class Minigame implements Scoreboard, Listener {
         }
     }
 
+    /**
+     * Graphics for counting down when a game is about to start.
+     * Should only be called when gameState() is GameState.STARTING
+     * since it directly uses timeRemaining
+     * Does not handle events for when timer hits 0 (countdown finishes).
+     */
+    public void startingCountdown() {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (timeRemaining <= 10 && timeRemaining > 3) {
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + timeRemaining + "<", 0, 20, 0);
+            } else if (timeRemaining == 3) {
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + ChatColor.RED + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
+            } else if (timeRemaining == 2) {
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + ChatColor.YELLOW + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
+            } else if (timeRemaining == 1) {
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + ChatColor.GREEN + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
+            }
+        }
+    }
+
     public void createLine(int score, String line, Participant p) {
         if (p.objective == null || !Objects.equals(p.gameObjective, gameName)) {
-            Bukkit.broadcastMessage("[Debug] p.objective == " + p.objective);
-            Bukkit.broadcastMessage("[Debug] gameObjective == " + p.gameObjective);
             p.gameObjective = gameName;
             MBC.getInstance().getMinigame().createScoreboard(p);
         }
@@ -176,34 +194,21 @@ public abstract class Minigame implements Scoreboard, Listener {
      * Sorts teams by their overall score to place onto scoreboard during lobby/after games
      */
     public void updateTeamStandings() {
-        //MBCTeam lastTeam = null;
-        //int ties = 0;
-        int line = 14;
+        if (MBC.getInstance().finalGame) return;
+        List<MBCTeam> teams = getValidTeams();
+        teams.sort(new TeamScoreSorter());
+        Collections.reverse(teams);
+
         int place = 1;
-        for (MBCTeam t : MBC.getInstance().teamScores) {
-            createLineAll(line--, String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedTotalScore()));
-
+        for (int i = 14; i > 14-teams.size(); i--) {
+            MBCTeam t = teams.get(14-i);
+            createLineAll(i,String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedTotalScore()));
             // we will handle ties in the future
-            t.setPlace(place++);
-
-            // use past scores to account for ties
-            /*
-            if (lastTeam != null && lastTeam.getMultipliedTotalScore() == t.getMultipliedTotalScore()) {
-                if (lastTeam.getPreviousPlace() > t.getPreviousPlace()) {
-                    lastTeam.setPlace()
-                }
-                t.setPlace(place);
-                ties++;
-            } else {
-                t.setPlace(place+ties);
-                //ties = 0;
-                place++;
-            }
-            //lastScore = t.getMultipliedTotalScore();
-            line--;
-            lastTeam = t;
-             */
+            t.setPlace(place);
+            Bukkit.broadcastMessage("Team: " + t.getTeamFullName() + ", Placement: " + place);
+            place++;
         }
+
         MBC.getInstance().lobby.colorPodiums();
     }
 
@@ -232,14 +237,7 @@ public abstract class Minigame implements Scoreboard, Listener {
     }
 
     public List<MBCTeam> getValidTeams() {
-        List<MBCTeam> newTeams = new ArrayList<>();
-        for (int i = 0; i < MBC.teamNames.size(); i++) {
-            if (!Objects.equals(MBC.getInstance().teams.get(i).fullName, "Spectator") && MBC.getInstance().teams.get(i).teamPlayers.size() > 0) {
-                newTeams.add(MBC.getInstance().teams.get(i));
-            }
-        }
-
-        return newTeams;
+        return MBC.getInstance().getValidTeams();
     }
 
     /**

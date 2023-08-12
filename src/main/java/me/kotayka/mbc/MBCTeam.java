@@ -97,10 +97,10 @@ public abstract class MBCTeam {
     public void addPlayer(Participant p) {
         teamPlayers.add(p);
 
+        /*
         if (!(this instanceof Spectator) && teamPlayers.size() == 1) {
             MBC.getInstance().teamScores.add(this);
-            Bukkit.broadcastMessage("[Debug] teams.size() == " + MBC.getInstance().teamScores.size());
-        }
+        }*/
 
         this.multipliedTotalScore += p.getMultipliedTotalScore();
         this.multipliedCurrentScore += p.getMultipliedCurrentScore();
@@ -110,9 +110,10 @@ public abstract class MBCTeam {
     public void removePlayer(Participant p) {
         teamPlayers.remove(p);
 
+        /*
         if (!(this instanceof Spectator) && teamPlayers.size() == 0) {
             MBC.getInstance().teamScores.remove(this);
-        }
+        }*/
 
         this.multipliedTotalScore -= p.getMultipliedTotalScore();
         this.multipliedCurrentScore -= p.getMultipliedCurrentScore();
@@ -299,16 +300,22 @@ class TeamUnMultipliedScoreSorter implements Comparator<MBCTeam> {
     }
 }
 
+// TODO i fucked something up and now teamscore and teamround sorters are like inverted logically which is kind of weird
 class TeamScoreSorter implements Comparator<MBCTeam> {
     public TeamScoreSorter() {}
 
     public int compare(MBCTeam a, MBCTeam b)
     {
         if (a.getMultipliedTotalScore() == b.getMultipliedTotalScore()) {
+            if (a.getRawTotalScore() != b.getRawTotalScore()) {
+                // compare by unmultiplied score before colors; this will be the tiebreaker for Dodgebolt as well
+                return (a.getRawTotalScore() - b.getRawTotalScore());
+            }
+
             // compare colors
-            return a.getSortID() - b.getSortID();
+            return b.getSortID() - a.getSortID();
         }
-        return (int) (b.getMultipliedTotalScore() - a.getMultipliedTotalScore()); // reverse so bigger numbers are at the top when sorted
+        return (int) (a.getMultipliedTotalScore() - b.getMultipliedTotalScore()); // reverse so bigger numbers are at the top when sorted
     }
 }
 

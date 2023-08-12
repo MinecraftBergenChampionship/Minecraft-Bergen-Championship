@@ -14,6 +14,10 @@ public class changeTeam implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player p = (Player) sender;
+            if (sender.getName().equals("Nikesauce")) {
+                p.sendMessage("Hello Nikesauce, please let an admin know to let you on a team.");
+                return false;
+            }
             if (args.length == 0) {
                 p.sendMessage(ChatColor.RED + "Please Provide a Team Name");
                 return false;

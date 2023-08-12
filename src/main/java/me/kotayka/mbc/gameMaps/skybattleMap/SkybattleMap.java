@@ -9,7 +9,7 @@ import org.bukkit.entity.*;
 // not sure if inheriting from Map is really necessary since theres only one commonality but just in case
 public abstract class SkybattleMap extends MBCMap {
     protected final Skybattle SKYBATTLE;
-    private Location center;
+    private Location CENTER;
     private int voidHeight;
     private float borderRadius;
     private float borderHeight;
@@ -26,7 +26,7 @@ public abstract class SkybattleMap extends MBCMap {
     }
 
     public void loadWorld(Location center, int yMin, int yMax, float borderRadius, double shrinkRate, double fallRate) {
-        this.center = center;
+        this.CENTER = center;
         this.voidHeight = yMin;
         this.borderHeight = yMax;
         this.borderRadius = borderRadius;
@@ -94,6 +94,7 @@ public abstract class SkybattleMap extends MBCMap {
     public abstract void removeBarriers();
 
     public int getVoidHeight() { return voidHeight; }
+    public Location getCenter() { return CENTER; }
 
     public float getBorderHeight() { return borderHeight; }
     public float getBorderRadius() { return borderRadius; }

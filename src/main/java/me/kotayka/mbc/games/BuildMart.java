@@ -135,6 +135,8 @@ public class BuildMart extends Game {
     @EventHandler
     public void blockBreak(BlockBreakEvent e) {
         if (!(e.getBlock().getLocation().getWorld().equals(map.getWorld()))) return;
+        Material m = e.getBlock().getType();
+
         if (e.getBlock().getLocation().getBlockY() == map.FIRST_LAYER_Y) {
             // note: this is assuming the plots will never be on the same level as ANY break area
             e.setCancelled(true);
@@ -152,6 +154,16 @@ public class BuildMart extends Game {
             }
             breakBlock(e.getPlayer(), b);
             return;
+        }
+
+        if (m.toString().endsWith("FAN") || m.toString().endsWith("CORAL")) {
+            map.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(m));
+            e.setCancelled(true);
+        }
+        if (m.equals(Material.FLOWER_POT)) {
+            for (ItemStack i : e.getBlock().getDrops()) {
+                map.getWorld().dropItemNaturally(b.getLocation(), i);
+            }
         }
 
         List<BreakArea> breakAreas = map.BreakAreas().get(e.getBlock().getType());

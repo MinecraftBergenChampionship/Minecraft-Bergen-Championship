@@ -1,21 +1,29 @@
 package me.kotayka.mbc;
 
-import me.kotayka.mbc.*;
 import org.bukkit.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class Lobby extends Minigame {
     public static final Location LOBBY = new Location(Bukkit.getWorld("world"), 0, 1, 0, 180, 0);
     public final World world = Bukkit.getWorld("world");
+    public ArmorStand cameraman;
 
     public Lobby() {
         super("Lobby");
+        Bukkit.getWorld("world").setTime(6000);
         colorPodiumsWhite();
+        teamBarriers(false);
     }
 
     public void createScoreboard(Participant p) {
@@ -34,6 +42,17 @@ public class Lobby extends Minigame {
         updatePlayerTotalScoreDisplay(p);
 
         displayTeamTotalScore(p.getTeam());
+    }
+
+    public void createScoreboardFinale() {
+        newObjective();
+        for (Participant p : MBC.getInstance().participants) {
+            newObjective(p);
+            createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Final Standings!", p);
+            createLine(19, ChatColor.RESET.toString(), p);
+            createLine(15, ChatColor.GREEN+"Team Leaderboard: ", p);
+            createLine(4, ChatColor.RESET.toString()+ChatColor.RESET, p);
+        }
         updateTeamStandings();
     }
 
@@ -47,6 +66,10 @@ public class Lobby extends Minigame {
                 toVoting();
             }
         } else if (getState().equals(GameState.END_ROUND)) {
+            if (timeRemaining == 0) {
+                toDodgebolt();
+            }
+        } else if (getState().equals(GameState.END_GAME)) {
 
         }
     }
@@ -60,6 +83,7 @@ public class Lobby extends Minigame {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if (!e.getPlayer().getWorld().equals(world)) return;
+
         if (e.getPlayer().getLocation().getY() < -45){
             e.getPlayer().teleport(LOBBY);
         }
@@ -80,11 +104,32 @@ public class Lobby extends Minigame {
         MBC.getInstance().setCurrentGame(this);
         createScoreboard();
         loadPlayers();
+        updateTeamStandings();
         stopTimer();
         setTimer(120);
         setGameState(GameState.ACTIVE);
     }
 
+    public void end() {
+        MBC.getInstance().setCurrentGame(this);
+        createScoreboard();
+        world.setTime(18000);
+        loadPlayersEnd();
+        updateTeamStandings();
+        stopTimer();
+        setTimer(60);
+        setGameState(GameState.END_GAME);
+    }
+
+    // prevent leaving cutscenes
+    @EventHandler
+    public void onSneak(PlayerToggleSneakEvent e) {
+        if (!getState().equals(GameState.END_ROUND)) return;
+
+        if (e.getPlayer().getSpectatorTarget() != null && e.getPlayer().getSpectatorTarget().equals(cameraman)) {
+            e.setCancelled(true);
+        }
+    }
 
     /**
      * Updates the player's total score in lobby
@@ -102,14 +147,35 @@ public class Lobby extends Minigame {
         }
     }
 
+    public void loadPlayersFinale() {
+        cameraman = (ArmorStand) world.spawnEntity(new Location(world, -14.5, -1, -21.5, 140, 0), EntityType.ARMOR_STAND);
+        cameraman.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100000, 5, true));
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.teleport(LOBBY);
+            p.setGameMode(GameMode.SPECTATOR);
+            p.setSpectatorTarget(cameraman);
+        }
+    }
+
     public void prepareFinale() {
         MBC.getInstance().setCurrentGame(this);
-        createScoreboard();
+        world.setTime(13000);
+        colorPodiumsWhite();
+        createScoreboardFinale();
+        //teamBarriers(true);
+        loadPlayersFinale();
         stopTimer();
         setTimer(60);
         setGameState(GameState.END_ROUND);
+    }
 
-
+    public void loadPlayersEnd() {
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            if (p.winner) {
+                p.getPlayer().teleport(new Location(world, 49.5, -1, 0.5));
+                p.getPlayer().getInventory().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
+            }
+        }
     }
 
     public void colorPodiumsWhite() {
@@ -117,8 +183,29 @@ public class Lobby extends Minigame {
             colorPodium(i, Material.WHITE_CONCRETE);
         }
     }
+
+    public void toDodgebolt() {
+        HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
+        setGameState(GameState.INACTIVE);
+        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+            p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
+            p.getPlayer().getInventory().clear();
+            p.getPlayer().setExp(0);
+            p.getPlayer().setLevel(0);
+        }
+
+        if (MBC.getInstance().dodgebolt == null) {
+            MBC.getInstance().dodgebolt = new Dodgebolt();
+        }
+        MBC.getInstance().dodgebolt.start();
+    }
+
     public void colorPodiums() {
-        for (MBCTeam t : MBC.getInstance().teamScores) {
+        for (MBCTeam t : MBC.getInstance().getValidTeams()) {
             colorPodium(t.getPlace(), t.getConcrete().getType());
         }
     }
@@ -147,7 +234,7 @@ public class Lobby extends Minigame {
                 }
             }
             case 3 -> {
-                for (int y = -2; y <= 0; y++) {
+                for (int y = -2; y <= 1; y++) {
                     world.getBlockAt(-20, y, -29).setType(m);
                     world.getBlockAt(-20, y, -30).setType(m);
                     world.getBlockAt(-21, y, -29).setType(m);

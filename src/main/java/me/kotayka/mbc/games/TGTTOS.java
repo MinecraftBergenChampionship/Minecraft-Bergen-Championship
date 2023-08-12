@@ -49,6 +49,7 @@ public class TGTTOS extends Game {
     public static int COMPLETION_POINTS = 1; // awarded for completing the course
     public static int FIRST_TEAM_BONUS = 5; // awarded per player on team
     public static int SECOND_TEAM_BONUS = 3; // awarded per player on team
+    public static int TOP_THREE_BONUS = 5; // bonus for placing top 3
 
     public TGTTOS() {
         super("TGTTOS");
@@ -308,8 +309,10 @@ public class TGTTOS extends Game {
 
     public void chickenClick(Participant p, Entity chicken) {
         finishedParticipants.add(p);
-        p.addCurrentScore(PLACEMENT_POINTS*(MBC.getInstance().getPlayers().size()-finishedParticipants.size())+COMPLETION_POINTS);
-        String place = getPlace(finishedParticipants.size());
+        int placement = finishedParticipants.size();
+        p.addCurrentScore(PLACEMENT_POINTS*(MBC.getInstance().getPlayers().size()-placement)+COMPLETION_POINTS);
+        String place = getPlace(placement);
+        if (placement < 4) { p.addCurrentScore(TOP_THREE_BONUS); }
         chicken.remove();
         Bukkit.broadcastMessage(p.getFormattedName()+ChatColor.WHITE+" finished in "+ChatColor.AQUA+place+"!");
         MBC.spawnFirework(p);
