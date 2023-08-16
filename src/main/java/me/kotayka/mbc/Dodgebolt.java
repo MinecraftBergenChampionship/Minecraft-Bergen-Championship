@@ -6,12 +6,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.ItemDespawnEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,8 +27,8 @@ public class Dodgebolt extends Minigame {
     public int[] score = {0, 0};
     int roundNum = 1;
     //private ArmorStand cameraman = null;
-    private final Location TEAM_ONE_ARROW_SPAWN = new Location(world, -5.5, 20, 0.5, -90, -90);
-    private final Location TEAM_TWO_ARROW_SPAWN = new Location(world, 6.5, 20, 0.5, -90, -90);
+    private final Location TEAM_ONE_ARROW_SPAWN = new Location(world, 6.5, 20, 0.5, -90, -90);
+    private final Location TEAM_TWO_ARROW_SPAWN = new Location(world, -5.5, 20, 0.5, -90, -90);
     private List<Location> TEAM_ONE_SPAWNS = new ArrayList<>(Arrays.asList(
             new Location(world, 9.5, 17, 9.5), new Location(world, 12.5, 17, 3.5),
             new Location(world, 9.5, 17, -8.5), new Location(world, 12.5, 17, -2.5)
@@ -41,13 +39,16 @@ public class Dodgebolt extends Minigame {
     ));
     private final Location SPAWN = new Location(world, 0, 22, 17, 180, 0);
     private final Vector SPAWN_ARROW_VELOCITY = new Vector(0, 0.3, 0);
-    private final ItemStack ARROW_ITEM = new ItemStack(Material.ARROW);
     public static final ItemStack BOW = new ItemStack(Material.BOW);
     private final List<DodgeboltPlayer> teamOnePlayers = new ArrayList<>(MBC.MAX_PLAYERS_PER_TEAM);
     private final List<DodgeboltPlayer> teamTwoPlayers = new ArrayList<>(MBC.MAX_PLAYERS_PER_TEAM);
     private int[] playersAlive;
     private boolean setTimerLine = false;
-    private List<Arrow> arrows = new ArrayList<>(2);
+    private int noDespawnTask = -1;
+    private List<Arrow> middleArrows = new ArrayList<Arrow>(2);
+    private List<Entity> spawnedArrowItems = new ArrayList<>();
+    private HashSet<Arrow> firedArrows = new HashSet<>();
+    int trailTask = -1;
 
     public Dodgebolt() {
         super("Dodgebolt");
@@ -102,6 +103,7 @@ public class Dodgebolt extends Minigame {
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
         setupArena();
         loadPlayers();
+        stopTimer();
         setTimer(30);
     }
 
@@ -140,44 +142,45 @@ public class Dodgebolt extends Minigame {
         if (roundNum == 1) {
             for (Participant p : firstPlace.teamPlayers) {
                 teamOnePlayers.add(new DodgeboltPlayer(p, true));
-                int rand = (int) (Math.random() * TEAM_ONE_SPAWNS.size());
-                Location spawn = TEAM_ONE_SPAWNS.get(rand);
-                p.getPlayer().teleport(spawn);
-                p.getPlayer().getInventory().clear();
-                TEAM_ONE_SPAWNS.remove(spawn);
-                p.getPlayer().getInventory().addItem(BOW);
             }
             for (Participant p : secondPlace.teamPlayers) {
                 teamTwoPlayers.add(new DodgeboltPlayer(p, false));
-                int rand = (int) (Math.random() * TEAM_TWO_SPAWNS.size());
-                Location spawn = TEAM_TWO_SPAWNS.get(rand);
-                p.getPlayer().getInventory().clear();
-                p.getPlayer().teleport(spawn);
-                TEAM_TWO_SPAWNS.remove(spawn);
-                p.getPlayer().getInventory().addItem(BOW);
             }
-            for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
-                p.getPlayer().setGameMode(GameMode.ADVENTURE);
-                p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-                p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
-                p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
-                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-                if (!p.getTeam().equals(firstPlace) && !p.getTeam().equals(secondPlace)) {
-                    p.getPlayer().teleport(SPAWN);
-                }
+        }
+
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+            p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
+            if (!p.getTeam().equals(firstPlace) && !p.getTeam().equals(secondPlace)) {
+                p.getPlayer().teleport(SPAWN);
             }
-        } else {
-            for (DodgeboltPlayer p : teamOnePlayers) {
-                p.outOfBounds = false;
-                p.shotBy = null;
-                p.fell = false;
-            }
-            for (DodgeboltPlayer p : teamTwoPlayers) {
-                p.outOfBounds = false;
-                p.shotBy = null;
-                p.dead = false;
-                p.fell = false;
-            }
+        }
+        for (DodgeboltPlayer p : teamOnePlayers) {
+            p.outOfBounds = false;
+            p.shotBy = null;
+            p.dead = false;
+            p.fell = false;
+            int rand = (int) (Math.random() * TEAM_ONE_SPAWNS.size());
+            Location spawn = TEAM_ONE_SPAWNS.get(rand);
+            p.getPlayer().teleport(spawn);
+            p.getPlayer().getInventory().clear();
+            TEAM_ONE_SPAWNS.remove(spawn);
+            p.getPlayer().getInventory().addItem(BOW);
+        }
+        for (DodgeboltPlayer p : teamTwoPlayers) {
+            p.outOfBounds = false;
+            p.shotBy = null;
+            p.dead = false;
+            p.fell = false;
+            int rand = (int) (Math.random() * TEAM_TWO_SPAWNS.size());
+            Location spawn = TEAM_TWO_SPAWNS.get(rand);
+            p.getPlayer().getInventory().clear();
+            p.getPlayer().teleport(spawn);
+            TEAM_TWO_SPAWNS.remove(spawn);
+            p.getPlayer().getInventory().addItem(BOW);
         }
     }
 
@@ -198,7 +201,7 @@ public class Dodgebolt extends Minigame {
                 setGameState(GameState.ACTIVE);
                 createLineAll(20, ChatColor.RED.toString()+ChatColor.BOLD+"Finale Active");
             } else {
-                if (timeRemaining == 15) {
+                if (timeRemaining == 16) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.MUSIC_DISC_CHIRP, 1, 1);
                     }
@@ -221,6 +224,12 @@ public class Dodgebolt extends Minigame {
             if (timeRemaining == 0) {
                 returnToLobby();
             }
+            if (noDespawnTask != -1) {
+                Bukkit.getScheduler().cancelTask(noDespawnTask);
+            }
+            if (trailTask != -1) {
+                Bukkit.getScheduler().cancelTask(trailTask);
+            }
         }
     }
 
@@ -230,16 +239,16 @@ public class Dodgebolt extends Minigame {
         String winsOne = "";
         String winsTwo = "";
         switch (score[0]) {
-            case 0 -> winsOne = firstPlace.teamNameFormat() + "     ① ① ③";
-            case 1 -> winsOne = firstPlace.teamNameFormat() + "     ② ① ③";
-            case 2 -> winsOne = firstPlace.teamNameFormat() + "     ② ② ③";
-            case 3 -> winsOne = firstPlace.teamNameFormat() + "     ② ② ④";
+            case 0 -> winsOne = "① ① ③ " + firstPlace.teamNameFormat();
+            case 1 -> winsOne = "② ① ③ " + firstPlace.teamNameFormat();
+            case 2 -> winsOne = "② ② ③ " + firstPlace.teamNameFormat();
+            case 3 -> winsOne = "② ② ④ " + firstPlace.teamNameFormat();
         }
         switch (score[1]) {
-            case 0 -> winsTwo = secondPlace.teamNameFormat() + "     ① ① ③";
-            case 1 -> winsTwo = secondPlace.teamNameFormat() + "     ② ① ③";
-            case 2 -> winsTwo = secondPlace.teamNameFormat() + "     ② ② ③";
-            case 3 -> winsTwo = secondPlace.teamNameFormat() + "     ② ② ④";
+            case 0 -> winsTwo = "① ① ③ " + secondPlace.teamNameFormat();
+            case 1 -> winsTwo = "② ① ③ " + secondPlace.teamNameFormat();
+            case 2 -> winsTwo = "② ② ③ " + secondPlace.teamNameFormat();
+            case 3 -> winsTwo = "② ② ④ " + secondPlace.teamNameFormat();
         }
         createLine(22, ChatColor.AQUA.toString()+ChatColor.BOLD+"Final Game: " + ChatColor.RESET+"Dodgebolt", p);
         createLine(1, winsOne, p);
@@ -310,16 +319,23 @@ public class Dodgebolt extends Minigame {
     }
 
     private void spawnArrow(boolean first) {
+        if (noDespawnTask == -1) {
+            noDespawnTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
+                for (Arrow a : middleArrows) {
+                    a.setTicksLived(1);
+                }
+            }, 100, 100);
+        }
         if (first) {
             Arrow a1 = world.spawnArrow(TEAM_ONE_ARROW_SPAWN, SPAWN_ARROW_VELOCITY, (float) 0.3, 0);
             a1.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
             a1.setGlowing(true);
-            arrows.add(a1);
+            middleArrows.add(a1);
         } else {
             Arrow a2 = world.spawnArrow(TEAM_TWO_ARROW_SPAWN, SPAWN_ARROW_VELOCITY, (float) 0.3, 0);
             a2.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
             a2.setGlowing(true);
-            arrows.add(a2);
+            middleArrows.add(a2);
         }
     }
 
@@ -341,19 +357,43 @@ public class Dodgebolt extends Minigame {
             p.playSound(p, Sound.MUSIC_DISC_CHIRP, 1, 1);
         }
         setGameState(GameState.END_ROUND);
-        setTimer(5);
+        setTimerLine = false;
+        setTimer(6);
         roundNum++;
     }
 
     @EventHandler
     public void onHit(ProjectileHitEvent e) {
-        if (e.getHitBlock() != null) {
+        if (!(e.getEntity() instanceof Arrow)) return;
+
+        Arrow arrow = (Arrow) e.getEntity();
+        firedArrows.remove(arrow);
+
+        if (e.getHitBlock() != null && e.getHitBlockFace() != null) {
+            if (middleArrows.contains(arrow)) return;
             Block b = e.getHitBlock();
-            if (b.getType().toString().endsWith("CONCRETE") || b.getType().equals(Material.BARRIER)) {
-                boolean side = e.getEntity().getLocation().getX() > 0.5;
-                e.getEntity().remove();
-                spawnArrow(side);
+            Location l = b.getLocation();
+            world.playSound(l, Sound.ENTITY_ARROW_HIT, 1, 1);
+            l.add(0.5, 0, 0.5);
+            // west -x east +x south +z north -z
+            switch (e.getHitBlockFace()) {
+                case EAST:
+                    l.add(1, 0, 0);
+                    break;
+                case WEST:
+                    l.add(-1, 0, 0);
+                    break;
+                case SOUTH:
+                    l.add(0, 0, 1);
+                    break;
+                case NORTH:
+                    l.add(0, 0, -1);
+                    break;
+                default: // UP
+                    l.add(0, 1, 0);
             }
+            spawnedArrowItems.add(world.dropItem(l, new ItemStack(Material.ARROW)));
+            arrow.remove();
         }
 
         if (e.getHitEntity() instanceof Player && e.getEntity().getShooter() instanceof Player) {
@@ -367,52 +407,22 @@ public class Dodgebolt extends Minigame {
 
             p.shotBy = shooter;
             MBC.spawnFirework(p.getParticipant());
-            world.dropItem(p.getPlayer().getLocation(), ARROW_ITEM);
-            if (p.FIRST) {
-                if (playersAlive[0] != 1) {
-                    p.getPlayer().damage(50);
-                    p.getPlayer().setVelocity(new Vector(0, 0, 0));
-                    playersAlive[0]--;
-                } else {
-                    p.getPlayer().teleport(SPAWN);
-                    score[1]++;
-                    playersAlive[0] = firstPlace.teamPlayers.size();
-                    if (score[1] == 3) endGame(secondPlace);
-                    else endRound();
-                }
-            } else {
-                if (playersAlive[1] != 1) {
-                    p.getPlayer().damage(50);
-                    p.getPlayer().setVelocity(new Vector(0, 0, 0));
-                    playersAlive[1]--;
-                } else {
-                    p.getPlayer().teleport(SPAWN);
-                    score[0]++;
-                    playersAlive[1] = secondPlace.teamPlayers.size();
-                    if (score[0] == 3) endGame(firstPlace);
-                    else endRound();
-                }
-            }
+            spawnedArrowItems.add(world.dropItem(p.getPlayer().getLocation(), new ItemStack(Material.ARROW)));
+            properKill(p);
+            e.setCancelled(true);
         }
     }
 
     private Material coloredCarpet(ChatColor c) {
-        switch (c) {
-            case RED:
-                return Material.RED_CARPET;
-            case YELLOW:
-                return Material.YELLOW_CARPET;
-            case GREEN:
-                return Material.GREEN_CARPET;
-            case BLUE:
-                return Material.BLUE_CARPET;
-            case DARK_PURPLE:
-                return Material.PURPLE_CARPET;
-            case LIGHT_PURPLE:
-                return Material.PINK_CARPET;
-            default:
-                return Material.WHITE_CARPET;
-        }
+        return switch (c) {
+            case RED -> Material.RED_CARPET;
+            case YELLOW -> Material.YELLOW_CARPET;
+            case GREEN -> Material.GREEN_CARPET;
+            case BLUE -> Material.BLUE_CARPET;
+            case DARK_PURPLE -> Material.PURPLE_CARPET;
+            case LIGHT_PURPLE -> Material.PINK_CARPET;
+            default -> Material.WHITE_CARPET;
+        };
     }
 
     @EventHandler
@@ -421,10 +431,58 @@ public class Dodgebolt extends Minigame {
         e.setRespawnLocation(SPAWN);
     }
 
+
+    @EventHandler
+    public void itemDamage(EntityDamageEvent e) {
+        if (e.getCause().equals(EntityDamageEvent.DamageCause.LAVA) && e.getEntity().getType().equals(EntityType.ARROW)) {
+            Entity arrow = e.getEntity();
+            if (((LivingEntity) arrow).getHealth()  - e.getDamage() <= 0) {
+                Location l = arrow.getLocation();
+                // if arrow was game spawned, it wasn't player's fault; spawn on same side
+                if (spawnedArrowItems.contains(arrow)) {
+                    spawnArrow(l.getX() <= 0.5);
+                    spawnedArrowItems.remove(arrow);
+                } else {
+                    spawnArrow(l.getX() > 0.5);
+                }
+                arrow.remove();
+            }
+        }
+    }
+
+    @EventHandler
+    public void onArrowPickup(PlayerPickupArrowEvent e) {
+        middleArrows.remove((Arrow) e.getArrow());
+    }
+
+    @EventHandler
+    public void onArrowFire(ProjectileLaunchEvent e) {
+        if (!e.getEntity().getWorld().equals(world)) return;
+        if (!(e.getEntity() instanceof Arrow && e.getEntity().getShooter() instanceof Player)) return;
+
+        DodgeboltPlayer p = getDodgeboltPlayer((Player) e.getEntity().getShooter());
+        if (p == null) return;
+
+        Arrow a = (Arrow) e.getEntity();
+        Vector velocity = a.getVelocity();
+        a.setVelocity(new Vector(velocity.getX() * 0.8, velocity.getY(), velocity.getZ()*0.8));
+        firedArrows.add(a);
+        if (trailTask == -1) {
+            trailTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
+                for (Arrow arrow : firedArrows) {
+                    world.spawnParticle(Particle.REDSTONE, arrow.getLocation(), 3, new Particle.DustOptions(p.getParticipant().getTeam().getColor(), 3));
+                }
+            }, 0, 10);
+        }
+    }
+
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         DodgeboltPlayer p = getDodgeboltPlayer(e.getPlayer());
         if (p == null) return;
+        for (ItemStack i : p.getPlayer().getInventory()) {
+            if (i.getType() != Material.ARROW) p.getPlayer().getInventory().remove(i);
+        }
         e.setDeathSound(Sound.ENTITY_FIREWORK_ROCKET_LAUNCH);
 
         p.dead = true;
@@ -434,7 +492,7 @@ public class Dodgebolt extends Minigame {
         } else if (p.fell) {
             e.setDeathMessage(p.getParticipant().getFormattedName() + " fell out of the arena!");
         } else {
-            e.setDeathMessage(p.getParticipant().getFormattedName() + "... really?");
+            e.setDeathMessage(p.getParticipant().getFormattedName() + " crossed into enemy territory!");
         }
     }
 
@@ -442,6 +500,19 @@ public class Dodgebolt extends Minigame {
     public void onPunch(EntityDamageByEntityEvent e) {
         if (e.getDamager() instanceof Player)
             e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent e) {
+        if (!(e.getEntity() instanceof Player)) return;
+        if (e.getEntity().getWorld() != world) return;
+
+        if (e.getCause() == EntityDamageEvent.DamageCause.LAVA) {
+            DodgeboltPlayer p = getDodgeboltPlayer((Player) e.getEntity());
+            if (p == null) return;
+            p.fell = true;
+            properKill(p);
+        }
     }
 
     @EventHandler
@@ -453,6 +524,7 @@ public class Dodgebolt extends Minigame {
         Location l = p.getPlayer().getLocation();
         // todo: move most of this into dodgeboltplayer class
         if (p.FIRST) {
+            // slow players crossing sides
             if (l.getX() < 0 && l.getX() > -2) {
                 if (e.getPlayer().getLocation().getDirection().getX() < 0) {
                     e.getPlayer().damage(0.5);
@@ -461,8 +533,9 @@ public class Dodgebolt extends Minigame {
                 }
             }
 
+            // kill players completely crossing sides
             if (l.getX() <= -2) {
-                e.getPlayer().damage(50);
+                properKill(p);
             }
 
             if (!p.outOfBounds) {
@@ -479,15 +552,18 @@ public class Dodgebolt extends Minigame {
                 }
             }
         } else {
+            // slow players crossing sides
             if (l.getX() > 1 && l.getX() < 3) {
                 if (e.getPlayer().getLocation().getDirection().getX() > 0) {
                     e.getPlayer().damage(0.5);
-                    e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1, 5, true));
+                    e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 5, true));
                     return;
                 }
             }
+
+            // kill players completely crossing
             if (l.getX() >= 3) {
-                e.getPlayer().damage(50);
+                properKill(p);
             }
 
             if (!p.outOfBounds) {
@@ -503,11 +579,6 @@ public class Dodgebolt extends Minigame {
                     p.giveBow();
                 }
             }
-        }
-
-        // TEMPORARY UNTIL I CAN FIND A BETTER SOLUTION: ALSO KIND OF RANDOM!!!
-        for (Arrow a : arrows) {
-            a.setTicksLived(1);
         }
     }
 
@@ -534,6 +605,50 @@ public class Dodgebolt extends Minigame {
     public void onItemThrow(PlayerDropItemEvent e) {
         if (e.getItemDrop().getItemStack().getType().equals(Material.BOW)) {
             e.setCancelled(true);
+        }
+    }
+
+    private void properKill(DodgeboltPlayer p) {
+        if (p.FIRST) {
+            if (playersAlive[0] != 1) {
+                p.getPlayer().damage(50);
+                p.getPlayer().setVelocity(new Vector(0, 0, 0));
+                playersAlive[0]--;
+            } else {
+                p.getPlayer().teleport(SPAWN);
+                if (p.shotBy != null) {
+                    Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " was tagged by " + p.shotBy.getFormattedName());
+                } else if (p.fell) {
+                    Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " fell out of the arena!");
+                } else {
+                    Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " crossed into enemy territory!");
+                }
+                score[1]++;
+                playersAlive[0] = firstPlace.teamPlayers.size();
+                if (score[1] == 3) endGame(secondPlace);
+                else endRound();
+            }
+        } else {
+            if (playersAlive[1] != 1) {
+                p.getPlayer().damage(50);
+                p.getPlayer().setVelocity(new Vector(0, 0, 0));
+                playersAlive[1]--;
+            } else {
+                p.getPlayer().teleport(SPAWN);
+                score[0]++;
+                if (p.shotBy != null) {
+                    Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " was tagged by " + p.shotBy.getFormattedName());
+                } else if (p.fell) {
+                    Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " fell out of the arena!");
+                } else {
+                    Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " crossed into enemy territory!");
+                }
+                score[1]++;
+                playersAlive[0] = firstPlace.teamPlayers.size();
+                playersAlive[1] = secondPlace.teamPlayers.size();
+                if (score[0] == 3) endGame(firstPlace);
+                else endRound();
+            }
         }
     }
 

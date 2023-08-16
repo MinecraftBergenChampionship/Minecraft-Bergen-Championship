@@ -387,24 +387,19 @@ public class MBC implements Listener {
 
     public void updatePlacings() {
         int i = 1;
-        int lastScore = -1;
+        //int lastScore = -1;
 
         List<Participant> individual = getPlayers();
         individual.sort(new TotalIndividualComparator());
 
-        for (Participant p : getPlayers()) {
-            Bukkit.broadcastMessage("p.score == " + p.getRawTotalScore());
-        }
-
         // TODO: using an auto sort ds maybe a set would be better
         for (Participant p : individual) {
-            if (p.getRawTotalScore() == lastScore) {
-                p.setPlacement(i);
-            } else {
-                p.setPlacement(i++);
-                Bukkit.broadcastMessage("p.placement == " + p.getPlacement() + " for " + p.getPlayerName());
-                lastScore = p.getRawTotalScore();
-            }
+            //if (p.getRawTotalScore() == lastScore) {
+                //p.setPlacement(i);
+            //} else {
+            p.setPlacement(i++);
+                //lastScore = p.getRawTotalScore();
+            //}
         }
     }
 

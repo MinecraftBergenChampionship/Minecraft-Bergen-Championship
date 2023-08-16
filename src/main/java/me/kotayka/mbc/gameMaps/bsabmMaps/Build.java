@@ -8,19 +8,37 @@ import org.bukkit.entity.Player;
 public class Build {
     private Block[][][] blocks = new Block[6][7][7];
     private final String NAME;
+    private final String AUTHOR;
     private final World WORLD;
 
     public Build(Location diamondBlock) {
         WORLD = diamondBlock.getWorld();
 
-        Block sign = WORLD.getBlockAt((int) diamondBlock.getX(), (int) diamondBlock.getY()+2, (int) (diamondBlock.getZ()-5));
+        Block sign = WORLD.getBlockAt(diamondBlock.getBlockX(), diamondBlock.getBlockY()+2, diamondBlock.getBlockZ()-5);
 
         if (sign.getType().equals(Material.OAK_WALL_SIGN)) {
-            NAME = ((Sign) sign.getState()).getLine(0);
-        }
-        else {
+            String[] lines = ((Sign) sign.getState()).getLines();
+            if (lines.length == 1) {
+                NAME = ((Sign) sign.getState()).getLine(0);
+            } else {
+                StringBuilder str = new StringBuilder();
+                for (String s : lines) {
+                    str.append(s.trim()).append(" ");
+                }
+                str.replace(str.length()-1, str.length(), "");
+                NAME = str.toString();
+            }
+        } else {
             Bukkit.broadcastMessage("[Debug] No build name! Sign (XYZ):" + ChatColor.LIGHT_PURPLE+"X: "+sign.getLocation().getX()+", Y: "+sign.getLocation().getY()+", Z: "+sign.getLocation().getZ());
             NAME ="Undefined";
+        }
+
+        Block authorSign = WORLD.getBlockAt(diamondBlock.getBlockX(), diamondBlock.getBlockY()+5, diamondBlock.getBlockZ()-5);
+        if (authorSign.getType().equals(Material.OAK_WALL_SIGN)) {
+            AUTHOR = ((Sign) authorSign.getState()).getLine(0);
+        } else {
+            Bukkit.broadcastMessage("[Debug] No author! Sign (XYZ):" + ChatColor.LIGHT_PURPLE+"X: "+sign.getLocation().getX()+", Y: "+sign.getLocation().getY()+", Z: "+sign.getLocation().getZ());
+            AUTHOR = "Undefined";
         }
 
         Location startBlock = new Location(WORLD, (int) diamondBlock.getX()+3, (int) diamondBlock.getY()+1, (int) diamondBlock.getZ()+3);
@@ -97,6 +115,22 @@ public class Build {
         return true;
     }
 
+    public boolean checkBuildBreak(Location midBlock, Location brokeBlock) {
+        for (int y = 1; y < 6; y++) {
+            for (int x = 0; x < 7; x++) {
+                for (int z = 0; z < 7; z++) {
+                    Block b = blocks[y][x][z];
+                    Block toMatch = midBlock.getWorld().getBlockAt(midBlock.getBlockX()+3-x, midBlock.getBlockY()+y, midBlock.getBlockZ()+3-z);
+                    if (toMatch.getLocation().equals(brokeBlock) && toMatch.getType().equals(Material.AIR)) continue;
+                    if (!(toMatch.getType().equals(b.getType()))) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * Tells the sender the first incorrect block found.
      * @param sender Player that executed the command.
@@ -127,4 +161,6 @@ public class Build {
     public String getName() {
         return NAME;
     }
+
+    public String getAuthor() { return AUTHOR;}
 }

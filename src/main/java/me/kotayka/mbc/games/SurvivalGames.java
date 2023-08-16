@@ -47,7 +47,7 @@ public class SurvivalGames extends Game {
     private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
     private boolean dropLocation = false;
     private int crateNum = 0;
-    private int deadTeams; // just to avoid sync issues w/teamsAlive.size()
+    private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
 
     // Enchantment
     private final GUIItem[] guiItems = setupGUIItems();
@@ -453,8 +453,9 @@ public class SurvivalGames extends Game {
             }
         }
 
-        if (count == deadTeams) {
+        if (count == teamPlacements.get(victimParticipant.getTeam())) {
             teamPlacements.put(victimParticipant.getTeam(), getValidTeams().size() - deadTeams);
+            deadTeams++;
         }
 
         // may require testing due to concurrency

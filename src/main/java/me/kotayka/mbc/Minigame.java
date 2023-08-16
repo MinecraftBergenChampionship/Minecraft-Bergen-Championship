@@ -194,7 +194,7 @@ public abstract class Minigame implements Scoreboard, Listener {
      * Sorts teams by their overall score to place onto scoreboard during lobby/after games
      */
     public void updateTeamStandings() {
-        if (MBC.getInstance().finalGame) return;
+        if (!getState().equals(GameState.ACTIVE)) return;
         List<MBCTeam> teams = getValidTeams();
         teams.sort(new TeamScoreSorter());
         Collections.reverse(teams);
@@ -203,10 +203,8 @@ public abstract class Minigame implements Scoreboard, Listener {
         for (int i = 14; i > 14-teams.size(); i--) {
             MBCTeam t = teams.get(14-i);
             createLineAll(i,String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedTotalScore()));
-            // we will handle ties in the future
-            t.setPlace(place);
-            Bukkit.broadcastMessage("Team: " + t.getTeamFullName() + ", Placement: " + place);
-            place++;
+            // ties determined by unmultiplied score
+            t.setPlace(place++);
         }
 
         MBC.getInstance().lobby.colorPodiums();

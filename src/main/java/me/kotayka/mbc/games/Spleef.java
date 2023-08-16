@@ -203,7 +203,10 @@ public class Spleef extends Game {
     public void placementPoints() {
         for (SpleefPlayer p : spleefPlayers) {
             if (p.getPlacement() > 0 && p.getPlacement() <= BONUS_POINTS.length) {
-                p.getParticipant().addCurrentScore(BONUS_POINTS[p.getPlacement()-1]);
+                int placement = p.getPlacement();
+                int points = BONUS_POINTS[placement-1];
+                p.getParticipant().addCurrentScore(points);
+                p.getPlayer().sendMessage(ChatColor.GREEN+"You placed " + getPlace(placement) + " and earned a bonus of " + (points*MBC.getInstance().multiplier) + " points!");
             }
         }
 

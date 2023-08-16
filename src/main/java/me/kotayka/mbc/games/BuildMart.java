@@ -98,28 +98,27 @@ public class BuildMart extends Game {
                 timeRemaining = 23;
             }
         } else if (getState().equals(GameState.END_GAME)) {
+            if (timeRemaining == 22) {
+                for (BuildMartTeam t : teams) {
+                    for (BuildPlot plot : t.getPlots()[0]) {
+                        plot.removeNames();
+                    }
+                }
+            }
             teamGameEndEvents();
         }
     }
 
     public void loadPlayers() {
-        ItemStack[] items = getItemsForBuildMart();
         for (Participant p : MBC.getInstance().getPlayers()) {
             BuildMartPlayer buildMartPlayer = new BuildMartPlayer(p, this);
             buildMartPlayers.add(buildMartPlayer);
-            buildMartPlayer.respawn();
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            buildMartPlayer.respawn();
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().setAllowFlight(true);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-            for (ItemStack i : items) {
-                if (i.getType().equals(Material.ELYTRA)) {
-                    p.getPlayer().getInventory().setChestplate(i);
-                } else {
-                    p.getPlayer().getInventory().addItem(i);
-                }
-            }
         }
     }
 
@@ -149,7 +148,7 @@ public class BuildMart extends Game {
         for (int i = 0; i < NUM_PLOTS_PER_TEAM; i++) {
             BuildPlot plot = t.getPlots()[i][1];
             if (!(plot.inBuildPlot(b.getLocation()))) continue;
-            if ((plot.getBuild().checkBuild(plot.getMIDPOINT()))) {
+            if ((plot.getBuild().checkBuildBreak(plot.getMIDPOINT(), b.getLocation()))) {
                 completeBuild(t, plot);
             }
             breakBlock(e.getPlayer(), b);
@@ -160,7 +159,7 @@ public class BuildMart extends Game {
             map.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(m));
             e.setCancelled(true);
         }
-        if (m.equals(Material.FLOWER_POT)) {
+        if (m.toString().contains("POTTED")){
             for (ItemStack i : e.getBlock().getDrops()) {
                 map.getWorld().dropItemNaturally(b.getLocation(), i);
             }

@@ -21,6 +21,7 @@ public class DecisionDome extends Minigame {
     private List<String> gameNames = new ArrayList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle", "Spleef","BuildMart"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
+    //public Map<Egg, Boolean> thrownEggs = new HashMap<Egg, Boolean>();
     private final int[][] coordsForBorder = {
             {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}, {0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7},
             {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}, {-1, 0}, {-2, 0}, {-3, 0}, {-4, 0}, {-5, 0}, {-6, 0}, {-7, 0},
@@ -43,7 +44,6 @@ public class DecisionDome extends Minigame {
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
 
         // Initialize variables and map
-        Bukkit.broadcastMessage("[Debug] bool revealedGames == " + revealedGames);
         removeEntities();
         if (!revealedGames) {
             initSections();
@@ -56,9 +56,7 @@ public class DecisionDome extends Minigame {
         loadPlayers();
         createScoreboard();
 
-        Bukkit.broadcastMessage("[Debug] Sections.size() == " + sections.size());
         if (sections.size() == 1) {
-            Bukkit.broadcastMessage("[Debug] Path of size 1");
             // start only game
             for (Section s : sections.values()) {
                 winner = s;
@@ -67,18 +65,14 @@ public class DecisionDome extends Minigame {
             setGameState(GameState.END_GAME);
             setTimer(13);
         } else {
-            Bukkit.broadcastMessage("[Debug] Path of size " + sections.size());
             // debug
             for (Section s : sections.values()) {
-                Bukkit.broadcastMessage("[Debug] s.game == " + s.game);
             }
             setGameState(GameState.STARTING);
             stopTimer();
-            Bukkit.broadcastMessage("[Debug] Revealed Games == " + revealedGames);
             if (revealedGames) {
                 setTimer(10);
             } else {
-                Bukkit.broadcastMessage("[Debug] Path of NO REVEALED GAMES");
                 setSectionsRed();
                 setTimer(48);
             }
@@ -292,6 +286,7 @@ public class DecisionDome extends Minigame {
             for (Location l : s.sectionLocs) {
                 l.getBlock().setType(Material.WHITE_GLAZED_TERRACOTTA);
             }
+            s.setGameDisplay();
             return;
         }
     }
@@ -306,6 +301,7 @@ public class DecisionDome extends Minigame {
                         key = world.getBlockAt(new Location(world, l.getBlockX(), l.getBlockY()-1, l.getBlockZ())).getType();
                     }
                 }
+                s.removeDisplay();
                 break;
             }
         }
@@ -384,7 +380,6 @@ public class DecisionDome extends Minigame {
         }
 
         List<Section> stillTied = new ArrayList<>();
-        Bukkit.broadcastMessage("[Debug] tiedSections.size() == " + tiedSections.size());
         for (Section s : tiedSections) {
             if (s.tiebreakerScore == maxScore) {
                stillTied.add(s);
@@ -455,13 +450,11 @@ public class DecisionDome extends Minigame {
             Bukkit.broadcastMessage(e.getEntity().getShooter().toString());
             return; // remove if powerup spawns a chicken turret or something
         }
-        if (e.getEntity().getType().equals(EntityType.EGG)) {
+        if (e.getEntity() instanceof Egg) {
             Egg egg = (Egg) e.getEntity();
             Participant p = Participant.getParticipant(((Player) e.getEntity().getShooter()));
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
-            Bukkit.broadcastMessage("new chicken! (1)");
             chickens.add(new VoteChicken(p.getTeam(), chicken));
-            Bukkit.broadcastMessage("chickens.size() == " + chickens.size());
             egg.remove();
         }
     }
@@ -470,6 +463,7 @@ public class DecisionDome extends Minigame {
     public void chickenHatch(PlayerEggThrowEvent e) {
         e.setHatching(false);
         e.setNumHatches((byte) 0);
+        //thrownEggs.put(e.getEgg(), false);
     }
 
     public void removeEntities() {
@@ -500,6 +494,7 @@ public class DecisionDome extends Minigame {
         Section s5 = new Section(5);
         Section s6 = new Section(6);
         Section s7 = new Section(7);
+
         sections.put(Material.WHITE_WOOL, s0);
         sections.put(Material.ORANGE_WOOL, s1);
         sections.put(Material.MAGENTA_WOOL, s2);
@@ -508,7 +503,17 @@ public class DecisionDome extends Minigame {
         sections.put(Material.LIME_WOOL, s5);
         sections.put(Material.PINK_WOOL, s6);
         sections.put(Material.GREEN_WOOL, s7);
+
         initLocs();
+
+        s0.setDisplayLocation(new Location(world, 2.5, -33.5, 4.5));
+        s1.setDisplayLocation(new Location(world, -1.5, -33.5, 4.5));
+        s2.setDisplayLocation(new Location(world, -3.5, -33.5, 2.5));
+        s3.setDisplayLocation(new Location(world, -3.5, -33.5, -1.5));
+        s4.setDisplayLocation(new Location(world, -1.5, -33.5, -3.5));
+        s5.setDisplayLocation(new Location(world, 2.5, -33.5, -3.5));
+        s6.setDisplayLocation((new Location(world, 4.5, -33.5, -1.5)));
+        s7.setDisplayLocation(new Location(world, 4.5, -33.5, 2.5));
     }
 
     private void initLocs() {
@@ -534,11 +539,11 @@ public class DecisionDome extends Minigame {
         }
         raiseWalls(false);
 
-        Bukkit.broadcastMessage("[Debug] before: sections.size() == " + sections.size());
+        //Bukkit.broadcastMessage("[Debug] before: sections.size() == " + sections.size());
         for (Section s : toRemove) {
             removeSection(s);
         }
-        Bukkit.broadcastMessage("[Debug] after: sections.size() == " + sections.size());
+        //Bukkit.broadcastMessage("[Debug] after: sections.size() == " + sections.size());
     }
 }
 
@@ -552,6 +557,8 @@ class Section {
     // well, well. well well well
     public final List<Location> sectionLocs = new ArrayList<>(16);
     public String game = null;
+    public ArmorStand gameDisplay = null;
+    private Location displayLocation;
     public List<VoteChicken> votes = new ArrayList<>();
     public float tiebreakerScore = 0;
     public boolean random = false;
@@ -567,7 +574,18 @@ class Section {
     public void addLoc(Location l) {
         sectionLocs.add(l);
     }
-
+    public void setDisplayLocation(Location l) { this.displayLocation = l; }
+    public void removeDisplay() { if (gameDisplay != null) gameDisplay.remove(); }
+    public void setGameDisplay() {
+        if (gameDisplay == null) {
+            gameDisplay = (ArmorStand) displayLocation.getWorld().spawnEntity(displayLocation, EntityType.ARMOR_STAND);
+            gameDisplay.setGravity(false);
+            gameDisplay.setInvulnerable(true);
+            gameDisplay.setInvisible(true);
+            gameDisplay.setCustomName(ChatColor.BOLD+game);
+            gameDisplay.setCustomNameVisible(true);
+        }
+    }
     public void reset() {
         votes.clear();
         tiebreakerScore = 0;

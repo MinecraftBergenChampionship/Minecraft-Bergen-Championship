@@ -10,10 +10,17 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 
 public class Classic extends SpleefMap {
-    List<Block> firstLayerDecayingBlocks = new ArrayList<>();
-    List<Block> secondLayerDecayingBlocks = new ArrayList<>();
-    List<Block> thirdLayerDecayingBlocks = new ArrayList<>();
-    List<Block> fourthLayerDecayingBlocks = new ArrayList<>();
+    Set<Block> firstLayerDecayingBlocks = new HashSet<>();
+    Set<Block> secondLayerDecayingBlocks = new HashSet<>();
+    Set<Block> thirdLayerDecayingBlocks = new HashSet<>();
+    Set<Block> fourthLayerDecayingBlocks = new HashSet<>();
+    HashSet<Block> decayingAll = new HashSet<>();
+    HashSet<Block> toRemove = new HashSet<>();
+    int erosion = -1;
+    int radiusOne = 20;
+    int radiusTwo = 20;
+    int radiusThree = 20;
+    int radiusFour = 25;
 
     public Classic() {
         super("Classic", 60);
@@ -21,6 +28,17 @@ public class Classic extends SpleefMap {
 
     @Override
     public void resetMap() {
+        if (erosion != -1) {
+            MBC.getInstance().cancelEvent(erosion);
+        }
+
+        radiusOne = radiusTwo = radiusThree = 20;
+        radiusFour = 25;
+        if (erosion != -1)  {
+            Bukkit.getScheduler().cancelTask(erosion);
+        }
+
+        decayingAll.clear();
         int copy_from_x = 180;
         int copy_from_z = 180;
 
@@ -74,51 +92,104 @@ public class Classic extends SpleefMap {
             case 60 -> Bukkit.broadcastMessage(ChatColor.RED + "Last layer is starting to erode!");
         }
 
-        if (timeRemaining <= 180 && !firstLayerDecayingBlocks.isEmpty()) {
+        if (timeRemaining <= 180 && timeRemaining % 2 == 0 && !firstLayerDecayingBlocks.isEmpty()) {
             erodeLayer(1);
+            radiusOne--;
         }
 
-        if (timeRemaining <= 150 && !secondLayerDecayingBlocks.isEmpty()) {
+        if (timeRemaining <= 150 && timeRemaining % 2 == 0 && !secondLayerDecayingBlocks.isEmpty()) {
             erodeLayer(2);
+            radiusTwo--;
         }
 
-        if (timeRemaining <= 90 && !thirdLayerDecayingBlocks.isEmpty()) {
+        if (timeRemaining <= 90 && timeRemaining % 2 == 0 && !thirdLayerDecayingBlocks.isEmpty()) {
             erodeLayer(3);
+            radiusThree--;
         }
 
-        if (timeRemaining <= 60 && !fourthLayerDecayingBlocks.isEmpty()) {
+        if (timeRemaining <= 60 && timeRemaining % 2 == 0 && !fourthLayerDecayingBlocks.isEmpty()) {
             erodeLayer(4);
+            radiusFour--;
         }
     }
 
     private void erodeLayer(int layer) {
         switch (layer) {
-            case 1 -> erodeLayerRandom(firstLayerDecayingBlocks);
-            case 2 -> erodeLayerRandom(secondLayerDecayingBlocks);
-            case 3 -> erodeLayerRandom(thirdLayerDecayingBlocks);
-            case 4 -> erodeLayerRandom(fourthLayerDecayingBlocks);
+            case 1 -> erodeLayer(firstLayerDecayingBlocks, radiusOne);
+            case 2 -> erodeLayer(secondLayerDecayingBlocks, radiusTwo);
+            case 3 -> erodeLayer(thirdLayerDecayingBlocks, radiusThree);
+            case 4 -> erodeLayer(fourthLayerDecayingBlocks, radiusFour);
         }
     }
 
-    private void erodeLayerRandom(List<Block> decaying) {
-        int rand = (int) (Math.random()*decaying.size());
-        Block b = decaying.get(rand);
-        // TODO: optimize this, creating a new runnable each time seems irresponsible
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                switch (b.getType()) {
-                    case LIGHT_GRAY_CONCRETE, WHITE_CONCRETE -> b.setType(Material.YELLOW_CONCRETE);
-                    case YELLOW_CONCRETE -> b.setType(Material.ORANGE_CONCRETE);
-                    case ORANGE_CONCRETE -> b.setType(Material.RED_CONCRETE);
-                    case RED_CONCRETE -> {
-                        b.setType(Material.AIR);
-                        decaying.remove(b);
-                        this.cancel();
+    private void erodeLayer(Set<Block> decay, int radius){
+        if (erosion == -1) {
+            erosion = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
+                for (Block b : decayingAll) {
+                    switch (b.getType()) {
+                        case LIGHT_GRAY_CONCRETE, WHITE_CONCRETE -> b.setType(Material.YELLOW_CONCRETE);
+                        case YELLOW_CONCRETE -> b.setType(Material.ORANGE_CONCRETE);
+                        case ORANGE_CONCRETE -> b.setType(Material.RED_CONCRETE);
+                        case RED_CONCRETE -> {
+                            b.setType(Material.AIR);
+                            toRemove.add(b);
+                        }
+                        case AIR -> toRemove.add(b);
                     }
-                    case AIR -> this.cancel();
                 }
-            }
-        }.runTaskTimer(MBC.getInstance().plugin, 20, 20);
+                for (Block b : toRemove) {
+                    decayingAll.remove(b);
+                }
+            }, 60, 60);
+        }
+
+        Set<Block> toRemove2 = new HashSet<>();
+        for (Block b : decay) {
+            if (!(b.getX() == radius || b.getZ() == radius || b.getX() == -1*radius || b.getZ() == radius*-1)) continue;
+            decayingAll.add(b);
+            toRemove2.add(b);
+        }
+        for (Block b : toRemove2) {
+            decay.remove(b);
+        }
     }
+
+    /*
+    private void erodeLayerRandom(List<Block> decaying) {
+        if (erosion == -1) {
+            int rand = (int) (Math.random() * decaying.size());
+            decayingAll.add(decaying.get(rand));
+            erosion = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
+                for (Block b : decayingAll) {
+                    switch (b.getType()) {
+                        case LIGHT_GRAY_CONCRETE, WHITE_CONCRETE -> b.setType(Material.YELLOW_CONCRETE);
+                        case YELLOW_CONCRETE -> b.setType(Material.ORANGE_CONCRETE);
+                        case ORANGE_CONCRETE -> b.setType(Material.RED_CONCRETE);
+                        case RED_CONCRETE -> {
+                            b.setType(Material.AIR);
+                            toRemove.add(b);
+                        }
+                        case AIR -> toRemove.add(b);
+                    }
+                }
+                for (Block b : toRemove) {
+                    decayingAll.remove(b);
+                }
+            }, 20, 20);
+        } else {
+            int rand = (int) (Math.random() * decaying.size());
+            Block b = decaying.get(rand);
+            decaying.remove(b);
+            decayingAll.add(b);
+            int rand2 = (int) (Math.random()*decaying.size());
+            Block b2 = decaying.get(rand2);
+            decaying.remove(b2);
+            decayingAll.add(b2);
+            int rand3 = (int) (Math.random()*decaying.size());
+            Block b3 = decaying.get(rand3);
+            decaying.remove(b3);
+            decayingAll.add(b3);
+        }
+    }
+     */
 }

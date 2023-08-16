@@ -91,7 +91,7 @@ public class AceRacePlayer extends GamePlayer {
             this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Finished!", placementColor +  placementString + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
             Bukkit.broadcastMessage(
                     this.getParticipant().getFormattedName() + " finished " +ChatColor.BOLD+ ACE_RACE.map.mapName + ChatColor.RESET+" in " +
-                            placementColor + placementString + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.RESET + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ChatColor.RESET+ ")");
+                            placementColor + placementString + ChatColor.RESET + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.RESET + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ChatColor.RESET+ ")");
             MBC.spawnFirework(this.getParticipant());
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");
             this.getParticipant().getPlayer().sendMessage("                                ");

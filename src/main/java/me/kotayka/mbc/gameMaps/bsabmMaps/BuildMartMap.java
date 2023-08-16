@@ -121,7 +121,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
         addBreakArea(new BreakArea(Material.BRICKS, new Location(w, -50, 66, 71), new Location(w, -40, 72, 81), spawn_bricks));
         addBreakArea(new BreakArea(Material.CHISELED_STONE_BRICKS, new Location(w, -62, 66, 71), new Location(w, -52, 72, 81), spawn_bricks));
         addBreakArea(new BreakArea(Material.PRISMARINE_BRICKS, new Location(w, -62, 66, 59), new Location(w, -52, 72, 69), spawn_bricks));
-        addBreakArea(new BreakArea(Material.MOSSY_COBBLESTONE, new Location(w, -62, 66, 59), new Location(w, -52, 72, 69), spawn_bricks));
+        addBreakArea(new BreakArea(Material.MOSSY_COBBLESTONE, new Location(w, -62, 66, 47), new Location(w, -52, 72, 57), spawn_bricks));
 
         // nether
         addBreakArea(new BreakArea(Material.WARPED_WART_BLOCK, new Location(w, 20, 66, 69), new Location(w, 30, 72, 79), new Location(w, 17, 73, 82, -90, 0)));
@@ -204,6 +204,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
                 example.setBuild(BUILD_MART.getOrder().get(n));
                 teams[i].addBuildPlot(replica, n);
                 teams[i].addExamplePlot(example, n);
+                replica.setAir();
                 n++;
             }
             i++;

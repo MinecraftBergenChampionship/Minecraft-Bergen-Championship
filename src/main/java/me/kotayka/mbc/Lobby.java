@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -102,23 +103,30 @@ public class Lobby extends Minigame {
     @Override
     public void start() {
         MBC.getInstance().setCurrentGame(this);
+        setGameState(GameState.ACTIVE);
         createScoreboard();
         loadPlayers();
         updateTeamStandings();
         stopTimer();
         setTimer(120);
-        setGameState(GameState.ACTIVE);
     }
 
     public void end() {
         MBC.getInstance().setCurrentGame(this);
+        setGameState(GameState.END_GAME);
         createScoreboard();
         world.setTime(18000);
         loadPlayersEnd();
         updateTeamStandings();
         stopTimer();
         setTimer(60);
-        setGameState(GameState.END_GAME);
+    }
+
+    @EventHandler
+    public void onPunch(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
+            e.setCancelled(true);
+        }
     }
 
     // prevent leaving cutscenes
@@ -149,7 +157,7 @@ public class Lobby extends Minigame {
 
     public void loadPlayersFinale() {
         cameraman = (ArmorStand) world.spawnEntity(new Location(world, -14.5, -1, -21.5, 140, 0), EntityType.ARMOR_STAND);
-        cameraman.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100000, 5, true));
+        cameraman.setInvisible(true);
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(LOBBY);
             p.setGameMode(GameMode.SPECTATOR);
@@ -159,6 +167,7 @@ public class Lobby extends Minigame {
 
     public void prepareFinale() {
         MBC.getInstance().setCurrentGame(this);
+        setGameState(GameState.END_ROUND);
         world.setTime(13000);
         colorPodiumsWhite();
         createScoreboardFinale();
@@ -166,7 +175,6 @@ public class Lobby extends Minigame {
         loadPlayersFinale();
         stopTimer();
         setTimer(60);
-        setGameState(GameState.END_ROUND);
     }
 
     public void loadPlayersEnd() {

@@ -24,10 +24,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class Skybattle extends Game {
-    public final Particle.DustOptions BORDER_PARTICLE = new Particle.DustOptions(Color.RED, 5);
-    public final Particle.DustOptions TOP_BORDER_PARTICLE = new Particle.DustOptions(Color.ORANGE, 5);
+    public final Particle.DustOptions BORDER_PARTICLE = new Particle.DustOptions(Color.RED, 3);
+    public final Particle.DustOptions TOP_BORDER_PARTICLE = new Particle.DustOptions(Color.ORANGE, 3);
     public SkybattleMap map = new Classic(this);
-    public List<SkybattlePlayer> skybattlePlayerList = new ArrayList<>();
+    public Map<UUID, SkybattlePlayer> skybattlePlayerMap = new HashMap<>();
     // Primed TNT Entity, Player (that placed that block); used for determining kills since primed tnt is spawned by world
     public Map<Entity, Player> TNTPlacers = new HashMap<Entity, Player>(5);
     // Creeper Entity, Player (that spawned them); used for determining kills by creeper explosion
@@ -47,11 +47,11 @@ public class Skybattle extends Game {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         updatePlayersAliveScoreboard();
-        if (skybattlePlayerList.size() < 1) {
+        if (skybattlePlayerMap.size() < 1) {
             createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0", p);
         } else {
-            for (SkybattlePlayer pl : skybattlePlayerList) {
-                createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+pl.kills, p);
+            for (SkybattlePlayer x : skybattlePlayerMap.values()) {
+                createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+x.kills, p);
             }
         }
 
@@ -71,14 +71,14 @@ public class Skybattle extends Game {
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 30, 10, false, false));
             if (roundNum == 1) {
-                skybattlePlayerList.add(new SkybattlePlayer(p));
+                skybattlePlayerMap.put(p.getPlayer().getUniqueId(), new SkybattlePlayer(p));
                 playersAlive.add(p);
             } else {
                 resetAliveLists();
             }
             // reset scoreboard & variables after each round
             updatePlayersAliveScoreboard(p);
-            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+(Objects.requireNonNull(getSkybattlePlayer(p.getPlayer()))).kills, p);
+            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+(Objects.requireNonNull(skybattlePlayerMap.get(p.getPlayer().getUniqueId()))).kills, p);
         }
         map.spawnPlayers();
     }
@@ -96,8 +96,8 @@ public class Skybattle extends Game {
         }
 
         // not sure if necessary
-        if (skybattlePlayerList != null) {
-            for (SkybattlePlayer p : skybattlePlayerList) {
+        if (skybattlePlayerMap != null) {
+            for (SkybattlePlayer p : skybattlePlayerMap.values()) {
                 p.lastDamager = null;
             }
         }
@@ -126,7 +126,7 @@ public class Skybattle extends Game {
                 setGameState(GameState.ACTIVE);
                 map.removeBarriers();
                 setPVP(true);
-                for (SkybattlePlayer p : skybattlePlayerList) {
+                for (SkybattlePlayer p : skybattlePlayerMap.values()) {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
                 timeRemaining = 240;
@@ -290,13 +290,13 @@ public class Skybattle extends Game {
                 l.add(1, 0, 0);
                 break;
             case WEST:
-                l.add(-1.5, 0, 0);
+                l.add(-1, 0, 0);
                 break;
             case SOUTH:
-                l.add(0, 0, 1.5);
+                l.add(0, 0, 1);
                 break;
             case NORTH:
-                l.add(0, 0, -1.5);
+                l.add(0, 0, -1);
                 break;
             default: // UP
                 l.add(0, 1, 0);
@@ -326,13 +326,7 @@ public class Skybattle extends Game {
         if (!isGameActive()) return;
         if (!((e.getEntity()) instanceof Player)) return;
 
-        SkybattlePlayer player = null;
-        for (SkybattlePlayer p : skybattlePlayerList) {
-            if (e.getEntity().getUniqueId().equals(p.getPlayer().getUniqueId())) {
-                player = p;
-                break;
-            }
-        }
+        SkybattlePlayer player = skybattlePlayerMap.get(e.getEntity().getUniqueId());
         if (player == null) return;
 
         if (e.getDamager() instanceof Player) {
@@ -373,7 +367,7 @@ public class Skybattle extends Game {
         if(!(e.getEntity().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
         */
 
-        SkybattlePlayer player = getSkybattlePlayer((Player) e.getHitEntity());
+        SkybattlePlayer player = skybattlePlayerMap.get(e.getHitEntity().getUniqueId());
         if (player == null) return;
 
         if (e.getEntity() instanceof Snowball) {
@@ -401,7 +395,7 @@ public class Skybattle extends Game {
             if (!potionType.equals(PotionEffectType.HARM)) return;
         }
 
-        SkybattlePlayer player = getSkybattlePlayer((Player) e.getHitEntity());
+        SkybattlePlayer player = skybattlePlayerMap.get(e.getHitEntity().getUniqueId());
         if (player == null) return;
 
         Participant damager = Participant.getParticipant((Player) e.getEntity().getShooter());
@@ -416,7 +410,7 @@ public class Skybattle extends Game {
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         if (!isGameActive()) return;
-        SkybattlePlayer player = getSkybattlePlayer(e.getEntity());
+        SkybattlePlayer player = skybattlePlayerMap.get(e.getEntity().getUniqueId());
         if (player == null) return;
 
         // remove any concrete
@@ -431,7 +425,7 @@ public class Skybattle extends Game {
             @Nullable EntityDamageEvent damageCause = e.getPlayer().getLastDamageCause();
             skybattleDeathGraphics(e, damageCause.getCause());
         } else {
-            SkybattlePlayer killer = getSkybattlePlayer(e.getPlayer().getKiller());
+            SkybattlePlayer killer = skybattlePlayerMap.get(e.getPlayer().getKiller().getUniqueId());
             killer.getParticipant().addCurrentScore(KILL_POINTS);
             killer.kills++;
             createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
@@ -464,7 +458,7 @@ public class Skybattle extends Game {
      * @param e Event thrown when a player dies
      */
     public void skybattleDeathGraphics(PlayerDeathEvent e, EntityDamageEvent.DamageCause damageCause) {
-        SkybattlePlayer victim = getSkybattlePlayer(e.getPlayer());
+        SkybattlePlayer victim = skybattlePlayerMap.get(e.getPlayer().getUniqueId());
         String deathMessage = e.getDeathMessage();
 
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
@@ -474,7 +468,7 @@ public class Skybattle extends Game {
         deathMessage = deathMessage.replace(victim.getPlayer().getName(), victim.getParticipant().getFormattedName());
 
         if (victim.lastDamager != null) {
-            SkybattlePlayer killer = getSkybattlePlayer(victim.lastDamager);
+            SkybattlePlayer killer = skybattlePlayerMap.get(victim.lastDamager.getUniqueId());
             killer.kills++;
 
             createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
@@ -536,7 +530,7 @@ public class Skybattle extends Game {
         if (!isGameActive()) return;
         if (!(e.getPlayer().getWorld().equals(map.getWorld()))) return;
 
-        SkybattlePlayer player = getSkybattlePlayer(e.getPlayer());
+        SkybattlePlayer player = skybattlePlayerMap.get(e.getPlayer().getUniqueId());
 
         // kill players immediately in void
         if (player.getPlayer().getLocation().getY() <= map.getVoidHeight()) {
@@ -550,24 +544,9 @@ public class Skybattle extends Game {
         if (!isGameActive()) return;
         if (!(e.getCaught() instanceof Player)) return;
 
-        SkybattlePlayer hooked = null;
-        for (SkybattlePlayer p : skybattlePlayerList) {
-            if (e.getCaught().getUniqueId().equals(p.getPlayer().getUniqueId())) {
-                hooked = p;
-                break;
-            }
-        }
+        SkybattlePlayer hooked = skybattlePlayerMap.get(e.getCaught().getUniqueId());
         if (hooked == null) return;
         hooked.lastDamager = e.getPlayer();
     }
 
-
-    private SkybattlePlayer getSkybattlePlayer(Player p) {
-        for (SkybattlePlayer pl : skybattlePlayerList) {
-            if (pl.getPlayer().getUniqueId().equals(p.getUniqueId())) {
-                return pl;
-            }
-        }
-        return null;
-    }
 }

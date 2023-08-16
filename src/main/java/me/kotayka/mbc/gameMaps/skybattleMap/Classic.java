@@ -98,13 +98,13 @@ public class Classic extends SkybattleMap {
             for (double t = 0; t < 50; t+=0.5) {
                 double x = (getBorderRadius() * (float) Math.cos(t)) + CENTER.getX();
                 double z = (getBorderRadius() * (float) Math.sin(t)) + CENTER.getZ();
-                getWorld().spawnParticle(Particle.REDSTONE, x, y, z, 5, SKYBATTLE.BORDER_PARTICLE);
+                getWorld().spawnParticle(Particle.REDSTONE, x, y, z, 1, SKYBATTLE.BORDER_PARTICLE);
             }
         }
 
         for (int x = -170; x < -142; x+=2) {
             for (int z = -278; z < -252; z+=2) {
-                getWorld().spawnParticle(Particle.REDSTONE, x, getBorderHeight(), z, 5, SKYBATTLE.TOP_BORDER_PARTICLE);
+                getWorld().spawnParticle(Particle.REDSTONE, x, getBorderHeight(), z, 1, SKYBATTLE.TOP_BORDER_PARTICLE);
             }
         }
 
@@ -177,8 +177,8 @@ public class Classic extends SkybattleMap {
         for (int y = 0; y <= 5; y++) {
             for (int x = 0; x <= 3; x++) {
                 for (int z = 0; z <= 3; z++) {
-                    Block b = getWorld().getBlockAt(l.getBlockX()+3-x, l.getBlockY()+25-y, l.getBlockZ()+3-z);
-                    if (b.getType().toString().endsWith("CONCRETE")) continue;
+                    Block b = getWorld().getBlockAt(l.getBlockX()+1-x, l.getBlockY()+25-y, l.getBlockZ()+1-z);
+                    if (!b.getType().toString().endsWith("CONCRETE")) continue;
                     Material m = switch (color) {
                         case RED -> Material.RED_CONCRETE;
                         case YELLOW -> Material.YELLOW_CONCRETE;
