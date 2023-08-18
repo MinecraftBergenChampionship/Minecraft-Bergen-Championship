@@ -29,15 +29,16 @@ public class BuildPlot {
     }
 
     public void setNameDisplays() {
-        if (buildNameDisplay == null || authorNameDisplay == null) {
-            Location display = new Location(WORLD, MIDPOINT.getX(), MIDPOINT.getY()+7, MIDPOINT.getZ());
+        if (buildNameDisplay == null) {
+            Location display = new Location(WORLD, MIDPOINT.getX()+0.5, MIDPOINT.getY() + 7, MIDPOINT.getZ()+0.5);
             buildNameDisplay = (ArmorStand) WORLD.spawnEntity(display, EntityType.ARMOR_STAND);
             buildNameDisplay.setInvulnerable(true);
             buildNameDisplay.setInvisible(true);
             buildNameDisplay.setGravity(false);
+        }
 
-            display.subtract(0, 0.5, 0);
-
+        if (authorNameDisplay == null) {
+            Location display = new Location(WORLD, MIDPOINT.getX()+0.5, MIDPOINT.getY()+6.5, MIDPOINT.getZ()+0.5);
             authorNameDisplay = (ArmorStand) WORLD.spawnEntity(display, EntityType.ARMOR_STAND);
             authorNameDisplay.setInvulnerable(true);
             authorNameDisplay.setInvisible(true);
@@ -84,8 +85,20 @@ public class BuildPlot {
     }
 
     public void removeNames() {
-        buildNameDisplay.remove();
-        authorNameDisplay.remove();
+        if (buildNameDisplay != null) {
+            buildNameDisplay.remove();
+        }
+        if (authorNameDisplay != null) {
+            authorNameDisplay.remove();
+        }
+    }
+
+    /**
+     * Gets the amount the build is completed, as a percent between 0 and 1.
+     * @return Number between 0 and 1 representing how much a build is done.
+     */
+    public double getPercentCompletion() {
+        return build.getPercentCompletion(MIDPOINT);
     }
 
     public Location getCorner() { return SE_CORNER; }

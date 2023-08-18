@@ -84,7 +84,8 @@ public class BuildMart extends Game {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
                 setGameState(GameState.ACTIVE);
-                timeRemaining = 720;
+                //timeRemaining = 720; // DEBUG
+                timeRemaining = 30;
             } else {
                 startingCountdown();
             }
@@ -92,19 +93,32 @@ public class BuildMart extends Game {
             if (timeRemaining == 0) {
                 gameOverGraphics();
                 for (Participant p : MBC.getInstance().getPlayers()) {
-                    flightEffects(p);
+                    flightEffects(p); // sets gamemode adventure
+                }
+                for (BuildMartTeam t : teams) {
+                    for (int i = 0; i < NUM_PLOTS_PER_TEAM; i++) {
+                        // remove names from example plots
+                        t.getPlots()[i][0].removeNames();
+
+                        // get completion bonuses for replica plots
+                        BuildPlot plot = t.getPlots()[i][1];
+                        Build build = plot.getBuild();
+                        double percent = plot.getPercentCompletion();
+                        int points = (int) (BUILD_COMPLETION_POINTS * t.getTeam().teamPlayers.size() * percent);
+                        for (Participant p : t.getTeam().teamPlayers) {
+                            p.getPlayer().sendMessage(
+                                    String.format("%sYour team completed %.2f%% of %s%s%s%s and earned %.2f points!",
+                                    ChatColor.GREEN, (percent*100), ChatColor.RESET, ChatColor.BOLD, build.getName(),
+                                    ChatColor.GREEN, (points*MBC.getInstance().multiplier))
+                            );
+                            p.addCurrentScore(points / t.getTeam().teamPlayers.size());
+                        }
+                    }
                 }
                 setGameState(GameState.END_GAME);
                 timeRemaining = 23;
             }
         } else if (getState().equals(GameState.END_GAME)) {
-            if (timeRemaining == 22) {
-                for (BuildMartTeam t : teams) {
-                    for (BuildPlot plot : t.getPlots()[0]) {
-                        plot.removeNames();
-                    }
-                }
-            }
             teamGameEndEvents();
         }
     }
@@ -289,6 +303,7 @@ public class BuildMart extends Game {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
+        if (!(e.getPlayer().getLocation().getWorld().equals(map.getWorld()))) return;
         map.onMove(e);
         Participant p = Participant.getParticipant(e.getPlayer());
         if (hotbarSelector.containsKey(p)) {

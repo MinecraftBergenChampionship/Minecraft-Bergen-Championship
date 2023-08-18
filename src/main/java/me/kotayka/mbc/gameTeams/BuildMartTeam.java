@@ -29,7 +29,6 @@ public class BuildMartTeam extends gameTeam {
     }
 
     /**
-     * Intended usage:
      * getPlots()[n][0] will give the example plot
      * getPlots()[n][1] will give the replication plot
      * n is the plot number for a team

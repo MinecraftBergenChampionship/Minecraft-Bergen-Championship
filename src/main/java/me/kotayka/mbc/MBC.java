@@ -265,6 +265,7 @@ public class MBC implements Listener {
         String msg = e.getMessage();
         for (Participant p : players) {
             if (e.getPlayer().getUniqueId().equals(p.getPlayer().getUniqueId())) {
+                msg = msg.replace("%", "%%");
                 e.setFormat(p.getFormattedName() + ": " + msg);
                 break;
             }

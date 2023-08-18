@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class Lobby extends Minigame {
-    public static final Location LOBBY = new Location(Bukkit.getWorld("world"), 0, 1, 0, 180, 0);
+    public static final Location LOBBY = new Location(Bukkit.getWorld("world"), 0.5, 1, 0.5, 180, 0);
     public final World world = Bukkit.getWorld("world");
     public ArmorStand cameraman;
 
@@ -71,7 +71,13 @@ public class Lobby extends Minigame {
                 toDodgebolt();
             }
         } else if (getState().equals(GameState.END_GAME)) {
-
+            if (timeRemaining <= 0) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.sendTitle(ChatColor.YELLOW+"Event Over!", "Thanks for playing!", 20, 60, 20);
+                    createLineAll(21, ChatColor.GREEN.toString()+ChatColor.BOLD+"Event Over!");
+                    createLineAll(20, "Thanks for playing!");
+                }
+            }
         }
     }
 
@@ -119,7 +125,19 @@ public class Lobby extends Minigame {
         loadPlayersEnd();
         updateTeamStandings();
         stopTimer();
-        setTimer(60);
+        setTimer(28);
+    }
+
+    public void createScoreboardEnd() {
+        newObjective();
+        for (Participant p : MBC.getInstance().participants) {
+            newObjective(p);
+            createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Event ends in:", p);
+            createLine(19, ChatColor.RESET.toString(), p);
+            createLine(15, ChatColor.GREEN+"Final Scores: ", p);
+            createLine(4, ChatColor.RESET.toString()+ChatColor.RESET, p);
+        }
+        updateTeamStandings();
     }
 
     @EventHandler
@@ -180,9 +198,12 @@ public class Lobby extends Minigame {
     public void loadPlayersEnd() {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             if (p.winner) {
-                p.getPlayer().teleport(new Location(world, 49.5, -1, 0.5));
+                p.getPlayer().teleport(new Location(world, 49.5, -1, 0.5, 90, 0));
                 p.getPlayer().getInventory().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
+            } else {
+                p.getPlayer().teleport(new Location(world, 38.5, -3, 0.5, -90, 0));
             }
+            p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_WARD, 1, 1);
         }
     }
 

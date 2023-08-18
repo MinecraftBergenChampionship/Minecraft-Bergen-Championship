@@ -270,11 +270,12 @@ public class SurvivalGames extends Game {
      */
     public void spawnSupplyCrate() {
         // delete this once it is final
-        double totalWeight = 0;
-        for (SurvivalGamesItem item : supply_items) {
+        double totalWeight = 42;
+        /*for (SurvivalGamesItem item : supply_items) {
             totalWeight += item.getWeight();
         }
         Bukkit.broadcastMessage("[Debug] Total Supply Weight == " + totalWeight);
+         */
 
         Location l = crates.get(crateNum).getLocation();
         l.getBlock().setType(Material.BLACK_SHULKER_BOX);
@@ -313,11 +314,12 @@ public class SurvivalGames extends Game {
      */
     public void regenChest() {
         // delete when final.
-        double totalWeight = 0;
-        for (SurvivalGamesItem item : items) {
+        double totalWeight = 114;
+        /*for (SurvivalGamesItem item : items) {
             totalWeight += item.getWeight();
         }
         Bukkit.broadcastMessage("[Debug] Total Weight == " + totalWeight);
+         */
 
         Random rand = new Random();
         Chunk[] c = map.getWorld().getLoadedChunks();
@@ -474,7 +476,7 @@ public class SurvivalGames extends Game {
 
         // this solution might be temporary, not sure if other maps or other blocks are necessary to add.
         String brokenBlock = e.getBlock().getType().toString();
-        if (!brokenBlock.contains("GLASS"))  e.setCancelled(true);
+        if (!(brokenBlock.contains("GLASS")) && !(e.getBlock().getType().equals(Material.TALL_GRASS)))  e.setCancelled(true);
 
         map.brokenBlocks.put(e.getBlock().getLocation(), e.getBlock().getType());
     }

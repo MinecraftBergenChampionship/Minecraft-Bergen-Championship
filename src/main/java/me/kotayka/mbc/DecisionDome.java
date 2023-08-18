@@ -147,6 +147,7 @@ public class DecisionDome extends Minigame {
                 case 0 -> {
                     for (Participant p : MBC.getInstance().getPlayers()) p.getPlayer().getInventory().clear();
                     setGameState(GameState.END_ROUND);
+                    createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Deciding game...");
                     timeRemaining = 20;
                 }
                 case 44 -> startVoting();

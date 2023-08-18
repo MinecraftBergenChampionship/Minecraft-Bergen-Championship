@@ -18,8 +18,9 @@ public class Build {
 
         if (sign.getType().equals(Material.OAK_WALL_SIGN)) {
             String[] lines = ((Sign) sign.getState()).getLines();
-            if (lines.length == 1) {
-                NAME = ((Sign) sign.getState()).getLine(0);
+            if (lines[1].isBlank()) {
+                String s = lines[0];
+                NAME = s.trim();
             } else {
                 StringBuilder str = new StringBuilder();
                 for (String s : lines) {
@@ -89,17 +90,30 @@ public class Build {
        }
     }
 
-    /*
-    public double getPercentageComplete(Location midBlock) {
-        for (int y = startBlock.getBlockY(); y <= startBlock.getBlockY()+5; y++) {
-            for (int x = startBlock.getBlockX(); x >= startBlock.getBlockX()-6; x--) {
-                for (int z = startBlock.getBlockZ(); z >= startBlock.getBlockZ()-6; z--) {
-                    blocks[y- startBlock.getBlockY()][startBlock.getBlockX()-x][startBlock.getBlockZ()-z] = WORLD.getBlockAt(x,y,z);
+    /**
+     * Returns a number between 0 and 1 representing how much a build is completed.
+     * @param midBlock Location of middle block.
+     * @return Number between 0 and 1 representing amount of build finished.
+     */
+
+    public double getPercentCompletion(Location midBlock) {
+        int count = 0;
+        int total = 0;
+        for (int y = 1; y < 6; y++) {
+            for (int x = 0; x < 7; x++) {
+                for (int z = 0; z < 7; z++) {
+                    Block b = blocks[y][x][z];
+                    if (b.getType().equals(Material.AIR)) continue;
+                    total++;
+                    if (midBlock.getWorld().getBlockAt(midBlock.getBlockX()+3-x, midBlock.getBlockY()+y, midBlock.getBlockZ()+3-z).getType().equals(b.getType())) {
+                        count++;
+                    }
                 }
             }
         }
+        return (((1.0 * count) / total));
     }
-     */
+
 
     public boolean checkBuild(Location midBlock) {
         for (int y = 1; y < 6; y++) {
@@ -121,7 +135,7 @@ public class Build {
                 for (int z = 0; z < 7; z++) {
                     Block b = blocks[y][x][z];
                     Block toMatch = midBlock.getWorld().getBlockAt(midBlock.getBlockX()+3-x, midBlock.getBlockY()+y, midBlock.getBlockZ()+3-z);
-                    if (toMatch.getLocation().equals(brokeBlock) && toMatch.getType().equals(Material.AIR)) continue;
+                    if (toMatch.getLocation().equals(brokeBlock)) continue;
                     if (!(toMatch.getType().equals(b.getType()))) {
                         return false;
                     }
