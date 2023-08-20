@@ -323,9 +323,7 @@ public abstract class Game extends Minigame {
        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
 
        // if timer hasn't reached 1, stop it
-       if (timeRemaining > 0) {
-           stopTimer();
-       }
+       stopTimer();
 
        // standards
        for (Participant p : MBC.getInstance().getPlayers()) {
@@ -532,7 +530,6 @@ public abstract class Game extends Minigame {
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
 
-            updatePlayerCurrentScoreDisplay(p);
             p.resetCurrentScores();
         }
 
@@ -632,6 +629,13 @@ public abstract class Game extends Minigame {
      * @param p Participant
      */
     public void handleDisconnect(Participant p) {} // TODO
+
+    /**
+     * @implNote This is called when a game needs to restart. This should reset variables such as
+     * roundNum, maps, and reset any gamePlayers, such that when the game starts again, the instance
+     * variables are properly initialized
+     */
+    public abstract void onRestart();
 
     public boolean PVP() { return PVP_ENABLED; }
 }

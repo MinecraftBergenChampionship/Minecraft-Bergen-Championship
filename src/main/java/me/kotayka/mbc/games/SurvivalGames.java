@@ -111,6 +111,18 @@ public class SurvivalGames extends Game {
     }
 
     @Override
+    public void onRestart() {
+        teamPlacements.clear();
+        playerKills.clear();
+        crateNum = 0;
+        deadTeams = 0;
+
+        resetCrates();
+        map.resetMap();
+        map.resetBorder();
+    }
+
+    @Override
     public void createScoreboard(Participant p) {
         createLineAll(21, ChatColor.AQUA+""+ChatColor.BOLD+"Map: " + ChatColor.RESET+ map.mapName);
         createLine(19, ChatColor.RESET.toString(), p);

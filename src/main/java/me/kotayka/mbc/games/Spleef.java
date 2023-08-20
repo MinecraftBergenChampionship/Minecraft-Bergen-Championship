@@ -12,21 +12,23 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class Spleef extends Game {
     private SpleefMap map = new Classic();
     //private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
-    public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
+    //public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
+    public Map<UUID, SpleefPlayer> spleefPlayers = new HashMap<>();
     private int roundNum = 0;
     private final Location lobby;
     private final Location spawnpoint;
@@ -76,6 +78,13 @@ public class Spleef extends Game {
     }
 
     @Override
+    public void onRestart() {
+        roundNum = 0;
+        resetPlayers();
+        map.resetMap();
+    }
+
+    @Override
     public void loadPlayers() {
         setPVP(false);
         openFloor(false);
@@ -95,7 +104,7 @@ public class Spleef extends Game {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
             if (roundNum == 0) {
-                spleefPlayers.add(new SpleefPlayer(p));
+                spleefPlayers.put(p.getPlayer().getUniqueId(), new SpleefPlayer(p));
                 playersAlive.add(p);
             } else {
                 resetAliveLists();
@@ -201,7 +210,7 @@ public class Spleef extends Game {
      * Award placement points to Top 12 spleef players; this should probably be adjusted for < 24 players
      */
     public void placementPoints() {
-        for (SpleefPlayer p : spleefPlayers) {
+        for (SpleefPlayer p : spleefPlayers.values()) {
             if (p.getPlacement() > 0 && p.getPlacement() <= BONUS_POINTS.length) {
                 int placement = p.getPlacement();
                 int points = BONUS_POINTS[placement-1];
@@ -316,15 +325,24 @@ public class Spleef extends Game {
     }
 
     public void resetSpleefers() {
-        for (SpleefPlayer p : spleefPlayers) {
+        for (SpleefPlayer p : spleefPlayers.values()) {
             p.resetKiller();
             p.setPlacement(-1);
             p.setResetTime(-1);
         }
     }
 
+    private void resetPlayers() {
+        for (SpleefPlayer p : spleefPlayers.values()) {
+            p.resetKiller();
+            p.setPlacement(-1);
+            p.setResetTime(-1);
+            p.resetKills();
+        }
+    }
+
     public void checkResetDamagers() {
-        for (SpleefPlayer p : spleefPlayers) {
+        for (SpleefPlayer p : spleefPlayers.values()) {
             if (!(p.getPlayer().getGameMode().equals(GameMode.SURVIVAL))) continue;
 
             if (p.getResetTime() >= timeRemaining) {
@@ -336,11 +354,14 @@ public class Spleef extends Game {
 
 
     public SpleefPlayer getSpleefPlayer(Player p) {
-        for (SpleefPlayer x : spleefPlayers) {
-            if (x.getPlayer().getUniqueId().equals(p.getUniqueId())) {
-                return x;
-            }
-        }
-        return null;
+        return spleefPlayers.get(p.getUniqueId());
     }
+
+    @EventHandler
+    public void onReconnect(PlayerJoinEvent e) {
+        SpleefPlayer p = spleefPlayers.get(e.getPlayer().getUniqueId());
+        if (p == null) return; // new login; doesn't matter
+        p.setPlayer(e.getPlayer());
+    }
+
 }

@@ -15,6 +15,7 @@ public class SpleefPlayer extends GamePlayer {
     public int getKills() { return kills; }
     public int getPlacement() { return placement; }
     public void incrementKills() { kills++; }
+    public void resetKills() { kills = 0; }
     public Participant getLastDamager() { return lastDamager; }
     public void setLastDamager(Participant p) {
         if (p.getTeam().equals(this.getParticipant().getTeam())) return;

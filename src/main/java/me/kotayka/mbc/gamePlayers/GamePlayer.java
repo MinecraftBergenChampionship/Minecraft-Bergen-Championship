@@ -16,6 +16,7 @@ public abstract class GamePlayer {
     }
 
     public Player getPlayer() { return participant.getPlayer(); }
+    public void setPlayer(Player p) { participant.setPlayer(p); }
 
     // NOTE: removed this to remove gamePlayers since games may or may not even use gamePlayers, and the ones
     // that do haven't even used the list? this is probably because i didn't realize that existed yet, but even

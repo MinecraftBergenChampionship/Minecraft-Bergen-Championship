@@ -17,6 +17,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.inventory.ItemStack;
@@ -76,6 +78,16 @@ public class BuildMart extends Game {
         setTimer(30);
     }
 
+    @Override
+    public void onRestart() {
+        for (BuildMartTeam t : teams) {
+            for (int i = 0; i < NUM_PLOTS_PER_TEAM; i++) {
+                // remove names from example plots
+                t.getPlots()[i][0].removeNames();
+            }
+        }
+    }
+
     public void events() {
         if (getState().equals(GameState.STARTING)) {
             if (timeRemaining == 0) {
@@ -84,8 +96,7 @@ public class BuildMart extends Game {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
                 setGameState(GameState.ACTIVE);
-                //timeRemaining = 720; // DEBUG
-                timeRemaining = 30;
+                timeRemaining = 720;
             } else {
                 startingCountdown();
             }
@@ -329,6 +340,17 @@ public class BuildMart extends Game {
     }
 
     @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        if (!e.getPlayer().getLocation().getWorld().equals(map.getWorld())) return;
+
+        ItemStack i = e.getItemDrop().getItemStack();
+        if (i.getType().equals(Material.DIAMOND_PICKAXE) || i.getType().equals(Material.DIAMOND_SHOVEL) || i.getType().equals(Material.DIAMOND_AXE)
+         || i.getType().equals(Material.DIAMOND_HOE) || i.getType().equals(Material.ELYTRA)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void CoralFade(BlockFadeEvent e) {
         if (e.getBlock().getType().toString().endsWith("FAN") || e.getBlock().getType().toString().endsWith("CORAL"))
             e.setCancelled(true);
@@ -379,6 +401,13 @@ public class BuildMart extends Game {
             }
         }
         return null;
+    }
+
+    @EventHandler
+    public void onReconnect(PlayerJoinEvent e) {
+        BuildMartPlayer p = getBuildMartPlayer(e.getPlayer());
+        if (p == null) return; // new login; doesn't matter
+        p.setPlayer(e.getPlayer());
     }
 
     public List<Build> getOrder() {

@@ -19,5 +19,11 @@ commands:
     description: gets player's individual placement information
   individual:
     description: gets top 8 individual
+  playerscore:
+    description: admin command to set player scores in case of emergency restart
+  teamscore:
+    description: admin command to set team scores in case of emergency restart
+  endgame:
+    description: stops a game immediately without carrying scores over
   checkbuild:
     description: checks a build during build mart

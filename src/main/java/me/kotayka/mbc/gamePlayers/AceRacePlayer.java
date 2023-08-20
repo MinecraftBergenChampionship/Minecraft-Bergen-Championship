@@ -34,7 +34,7 @@ public class AceRacePlayer extends GamePlayer {
      * Also displays text and updates score
      */
     private void Lap() {
-        if (!(ACE_RACE.getState().equals(GameState.ACTIVE))) { return; }
+        if (!(ACE_RACE.getState().equals(GameState.ACTIVE)) || !(ACE_RACE.getState().equals(GameState.PAUSED))) { return; }
 
         long lapTime;
         ACE_RACE.finishedPlayersByLap[lap - 1]++;  // increment amount of players that have finished
@@ -113,7 +113,7 @@ public class AceRacePlayer extends GamePlayer {
             }
 
             // since this was the last lap, check if all players have finished the last lap
-            if (ACE_RACE.finishedPlayersByLap[2] == ACE_RACE.aceRacePlayerList.size()) {
+            if (ACE_RACE.finishedPlayersByLap[2] == ACE_RACE.aceRacePlayerMap.size()) {
                 ACE_RACE.timeRemaining = 1; // end the game
             }
         }
@@ -123,7 +123,7 @@ public class AceRacePlayer extends GamePlayer {
      * Handles updating player and team score
      */
     private void updateScore(Participant p) {
-        int beatPlayers = ACE_RACE.aceRacePlayerList.size() - ACE_RACE.finishedPlayersByLap[lap-1];
+        int beatPlayers = ACE_RACE.aceRacePlayerMap.size() - ACE_RACE.finishedPlayersByLap[lap-1];
         if (lap < 3) {
             p.addCurrentScore(beatPlayers * AceRace.PLACEMENT_LAP_POINTS);
         } else {
@@ -167,5 +167,17 @@ public class AceRacePlayer extends GamePlayer {
     public boolean checkCoords() {
         // If checkpoint is out of bounds, player is on last lap and should compare to first checkpoint
         return (ACE_RACE.map.checkpoints.get(checkpoint < ACE_RACE.map.mapLength ? checkpoint : 0).distance(getParticipant().getPlayer().getLocation()) <= 6);
+    }
+
+    public void reset() {
+        // assuming each map will have 3 laps
+        for (int i = 0; i < 3; i++) {
+            lapTimes[i] = "";
+        }
+        lap = 1;
+        checkpoint = 0;
+        lapStartTime = 0;
+        totalTime = 0;
+        placement = 0;
     }
 }

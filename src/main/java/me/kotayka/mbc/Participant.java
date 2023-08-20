@@ -110,6 +110,12 @@ public class Participant {
         resetCurrentScores();
     }
 
+    public void addTotalScore(int amount) {
+        team.addTotalScoreManual(amount);
+        rawTotalScore += amount;
+        multipliedTotalScore += amount;
+    }
+
     /**
      * Called inbetween games to reset scores for each game to 0
      * Does not check whether or not game scores have been added to total event score.
@@ -194,6 +200,12 @@ public class Participant {
     }
     public int getPlacement() { return totalPlacement; }
     public void setPlayer(Player p) { player = p; } // used after relog
+    public void setTotalScore(int amount) {
+        rawTotalScore = amount;
+        multipliedTotalScore = amount;
+        team.resetTotalScores();
+        team.addTotalScoreManual(amount);
+    }
 
     /**
      * Adds player to own scoreboard

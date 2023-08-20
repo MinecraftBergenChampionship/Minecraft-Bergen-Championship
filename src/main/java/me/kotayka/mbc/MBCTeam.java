@@ -1,6 +1,5 @@
 package me.kotayka.mbc;
 
-import me.kotayka.mbc.teams.Spectator;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -232,6 +231,21 @@ public abstract class MBCTeam {
         multipliedTotalScore +=score*MBC.getInstance().multiplier;
     }
 
+    public void addTotalScoreManual(double score) {
+        this.rawTotalScore += (int) score;
+        multipliedTotalScore += score;
+        MBC.getInstance().getMinigame().displayTeamTotalScore(this);
+        MBC.getInstance().getMinigame().updateTeamStandings();
+    }
+
+    public void setTotalScore(double score) {
+        this.rawTotalScore = (int) score;
+        multipliedTotalScore = score;
+        MBC.getInstance().getMinigame().displayTeamTotalScore(this);
+        MBC.getInstance().getMinigame().updateTeamStandings();
+    }
+
+
     /**
      * Transfers the current raw score to total score, resets total score after.
      * Called per player.
@@ -242,9 +256,14 @@ public abstract class MBCTeam {
         resetCurrentScores();
     }
 
-    private void resetCurrentScores() {
+    public void resetCurrentScores() {
         rawCurrentScore = 0;
         multipliedCurrentScore = 0;
+    }
+
+    public void resetTotalScores() {
+        rawTotalScore = 0;
+        multipliedTotalScore = 0;
     }
 
     /**

@@ -2,7 +2,9 @@ package me.kotayka.mbc;
 
 import me.kotayka.mbc.commands.*;
 import me.kotayka.mbc.commands.tab.changeTeamTabCompletion;
+import me.kotayka.mbc.commands.tab.playerscoreTabCompletion;
 import me.kotayka.mbc.commands.tab.startTabCompletion;
+import me.kotayka.mbc.commands.tab.teamscoreTabCompletion;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -44,6 +46,12 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("checkbuild").setExecutor(new checkbuild());
         getCommand("placement").setExecutor(new placement());
         getCommand("individual").setExecutor(new individual());
+
+        getCommand("playerscore").setExecutor(new playerscore());
+        getCommand("playerscore").setTabCompleter(new playerscoreTabCompletion());
+        getCommand("teamscore").setExecutor(new teamscore());
+        getCommand("teamscore").setTabCompleter(new teamscoreTabCompletion());
+        getCommand("endgame").setExecutor(new endgame());
 
         // prevent crafting wooden axes (worldedit)
         Iterator<Recipe> it = getServer().recipeIterator();

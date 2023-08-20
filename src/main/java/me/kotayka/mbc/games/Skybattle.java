@@ -3,6 +3,7 @@ package me.kotayka.mbc.games;
 import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.skybattleMap.Classic;
 import me.kotayka.mbc.gameMaps.skybattleMap.SkybattleMap;
+import me.kotayka.mbc.gamePlayers.BuildMartPlayer;
 import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -15,6 +16,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -111,6 +113,12 @@ public class Skybattle extends Game {
         setGameState(GameState.STARTING);
 
         setTimer(20);
+    }
+
+    @Override
+    public void onRestart() {
+        roundNum = 1;
+        resetPlayers();
     }
 
     @Override
@@ -547,6 +555,21 @@ public class Skybattle extends Game {
         SkybattlePlayer hooked = skybattlePlayerMap.get(e.getCaught().getUniqueId());
         if (hooked == null) return;
         hooked.lastDamager = e.getPlayer();
+    }
+
+    @EventHandler
+    public void onReconnect(PlayerJoinEvent e) {
+        SkybattlePlayer p = skybattlePlayerMap.get(e.getPlayer().getUniqueId());
+        if (p == null) return; // new login; doesn't matter
+        p.setPlayer(e.getPlayer());
+    }
+
+    public void resetPlayers() {
+        for (SkybattlePlayer p : skybattlePlayerMap.values()) {
+            p.kills = 0;
+            p.voidDeath = false;
+            p.lastDamager = null;
+        }
     }
 
 }

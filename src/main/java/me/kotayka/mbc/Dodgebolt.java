@@ -38,10 +38,12 @@ public class Dodgebolt extends Minigame {
     private final Location SPAWN = new Location(world, 0, 22, 17, 180, 0);
     private final Vector SPAWN_ARROW_VELOCITY = new Vector(0, 0.3, 0);
     public static final ItemStack BOW = new ItemStack(Material.BOW);
+    public static final ItemStack BOOTS = new ItemStack(Material.LEATHER_BOOTS);
     private final List<DodgeboltPlayer> teamOnePlayers = new ArrayList<>(MBC.MAX_PLAYERS_PER_TEAM);
     private final List<DodgeboltPlayer> teamTwoPlayers = new ArrayList<>(MBC.MAX_PLAYERS_PER_TEAM);
     private int[] playersAlive;
     private boolean setTimerLine = false;
+    private boolean disconnect = false;
     private int noDespawnTask = -1;
     private List<Arrow> middleArrows = new ArrayList<Arrow>(2);
     private List<Entity> spawnedArrowItems = new ArrayList<>();
@@ -170,6 +172,7 @@ public class Dodgebolt extends Minigame {
             Location spawn = TEAM_ONE_SPAWNS.get(rand);
             p.getPlayer().teleport(spawn);
             p.getPlayer().getInventory().clear();
+            p.getPlayer().getInventory().setBoots(p.getParticipant().getTeam().getColoredLeatherArmor(BOOTS));
             TEAM_ONE_SPAWNS.remove(spawn);
             p.getPlayer().getInventory().addItem(BOW);
         }
@@ -182,8 +185,9 @@ public class Dodgebolt extends Minigame {
             p.getPlayer().setVelocity(new Vector(0, 0, 0));
             int rand = (int) (Math.random() * TEAM_TWO_SPAWNS.size());
             Location spawn = TEAM_TWO_SPAWNS.get(rand);
-            p.getPlayer().getInventory().clear();
             p.getPlayer().teleport(spawn);
+            p.getPlayer().getInventory().clear();
+            p.getPlayer().getInventory().setBoots(p.getParticipant().getTeam().getColoredLeatherArmor(BOOTS));
             TEAM_TWO_SPAWNS.remove(spawn);
             p.getPlayer().getInventory().addItem(BOW);
         }
@@ -410,6 +414,7 @@ public class Dodgebolt extends Minigame {
     }
 
     private void endGame(MBCTeam t) {
+        Bukkit.broadcastMessage(t.teamNameFormat() + " win MBC!");
         for (Player p : Bukkit.getOnlinePlayers()) {
             createScoreboard();
             p.sendTitle(t.teamNameFormat() + " win MBC!", " ", 0, 100, 20);
@@ -427,7 +432,6 @@ public class Dodgebolt extends Minigame {
 
     private void endRound() {
         createScoreboard();
-        setGameState(GameState.END_ROUND);
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.stopSound(Sound.MUSIC_DISC_CHIRP);
             p.setInvulnerable(true);
@@ -435,8 +439,20 @@ public class Dodgebolt extends Minigame {
         }
         setTimerLine = false;
         createLineAll(21, ChatColor.RED.toString()+ChatColor.BOLD+"Next Round:");
-        setTimer(6);
         roundNum++;
+        if (disconnect) {
+            Bukkit.broadcastMessage("Event Paused!");
+            setGameState(GameState.PAUSED);
+        } else {
+            setGameState(GameState.END_ROUND);
+            setTimer(6);
+        }
+    }
+
+    @Override
+    public void Unpause() {
+        setGameState(GameState.END_ROUND);
+        setTimer(6);
     }
 
     @EventHandler
@@ -725,6 +741,7 @@ public class Dodgebolt extends Minigame {
                 }
                 score[1]++;
                 playersAlive[0] = firstPlace.teamPlayers.size();
+                playersAlive[1] = secondPlace.teamPlayers.size();
                 if (score[1] == 3) endGame(secondPlace);
                 else endRound();
             }
@@ -768,6 +785,47 @@ public class Dodgebolt extends Minigame {
 
         MBC.getInstance().lobby.end();
     }
+
+    @EventHandler
+    public void onDisconnect(PlayerQuitEvent e) {
+        DodgeboltPlayer p = getDodgeboltPlayer(e.getPlayer());
+        if (p == null) return;
+
+        disconnect = true;
+        Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " disconnected!");
+        if (p.FIRST) {
+            if (playersAlive[0] != 1) {
+                playersAlive[0]--;
+            } else {
+                p.getPlayer().teleport(SPAWN);
+                score[1]++;
+                playersAlive[0] = firstPlace.teamPlayers.size();
+                playersAlive[1] = secondPlace.teamPlayers.size();
+                if (score[1] == 3) endGame(secondPlace);
+                else endRound();
+            }
+        } else {
+            if (playersAlive[1] != 1) {
+                playersAlive[1]--;
+            } else {
+                p.getPlayer().teleport(SPAWN);
+                score[0]++;
+                playersAlive[0] = firstPlace.teamPlayers.size();
+                playersAlive[1] = secondPlace.teamPlayers.size();
+                if (score[0] == 3) endGame(firstPlace);
+                else endRound();
+            }
+        }
+    }
+
+    @EventHandler
+    public void onReconnect(PlayerJoinEvent e) {
+        DodgeboltPlayer p = getDodgeboltPlayer(e.getPlayer());
+        if (p == null) return; // new login; doesn't matter
+        p.setPlayer(e.getPlayer());
+        // switch
+    }
+
     /*
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent e) {

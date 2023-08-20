@@ -129,6 +129,17 @@ public class TGTTOS extends Game {
         startRound();
     }
 
+    @Override
+    public void onRestart() {
+        roundNum = 0;
+        maps = new ArrayList<>(
+                Arrays.asList(new Pit(), new Meatball(), new Walls(),
+                        new Cliffs(), new Glide(), new Skydive(), new Boats()
+                )
+        );
+        removePlacedBlocks();
+    }
+
     /**
      * Moved from startRound()
      * repurpose loadPlayers() however is best needed for tgttos

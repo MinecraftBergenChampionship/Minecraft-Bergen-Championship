@@ -4,6 +4,7 @@ import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SkeletonHorse;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
@@ -71,7 +72,7 @@ public class Lobby extends Minigame {
                 toDodgebolt();
             }
         } else if (getState().equals(GameState.END_GAME)) {
-            if (timeRemaining <= 0) {
+            if (timeRemaining == 0) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.sendTitle(ChatColor.YELLOW+"Event Over!", "Thanks for playing!", 20, 60, 20);
                     createLineAll(21, ChatColor.GREEN.toString()+ChatColor.BOLD+"Event Over!");
@@ -143,6 +144,8 @@ public class Lobby extends Minigame {
     @EventHandler
     public void onPunch(EntityDamageByEntityEvent e) {
         if (e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
+            e.setCancelled(true);
+        } else if (e.getEntity() instanceof SkeletonHorse) {
             e.setCancelled(true);
         }
     }

@@ -15,5 +15,4 @@ public class SkybattlePlayer extends GamePlayer {
     }
 
 
-
 }

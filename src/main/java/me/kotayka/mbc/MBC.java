@@ -210,8 +210,13 @@ public class MBC implements Listener {
             p.getPlayer().setScoreboard(newBoard);
             p.changeTeam(p.getTeam());
             p.setupScoreboardTeams();
-            currentGame.createScoreboard(p);
             p.gameObjective = currentGame.gameName;
+            currentGame.newObjective(p);
+            currentGame.createScoreboard(p);
+            if (currentGame instanceof Game) {
+                currentGame.createLineAll(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, currentGame.gameName));
+                currentGame.createLineAll(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET));
+            }
         }
     }
 

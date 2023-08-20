@@ -139,6 +139,7 @@ public abstract class Minigame implements Scoreboard, Listener {
     public void createLine(int score, String line, Participant p) {
         if (p.objective == null || !Objects.equals(p.gameObjective, gameName)) {
             p.gameObjective = gameName;
+            MBC.getInstance().getMinigame().newObjective(p);
             MBC.getInstance().getMinigame().createScoreboard(p);
         }
 
@@ -194,7 +195,7 @@ public abstract class Minigame implements Scoreboard, Listener {
      * Sorts teams by their overall score to place onto scoreboard during lobby/after games
      */
     public void updateTeamStandings() {
-        if (!getState().equals(GameState.ACTIVE)) return;
+        if (getState().equals(GameState.END_ROUND)) return;
         List<MBCTeam> teams = getValidTeams();
         teams.sort(new TeamScoreSorter());
         Collections.reverse(teams);
