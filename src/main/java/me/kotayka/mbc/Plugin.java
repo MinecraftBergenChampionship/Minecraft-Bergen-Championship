@@ -1,10 +1,7 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.commands.*;
-import me.kotayka.mbc.commands.tab.changeTeamTabCompletion;
-import me.kotayka.mbc.commands.tab.playerscoreTabCompletion;
-import me.kotayka.mbc.commands.tab.startTabCompletion;
-import me.kotayka.mbc.commands.tab.teamscoreTabCompletion;
+import me.kotayka.mbc.commands.tab.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,11 +17,11 @@ public class Plugin extends JavaPlugin implements Listener {
     public void onEnable() {
         MBC.getInstance(this);
 
-
         for (Player p : Bukkit.getOnlinePlayers()) {
             MBC.getInstance().players.add(new Participant(p));
         }
         Bukkit.getLogger().info("MBC enabled");
+        Bukkit.broadcastMessage("Enable stat logging with /statlogs set true");
 
         getServer().getPluginManager().registerEvents(MBC.getInstance(), this);
         getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, this);
@@ -52,6 +49,9 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("teamscore").setExecutor(new teamscore());
         getCommand("teamscore").setTabCompleter(new teamscoreTabCompletion());
         getCommand("endgame").setExecutor(new endgame());
+
+        getCommand("statlogs").setExecutor(new statlogs());
+        getCommand("statlogs").setTabCompleter(new statlogsTabCompleter());
 
         // prevent crafting wooden axes (worldedit)
         Iterator<Recipe> it = getServer().recipeIterator();

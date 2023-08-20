@@ -19,11 +19,13 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.util.Vector;
 
+import java.io.File;
 import java.util.*;
 
 public class MBC implements Listener {
     // singleton for event
     public static MBC mbc = null;
+    private boolean enable_stat_logging = false;
 
     // event specifics
     public static final int MAX_PLAYERS_PER_TEAM = 4;
@@ -151,6 +153,29 @@ public class MBC implements Listener {
     // todo: this is kinda lazy and using enums would probably be way better if possible down the line
     public Minigame gameInstance(String gameName) {
         return gameInstance(gameNameList.indexOf(gameName));
+    }
+
+    public Game getGame(String name) {
+        return game(gameNameList.indexOf(name));
+    }
+
+    private Game game(int num) {
+        switch (gameNameList.get(num)) {
+            case "AceRace":
+                return aceRace;
+            case "TGTTOS":
+                return tgttos;
+            case "SurvivalGames":
+                return sg;
+            case "Skybattle":
+                return skybattle;
+            case "BuildMart":
+                return bsabm;
+            case "Spleef":
+                return spleef;
+            default:
+                return null;
+        }
     }
 
     /**
@@ -457,6 +482,9 @@ public class MBC implements Listener {
         sender.sendMessage(msg.toString());
     }
 
+    public void setLogStats(boolean b) { enable_stat_logging = b; }
+    public boolean logStats() { return enable_stat_logging; }
+    public static String statDirectory() { return "stat_archive"+File.separator+"testing";}
     /**
      * ArrayList of all Participants including Spectators.
      * @return Copy of list of current players with spectators.

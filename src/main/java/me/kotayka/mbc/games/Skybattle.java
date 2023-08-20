@@ -441,6 +441,9 @@ public class Skybattle extends Game {
         }
 
         e.setCancelled(true);
+
+        getLogger().log(e.getDeathMessage());
+
         Bukkit.broadcastMessage(e.getDeathMessage());
         for (ItemStack i : player.getPlayer().getInventory()) {
             if (i == null) continue;

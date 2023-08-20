@@ -22,15 +22,21 @@ public abstract class Game extends Minigame {
     // TRUE = pvp is on ; FALSE = pvp is off
     private boolean PVP_ENABLED = false;
 
-    public List<Participant> gameIndividual = new ArrayList<Participant>(MBC.getInstance().getPlayers().size());
+    // TODO: refactor to use auto sorting structures to remove redundancy
+    public List<Participant> gameIndividual = new ArrayList<>(MBC.getInstance().getPlayers().size());
+    public Map<Participant, Integer> individual = new HashMap<>();
+
+    public List<MBCTeam> teamScores = new ArrayList<>(MBC.getInstance().getValidTeams().size());
+    public Map<MBCTeam, Float> scoreMap = new HashMap<>();
 
     public Game(String gameName) {
         super(gameName);
+        initLogger();
     }
 
     public List<Participant> playersAlive = new ArrayList<>();
     public List<MBCTeam> teamsAlive = new ArrayList<>();
-
+    private StatLogger logger;
     // Used to signal whether or not there has been a disconnect when moving from any state -> starting; if so, pause
     public boolean disconnect = false;
 
@@ -40,6 +46,10 @@ public abstract class Game extends Minigame {
             newObjective(p);
             createScoreboard(p);
         }
+    }
+
+    private void initLogger() {
+        logger = new StatLogger(this);
     }
 
 
@@ -237,12 +247,11 @@ public abstract class Game extends Minigame {
     }
 
     public void finalGameScoreDisplay() {
-        List<MBCTeam> teamRoundsScores = getValidTeams();
-        teamRoundsScores.sort(new TeamRoundSorter());
+        teamScores.sort(new TeamRoundSorter());
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
 
-            for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
-                MBCTeam t = teamRoundsScores.get(14-i);
+            for (int i = 14; i > 14-teamScores.size(); i--) {
+                MBCTeam t = teamScores.get(14-i);
                 createLine(i,String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedCurrentScore()), p);
             }
 
@@ -277,6 +286,7 @@ public abstract class Game extends Minigame {
      * @param points Amount of points to give. Specify 0 for no points.
      */
     public void roundWinners(int points) {
+        String s;
         if (playersAlive.size() > 1) {
             StringBuilder survivors = new StringBuilder("The winners of this round are: ");
             for (int i = 0; i < playersAlive.size(); i++) {
@@ -293,15 +303,17 @@ public abstract class Game extends Minigame {
                     survivors.append(p.getFormattedName()).append(", ");
                 }
             }
-            Bukkit.broadcastMessage(survivors.toString()+ChatColor.WHITE+"!");
+            s = survivors.toString()+ChatColor.WHITE+"!";
         } else if (playersAlive.size() == 1) {
             playersAlive.get(0).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
             playersAlive.get(0).addCurrentScore(points);
             winEffects(playersAlive.get(0));
-            Bukkit.broadcastMessage("The winner of this round is " + playersAlive.get(0).getFormattedName()+"!");
+            s = "The winner of this round is " + playersAlive.get(0).getFormattedName()+"!";
         } else {
-            Bukkit.broadcastMessage("Nobody survived the round.");
+            s = "Nobody survived the round.";
         }
+        logger.log(s+"\n");
+        Bukkit.broadcastMessage(s);
     }
 
     public static String getColorStringFromPlacement(int place) {
@@ -352,11 +364,13 @@ public abstract class Game extends Minigame {
     */
     public void gameEndEvents() {
         if (MBC.getInstance().finalGame) {
+            logger.logStats();
             gameEndEventsFinal();
         }
         // GAME_END should have ~35 seconds by default
         switch (timeRemaining) {
             case 30 -> {
+                logger.logStats();
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
                 TO_PRINT = printRoundScores();
             }
@@ -381,11 +395,13 @@ public abstract class Game extends Minigame {
      */
     public void teamGameEndEvents() {
         if (MBC.getInstance().finalGame) {
+            logger.logStats();
             teamGameEndEventsFinal();
         }
         // Team Games should leave at least 25 seconds for GAME_END
         switch (timeRemaining) {
             case 20 -> {
+                logger.logStats();
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
                 TO_PRINT = printRoundScores();
             }
@@ -463,13 +479,15 @@ public abstract class Game extends Minigame {
                 }
             }
 
+            String score = String.format(
+                    (num) + ". %s: %.1f (%d x %.1f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier
+            );
+            logger.logIndividual(score);
             if (counter < 5) {
-                topFive.append(String.format(
-                        (num) + ". %s: %.1f (%d x %.1f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier)
-                );
-                lastScore = p.getRawCurrentScore();
+                topFive.append(score);
                 counter++;
             }
+            lastScore = p.getRawCurrentScore();
             p.addCurrentScoreToTotal();
         }
         return topFive.toString();
@@ -494,22 +512,25 @@ public abstract class Game extends Minigame {
     }
 
     public String printRoundScores() {
-        List<MBCTeam> teamRoundsScores = new ArrayList<>(getValidTeams());
-        teamRoundsScores.sort(new TeamRoundSorter());
+        teamScores.sort(new TeamRoundSorter());
         StringBuilder teamString = new StringBuilder();
 
-        for (int i = 0; i < teamRoundsScores.size(); i++) {
-            MBCTeam t = teamRoundsScores.get(i);
-            teamString.append(ChatColor.BOLD+""+(i+1)+". ")
-                .append(String.format(
-                    "%s: %.1f\n", t.teamNameFormat(), t.getMultipliedCurrentScore()
-            ));
+        for (int i = 0; i < teamScores.size(); i++) {
+            MBCTeam t = teamScores.get(i);
+            String str = ChatColor.BOLD+""+(i+1)+". "+String.format("%s: %.1f\n", t.teamNameFormat(), t.getMultipliedCurrentScore());
+            logger.logTeamScores(str);
+            teamString.append(str);
         }
         return teamString.toString();
     }
 
     public void getScoresNoPrint() {
         for (Participant p : MBC.getInstance().getPlayers()) {
+            String score = String.format(
+                    "%s: %.1f (%d x %.1f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier
+            );
+            logger.logIndividual(score);
+
             p.addCurrentScoreToTotal();
         }
     }
@@ -593,6 +614,7 @@ public abstract class Game extends Minigame {
      * (gonna see if this is used at all in the future before deleting)
      */
     public void gameOverGraphics() {
+        logger.log(ChatColor.BOLD+""+ChatColor.RED+"Game Over!");
         Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!");
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Game Over!","",0, 60, 20);
@@ -603,6 +625,7 @@ public abstract class Game extends Minigame {
      * Display red text "Round Over!"
      */
     public void roundOverGraphics() {
+        logger.log(ChatColor.BOLD+""+ChatColor.RED+"Round Over!");
         Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!");
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().sendTitle(ChatColor.BOLD + "" + ChatColor.RED + "Round Over!", "", 0, 60, 20);
@@ -636,6 +659,10 @@ public abstract class Game extends Minigame {
      * variables are properly initialized
      */
     public abstract void onRestart();
+
+    public StatLogger getLogger() {
+        return logger;
+    }
 
     public boolean PVP() { return PVP_ENABLED; }
 }

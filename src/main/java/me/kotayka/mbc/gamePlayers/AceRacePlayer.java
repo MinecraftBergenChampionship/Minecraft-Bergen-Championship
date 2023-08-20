@@ -58,6 +58,7 @@ public class AceRacePlayer extends GamePlayer {
         }
 
         // only add to Top 5 if this lap's split was faster or equal to the 5th (map is maintained to be at max size 5).
+        // TODO: this may be buggy and may require a second review. The use of a set means equivalent laps are also not tracked
         if (ACE_RACE.fastestLaps.size() == 0) {
             List<String> t = new ArrayList<String>();
             t.add(this.getParticipant().getFormattedName());
@@ -80,18 +81,24 @@ public class AceRacePlayer extends GamePlayer {
         }
 
         if (lap < 3) {
-            Bukkit.broadcastMessage(
+            String str =
                     this.getParticipant().getFormattedName() + ChatColor.GRAY + " has finished Lap " + lap + " in " +
-                            placementColor + placementString + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ")");
+                            placementColor + placementString + ChatColor.GRAY + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ")";
+            ACE_RACE.getLogger().log(str);
+            Bukkit.broadcastMessage(str);
             this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Completed Lap " + lap + "!", placementColor + placementString + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
             lap++;
         } else {
             String totalTimeFormat = ChatColor.YELLOW + new SimpleDateFormat("m:ss.S").format(new Date(totalTime));
             this.getParticipant().getPlayer().setGameMode(GameMode.SPECTATOR);
             this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Finished!", placementColor +  placementString + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
-            Bukkit.broadcastMessage(
+
+            String str =
                     this.getParticipant().getFormattedName() + " finished " +ChatColor.BOLD+ ACE_RACE.map.mapName + ChatColor.RESET+" in " +
-                            placementColor + placementString + ChatColor.RESET + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.RESET + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ChatColor.RESET+ ")");
+                            placementColor + placementString + ChatColor.RESET + " with " + ChatColor.YELLOW + totalTimeFormat + ChatColor.RESET + "! (Split: " + ChatColor.YELLOW + lapTimes[lap - 1] + ChatColor.RESET+ ")";
+            ACE_RACE.getLogger().log(str);
+            Bukkit.broadcastMessage(str);
+
             MBC.spawnFirework(this.getParticipant());
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");
             this.getParticipant().getPlayer().sendMessage("                                ");

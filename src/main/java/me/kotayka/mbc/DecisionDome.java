@@ -111,7 +111,7 @@ public class DecisionDome extends Minigame {
                 default -> l = new Location(world, 0, -27, 0);
             }
             for (Participant p : t.getPlayers()) {
-                //p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_CAT, 1, 1); // DEBUG: THIS IS TEMPORARY
+                //p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_CAT, (float) 0.5, (float) 1.0)
                 p.getPlayer().teleport(l);
                 p.getPlayer().getInventory().clear();
             }

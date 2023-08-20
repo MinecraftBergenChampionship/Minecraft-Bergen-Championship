@@ -106,7 +106,10 @@ public class BuildMart extends Game {
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     flightEffects(p); // sets gamemode adventure
                 }
+
+                getLogger().log(ChatColor.BOLD+"Team completion bonuses: ");
                 for (BuildMartTeam t : teams) {
+                    getLogger().log(t.getTeam().teamNameFormat() + ": ");
                     for (int i = 0; i < NUM_PLOTS_PER_TEAM; i++) {
                         // remove names from example plots
                         t.getPlots()[i][0].removeNames();
@@ -116,6 +119,9 @@ public class BuildMart extends Game {
                         Build build = plot.getBuild();
                         double percent = plot.getPercentCompletion();
                         int points = (int) (BUILD_COMPLETION_POINTS * t.getTeam().teamPlayers.size() * percent);
+
+                        getLogger().log(String.format("%.2f%% of %s%s%s", percent, ChatColor.BOLD, build.getName(), ChatColor.RESET));
+
                         for (Participant p : t.getTeam().teamPlayers) {
                             p.getPlayer().sendMessage(
                                     String.format("%sYour team completed %.2f%% of %s%s%s%s and earned %.2f points!",
@@ -267,10 +273,14 @@ public class BuildMart extends Game {
             createLine(3, ChatColor.GREEN.toString()+ChatColor.BOLD+"Builds Completed: " + ChatColor.RESET+team.getBuildsCompleted(), p);
         }
 
-        Bukkit.broadcastMessage(
+        String s =
                 String.format("%s completed [%s%s%s] in %s%s%s place!", team.getTeam().teamNameFormat(), ChatColor.BOLD, plot.getBuild().getName(),
-                               ChatColor.RESET, getColorStringFromPlacement(placement), getPlace(placement), ChatColor.RESET)
-        );
+                        ChatColor.RESET, getColorStringFromPlacement(placement), getPlace(placement), ChatColor.RESET);
+
+        if (MBC.getInstance().logStats()) {
+            getLogger().log(s);
+        }
+        Bukkit.broadcastMessage(s);
 
         // Next Build
         int id = plot.getID();

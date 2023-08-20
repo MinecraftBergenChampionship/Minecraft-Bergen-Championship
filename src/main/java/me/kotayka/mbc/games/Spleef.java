@@ -229,8 +229,9 @@ public class Spleef extends Game {
     }
 
     public void handleDeath(SpleefPlayer victim) {
+        String deathMessage;
         if (victim.getLastDamager() == null) {
-            Bukkit.broadcastMessage(victim.getParticipant().getFormattedName()+" fell into the void.");
+            deathMessage = victim.getParticipant().getFormattedName()+" fell into the void.";
         } else {
             SpleefPlayer killer = getSpleefPlayer(victim.getLastDamager().getPlayer());
             killer.incrementKills();
@@ -238,8 +239,13 @@ public class Spleef extends Game {
             killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + victim.getPlayer().getName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
             createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+killer.getKills(), killer.getParticipant());
-            Bukkit.broadcastMessage(victim.getParticipant().getFormattedName()+" was spleefed by " + killer.getParticipant().getFormattedName());
+
+            deathMessage = victim.getParticipant().getFormattedName()+" was spleefed by " + killer.getParticipant().getFormattedName();
         }
+
+        getLogger().log(deathMessage);
+        Bukkit.broadcastMessage(deathMessage);
+
         updatePlayersAlive(victim.getParticipant());
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 20);

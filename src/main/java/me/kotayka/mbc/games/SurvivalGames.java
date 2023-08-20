@@ -186,6 +186,7 @@ public class SurvivalGames extends Game {
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
                 }
                 setPVP(true);
+                getLogger().log(ChatColor.DARK_RED+"Grace period is now over.");
                 Bukkit.broadcastMessage(ChatColor.DARK_RED+"Grace period is now over.");
                 map.startBorder();
                 Bukkit.broadcastMessage(ChatColor.RED+"Border will continue to shrink!");
@@ -203,6 +204,7 @@ public class SurvivalGames extends Game {
                     player.sendTitle("", ChatColor.RED+"Chests refilled!", 20, 60, 20);
                     player.playSound(player, Sound.BLOCK_CHEST_OPEN, 1, 1);
                 }
+                getLogger().log(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 regenChest();
                 event = SurvivalGamesEvent.SUPPLY_CRATE;
@@ -272,7 +274,9 @@ public class SurvivalGames extends Game {
         chestLocations.remove(l);
         dropLocation = true;
         crates.add(new SupplyCrate(l, false));
-        Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"Supply crate spawning at " + ChatColor.RESET+"("+l.getX()+", "+l.getY()+", "+l.getZ()+")");
+        String s = ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"Supply crate spawning at " + ChatColor.RESET+"("+l.getX()+", "+l.getY()+", "+l.getZ()+")";
+        getLogger().log(s);
+        Bukkit.broadcastMessage(s);
     }
 
     /**
@@ -450,6 +454,8 @@ public class SurvivalGames extends Game {
         }
 
         deathEffectsWithHealth(e);
+
+        getLogger().log(e.getDeathMessage());
 
         Bukkit.broadcastMessage(e.getDeathMessage());
         for (ItemStack i : victim.getPlayer().getInventory()) {

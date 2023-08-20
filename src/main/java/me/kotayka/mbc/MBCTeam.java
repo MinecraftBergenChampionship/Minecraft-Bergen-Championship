@@ -1,6 +1,7 @@
 package me.kotayka.mbc;
 
 import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
@@ -280,10 +281,17 @@ public abstract class MBCTeam {
      */
     public void announceTeamDeath() {
         // small delay to sync messages correctly
+        String s = teamNameFormat() + " have been eliminated!";
+
+        MBC.getInstance().getGame().getLogger().log(s);
+
         Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().plugin, new Runnable() {
             @Override
             public void run() {
-                Bukkit.broadcastMessage(teamNameFormat() + " have been eliminated!");
+                Bukkit.broadcastMessage(s);
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.ENTITY_BAT_DEATH, 1, 2);
+                }
             }
         }, 5L);
     }

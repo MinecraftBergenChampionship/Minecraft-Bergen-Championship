@@ -149,6 +149,9 @@ public class TGTTOS extends Game {
         if (map == null) {
             return;
         }
+
+        getLogger().log(ChatColor.AQUA.toString() + ChatColor.BOLD+"New Map: " + ChatColor.WHITE+map.getName());
+
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getInventory().clear();
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -325,7 +328,12 @@ public class TGTTOS extends Game {
         String place = getPlace(placement);
         if (placement < 4) { p.addCurrentScore(TOP_THREE_BONUS); }
         chicken.remove();
-        Bukkit.broadcastMessage(p.getFormattedName()+ChatColor.WHITE+" finished in "+ChatColor.AQUA+place+"!");
+        String finish = p.getFormattedName()+ChatColor.WHITE+" finished in " + ChatColor.AQUA+place+"!";
+
+        getLogger().log(finish);
+
+        Bukkit.broadcastMessage(finish);
+
         MBC.spawnFirework(p);
         p.getPlayer().setGameMode(GameMode.SPECTATOR);
         p.getPlayer().sendMessage(ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GREEN+" place!");
