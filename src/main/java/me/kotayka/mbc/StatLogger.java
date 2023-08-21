@@ -4,7 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,20 +33,27 @@ public class StatLogger {
 
     public void logStats() {
         // log stats
-        write(ChatColor.BOLD+"Team (Multiplied) Scores: "+ChatColor.RESET+"\n");
-        for (String s : teamScores) {
-            write(s+ChatColor.RESET);
-        }
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write(ChatColor.BOLD+"Team (Multiplied) Scores: " + ChatColor.RESET+"\n");
+            for (String s : teamScores) {
+                writer.write(s+ChatColor.RESET);
+            }
 
-        write(ChatColor.BOLD+"Individual Scores: " + ChatColor.RESET+"\n");
-        for (String s : individual) {
-            write(s+ChatColor.RESET);
-        }
+            writer.write(ChatColor.BOLD+"Individual Scores: " + ChatColor.RESET+"\n");
+            for (String s : individual) {
+                writer.write(s+ChatColor.RESET);
+            }
 
-        // transcript
-        write("\n"+ChatColor.BOLD+"Transcript:"+ChatColor.RESET);
-        for (String s : transcript) {
-            write(s+ChatColor.RESET+"\n");
+            // transcript
+            writer.write("\n"+ChatColor.BOLD+"Transcript:"+ChatColor.RESET);
+            for (String s : transcript) {
+                writer.write(s+ChatColor.RESET);
+            }
+            writer.close();
+        } catch (IOException e) {
+            error();
+            e.printStackTrace();
         }
 
         teamScores.clear();
@@ -60,27 +67,6 @@ public class StatLogger {
         }
     }
 
-    private void write(String s) {
-        FileOutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(file.getName());
-            byte[] bytes = s.getBytes();
-            outputStream.write(bytes);
-        } catch (IOException e) {
-            error();
-            e.printStackTrace();
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch(IOException e) {
-                    System.err.print(e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
     public void log(String s) {
         if (MBC.getInstance().logStats()) {
             transcript.add(s);
@@ -89,8 +75,7 @@ public class StatLogger {
 
     private File createFile() {
         try {
-            Bukkit.broadcastMessage("directory == " + directory);
-            File file = new File(directory, GAME.gameName);
+            File file = new File(directory, GAME.gameName+".txt");
             file.getParentFile().mkdirs();
             if (file.createNewFile()) {
                 return file;

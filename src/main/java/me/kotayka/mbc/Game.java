@@ -27,7 +27,7 @@ public abstract class Game extends Minigame {
     public Map<Participant, Integer> individual = new HashMap<>();
 
     public List<MBCTeam> teamScores = new ArrayList<>(MBC.getInstance().getValidTeams().size());
-    public Map<MBCTeam, Float> scoreMap = new HashMap<>();
+    public Map<MBCTeam, Double> scoreMap = new HashMap<>();
 
     public Game(String gameName) {
         super(gameName);
@@ -105,6 +105,19 @@ public abstract class Game extends Minigame {
         // Check if only one team remains
         updatePlayersAlive(victim);
     }
+
+    /*
+    public void playerDeathEffectsDisconnect(Participant victim, @Nullable Participant killer) {
+        String deathMessage = victim.getFormattedName() + " disconnected!";
+
+        if (killer != null){
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed "+victim.getPlayerName()+"!");
+            killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
+        }
+        updatePlayersAlive(victim);
+    }
+     */
+
 
     /**
      * Variant of playerDeathEffects() but where the death message is displayed as:
@@ -364,13 +377,11 @@ public abstract class Game extends Minigame {
     */
     public void gameEndEvents() {
         if (MBC.getInstance().finalGame) {
-            logger.logStats();
             gameEndEventsFinal();
         }
         // GAME_END should have ~35 seconds by default
         switch (timeRemaining) {
             case 30 -> {
-                logger.logStats();
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
                 TO_PRINT = printRoundScores();
             }
@@ -385,7 +396,10 @@ public abstract class Game extends Minigame {
             }
             case 1 -> Bukkit.broadcastMessage(ChatColor.RED + "Returning to lobby...");
             case 28, 20, 12 -> Bukkit.broadcastMessage(TO_PRINT);
-            case 0 -> returnToLobby();
+            case 0 -> {
+                logger.logStats();
+                returnToLobby();
+            }
         }
     }
 
@@ -395,13 +409,11 @@ public abstract class Game extends Minigame {
      */
     public void teamGameEndEvents() {
         if (MBC.getInstance().finalGame) {
-            logger.logStats();
             teamGameEndEventsFinal();
         }
         // Team Games should leave at least 25 seconds for GAME_END
         switch (timeRemaining) {
             case 20 -> {
-                logger.logStats();
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
                 TO_PRINT = printRoundScores();
             }
@@ -413,7 +425,10 @@ public abstract class Game extends Minigame {
             case 11 -> MBC.getInstance().updatePlacings();
             case 18, 12 -> Bukkit.broadcastMessage(TO_PRINT);
             case 1 -> Bukkit.broadcastMessage(ChatColor.RED+"Returning to lobby...");
-            case 0 -> returnToLobby();
+            case 0 -> {
+                logger.logStats();
+                returnToLobby();
+            }
         }
     }
 
@@ -433,7 +448,10 @@ public abstract class Game extends Minigame {
             case 20, 10 -> Bukkit.broadcastMessage(TO_PRINT);
             case 8 -> MBC.getInstance().updatePlacings();
             case 1 -> Bukkit.broadcastMessage(ChatColor.RED+"Preparing finale...");
-            case 0 -> returnToLobby();
+            case 0 -> {
+                logger.logStats();
+                returnToLobby();
+            }
         }
     }
 
@@ -451,7 +469,10 @@ public abstract class Game extends Minigame {
             case 5 -> getScoresNoPrint();
             case 1 -> Bukkit.broadcastMessage(ChatColor.RED + "Preparing finale...");
             case 3 -> MBC.getInstance().updatePlacings();
-            case 0 -> returnToLobby();
+            case 0 -> {
+                logger.logStats();
+                returnToLobby();
+            }
         }
     }
 
@@ -483,6 +504,7 @@ public abstract class Game extends Minigame {
                     (num) + ". %s: %.1f (%d x %.1f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier
             );
             logger.logIndividual(score);
+            individual.put(p, p.getRawCurrentScore());
             if (counter < 5) {
                 topFive.append(score);
                 counter++;
@@ -517,9 +539,12 @@ public abstract class Game extends Minigame {
 
         for (int i = 0; i < teamScores.size(); i++) {
             MBCTeam t = teamScores.get(i);
-            String str = ChatColor.BOLD+""+(i+1)+". "+String.format("%s: %.1f\n", t.teamNameFormat(), t.getMultipliedCurrentScore());
+            String str = ChatColor.BOLD+""+(i+1)+". "+String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedCurrentScore());
+            teamString.append(ChatColor.BOLD+""+(i+1)+". ").append(String.format(
+                    "%s: .1f\n", t.teamNameFormat(), t.getMultipliedCurrentScore()
+            ));
             logger.logTeamScores(str);
-            teamString.append(str);
+            scoreMap.put(t, t.getMultipliedCurrentScore());
         }
         return teamString.toString();
     }
@@ -646,12 +671,6 @@ public abstract class Game extends Minigame {
         //Bukkit.broadcastMessage(s);
         PVP_ENABLED = b;
     }
-
-    /**
-     * General rules for handling a disconnected player
-     * @param p Participant
-     */
-    public void handleDisconnect(Participant p) {} // TODO
 
     /**
      * @implNote This is called when a game needs to restart. This should reset variables such as

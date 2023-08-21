@@ -14,10 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.player.PlayerFishEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -559,6 +556,17 @@ public class Skybattle extends Game {
         if (hooked == null) return;
         hooked.lastDamager = e.getPlayer();
     }
+
+    /*
+    @EventHandler
+    public void onDisconnect(PlayerQuitEvent e) {
+        SkybattlePlayer p = skybattlePlayerMap.get(e.getPlayer().getUniqueId());
+        if (p == null) return;
+        if (e.getPlayer().getKiller() == null)  {
+
+        }
+    }
+     */
 
     @EventHandler
     public void onReconnect(PlayerJoinEvent e) {

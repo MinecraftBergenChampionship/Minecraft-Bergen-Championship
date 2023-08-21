@@ -1,8 +1,6 @@
 package me.kotayka.mbc.commands;
 
-import me.kotayka.mbc.Game;
-import me.kotayka.mbc.MBC;
-import me.kotayka.mbc.MBCTeam;
+import me.kotayka.mbc.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -18,6 +16,11 @@ public class statlogs implements CommandExecutor {
 
         if (!(sender.isOp())) {
             sender.sendMessage(ChatColor.RED+"Admin restricted command, sorry!");
+            return false;
+        }
+
+        if (!(MBC.getInstance().getMinigame() instanceof Lobby)) {
+            sender.sendMessage(ChatColor.RED+"This command should only be used in lobby!");
             return false;
         }
 
@@ -69,18 +72,18 @@ public class statlogs implements CommandExecutor {
                 return false;
             }
 
-            if (args[3].equalsIgnoreCase("team")) {
+            if (args[2].equalsIgnoreCase("team")) {
                 sender.sendMessage(ChatColor.BOLD+"Team Scores:\n"+ChatColor.RESET);
                 int num = 1;
                 for (MBCTeam t : game.teamScores) {
                     sender.sendMessage(String.format("%d. %s: %.1f\n", num++, t.teamNameFormat(), game.scoreMap.get(t)));
                 }
                 return true;
-            } else if (args[3].equalsIgnoreCase("individual")) {
-                sender.sendMessage(ChatColor.BOLD+"Team Scores:\n"+ChatColor.RESET);
+            } else if (args[2].equalsIgnoreCase("individual")) {
+                sender.sendMessage(ChatColor.BOLD+"Individual Scores:\n"+ChatColor.RESET);
                 int num = 1;
-                for (MBCTeam t : game.teamScores) {
-                    sender.sendMessage(String.format("%d. %s: %.1f\n", num++, t.teamNameFormat(), game.scoreMap.get(t)));
+                for (Participant p : game.gameIndividual) {
+                    sender.sendMessage(String.format("%d. %s: %d\n", num++, p.getFormattedName(), game.individual.get(p)));
                 }
                 return true;
             } else {

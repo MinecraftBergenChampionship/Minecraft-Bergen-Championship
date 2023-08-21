@@ -260,9 +260,6 @@ public class MBC implements Listener {
                 case STARTING:
                     currentGame.Pause();
                     break;
-                case ACTIVE:
-                case OVERTIME:
-                    ((Game) currentGame).handleDisconnect(p);
             }
         }
     }
