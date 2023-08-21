@@ -72,18 +72,17 @@ public class statlogs implements CommandExecutor {
                 return false;
             }
 
+            // NOTE: this may not put in order rn, not the biggest deal
             if (args[2].equalsIgnoreCase("team")) {
                 sender.sendMessage(ChatColor.BOLD+"Team Scores:\n"+ChatColor.RESET);
-                int num = 1;
-                for (MBCTeam t : game.teamScores) {
-                    sender.sendMessage(String.format("%d. %s: %.1f\n", num++, t.teamNameFormat(), game.scoreMap.get(t)));
+                for (MBCTeam t : game.scoreMap.keySet()) {
+                    sender.sendMessage(String.format("%s: %.1f", t.teamNameFormat(), game.scoreMap.get(t)));
                 }
                 return true;
             } else if (args[2].equalsIgnoreCase("individual")) {
-                sender.sendMessage(ChatColor.BOLD+"Individual Scores:\n"+ChatColor.RESET);
-                int num = 1;
+                sender.sendMessage(ChatColor.BOLD+"Individual Scores:"+ChatColor.RESET);
                 for (Participant p : game.gameIndividual) {
-                    sender.sendMessage(String.format("%d. %s: %d\n", num++, p.getFormattedName(), game.individual.get(p)));
+                    sender.sendMessage(String.format("%s: %d", p.getFormattedName(), game.individual.get(p)));
                 }
                 return true;
             } else {

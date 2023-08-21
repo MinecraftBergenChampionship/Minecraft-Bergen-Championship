@@ -32,6 +32,10 @@ public class StatLogger {
     }
 
     public void logStats() {
+        if (!MBC.getInstance().logStats()) {
+            return;
+        }
+
         // log stats
         try {
             FileWriter writer = new FileWriter(file);
@@ -48,7 +52,7 @@ public class StatLogger {
             // transcript
             writer.write("\n"+ChatColor.BOLD+"Transcript:"+ChatColor.RESET);
             for (String s : transcript) {
-                writer.write(s+ChatColor.RESET);
+                writer.write(s+ChatColor.RESET+"\n");
             }
             writer.close();
         } catch (IOException e) {

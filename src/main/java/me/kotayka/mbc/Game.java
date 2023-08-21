@@ -534,14 +534,16 @@ public abstract class Game extends Minigame {
     }
 
     public String printRoundScores() {
-        teamScores.sort(new TeamRoundSorter());
+        List<MBCTeam> gameScores = new ArrayList<>(getValidTeams());
+        gameScores.sort(new TeamRoundSorter());
+        Collections.reverse(gameScores);
         StringBuilder teamString = new StringBuilder();
 
-        for (int i = 0; i < teamScores.size(); i++) {
-            MBCTeam t = teamScores.get(i);
+        for (int i = 0; i < gameScores.size(); i++) {
+            MBCTeam t = gameScores.get(i);
             String str = ChatColor.BOLD+""+(i+1)+". "+String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedCurrentScore());
             teamString.append(ChatColor.BOLD+""+(i+1)+". ").append(String.format(
-                    "%s: .1f\n", t.teamNameFormat(), t.getMultipliedCurrentScore()
+                    "%s: %.1f\n", t.teamNameFormat(), t.getMultipliedCurrentScore()
             ));
             logger.logTeamScores(str);
             scoreMap.put(t, t.getMultipliedCurrentScore());
