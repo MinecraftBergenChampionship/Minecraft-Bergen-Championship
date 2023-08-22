@@ -5,7 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -17,10 +16,7 @@ public class Classic extends SpleefMap {
     HashSet<Block> decayingAll = new HashSet<>();
     HashSet<Block> toRemove = new HashSet<>();
     int erosion = -1;
-    int radiusOne = 20;
-    int radiusTwo = 20;
-    int radiusThree = 20;
-    int radiusFour = 25;
+    int[] layerRadius = new int[]{20, 20, 20, 25};
 
     public Classic() {
         super("Classic", 60);
@@ -30,15 +26,19 @@ public class Classic extends SpleefMap {
     public void resetMap() {
         if (erosion != -1) {
             MBC.getInstance().cancelEvent(erosion);
+            erosion = -1;
         }
 
-        radiusOne = radiusTwo = radiusThree = 20;
-        radiusFour = 25;
-        if (erosion != -1)  {
-            Bukkit.getScheduler().cancelTask(erosion);
-        }
+        layerRadius[0] = layerRadius[1] = layerRadius[2] = 20;
+        layerRadius[3] = 25;
 
         decayingAll.clear();
+        firstLayerDecayingBlocks.clear();
+        secondLayerDecayingBlocks.clear();
+        thirdLayerDecayingBlocks.clear();
+        fourthLayerDecayingBlocks.clear();
+        toRemove.clear();
+
         int copy_from_x = 180;
         int copy_from_z = 180;
 
@@ -68,7 +68,7 @@ public class Classic extends SpleefMap {
         // last layer
         copy_from_x = 175;
         copy_from_z = 175;
-        for (int paste_to_x = -24; paste_to_x <= 25; paste_to_x++) {
+        for (int paste_to_x = -25; paste_to_x <= 25; paste_to_x++) {
             for (int paste_to_z = -25; paste_to_z <= 25; paste_to_z++) {
                 Block b = getWorld().getBlockAt(copy_from_x, 64, copy_from_z);
                 if (!(b.getType().equals(Material.AIR))) {
@@ -86,7 +86,7 @@ public class Classic extends SpleefMap {
     @Override
     public void Border(int timeRemaining) {
         switch (timeRemaining) {
-            case 180 -> Bukkit.broadcastMessage(ChatColor.RED + "First layer is starting to erode!");
+            case 210 -> Bukkit.broadcastMessage(ChatColor.RED + "First layer is starting to erode!");
             case 150 -> Bukkit.broadcastMessage(ChatColor.RED + "Second layer is starting to erode!");
             case 90 -> Bukkit.broadcastMessage(ChatColor.RED + "Third layer is starting to erode!");
             case 60 -> Bukkit.broadcastMessage(ChatColor.RED + "Last layer is starting to erode!");
@@ -94,35 +94,32 @@ public class Classic extends SpleefMap {
 
         if (timeRemaining <= 180 && timeRemaining % 2 == 0 && !firstLayerDecayingBlocks.isEmpty()) {
             erodeLayer(1);
-            radiusOne--;
         }
 
         if (timeRemaining <= 150 && timeRemaining % 2 == 0 && !secondLayerDecayingBlocks.isEmpty()) {
             erodeLayer(2);
-            radiusTwo--;
         }
 
         if (timeRemaining <= 90 && timeRemaining % 2 == 0 && !thirdLayerDecayingBlocks.isEmpty()) {
             erodeLayer(3);
-            radiusThree--;
         }
 
         if (timeRemaining <= 60 && timeRemaining % 2 == 0 && !fourthLayerDecayingBlocks.isEmpty()) {
             erodeLayer(4);
-            radiusFour--;
         }
     }
 
     private void erodeLayer(int layer) {
         switch (layer) {
-            case 1 -> erodeLayer(firstLayerDecayingBlocks, radiusOne);
-            case 2 -> erodeLayer(secondLayerDecayingBlocks, radiusTwo);
-            case 3 -> erodeLayer(thirdLayerDecayingBlocks, radiusThree);
-            case 4 -> erodeLayer(fourthLayerDecayingBlocks, radiusFour);
+            case 1 -> erodeLayer(firstLayerDecayingBlocks, 0);
+            case 2 -> erodeLayer(secondLayerDecayingBlocks, 1);
+            case 3 -> erodeLayer(thirdLayerDecayingBlocks, 2);
+            case 4 -> erodeLayer(fourthLayerDecayingBlocks, 3);
         }
     }
 
-    private void erodeLayer(Set<Block> decay, int radius){
+    private void erodeLayer(Set<Block> decay, int radiusNum){
+        int radius = layerRadius[radiusNum];
         if (erosion == -1) {
             erosion = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
                 for (Block b : decayingAll) {
@@ -140,7 +137,7 @@ public class Classic extends SpleefMap {
                 for (Block b : toRemove) {
                     decayingAll.remove(b);
                 }
-            }, 60, 60);
+            }, 40, 40);
         }
 
         Set<Block> toRemove2 = new HashSet<>();
@@ -149,6 +146,8 @@ public class Classic extends SpleefMap {
             decayingAll.add(b);
             toRemove2.add(b);
         }
+
+        layerRadius[radiusNum]--;
         for (Block b : toRemove2) {
             decay.remove(b);
         }

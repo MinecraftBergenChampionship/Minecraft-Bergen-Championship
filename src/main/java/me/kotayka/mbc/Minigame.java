@@ -278,12 +278,12 @@ public abstract class Minigame implements Scoreboard, Listener {
         Objective obj;
 
         if (p.board.getObjective("Objective") == null) {
-            obj = p.board.registerNewObjective("Objective", "dummy", ChatColor.YELLOW + "" + ChatColor.BOLD + "MCC");
+            obj = p.board.registerNewObjective("Objective", "dummy", ChatColor.YELLOW + "" + ChatColor.BOLD + "MBC");
         } else {
             obj = p.board.getObjective("Objective");
         }
         if (obj == null) {
-            obj = p.board.registerNewObjective("Objective", "dummy", ChatColor.YELLOW + "" +ChatColor.BOLD +"MCC");
+            obj = p.board.registerNewObjective("Objective", "dummy", ChatColor.YELLOW + "" +ChatColor.BOLD +"MBC");
         }
 
         p.lines = new HashMap<>();

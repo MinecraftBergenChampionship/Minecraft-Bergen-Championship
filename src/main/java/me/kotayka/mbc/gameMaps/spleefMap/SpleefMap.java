@@ -1,5 +1,6 @@
 package me.kotayka.mbc.gameMaps.spleefMap;
 
+import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.gameMaps.MBCMap;
 import org.bukkit.Bukkit;
 

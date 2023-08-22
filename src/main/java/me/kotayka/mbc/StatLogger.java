@@ -24,11 +24,15 @@ public class StatLogger {
     }
 
     public void logIndividual(String s) {
-        individual.add(s);
+        if (MBC.getInstance().logStats()) {
+            individual.add(s);
+        }
     }
 
     public void logTeamScores(String s) {
-        teamScores.add(s);
+        if (MBC.getInstance().logStats()) {
+            teamScores.add(s);
+        }
     }
 
     public void logStats() {
@@ -56,6 +60,7 @@ public class StatLogger {
             }
             writer.close();
         } catch (IOException e) {
+            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: IOException while logging stats!");
             error();
             e.printStackTrace();
         }
@@ -78,17 +83,20 @@ public class StatLogger {
     }
 
     private File createFile() {
+        if (!MBC.getInstance().logStats()) return null;
         try {
             File file = new File(directory, GAME.gameName+".txt");
             file.getParentFile().mkdirs();
             if (file.createNewFile()) {
                 return file;
             } else {
+                Bukkit.broadcastMessage(ChatColor.RED+"ERROR: File already exists!");
                 error();
                 return null;
             }
         } catch (IOException e) {
             error();
+            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: IOException while creating files!");
             e.printStackTrace();
             return null;
         }

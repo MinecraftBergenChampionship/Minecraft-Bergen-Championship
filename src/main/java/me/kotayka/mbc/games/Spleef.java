@@ -153,7 +153,7 @@ public class Spleef extends Game {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
                 setGameState(GameState.ACTIVE);
-                timeRemaining = 210;
+                timeRemaining = 240;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             checkResetDamagers();
