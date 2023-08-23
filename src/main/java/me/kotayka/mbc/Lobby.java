@@ -10,6 +10,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -168,6 +169,7 @@ public class Lobby extends Minigame {
                             p.sendTitle("Final Duel!", reveal.get(reveal.size()-1).teamNameFormat() + " vs. " + reveal.get(reveal.size()-2).teamNameFormat(), 20, 60, 20);
                         }
                     }
+                    cameraman.remove();
                 }
             }
         } else if (getState().equals(GameState.END_GAME)) {
@@ -513,5 +515,15 @@ public class Lobby extends Minigame {
         world.getBlockAt(-17, 0, -24).setType(m);
         world.getBlockAt(-18, 0, -23).setType(m);
         world.getBlockAt(-19, 0, -23).setType(m);
+    }
+
+    @EventHandler
+    public void onReconnect(PlayerJoinEvent e) {
+        if (getState().equals(GameState.END_ROUND) && timeRemaining > 60) {
+            e.getPlayer().setGameMode(GameMode.SPECTATOR);
+            e.getPlayer().setSpectatorTarget(cameraman);
+        } else {
+            e.getPlayer().teleport(LOBBY);
+        }
     }
 }

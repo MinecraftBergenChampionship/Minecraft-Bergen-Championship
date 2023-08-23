@@ -557,22 +557,38 @@ public class Skybattle extends Game {
         hooked.lastDamager = e.getPlayer();
     }
 
-    /*
     @EventHandler
     public void onDisconnect(PlayerQuitEvent e) {
-        SkybattlePlayer p = skybattlePlayerMap.get(e.getPlayer().getUniqueId());
-        if (p == null) return;
-        if (e.getPlayer().getKiller() == null)  {
+        if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+            SkybattlePlayer p = skybattlePlayerMap.get(e.getPlayer().getUniqueId());
+            Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " disconnected!");
+            updatePlayersAlive(p.getParticipant());
+            if (p.lastDamager != null) {
+                SkybattlePlayer killer = skybattlePlayerMap.get(p.getPlayer().getUniqueId());
+                if (killer == null) return;
+                killer.getParticipant().addCurrentScore(KILL_POINTS);
+                killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + p.getParticipant().getPlayerName() + "!");
+                killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + p.getParticipant().getFormattedName(), 0, 60, 20);
+                killer.kills++;
+            }
 
+            for (Participant x : playersAlive) {
+                x.addCurrentScore(SURVIVAL_POINTS);
+            }
         }
     }
-     */
 
     @EventHandler
     public void onReconnect(PlayerJoinEvent e) {
         SkybattlePlayer p = skybattlePlayerMap.get(e.getPlayer().getUniqueId());
         if (p == null) return; // new login; doesn't matter
         p.setPlayer(e.getPlayer());
+
+        // if log back in during paused/starting, manually teleport them
+        if (!(getState().equals(GameState.PAUSED)) && !(getState().equals(GameState.STARTING))) {
+            e.getPlayer().setGameMode(GameMode.SPECTATOR);
+            e.getPlayer().teleport(map.getCenter());
+        }
     }
 
     public void resetPlayers() {

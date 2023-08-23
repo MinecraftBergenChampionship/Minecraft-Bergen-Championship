@@ -17,6 +17,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -380,6 +381,44 @@ public class Spleef extends Game {
         f.setYield(0);
     }
 
+    @EventHandler
+    public void onDisconnect(PlayerQuitEvent e) {
+        if (!e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) return;
+
+        SpleefPlayer p = getSpleefPlayer(e.getPlayer());
+        if (p == null) return;
+        updatePlayersAlive(p.getParticipant());
+        Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " disconnected!");
+
+        Participant killer = p.getLastDamager();
+        if (killer != null) {
+            killer.addCurrentScore(KILL_POINTS);
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + p.getParticipant().getPlayerName() + "!");
+            killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + p.getParticipant().getFormattedName(), 0, 60, 20);
+            getSpleefPlayer(killer.getPlayer()).incrementKills();
+        }
+
+        for (Participant n : playersAlive) {
+            n.addCurrentScore(SURVIVAL_POINTS);
+        }
+    }
+
+    @EventHandler
+    public void onReconnect(PlayerJoinEvent e) {
+        SpleefPlayer p = spleefPlayers.get(e.getPlayer().getUniqueId());
+        if (p == null) return; // new login; doesn't matter
+        p.setPlayer(e.getPlayer());
+
+        // if log back in during paused/starting, manually teleport them
+        if (!(getState().equals(GameState.PAUSED)) && !(getState().equals(GameState.STARTING))) {
+            e.getPlayer().setGameMode(GameMode.SPECTATOR);
+            e.getPlayer().teleport(spawnpoint);
+        } else {
+            e.getPlayer().setGameMode(GameMode.ADVENTURE);
+            e.getPlayer().teleport(lobby);
+        }
+    }
+
     public void resetSpleefers() {
         for (SpleefPlayer p : spleefPlayers.values()) {
             p.resetKiller();
@@ -412,12 +451,4 @@ public class Spleef extends Game {
     public SpleefPlayer getSpleefPlayer(Player p) {
         return spleefPlayers.get(p.getUniqueId());
     }
-
-    @EventHandler
-    public void onReconnect(PlayerJoinEvent e) {
-        SpleefPlayer p = spleefPlayers.get(e.getPlayer().getUniqueId());
-        if (p == null) return; // new login; doesn't matter
-        p.setPlayer(e.getPlayer());
-    }
-
 }

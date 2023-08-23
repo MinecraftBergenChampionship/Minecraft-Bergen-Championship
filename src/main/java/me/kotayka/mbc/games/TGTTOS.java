@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -34,8 +35,8 @@ public class TGTTOS extends Game {
     private TGTTOSMap map = null;
     private List<TGTTOSMap> maps = new ArrayList<>(
             Arrays.asList(new Pit(), new Meatball(), new Walls(),
-                          new Cliffs(), new Glide(), new Skydive(),
-                          new Boats()
+                    new Cliffs(), new Glide(), new Skydive(),
+                    new Boats()
             ));
 
     private List<Participant> finishedParticipants;
@@ -66,30 +67,30 @@ public class TGTTOS extends Game {
      * Update scoreboard display on how many players have finished the round
      */
     public void updateFinishedPlayers() {
-        for (Participant p : MBC.getInstance().getPlayers()){
-            createLine(2, ChatColor.YELLOW + "Finished: " + ChatColor.WHITE + finishedParticipants.size()+"/"+MBC.getInstance().getPlayers().size(), p);
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            createLine(2, ChatColor.YELLOW + "Finished: " + ChatColor.WHITE + finishedParticipants.size() + "/" + MBC.getInstance().getPlayers().size(), p);
         }
     }
 
     public void events() {
         if (getState().equals(GameState.STARTING)) {
-           if (timeRemaining == 0) {
-               for (Participant p : MBC.getInstance().getPlayers()) {
+            if (timeRemaining == 0) {
+                for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
-               }
-               map.Barriers(false);
-               setPVP(true);
-               setGameState(GameState.ACTIVE);
-               timeRemaining = 120;
-           } else {
-               Countdown();
-           }
+                }
+                map.Barriers(false);
+                setPVP(true);
+                setGameState(GameState.ACTIVE);
+                timeRemaining = 120;
+            } else {
+                Countdown();
+            }
         } else if (getState().equals(GameState.ACTIVE)) {
             if (timeRemaining == 0) {
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     if (!finishedParticipants.contains(p)) {
                         flightEffects(p);
-                        p.getPlayer().sendMessage(ChatColor.RED+"You didn't finish in time!");
+                        p.getPlayer().sendMessage(ChatColor.RED + "You didn't finish in time!");
                     }
                 }
 
@@ -150,12 +151,12 @@ public class TGTTOS extends Game {
             return;
         }
 
-        getLogger().log(ChatColor.AQUA.toString() + ChatColor.BOLD+"New Map: " + ChatColor.WHITE+map.getName());
+        getLogger().log(ChatColor.AQUA.toString() + ChatColor.BOLD + "New Map: " + ChatColor.WHITE + map.getName());
 
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getInventory().clear();
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
-            p.getPlayer().setVelocity(new Vector(0,0,0));
+            p.getPlayer().setVelocity(new Vector(0, 0, 0));
             p.getPlayer().teleport(map.getSpawnLocation());
 
             if (p.getPlayer().getAllowFlight()) {
@@ -208,12 +209,12 @@ public class TGTTOS extends Game {
         secondTeamBonus = false;
 
         finishedParticipants = new ArrayList<>(MBC.getInstance().players.size());
-        map = maps.get((int) (Math.random()*maps.size()));
+        map = maps.get((int) (Math.random() * maps.size()));
         maps.remove(map);
         map.Barriers(true);
 
-        createLineAll(22, ChatColor.AQUA+""+ChatColor.BOLD+"Map: "+ChatColor.RESET+map.getName());
-        createLineAll(21, ChatColor.GREEN +  "Round: "+ ChatColor.RESET+roundNum+"/6");
+        createLineAll(22, ChatColor.AQUA + "" + ChatColor.BOLD + "Map: " + ChatColor.RESET + map.getName());
+        createLineAll(21, ChatColor.GREEN + "Round: " + ChatColor.RESET + roundNum + "/6");
         updateFinishedPlayers();
 
         if (map != null) {
@@ -240,25 +241,25 @@ public class TGTTOS extends Game {
             br.close();
             fr.close();
         } catch (IOException e) {
-            Bukkit.broadcastMessage(ChatColor.RED+"Error: " + e.getMessage());
+            Bukkit.broadcastMessage(ChatColor.RED + "Error: " + e.getMessage());
         }
     }
 
     private void printDeathMessage(Participant p) {
         int rand = (int) (Math.random() * deathMessages.length);
-        Bukkit.broadcastMessage(ChatColor.GRAY+deathMessages[rand].replace("{player}", p.getFormattedName() + ChatColor.GRAY));
+        Bukkit.broadcastMessage(ChatColor.GRAY + deathMessages[rand].replace("{player}", p.getFormattedName() + ChatColor.GRAY));
     }
 
     private void Countdown() {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (timeRemaining <= 10 && timeRemaining > 3) {
-                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">"+timeRemaining+"<", 0,20,0);
+                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">" + timeRemaining + "<", 0, 20, 0);
             } else if (timeRemaining == 3) {
-                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">"+ChatColor.RED+""+ChatColor.BOLD+ timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">" + ChatColor.RED + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             } else if (timeRemaining == 2) {
-                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">"+ChatColor.YELLOW+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">" + ChatColor.YELLOW + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             } else if (timeRemaining == 1) {
-                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">"+ChatColor.GREEN+""+ChatColor.BOLD + timeRemaining+ChatColor.WHITE+""+ChatColor.BOLD+"<", 0,20,0);
+                p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">" + ChatColor.GREEN + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             }
         }
     }
@@ -278,7 +279,7 @@ public class TGTTOS extends Game {
         if (!e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) return;
 
         if (e.getPlayer().getLocation().getY() < map.getDeathY()) {
-            e.getPlayer().setVelocity(new Vector(0,0,0));
+            e.getPlayer().setVelocity(new Vector(0, 0, 0));
             e.getPlayer().teleport(map.getSpawnLocation());
             printDeathMessage(Participant.getParticipant(e.getPlayer()));
         }
@@ -306,13 +307,13 @@ public class TGTTOS extends Game {
         }
         if (count == p.getTeam().getPlayers().size()) {
             if (!firstTeamBonus) {
-                Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN+ "" +ChatColor.BOLD+" was the first full team to finish!");
+                Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN + "" + ChatColor.BOLD + " was the first full team to finish!");
                 for (Participant teammate : p.getTeam().getPlayers()) {
                     teammate.addCurrentScore(FIRST_TEAM_BONUS);
                 }
                 firstTeamBonus = true;
             } else {
-                Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN+ "" +ChatColor.BOLD+" was the second full team to finish!");
+                Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN + "" + ChatColor.BOLD + " was the second full team to finish!");
                 for (Participant teammate : p.getTeam().getPlayers()) {
                     teammate.addCurrentScore(SECOND_TEAM_BONUS);
                 }
@@ -324,11 +325,13 @@ public class TGTTOS extends Game {
     public void chickenClick(Participant p, Entity chicken) {
         finishedParticipants.add(p);
         int placement = finishedParticipants.size();
-        p.addCurrentScore(PLACEMENT_POINTS*(MBC.getInstance().getPlayers().size()-placement)+COMPLETION_POINTS);
+        p.addCurrentScore(PLACEMENT_POINTS * (MBC.getInstance().getPlayers().size() - placement) + COMPLETION_POINTS);
         String place = getPlace(placement);
-        if (placement < 4) { p.addCurrentScore(TOP_THREE_BONUS); }
+        if (placement < 4) {
+            p.addCurrentScore(TOP_THREE_BONUS);
+        }
         chicken.remove();
-        String finish = p.getFormattedName()+ChatColor.WHITE+" finished in " + ChatColor.AQUA+place+"!";
+        String finish = p.getFormattedName() + ChatColor.WHITE + " finished in " + ChatColor.AQUA + place + "!";
 
         getLogger().log(finish);
 
@@ -336,7 +339,7 @@ public class TGTTOS extends Game {
 
         MBC.spawnFirework(p);
         p.getPlayer().setGameMode(GameMode.SPECTATOR);
-        p.getPlayer().sendMessage(ChatColor.GREEN+"You finished in "+ ChatColor.AQUA+place+ChatColor.GREEN+" place!");
+        p.getPlayer().sendMessage(ChatColor.GREEN + "You finished in " + ChatColor.AQUA + place + ChatColor.GREEN + " place!");
 
         // check if all players on a team finished
         if (!firstTeamBonus || !secondTeamBonus)
@@ -354,6 +357,7 @@ public class TGTTOS extends Game {
             }
         }
     }
+
     @EventHandler
     public void chickenLeftClick(EntityDamageByEntityEvent event) {
         if (!isGameActive()) return;

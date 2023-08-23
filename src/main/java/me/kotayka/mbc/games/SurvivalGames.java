@@ -17,6 +17,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -505,6 +507,34 @@ public class SurvivalGames extends Game {
     @EventHandler
     public void onPlayerEntityInteract(PlayerInteractEntityEvent e) {
         if (e.getRightClicked().getType().equals(EntityType.ITEM_FRAME)) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onDisconnect(PlayerQuitEvent e) {
+        if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+            Participant p = Participant.getParticipant(e.getPlayer());
+            if (p == null) return;
+            Bukkit.broadcastMessage(p.getFormattedName() + " disconnected!");
+            updatePlayersAlive(p);
+            for (Participant n : playersAlive) {
+                n.addCurrentScore(SURVIVAL_POINTS);
+            }
+        }
+    }
+
+    // NOTE:
+    // for this implementation of disconnect handling (present for all pvp games)
+    // we may have to restart if someone's internet completely gives out
+    @EventHandler
+    public void onReconnect(PlayerJoinEvent e) {
+        Participant p = Participant.getParticipant(e.getPlayer());
+        if (p == null) {
+            e.getPlayer().teleport(map.Center());
+            return;
+        }
+        if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+            e.getPlayer().setGameMode(GameMode.SPECTATOR);
+        }
     }
 
     @EventHandler

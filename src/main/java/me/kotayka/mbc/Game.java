@@ -165,7 +165,7 @@ public abstract class Game extends Minigame {
      * If only one team remains, "cancel" game by setting timeRemaining to 1
      * @param t Team to check whether any players remain.
      */
-    private void checkLastTeam(MBCTeam t) {
+    public void checkLastTeam(MBCTeam t) {
         if (checkTeamEliminated(t)) {
             teamsAlive.remove(t);
             t.announceTeamDeath();
