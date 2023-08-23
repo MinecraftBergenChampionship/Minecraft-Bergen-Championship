@@ -43,6 +43,7 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("checkbuild").setExecutor(new checkbuild());
         getCommand("placement").setExecutor(new placement());
         getCommand("individual").setExecutor(new individual());
+        getCommand("gamenum").setExecutor(new gamenum());
 
         getCommand("playerscore").setExecutor(new playerscore());
         getCommand("playerscore").setTabCompleter(new playerscoreTabCompletion());

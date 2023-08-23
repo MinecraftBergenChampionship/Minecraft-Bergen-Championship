@@ -27,5 +27,7 @@ commands:
     description: stops a game immediately without carrying scores over
   statlogs:
     description: for admin stat archive
+  gamenum:
+    description: admin set game number
   checkbuild:
     description: checks a build during build mart

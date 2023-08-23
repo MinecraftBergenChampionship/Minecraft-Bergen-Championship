@@ -16,10 +16,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.List;
+
 public class Lobby extends Minigame {
     public static final Location LOBBY = new Location(Bukkit.getWorld("world"), 0.5, 1, 0.5, 180, 0);
     public final World world = Bukkit.getWorld("world");
     public ArmorStand cameraman;
+    private List<MBCTeam> reveal;
+    private int revealCounter = 0;
 
     public Lobby() {
         super("Lobby");
@@ -46,7 +50,7 @@ public class Lobby extends Minigame {
         displayTeamTotalScore(p.getTeam());
     }
 
-    public void createScoreboardFinale() {
+    public void createScoreboardTeamReveal() {
         newObjective();
         for (Participant p : MBC.getInstance().participants) {
             newObjective(p);
@@ -71,6 +75,101 @@ public class Lobby extends Minigame {
             if (timeRemaining == 0) {
                 toDodgebolt();
             }
+            if (revealCounter < 3) {
+                if (timeRemaining % 10 == 0) {
+                    if (reveal.size() < (MBC.MAX_TEAMS - revealCounter)) {
+                        String title = ChatColor.BOLD+"Nobody!";
+                        Bukkit.broadcastMessage(title);
+                        MBC.sendTitle(title, " ", 0, 80, 20);
+                    } else {
+                        revealTeam(reveal.get(revealCounter), MBC.MAX_TEAMS-revealCounter);
+                    }
+                    revealCounter++;
+                } else if (timeRemaining % 5 == 0) {
+                    String title = ChatColor.BOLD+"In " + Game.getPlace(MBC.MAX_TEAMS-revealCounter);
+                    MBC.sendTitle(title," ", 20, 140, 20);
+                    Bukkit.broadcastMessage(title+"...");
+                }
+            }
+            switch (timeRemaining) {
+                case 127 -> {
+                    reveal = getValidTeams();
+                    reveal.sort(new TeamScoreSorter());
+                }
+                case 95 -> {
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"Now for the Dodgebolt Qualifiers!");
+                }
+                case 90 -> {
+                    String title = String.format("In %s1st", ChatColor.GOLD);
+                    Bukkit.broadcastMessage(title+"...");
+                    MBC.sendTitle(title, " ", 20, 140, 20);
+                }
+                case 85 -> {
+                    if (reveal.size() == 0) {
+                        String title = ChatColor.BOLD+"Nobody!";
+                        Bukkit.broadcastMessage(title);
+                        MBC.sendTitle(title, " ", 0, 80, 20);
+                    } else {
+                        revealTeam(reveal.get(reveal.size()-1), 1);
+                    }
+                }
+                case 80 -> {
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"Finally...");
+                }
+                case 79 -> {
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"The team in " + ChatColor.GRAY+ "2nd"+ ChatColor.WHITE + ChatColor.BOLD+" place...");
+                    MBC.sendTitle(ChatColor.BOLD+"In " + ChatColor.GRAY+"2nd", " ", 20, 140, 20);
+                }
+                case 77 -> {
+                    if (reveal.size() <= 2) { return; }
+                    MBCTeam two = reveal.get(reveal.size()-2);
+                    MBCTeam third = reveal.get(reveal.size()-3);
+                    Bukkit.broadcastMessage("With a gap of " + (two.getMultipliedTotalScore() - third.getMultipliedTotalScore()) + " points...");
+                    MBC.sendTitle(ChatColor.BOLD+"In " + ChatColor.GRAY+"2nd", "With " + two.getMultipliedTotalScore() + "points", 0, 140, 20);
+                }
+                case 75 -> {
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"Playing in dodgebolt...");
+                }
+                case 73 -> {
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"is...");
+                }
+                case 70 -> {
+                    if (reveal.size() <= 1) {
+                        String title = ChatColor.BOLD+"Nobody!";
+                        Bukkit.broadcastMessage(title);
+                        MBC.sendTitle(title, " ", 0, 80, 20);
+                    } else {
+                        revealTeam(reveal.get(reveal.size()-2), 2);
+                    }
+                }
+                case 66 -> {
+                    Bukkit.broadcastMessage("Which leaves us with " + ChatColor.DARK_RED + "3rd"+ChatColor.WHITE+",");
+                }
+                case 65 -> {
+                    if (reveal.size() <= 2) {
+                        String title = ChatColor.BOLD + "Nobody!";
+                        Bukkit.broadcastMessage(title);
+                        MBC.sendTitle(title, " ", 0, 80, 20);
+                    } else {
+                        revealTeam(reveal.get(reveal.size()-3), 3);
+                    }
+                }
+                case 60 -> {
+                    teamBarriers(false);
+                    boolean flag = false;
+                    if (reveal.size() > 1) {
+                        flag = true;
+                    }
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.MUSIC_DISC_WAIT, 1, 1);
+                        p.setGameMode(GameMode.ADVENTURE);
+                        p.teleport(LOBBY);
+                        if (flag) {
+                            p.sendTitle("Final Duel!", reveal.get(reveal.size()-1).teamNameFormat() + " vs. " + reveal.get(reveal.size()-2).teamNameFormat(), 20, 60, 20);
+                        }
+                    }
+                }
+            }
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 0) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -91,6 +190,8 @@ public class Lobby extends Minigame {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if (!e.getPlayer().getWorld().equals(world)) return;
+
+        if (getState().equals(GameState.END_ROUND) && e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) { e.setCancelled(true); }
 
         if (e.getPlayer().getLocation().getY() < -45){
             e.getPlayer().teleport(LOBBY);
@@ -121,12 +222,39 @@ public class Lobby extends Minigame {
     public void end() {
         MBC.getInstance().setCurrentGame(this);
         setGameState(GameState.END_GAME);
-        createScoreboard();
+        createScoreboardEnd();
         world.setTime(18000);
         loadPlayersEnd();
         updateTeamStandings();
         stopTimer();
         setTimer(28);
+    }
+
+    public void revealTeam(MBCTeam t, int place) {
+        colorPodium(place, t.getConcrete().getType());
+        MBC.sendTitle(t.teamNameFormat(), "with " + t.getMultipliedTotalScore() + " points", 20, 90, 20);
+        Bukkit.broadcastMessage(t.teamNameFormat() + " with " + t.getMultipliedTotalScore() + " points!");
+        MBC.spawnFirework(placeLocation(place), t.getColor());
+        for (Participant p : MBC.getInstance().participants) {
+            if (p.getTeam().getIcon().equals(t.getIcon())) {
+                p.getPlayer().setGameMode(GameMode.ADVENTURE);
+                p.getPlayer().teleport(placeLocation(place));
+            }
+            createLine(teamScoreForDisplay(place), String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedTotalScore()), p);
+        }
+    }
+
+    // lol
+    private int teamScoreForDisplay(int place) {
+        return switch (place) {
+            case 1 -> 14; //+13
+            case 2 -> 13; // +11
+            case 3 -> 12; // +9
+            case 4 -> 11; // +7
+            case 5 -> 10; // +5
+            case 6 -> 9; // +3
+            default -> -1;
+        };
     }
 
     public void createScoreboardEnd() {
@@ -176,7 +304,7 @@ public class Lobby extends Minigame {
         }
     }
 
-    public void loadPlayersFinale() {
+    public void loadPlayersScoreReveal() {
         cameraman = (ArmorStand) world.spawnEntity(new Location(world, -14.5, -1, -21.5, 140, 0), EntityType.ARMOR_STAND);
         cameraman.setInvisible(true);
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -186,16 +314,16 @@ public class Lobby extends Minigame {
         }
     }
 
-    public void prepareFinale() {
+    public void prepareScoreReveal() {
         MBC.getInstance().setCurrentGame(this);
         setGameState(GameState.END_ROUND);
         world.setTime(13000);
         colorPodiumsWhite();
-        createScoreboardFinale();
-        //teamBarriers(true);
-        loadPlayersFinale();
+        createScoreboardTeamReveal();
+        teamBarriers(true);
+        loadPlayersScoreReveal();
         stopTimer();
-        setTimer(60);
+        setTimer(130);
     }
 
     public void loadPlayersEnd() {
@@ -241,6 +369,37 @@ public class Lobby extends Minigame {
             colorPodium(t.getPlace(), t.getConcrete().getType());
         }
     }
+
+    /*
+     * Where to teleport players/spawn firework depending on
+     * their team placement podium location
+     */
+    private Location placeLocation(int place) {
+        switch(place) {
+            case 6 -> {
+                return new Location(world, -18, -1, -24);
+            }
+            case 5 -> {
+                return new Location(world, -17, 0, -28);
+            }
+            case 4 -> {
+                return new Location(world, -18, 1, -32);
+            }
+            case 3 -> {
+                return new Location(world, -20, 2, -29);
+            }
+            case 2 -> {
+                return new Location(world, -24, 3, -27);
+            }
+            case 1 -> {
+                return new Location(world, -25, 4, -31);
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
     private void colorPodium(int place, Material m) {
         switch (place) {
             case 6 -> {

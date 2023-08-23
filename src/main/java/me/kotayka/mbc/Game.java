@@ -378,6 +378,7 @@ public abstract class Game extends Minigame {
     public void gameEndEvents() {
         if (MBC.getInstance().finalGame) {
             gameEndEventsFinal();
+            return;
         }
         // GAME_END should have ~35 seconds by default
         switch (timeRemaining) {
@@ -410,6 +411,7 @@ public abstract class Game extends Minigame {
     public void teamGameEndEvents() {
         if (MBC.getInstance().finalGame) {
             teamGameEndEventsFinal();
+            return;
         }
         // Team Games should leave at least 25 seconds for GAME_END
         switch (timeRemaining) {
@@ -588,7 +590,7 @@ public abstract class Game extends Minigame {
         MBC.getInstance().gameNum++;
 
         if (MBC.getInstance().finalGame) {
-            MBC.getInstance().lobby.prepareFinale();
+            MBC.getInstance().lobby.prepareScoreReveal();
         } else {
             // if 2nd to last game just ended
             if (MBC.getInstance().gameNum == MBC.GAME_COUNT) {

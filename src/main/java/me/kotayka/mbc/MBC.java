@@ -52,6 +52,7 @@ public class MBC implements Listener {
     public Spectator spectator = new Spectator();
 
     public List<MBCTeam> teams = new ArrayList<>(Arrays.asList(red, yellow, green, blue, purple, pink, spectator));
+    //public List<MBCTeam> validTeams = new ArrayList<>();
     //public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets", "Spectator"));
     public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets", "Spectator"));
     public ScoreboardManager manager =  Bukkit.getScoreboardManager();
@@ -477,6 +478,21 @@ public class MBC implements Listener {
             }
         }
         sender.sendMessage(msg.toString());
+    }
+
+    public static void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
+        }
+    }
+
+    public void setGameNum(int num) {
+        if (finalGame && num != 6) {
+            finalGame = false;
+        } else if (num == 6) {
+            finalGame = true;
+        }
+        gameNum = num;
     }
 
     public void setLogStats(boolean b) { enable_stat_logging = b; }
