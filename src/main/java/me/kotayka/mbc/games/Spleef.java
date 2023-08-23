@@ -2,16 +2,19 @@ package me.kotayka.mbc.games;
 
 import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.spleefMap.Classic;
+import me.kotayka.mbc.gameMaps.spleefMap.SkySpleef;
+import me.kotayka.mbc.gameMaps.spleefMap.Space;
 import me.kotayka.mbc.gameMaps.spleefMap.SpleefMap;
 import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -19,13 +22,13 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class Spleef extends Game {
-    private SpleefMap map = new Classic();
+    private SpleefMap map = null;
+    private List<SpleefMap> maps = new ArrayList<>(
+            Arrays.asList(new Classic(), new Space(), new SkySpleef())
+    );
     //private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
     //public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
     public Map<UUID, SpleefPlayer> spleefPlayers = new HashMap<>();
@@ -81,16 +84,23 @@ public class Spleef extends Game {
     public void onRestart() {
         roundNum = 0;
         resetPlayers();
+        maps = new ArrayList<>(
+                Arrays.asList(new Classic(), new Space(), new SkySpleef())
+        );
         map.resetMap();
     }
 
     @Override
     public void loadPlayers() {
         setPVP(false);
-        openFloor(false);
+        if (map != null) {
+            map.deleteMap();
+        }
+        loadMap();
         if (roundNum == 0) {
             teamsAlive.addAll(getValidTeams());
         }
+        openFloor(false);
 
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().teleport(lobby);
@@ -128,9 +138,9 @@ public class Spleef extends Game {
 
         resetSpleefers();
 
-        //map = maps.get((int) (Math.random()*maps.size()));
-        //maps.remove(map);
-        map.resetMap();
+        if (map == null) {
+            loadMap();
+        }
 
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             createLine(22, ChatColor.AQUA+""+ChatColor.BOLD+"Map: "+ChatColor.RESET+map.Name(), p);
@@ -139,6 +149,12 @@ public class Spleef extends Game {
 
         setGameState(GameState.STARTING);
         setTimer(30);
+    }
+
+    private void loadMap() {
+        map = maps.get((int) (Math.random()*maps.size()));
+        maps.remove(map);
+        map.resetMap();
     }
 
     @Override
@@ -187,6 +203,9 @@ public class Spleef extends Game {
                 timeRemaining = 20;
             }
         } else if (getState().equals(GameState.END_GAME)) {
+            if (timeRemaining == 0) {
+                map.deleteMap();
+            }
             gameEndEvents();
         }
     }
@@ -290,28 +309,47 @@ public class Spleef extends Game {
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent e) {
         if (!(getState().equals(GameState.ACTIVE))) return;
-        if (!(e.getEntity() instanceof Snowball)) return;
+        if (!(e.getEntity() instanceof Snowball) && !(e.getEntity() instanceof Fireball)) return;
         if (!(e.getEntity().getShooter() instanceof Player)) return;
 
         // deal slight knockback to other players
-        if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
-            Player p = (Player) e.getHitEntity();
-            Participant shooter = Participant.getParticipant((Player) e.getEntity().getShooter());
+        if (e.getEntity() instanceof Snowball) {
+            if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
+                Player p = (Player) e.getHitEntity();
+                Participant shooter = Participant.getParticipant((Player) e.getEntity().getShooter());
 
-            snowballHit((Snowball) e.getEntity(), p);
-            SpleefPlayer s = getSpleefPlayer(p);
-            s.setLastDamager(shooter);
-            s.setResetTime(timeRemaining-RESET_DAMAGE_TIME);
+                snowballHit((Snowball) e.getEntity(), p);
+                SpleefPlayer s = getSpleefPlayer(p);
+                s.setLastDamager(shooter);
+                s.setResetTime(timeRemaining-RESET_DAMAGE_TIME);
+            }
+
+            // destroy map blocks (not gold blocks) in contact with snowballs
+            if (e.getHitBlock() != null) {
+                Block b = e.getHitBlock();
+                if (b.getType().equals(Material.GOLD_BLOCK) || b.getType().equals(Material.PACKED_ICE) || b.getType().equals(Material.BARRIER)) return;
+
+                b.breakNaturally();
+                map.getWorld().playSound(b.getLocation(), b.getBlockSoundGroup().getBreakSound(), 1, 1);
+            }
+        } else {
+            Fireball f = (Fireball) e.getEntity();
+            if (e.getHitEntity() != null && e.getHitEntity().equals(f.getShooter())) return;
+            f.getWorld().createExplosion(f.getLocation(), 1, false, true);
+            f.remove();
+            for (Entity ent : f.getNearbyEntities(3, 3, 3)) {
+                if (ent instanceof LargeFireball) { ent.remove(); continue; }
+                if (!(ent instanceof Player)) continue;
+                Player p = (Player) ent;
+                double distance =  f.getLocation().distanceSquared(p.getLocation());
+                if (distance <= 0.5) {
+                    p.setVelocity(new Location(p.getWorld(), 0, 1.25, 0).toVector());
+                } else {
+                    p.setVelocity(p.getLocation().subtract(f.getLocation()).toVector().multiply(1/distance));
+                }
+            }
         }
 
-        // destroy map blocks (not gold blocks) in contact with snowballs
-        if (e.getHitBlock() != null) {
-            Block b = e.getHitBlock();
-            if (b.getType().equals(Material.GOLD_BLOCK) || b.getType().equals(Material.PACKED_ICE) || b.getType().equals(Material.BARRIER)) return;
-
-            b.breakNaturally();
-            map.getWorld().playSound(b.getLocation(), b.getBlockSoundGroup().getBreakSound(), 1, 1);
-        }
     }
 
     @EventHandler
@@ -328,6 +366,18 @@ public class Spleef extends Game {
         hit.setLastDamager(Participant.getParticipant((Player) e.getDamager()));
         hit.setResetTime(timeRemaining - RESET_DAMAGE_TIME);
         e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent e) {
+        if (!(getState().equals(GameState.ACTIVE))) return;
+        if (!(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR))) return;
+        if (!e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.GOLDEN_SHOVEL)) return;
+
+        Fireball f = map.getWorld().spawn(e.getPlayer().getEyeLocation(), Fireball.class);
+        f.setShooter(e.getPlayer());
+        f.setIsIncendiary(false);
+        f.setYield(0);
     }
 
     public void resetSpleefers() {

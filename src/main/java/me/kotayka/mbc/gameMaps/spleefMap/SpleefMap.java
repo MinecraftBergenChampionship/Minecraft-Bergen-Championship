@@ -24,6 +24,11 @@ public abstract class SpleefMap extends MBCMap {
      */
     public abstract void resetMap();
 
+    /*
+     * set entire map to air to prepare for next map
+     */
+    public abstract void deleteMap();
+
     /**
      * Erode border over time
      */

@@ -49,9 +49,7 @@ public abstract class Game extends Minigame {
     }
 
     private void initLogger() {
-        if (MBC.getInstance().logStats()) {
-            logger = new StatLogger(this);
-        }
+        logger = new StatLogger(this);
     }
 
 

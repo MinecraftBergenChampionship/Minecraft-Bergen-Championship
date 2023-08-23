@@ -201,7 +201,7 @@ public class Lobby extends Minigame {
     public void loadPlayersEnd() {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             if (p.winner) {
-                p.getPlayer().teleport(new Location(world, 49.5, -1, 0.5, 90, 0));
+                p.getPlayer().teleport(new Location(world, 49.5, 0.5, 0.5, 90, 0));
                 p.getPlayer().getInventory().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
             } else {
                 p.getPlayer().teleport(new Location(world, 38.5, -3, 0.5, -90, 0));

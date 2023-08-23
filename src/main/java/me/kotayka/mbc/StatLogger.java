@@ -60,8 +60,9 @@ public class StatLogger {
             }
             writer.close();
         } catch (IOException e) {
-            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: IOException while logging stats!");
-            error();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (p.isOp()) p.sendMessage(ChatColor.RED+"ERROR: IOException while logging stats!");
+            }
             e.printStackTrace();
         }
 
@@ -90,23 +91,19 @@ public class StatLogger {
             if (file.createNewFile()) {
                 return file;
             } else {
-                Bukkit.broadcastMessage(ChatColor.RED+"ERROR: File already exists!");
-                error();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (p.isOp())
+                        p.sendMessage(ChatColor.RED+"ERROR: File already exists!");
+                }
                 return null;
             }
         } catch (IOException e) {
-            error();
-            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: IOException while creating files!");
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (p.isOp())
+                    p.sendMessage(ChatColor.RED+"ERROR: IOException while creating files!");
+            }
             e.printStackTrace();
             return null;
-        }
-    }
-
-    private void error() {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (p.isOp()) {
-                p.sendMessage(ChatColor.RED+"An error occurred while logging stats!");
-            }
         }
     }
 }

@@ -84,6 +84,22 @@ public class Classic extends SpleefMap {
     }
 
     @Override
+    public void deleteMap() {
+        for (int paste_to_x = -20; paste_to_x <= 20; paste_to_x++) {
+            for (int paste_to_z = -20; paste_to_z <= 20; paste_to_z++) {
+                getWorld().getBlockAt(paste_to_x, 100, paste_to_z).setType(Material.AIR);
+                getWorld().getBlockAt(paste_to_x, 88, paste_to_z).setType(Material.AIR);
+                getWorld().getBlockAt(paste_to_x, 76, paste_to_z).setType(Material.AIR);
+            }
+        }
+        for (int paste_to_x = -25; paste_to_x <= 25; paste_to_x++) {
+            for (int paste_to_z = -25; paste_to_z <= 25; paste_to_z++) {
+                getWorld().getBlockAt(paste_to_x, 64, paste_to_z).setType(Material.AIR);
+            }
+        }
+    }
+
+    @Override
     public void Border(int timeRemaining) {
         switch (timeRemaining) {
             case 210 -> Bukkit.broadcastMessage(ChatColor.RED + "First layer is starting to erode!");
@@ -92,7 +108,7 @@ public class Classic extends SpleefMap {
             case 60 -> Bukkit.broadcastMessage(ChatColor.RED + "Last layer is starting to erode!");
         }
 
-        if (timeRemaining <= 180 && timeRemaining % 2 == 0 && !firstLayerDecayingBlocks.isEmpty()) {
+        if (timeRemaining <= 210 && timeRemaining % 2 == 0 && !firstLayerDecayingBlocks.isEmpty()) {
             erodeLayer(1);
         }
 
