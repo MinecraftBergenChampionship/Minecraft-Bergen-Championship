@@ -8,6 +8,7 @@ import org.bukkit.entity.SkeletonHorse;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -208,6 +209,11 @@ public class Lobby extends Minigame {
         if (e.getClickedBlock().getType().equals(Material.DAYLIGHT_DETECTOR)) {
             e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void coralDecay(BlockFadeEvent e) {
+        e.setCancelled((true));
     }
 
     @Override
