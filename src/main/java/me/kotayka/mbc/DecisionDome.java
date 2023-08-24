@@ -21,7 +21,7 @@ public class DecisionDome extends Minigame {
     private List<String> gameNames = new ArrayList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle", "Spleef","BuildMart"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
-    //public Map<Egg, Boolean> thrownEggs = new HashMap<Egg, Boolean>();
+    public Set<Player> voters = new HashSet<>();
     private final int[][] coordsForBorder = {
             {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}, {0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7},
             {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}, {-1, 0}, {-2, 0}, {-3, 0}, {-4, 0}, {-5, 0}, {-6, 0}, {-7, 0},
@@ -451,9 +451,15 @@ public class DecisionDome extends Minigame {
             Bukkit.broadcastMessage(e.getEntity().getShooter().toString());
             return; // remove if powerup spawns a chicken turret or something
         }
-        if (e.getEntity() instanceof Egg) {
+
+
+        if (e.getEntity().getType().equals(EntityType.EGG)) {
             Egg egg = (Egg) e.getEntity();
             Participant p = Participant.getParticipant(((Player) e.getEntity().getShooter()));
+            Bukkit.broadcastMessage("Shooter == " + p.getPlayer().getName());
+           // if (!(voters.add(p.getPlayer()))) {
+            //    return;
+            //}
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
             chickens.add(new VoteChicken(p.getTeam(), chicken));
             egg.remove();
@@ -464,7 +470,6 @@ public class DecisionDome extends Minigame {
     public void chickenHatch(PlayerEggThrowEvent e) {
         e.setHatching(false);
         e.setNumHatches((byte) 0);
-        //thrownEggs.put(e.getEgg(), false);
     }
 
     public void removeEntities() {

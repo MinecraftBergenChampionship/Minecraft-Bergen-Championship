@@ -27,14 +27,8 @@ public class Dodgebolt extends Minigame {
     //private ArmorStand cameraman = null;
     private final Location TEAM_ONE_ARROW_SPAWN = new Location(world, 6.5, 20, 0.5, -90, -90);
     private final Location TEAM_TWO_ARROW_SPAWN = new Location(world, -5.5, 20, 0.5, -90, -90);
-    private List<Location> TEAM_ONE_SPAWNS = new ArrayList<>(Arrays.asList(
-            new Location(world, 9.5, 17, 9.5), new Location(world, 12.5, 17, 3.5),
-            new Location(world, 9.5, 17, -8.5), new Location(world, 12.5, 17, -2.5)
-    ));
-    private List<Location> TEAM_TWO_SPAWNS = new ArrayList<>(Arrays.asList(
-            new Location(world, -8.5, 17, 9.5), new Location(world, -11.5, 17, 3.5),
-            new Location(world, -8.5, 17, -8.5), new Location(world, -11.5, 17, -2.5)
-    ));
+    private List<Location> TEAM_ONE_SPAWNS;
+    private List<Location> TEAM_TWO_SPAWNS;
     private final Location SPAWN = new Location(world, 0, 22, 17, 180, 0);
     private final Vector SPAWN_ARROW_VELOCITY = new Vector(0, 0.3, 0);
     public static final ItemStack BOW = new ItemStack(Material.BOW);
@@ -133,12 +127,12 @@ public class Dodgebolt extends Minigame {
          */
 
         TEAM_ONE_SPAWNS = new ArrayList<>(Arrays.asList(
-                new Location(world, 9.5, 18, 9.5, 90, 0), new Location(world, 12.5, 18, 3.5,90, 0),
-                new Location(world, 9.5, 18, -8.5, 90, 0), new Location(world, 12.5, 18, -2.5,90,0)
+                new Location(world, 9.5, 17, 9.5, 90, 0), new Location(world, 12.5, 17, 3.5,90, 0),
+                new Location(world, 9.5, 17, -8.5, 90, 0), new Location(world, 12.5, 17, -2.5,90,0)
         ));
         TEAM_TWO_SPAWNS = new ArrayList<>(Arrays.asList(
-                new Location(world, -8.5, 18, 8.5,-90,0), new Location(world, -11.5, 18, 3.5,-90,0),
-                new Location(world, -8.5, 18, -8.5,-90,0), new Location(world, -11.5, 18, -2.5,-90,0)
+                new Location(world, -8.5, 17, 9.5,-90,0), new Location(world, -11.5, 17, 3.5,-90,0),
+                new Location(world, -8.5, 17, -8.5,-90,0), new Location(world, -11.5, 17, -2.5,-90,0)
         ));
 
         // for when the game starts
@@ -535,6 +529,7 @@ public class Dodgebolt extends Minigame {
     public void onRespawn(PlayerRespawnEvent e) {
         e.getPlayer().getInventory().clear();
         e.setRespawnLocation(SPAWN);
+        e.getPlayer().playSound(e.getPlayer(), Sound.MUSIC_DISC_CHIRP, 1, 1);
     }
 
     @EventHandler
@@ -578,7 +573,7 @@ public class Dodgebolt extends Minigame {
 
         Arrow a = (Arrow) e.getEntity();
         Vector velocity = a.getVelocity();
-        a.setVelocity(new Vector(velocity.getX() * 0.8, velocity.getY(), velocity.getZ()*0.8));
+        a.setVelocity(new Vector(velocity.getX() * 0.95, velocity.getY(), velocity.getZ()*0.95));
         firedArrows.add(a);
         if (trailTask == -1) {
             trailTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
@@ -724,6 +719,7 @@ public class Dodgebolt extends Minigame {
     }
 
     private void properKill(DodgeboltPlayer p) {
+        p.dead = true;
         if (p.FIRST) {
             if (playersAlive[0] != 1) {
                 p.getPlayer().damage(50);
@@ -767,6 +763,7 @@ public class Dodgebolt extends Minigame {
                 else endRound();
             }
         }
+        p.getPlayer().setFireTicks(0);
     }
 
     private void returnToLobby() {

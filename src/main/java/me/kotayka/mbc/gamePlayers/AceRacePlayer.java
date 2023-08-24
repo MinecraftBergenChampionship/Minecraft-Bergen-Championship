@@ -34,7 +34,7 @@ public class AceRacePlayer extends GamePlayer {
      * Also displays text and updates score
      */
     private void Lap() {
-        if (!(ACE_RACE.getState().equals(GameState.ACTIVE)) || !(ACE_RACE.getState().equals(GameState.PAUSED))) { return; }
+        if (!(ACE_RACE.getState().equals(GameState.ACTIVE)) && !(ACE_RACE.getState().equals(GameState.PAUSED))) { return; }
 
         long lapTime;
         ACE_RACE.finishedPlayersByLap[lap - 1]++;  // increment amount of players that have finished

@@ -453,9 +453,11 @@ public class SurvivalGames extends Game {
                 playerKills.put(e.getPlayer().getKiller(), kills++);
                 createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
             }
+            deathEffectsWithHealth(e);
+        } else {
+            playerDeathEffects(e);
         }
 
-        deathEffectsWithHealth(e);
 
         getLogger().log(e.getDeathMessage());
 

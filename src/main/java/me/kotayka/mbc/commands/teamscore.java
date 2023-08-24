@@ -40,7 +40,7 @@ public class teamscore implements CommandExecutor {
             return false;
         }
 
-        MBCTeam t = MBCTeam.getTeam(args[0]);
+        MBCTeam t = MBCTeam.getTeam(args[1]);
         if (t == null) {
             sender.sendMessage(ChatColor.RED + "Please Provide a valid team name");
             return false;

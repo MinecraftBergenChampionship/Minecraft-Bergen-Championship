@@ -401,19 +401,23 @@ public class Spleef extends Game {
         for (Participant n : playersAlive) {
             n.addCurrentScore(SURVIVAL_POINTS);
         }
+
+        p.setPlacement(playersAlive.size()+1);
     }
 
     @EventHandler
     public void onReconnect(PlayerJoinEvent e) {
         SpleefPlayer p = spleefPlayers.get(e.getPlayer().getUniqueId());
         if (p == null) return; // new login; doesn't matter
-        p.setPlayer(e.getPlayer());
 
         // if log back in during paused/starting, manually teleport them
         if (!(getState().equals(GameState.PAUSED)) && !(getState().equals(GameState.STARTING))) {
             e.getPlayer().setGameMode(GameMode.SPECTATOR);
             e.getPlayer().teleport(spawnpoint);
         } else {
+            p.setPlayer(e.getPlayer());
+            p.resetKiller();
+            p.setResetTime(-1);
             e.getPlayer().setGameMode(GameMode.ADVENTURE);
             e.getPlayer().teleport(lobby);
         }

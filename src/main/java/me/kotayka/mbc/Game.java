@@ -538,12 +538,11 @@ public abstract class Game extends Minigame {
     public String printRoundScores() {
         List<MBCTeam> gameScores = new ArrayList<>(getValidTeams());
         gameScores.sort(new TeamRoundSorter());
-        Collections.reverse(gameScores);
         StringBuilder teamString = new StringBuilder();
 
         for (int i = 0; i < gameScores.size(); i++) {
             MBCTeam t = gameScores.get(i);
-            String str = ChatColor.BOLD+""+(i+1)+". "+String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedCurrentScore());
+            String str = ChatColor.BOLD+""+(i+1)+". "+String.format("%s: %.1f\n", t.teamNameFormat(), t.getMultipliedCurrentScore());
             teamString.append(ChatColor.BOLD+""+(i+1)+". ").append(String.format(
                     "%s: %.1f\n", t.teamNameFormat(), t.getMultipliedCurrentScore()
             ));
