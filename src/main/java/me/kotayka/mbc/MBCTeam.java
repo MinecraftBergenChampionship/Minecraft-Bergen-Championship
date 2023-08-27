@@ -61,7 +61,7 @@ public abstract class MBCTeam {
         }
     }
 
-    public List<Participant>teamPlayers = new ArrayList<>(4);
+    public List<Participant>teamPlayers = new ArrayList<>();
 
     public double getMultipliedTotalScore() {
         return multipliedTotalScore;

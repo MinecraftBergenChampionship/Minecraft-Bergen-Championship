@@ -455,10 +455,14 @@ public class SurvivalGames extends Game {
             }
             deathEffectsWithHealth(e);
         } else {
-            playerDeathEffects(e);
+            Participant p = Participant.getParticipant(victim);
+            if (p == null) return;
+            MBC.spawnFirework(p);
+            e.setDeathMessage(e.getDeathMessage().replace(e.getPlayer().getName(), p.getFormattedName()));
+            updatePlayersAlive(p);
         }
 
-
+        victim.setGameMode(GameMode.SPECTATOR);
         getLogger().log(e.getDeathMessage());
 
         Bukkit.broadcastMessage(e.getDeathMessage());
@@ -467,7 +471,6 @@ public class SurvivalGames extends Game {
             map.getWorld().dropItemNaturally(victim.getLocation(), i);
         }
         e.setCancelled(true);
-        victim.setGameMode(GameMode.SPECTATOR);
 
         int count = 0;
         Participant victimParticipant = Participant.getParticipant(victim);
@@ -477,7 +480,7 @@ public class SurvivalGames extends Game {
             }
         }
 
-        if (count == teamPlacements.get(victimParticipant.getTeam())) {
+        if (count == victimParticipant.getTeam().teamPlayers.size()) {
             teamPlacements.put(victimParticipant.getTeam(), getValidTeams().size() - deadTeams);
             deadTeams++;
         }

@@ -160,8 +160,9 @@ public class Participant {
     }
 
     public static Participant getParticipant(Player p) {
+        if (p == null) return null;
         for (Participant x : MBC.getInstance().players) {
-            if (Objects.equals(x.getPlayer().getName(), p.getName())) {
+            if (Objects.equals(x.getPlayer().getUniqueId(), p.getUniqueId())) {
                 return x;
             }
         }
