@@ -143,7 +143,14 @@ public class MBC implements Listener {
                 return spleef;
             case "Dodgebolt":
                 if (dodgebolt == null) {
-                    dodgebolt = new Dodgebolt();
+                    if (getValidTeams().size() < 2) {
+                        dodgebolt = new Dodgebolt();
+                    } else {
+                        // TODO: this is a sin against man
+                        List<MBCTeam> temp = getValidTeams();
+                        temp.sort(new TeamScoreSorter());
+                        dodgebolt = new Dodgebolt(temp.get(temp.size()-1), temp.get(temp.size()-2));
+                    }
                 }
                 return dodgebolt;
             default:
@@ -497,6 +504,7 @@ public class MBC implements Listener {
 
     public void setLogStats(boolean b) { enable_stat_logging = b; }
     public boolean logStats() { return enable_stat_logging; }
+    public void setMultiplier(double multiplier) { this.multiplier = multiplier; }
     public static String statDirectory() { return "stat_archive"+File.separator+"testing";}
     /**
      * ArrayList of all Participants including Spectators.

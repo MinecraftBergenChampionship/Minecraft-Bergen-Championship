@@ -469,8 +469,8 @@ public class Lobby extends Minigame {
         // first place
         world.getBlockAt(-27, 5, -31).setType(m);
         world.getBlockAt(-27, 5, -32).setType(m);
-        world.getBlockAt(-26, 5, -32).setType(m);
-        world.getBlockAt(-25, 5, -32).setType(m);
+        world.getBlockAt(-26, 5, -33).setType(m);
+        world.getBlockAt(-25, 5, -33).setType(m);
         world.getBlockAt(-24, 5, -32).setType(m);
         world.getBlockAt(-24, 5, -31).setType(m);
         world.getBlockAt(-25, 5, -30).setType(m);

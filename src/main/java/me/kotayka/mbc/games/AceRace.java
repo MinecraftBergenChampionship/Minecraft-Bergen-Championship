@@ -48,6 +48,7 @@ public class AceRace extends Game {
 
     public void createScoreboard(Participant p) {
         createLine(19, ChatColor.RESET.toString(), p);
+        createLine(7, ChatColor.RESET.toString() + ChatColor.RESET, p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
 
         updateInGameTeamScoreboard();
@@ -90,6 +91,7 @@ public class AceRace extends Game {
                     p.getPlayer().setVelocity(new Vector(0,0,0));
                     p.getPlayer().removePotionEffect(PotionEffectType.SPEED);
                     p.getPlayer().sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "Practice Over!", "", 0, 60, 20);
+                    createLine(6, ChatColor.GREEN.toString()+ChatColor.BOLD+"Lap: " + ChatColor.RESET+"1/3", p.getParticipant());
                 }
                 setGameState(GameState.END_ROUND);
                 timeRemaining = 5;

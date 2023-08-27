@@ -36,6 +36,13 @@ public class gamenum implements CommandExecutor {
         }
 
         MBC.getInstance().setGameNum(n);
+        double newMult = switch (n) {
+            case 2, 3 -> 1.5;
+            case 4, 5 -> 2.0;
+            case 6 -> 2.5;
+            default -> 1.0;
+        };
+        MBC.getInstance().setMultiplier(newMult);
         sender.sendMessage(ChatColor.GREEN+"Successfully set game to " + n + ".");
         return true;
     }

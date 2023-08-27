@@ -88,6 +88,7 @@ public class AceRacePlayer extends GamePlayer {
             Bukkit.broadcastMessage(str);
             this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Completed Lap " + lap + "!", placementColor + placementString + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
             lap++;
+            ACE_RACE.createLine(6, ChatColor.GREEN.toString()+ChatColor.BOLD+"Lap: " + lap+"/3", getParticipant());
         } else {
             String totalTimeFormat = ChatColor.YELLOW + new SimpleDateFormat("m:ss.S").format(new Date(totalTime));
             this.getParticipant().getPlayer().setGameMode(GameMode.SPECTATOR);
@@ -109,6 +110,9 @@ public class AceRacePlayer extends GamePlayer {
             this.getParticipant().getPlayer().sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "Overall: " + ChatColor.YELLOW + new SimpleDateFormat("m:ss.S").format(new Date(totalTime)));
             this.getParticipant().getPlayer().sendMessage("                                ");
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");
+
+            ACE_RACE.createLine(6, ChatColor.GREEN.toString()+ChatColor.BOLD+"Lap: " + ChatColor.RESET+"Complete!", this.getParticipant());
+            ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " + ChatColor.RESET+"Complete!", this.getParticipant());
 
             // check if all players on team have finished last lap
             int done = 0;
@@ -159,9 +163,11 @@ public class AceRacePlayer extends GamePlayer {
         // case for finishing lap
         if (checkpoint == ACE_RACE.map.mapLength) {
             checkpoint = 0;
+            ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
             Lap();
         } else { // not last checkpoint
             checkpoint++;
+            ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
         }
     }
 
