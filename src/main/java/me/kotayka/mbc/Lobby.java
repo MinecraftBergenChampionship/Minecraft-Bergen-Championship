@@ -408,6 +408,36 @@ public class Lobby extends Minigame {
         }
     }
 
+    public void populatePodium() {
+        Location[] locs = {
+                new Location(this.world, -62.5, 15, -7.5, -90, 0),
+                new Location(this.world, -65.5, 14, -5.5, -90, 0),
+                new Location(this.world, -67.5, 13, -2.5, -90, 0),
+                new Location(this.world, -67.5, 12, .5, -90, 0),
+                new Location(this.world, -67.5, 12, 3.5, -90, 0),
+                new Location(this.world, -65.5, 11, 6.5, -90, 0),
+                new Location(this.world, -62.5, 11, 8.5, -90, 0),
+                new Location(this.world, -59.5, 11, 9.5, -90, 0),
+        };
+
+        List<Participant> individual = MBC.getInstance().getPlayers();
+        individual.sort(new TotalIndividualComparator());
+
+        for (int i = 0; i < 8; i++) {
+            Player p;
+            if (i < individual.size()) {
+                p = individual.get(i).getPlayer();
+            }
+            else {
+                p = Bukkit.getPlayer("kotayka_");
+            }
+
+            Location l = locs[i];
+
+            MBC.npcManager.showAll(MBC.npcManager.createNPC(p,l));
+        }
+    }
+
     private void colorPodium(int place, Material m) {
         switch (place) {
             case 6 -> {

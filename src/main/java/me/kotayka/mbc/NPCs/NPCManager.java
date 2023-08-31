@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import me.kotayka.mbc.Plugin;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation;
 import net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn;
@@ -27,7 +28,7 @@ import java.util.*;
 
 public class NPCManager {
     public final JavaPlugin plugin;
-    public List<NPC> npcs = new ArrayList<>();
+    public static List<NPC> npcs = new ArrayList<>();
 
     public NPCManager(JavaPlugin plugin) {
         this.plugin = plugin;

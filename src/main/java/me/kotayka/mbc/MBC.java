@@ -1,5 +1,6 @@
 package me.kotayka.mbc;
 
+import me.kotayka.mbc.NPCs.NPCManager;
 import me.kotayka.mbc.games.*;
 import me.kotayka.mbc.teams.*;
 import org.bukkit.*;
@@ -13,6 +14,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
@@ -84,9 +86,12 @@ public class MBC implements Listener {
     public static final Material JUMP_PAD = Material.WAXED_WEATHERED_COPPER;
     public double multiplier = 1;
 
+    public static NPCManager npcManager;
+
     private MBC(Plugin plugin) {
         this.plugin = plugin;
         currentGame = lobby;
+        npcManager = new NPCManager((JavaPlugin) plugin);
     }
 
     // ensure singular instance to remove static overuse

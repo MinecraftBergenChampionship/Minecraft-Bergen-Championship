@@ -598,6 +598,8 @@ public abstract class Game extends Minigame {
             }
             MBC.getInstance().lobby.start();
         }
+
+        MBC.getInstance().lobby.populatePodium();
     }
 
     /**
