@@ -1,5 +1,6 @@
 package me.kotayka.mbc;
 
+import me.kotayka.mbc.NPCs.NPCManager;
 import me.kotayka.mbc.commands.*;
 import me.kotayka.mbc.commands.tab.*;
 import org.bukkit.Bukkit;
@@ -16,6 +17,8 @@ public class Plugin extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         MBC.getInstance(this);
+
+        NPCManager npcManager = new NPCManager(this);
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             MBC.getInstance().players.add(new Participant(p));
@@ -53,6 +56,8 @@ public class Plugin extends JavaPlugin implements Listener {
 
         getCommand("statlogs").setExecutor(new statlogs());
         getCommand("statlogs").setTabCompleter(new statlogsTabCompleter());
+
+        getCommand("spawnNPC").setExecutor(new spawnNPC(npcManager));
 
         // prevent crafting wooden axes (worldedit)
         Iterator<Recipe> it = getServer().recipeIterator();

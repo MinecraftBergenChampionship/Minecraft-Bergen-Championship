@@ -31,3 +31,6 @@ commands:
     description: admin set game number
   checkbuild:
     description: checks a build during build mart
+  spawnNPC:
+    description: spawns a npc at that location
+    permission: minecraft.command.op
