@@ -581,6 +581,8 @@ public class Skybattle extends Game {
     @EventHandler
     public void onReconnect(PlayerJoinEvent e) {
         SkybattlePlayer p = skybattlePlayerMap.get(e.getPlayer().getUniqueId());
+        p.voidDeath = false;
+        p.lastDamager = null;
         if (p == null) return; // new login; doesn't matter
         p.setPlayer(e.getPlayer());
 

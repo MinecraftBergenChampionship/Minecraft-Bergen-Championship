@@ -27,25 +27,19 @@ public class Dodgebolt extends Minigame {
     //private ArmorStand cameraman = null;
     private final Location TEAM_ONE_ARROW_SPAWN = new Location(world, 6.5, 20, 0.5, -90, -90);
     private final Location TEAM_TWO_ARROW_SPAWN = new Location(world, -5.5, 20, 0.5, -90, -90);
-    private List<Location> TEAM_ONE_SPAWNS = new ArrayList<>(Arrays.asList(
-            new Location(world, 9.5, 17, 9.5), new Location(world, 12.5, 17, 3.5),
-            new Location(world, 9.5, 17, -8.5), new Location(world, 12.5, 17, -2.5)
-    ));
-    private List<Location> TEAM_TWO_SPAWNS = new ArrayList<>(Arrays.asList(
-            new Location(world, -8.5, 17, 9.5), new Location(world, -11.5, 17, 3.5),
-            new Location(world, -8.5, 17, -8.5), new Location(world, -11.5, 17, -2.5)
-    ));
+    private List<Location> TEAM_ONE_SPAWNS;
+    private List<Location> TEAM_TWO_SPAWNS;
     private final Location SPAWN = new Location(world, 0, 22, 17, 180, 0);
     private final Vector SPAWN_ARROW_VELOCITY = new Vector(0, 0.3, 0);
     public static final ItemStack BOW = new ItemStack(Material.BOW);
     public static final ItemStack BOOTS = new ItemStack(Material.LEATHER_BOOTS);
-    private final List<DodgeboltPlayer> teamOnePlayers = new ArrayList<>(MBC.MAX_PLAYERS_PER_TEAM);
-    private final List<DodgeboltPlayer> teamTwoPlayers = new ArrayList<>(MBC.MAX_PLAYERS_PER_TEAM);
+    private final List<DodgeboltPlayer> teamOnePlayers = new ArrayList<>();
+    private final List<DodgeboltPlayer> teamTwoPlayers = new ArrayList<>();
     private int[] playersAlive;
     private boolean setTimerLine = false;
     private boolean disconnect = false;
     private int noDespawnTask = -1;
-    private List<Arrow> middleArrows = new ArrayList<Arrow>(2);
+    private Set<Arrow> middleArrows = new HashSet<>(2);
     private List<Entity> spawnedArrowItems = new ArrayList<>();
     private HashSet<Arrow> firedArrows = new HashSet<>();
     private Map<Integer, Map<Block, Material>> borderBlocks = new HashMap<>();
@@ -96,6 +90,15 @@ public class Dodgebolt extends Minigame {
         ItemMeta bowMeta = BOW.getItemMeta();
         bowMeta.setUnbreakable(true);
         BOW.setItemMeta(bowMeta);
+
+        for (Participant p : firstPlace.teamPlayers) {
+            teamOnePlayers.add(new DodgeboltPlayer(p, true));
+        }
+        for (Participant p : secondPlace.teamPlayers) {
+            teamTwoPlayers.add(new DodgeboltPlayer(p, false));
+        }
+
+        playersAlive = new int[]{firstPlace.teamPlayers.size(), secondPlace.teamPlayers.size()};
     }
 
     @Override
@@ -133,12 +136,12 @@ public class Dodgebolt extends Minigame {
          */
 
         TEAM_ONE_SPAWNS = new ArrayList<>(Arrays.asList(
-                new Location(world, 9.5, 18, 9.5, 90, 0), new Location(world, 12.5, 18, 3.5,90, 0),
-                new Location(world, 9.5, 18, -8.5, 90, 0), new Location(world, 12.5, 18, -2.5,90,0)
+                new Location(world, 9.5, 17, 9.5, 90, 0), new Location(world, 12.5, 17, 3.5,90, 0),
+                new Location(world, 9.5, 17, -8.5, 90, 0), new Location(world, 12.5, 17, -2.5,90,0)
         ));
         TEAM_TWO_SPAWNS = new ArrayList<>(Arrays.asList(
-                new Location(world, -8.5, 18, 8.5,-90,0), new Location(world, -11.5, 18, 3.5,-90,0),
-                new Location(world, -8.5, 18, -8.5,-90,0), new Location(world, -11.5, 18, -2.5,-90,0)
+                new Location(world, -8.5, 17, 9.5,-90,0), new Location(world, -11.5, 17, 3.5,-90,0),
+                new Location(world, -8.5, 17, -8.5,-90,0), new Location(world, -11.5, 17, -2.5,-90,0)
         ));
 
         // for when the game starts
@@ -268,6 +271,7 @@ public class Dodgebolt extends Minigame {
         barriers(false);
         spawnArrow(true);
         spawnArrow(false);
+        createLineAll(21, ChatColor.RESET.toString());
     }
 
     private void setupArena() {
@@ -405,11 +409,13 @@ public class Dodgebolt extends Minigame {
             a1.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
             a1.setGlowing(true);
             middleArrows.add(a1);
+            Bukkit.broadcastMessage("middleArrows.size() == " + middleArrows.size());
         } else {
             Arrow a2 = world.spawnArrow(TEAM_TWO_ARROW_SPAWN, SPAWN_ARROW_VELOCITY, (float) 0.3, 0);
             a2.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
             a2.setGlowing(true);
             middleArrows.add(a2);
+            Bukkit.broadcastMessage("middleArrows.size() == " + middleArrows.size());
         }
     }
 
@@ -464,6 +470,7 @@ public class Dodgebolt extends Minigame {
         firedArrows.remove(arrow);
 
         if (e.getHitBlock() != null && e.getHitBlockFace() != null) {
+            Bukkit.broadcastMessage("middleArrows == " + middleArrows.toString());
             if (middleArrows.contains(arrow)) return;
             Block b = e.getHitBlock();
             Location l = b.getLocation();
@@ -507,8 +514,10 @@ public class Dodgebolt extends Minigame {
             DodgeboltPlayer p = getDodgeboltPlayer((Player) e.getHitEntity());
             if (p == null) {
                 // hits a spectator ??
+                Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " somehow hit a spectator.");
                 e.setCancelled(true);
                 spawnArrow(!shooter.getTeam().equals(firstPlace));
+                return;
             }
 
             p.shotBy = shooter;
@@ -535,6 +544,7 @@ public class Dodgebolt extends Minigame {
     public void onRespawn(PlayerRespawnEvent e) {
         e.getPlayer().getInventory().clear();
         e.setRespawnLocation(SPAWN);
+        e.getPlayer().playSound(e.getPlayer(), Sound.MUSIC_DISC_CHIRP, 1, 1);
     }
 
     @EventHandler
@@ -566,6 +576,7 @@ public class Dodgebolt extends Minigame {
     @EventHandler
     public void onArrowPickup(PlayerPickupArrowEvent e) {
         middleArrows.remove((Arrow) e.getArrow());
+        Bukkit.broadcastMessage("middleArrows == " + middleArrows);
     }
 
     @EventHandler
@@ -578,7 +589,7 @@ public class Dodgebolt extends Minigame {
 
         Arrow a = (Arrow) e.getEntity();
         Vector velocity = a.getVelocity();
-        a.setVelocity(new Vector(velocity.getX() * 0.8, velocity.getY(), velocity.getZ()*0.8));
+        a.setVelocity(new Vector(velocity.getX() * 0.95, velocity.getY(), velocity.getZ()*0.95));
         firedArrows.add(a);
         if (trailTask == -1) {
             trailTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
@@ -595,7 +606,10 @@ public class Dodgebolt extends Minigame {
         DodgeboltPlayer p = getDodgeboltPlayer(e.getPlayer());
         if (p == null) return;
         for (ItemStack i : p.getPlayer().getInventory()) {
-            if (i.getType() != Material.ARROW) p.getPlayer().getInventory().remove(i);
+            if (i == null) continue;
+            if (i.getType() == Material.ARROW) {
+                world.dropItem(p.getPlayer().getLocation(), i);
+            }
         }
         e.setDeathSound(Sound.ENTITY_FIREWORK_ROCKET_LAUNCH);
 
@@ -724,6 +738,7 @@ public class Dodgebolt extends Minigame {
     }
 
     private void properKill(DodgeboltPlayer p) {
+        p.dead = true;
         if (p.FIRST) {
             if (playersAlive[0] != 1) {
                 p.getPlayer().damage(50);
@@ -767,6 +782,7 @@ public class Dodgebolt extends Minigame {
                 else endRound();
             }
         }
+        p.getPlayer().setFireTicks(0);
     }
 
     private void returnToLobby() {

@@ -127,7 +127,7 @@ public class Lobby extends Minigame {
                     MBCTeam two = reveal.get(reveal.size()-2);
                     MBCTeam third = reveal.get(reveal.size()-3);
                     Bukkit.broadcastMessage("With a gap of " + (two.getMultipliedTotalScore() - third.getMultipliedTotalScore()) + " points...");
-                    MBC.sendTitle(ChatColor.BOLD+"In " + ChatColor.GRAY+"2nd", "With " + two.getMultipliedTotalScore() + "points", 0, 140, 20);
+                    MBC.sendTitle(ChatColor.BOLD+"In " + ChatColor.GRAY+"2nd", "With " + two.getMultipliedTotalScore() + " points", 0, 140, 20);
                 }
                 case 75 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"Playing in dodgebolt...");
@@ -174,7 +174,7 @@ public class Lobby extends Minigame {
                 }
             }
         } else if (getState().equals(GameState.END_GAME)) {
-            if (timeRemaining == 0) {
+            if (timeRemaining < 0) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.sendTitle(ChatColor.YELLOW+"Event Over!", "Thanks for playing!", 20, 60, 20);
                     createLineAll(21, ChatColor.GREEN.toString()+ChatColor.BOLD+"Event Over!");
@@ -355,7 +355,14 @@ public class Lobby extends Minigame {
     public void toDodgebolt() {
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
         setGameState(GameState.INACTIVE);
-        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
+        if (MBC.getInstance().dodgebolt == null) {
+            if (reveal.size() < 2) {
+                MBC.getInstance().dodgebolt = new Dodgebolt();
+            } else {
+                MBC.getInstance().dodgebolt = new Dodgebolt(reveal.get(reveal.size()-1), reveal.get(reveal.size()-2));
+            }
+        }
+        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().dodgebolt, MBC.getInstance().plugin);
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
@@ -366,9 +373,6 @@ public class Lobby extends Minigame {
             p.getPlayer().setLevel(0);
         }
 
-        if (MBC.getInstance().dodgebolt == null) {
-            MBC.getInstance().dodgebolt = new Dodgebolt();
-        }
         MBC.getInstance().dodgebolt.start();
     }
 
@@ -495,8 +499,8 @@ public class Lobby extends Minigame {
         // first place
         world.getBlockAt(-27, 5, -31).setType(m);
         world.getBlockAt(-27, 5, -32).setType(m);
-        world.getBlockAt(-26, 5, -32).setType(m);
-        world.getBlockAt(-25, 5, -32).setType(m);
+        world.getBlockAt(-26, 5, -33).setType(m);
+        world.getBlockAt(-25, 5, -33).setType(m);
         world.getBlockAt(-24, 5, -32).setType(m);
         world.getBlockAt(-24, 5, -31).setType(m);
         world.getBlockAt(-25, 5, -30).setType(m);
