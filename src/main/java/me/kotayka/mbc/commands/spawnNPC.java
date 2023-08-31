@@ -18,8 +18,7 @@ public class spawnNPC implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
-            int npcID = manager.createNPC(((Player) sender).getPlayer(), ((Player) sender).getLocation());
-            manager.show(npcID, ((Player) sender).getPlayer());
+            manager.createNPC(((Player) sender).getPlayer(), ((Player) sender).getLocation()).show(((Player) sender).getPlayer());
         }
         return true;
     }

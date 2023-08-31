@@ -27,46 +27,42 @@ import java.util.*;
 
 public class NPCManager {
     public final JavaPlugin plugin;
-    public Map<Integer, NPC> npcs = new HashMap<>();
+    public List<NPC> npcs = new ArrayList<>();
 
     public NPCManager(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 
-    public int createNPC(Player player, Location loc){
+    public NPC createNPC(Player player, Location loc){
         NPC npc = new NPC(this.plugin, player, loc);
-        int entityID = npc.create();
-        npcs.put(entityID, npc);
-        return entityID;
+        npc.create(player.getName());
+        npcs.add(npc);
+        return npc;
     }
 
-    public void show(int id, Player p) {
-        if (npcs.containsKey(id)) {
-            npcs.get(id).show(p);
-        }
+    public void show(NPC npc, Player p) {
+        npc.show(p);
     }
 
-    public void showAll(int id) {
+    public void showAll(NPC npc) {
         for (Player p : Bukkit.getOnlinePlayers()) {
-            this.show(id, p);
+            this.show(npc, p);
         }
     }
 
     public void addPlayer(Player p) {
-        for (Map.Entry<Integer, NPC> entry : npcs.entrySet()) {
-            entry.getValue().show(p);
+        for (NPC npc : npcs) {
+            npc.show(p);
         }
     }
 
-    public void remove(int id, Player p) {
-        if (npcs.containsKey(id)) {
-            npcs.get(id).show(p);
-        }
+    public void remove(NPC npc, Player p) {
+        npc.remove(p);
     }
 
-    public void removeAll(int id) {
+    public void removeAll(NPC npc) {
         for (Player p : Bukkit.getOnlinePlayers()) {
-            this.remove(id, p);
+            this.remove(npc, p);
         }
     }
 }

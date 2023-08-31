@@ -45,7 +45,11 @@ public class NPC {
         this.location = loc;
     }
 
-    public int create() {
+    public void create() {
+        this.create("NPC");
+    }
+
+    public void create(String name) {
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
         WorldServer world = ((CraftWorld) Objects.requireNonNull((player).getWorld())).getHandle();
 
@@ -54,7 +58,7 @@ public class NPC {
         String texture = things[0];
         String signature = things[1];
 
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "NPC");
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), name);
 
         gameProfile.getProperties().put("textures", new Property("textures", texture, signature));
 
@@ -64,8 +68,6 @@ public class NPC {
 
         this.entityID = npcPlayer.getBukkitEntity().getEntityId();
         this.npc = npcPlayer;
-
-        return this.entityID;
     }
 
     public void show(Player p) {
