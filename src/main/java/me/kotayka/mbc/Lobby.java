@@ -1,10 +1,8 @@
 package me.kotayka.mbc;
 
+import me.kotayka.mbc.NPCs.NPC;
 import org.bukkit.*;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.SkeletonHorse;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
@@ -18,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Lobby extends Minigame {
@@ -26,6 +25,8 @@ public class Lobby extends Minigame {
     public ArmorStand cameraman;
     private List<MBCTeam> reveal;
     private int revealCounter = 0;
+
+    private List<NPC> podiumNPCS = new ArrayList<>();
 
     public Lobby() {
         super("Lobby");
@@ -413,6 +414,12 @@ public class Lobby extends Minigame {
     }
 
     public void populatePodium() {
+        for (NPC npc : podiumNPCS) {
+            MBC.npcManager.removeAll(npc);
+        }
+
+        podiumNPCS = new ArrayList<>();
+
         Location[] locs = {
                 new Location(this.world, -62.5, 15, -7.5, -90, 0),
                 new Location(this.world, -65.5, 14, -5.5, -90, 0),
@@ -438,7 +445,10 @@ public class Lobby extends Minigame {
 
             Location l = locs[i];
 
-            MBC.npcManager.showAll(MBC.npcManager.createNPC(p,l));
+            NPC npc = MBC.npcManager.createNPC(p,l);
+
+            MBC.npcManager.showAll(npc);
+            podiumNPCS.add(npc);
         }
     }
 

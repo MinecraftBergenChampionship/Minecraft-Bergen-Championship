@@ -84,7 +84,7 @@ public class NPC {
             public void run() {
                 connection.a(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, npc));
             }
-        }, 20);
+        }, 100);
     }
 
     public void remove(Player p) {
