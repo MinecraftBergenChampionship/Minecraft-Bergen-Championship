@@ -48,7 +48,7 @@ public class AceRace extends Game {
 
     public void createScoreboard(Participant p) {
         createLine(19, ChatColor.RESET.toString(), p);
-        createLine(7, ChatColor.RESET.toString() + ChatColor.RESET, p);
+        createLine(7, " ", p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
 
         updateInGameTeamScoreboard();
@@ -64,9 +64,6 @@ public class AceRace extends Game {
         for (AceRacePlayer p : aceRacePlayerMap.values()) {
             p.reset();
         }
-
-        //loadPlayers();
-        //createScoreboard();
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.getPlayer().sendTitle(ChatColor.GOLD+""+ChatColor.BOLD+"Practice Starting!", "", 20, 60, 20);

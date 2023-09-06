@@ -438,9 +438,8 @@ public class Lobby extends Minigame {
             Player p;
             if (i < individual.size()) {
                 p = individual.get(i).getPlayer();
-            }
-            else {
-                p = Bukkit.getPlayer("kotayka_");
+            } else {
+                return;
             }
 
             Location l = locs[i];

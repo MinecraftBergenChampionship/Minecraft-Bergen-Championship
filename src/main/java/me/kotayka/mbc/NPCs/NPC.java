@@ -91,9 +91,7 @@ public class NPC {
         PlayerConnection connection = ((CraftPlayer) p).getHandle().b;
         connection.a(new PacketPlayOutEntityDestroy(this.npc.ae()));
 
-        if (this.viewers.contains(p)) {
-            this.viewers.remove(p);
-        }
+        this.viewers.remove(p);
     }
 
     public String[] getRequest(String name)  {

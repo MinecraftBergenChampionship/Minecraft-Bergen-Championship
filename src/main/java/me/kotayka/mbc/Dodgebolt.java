@@ -516,6 +516,7 @@ public class Dodgebolt extends Minigame {
                 // hits a spectator ??
                 Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " somehow hit a spectator.");
                 e.setCancelled(true);
+                arrow.remove();
                 spawnArrow(!shooter.getTeam().equals(firstPlace));
                 return;
             }
@@ -524,6 +525,7 @@ public class Dodgebolt extends Minigame {
             MBC.spawnFirework(p.getParticipant());
             spawnedArrowItems.add(world.dropItem(p.getPlayer().getLocation(), new ItemStack(Material.ARROW)));
             properKill(p);
+            arrow.remove();
             e.setCancelled(true);
         }
     }

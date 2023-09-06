@@ -57,6 +57,7 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("statlogs").setTabCompleter(new statlogsTabCompleter());
 
         getCommand("spawnNPC").setExecutor(new spawnNPC());
+        getCommand("invincible").setExecutor(new invincible());
 
         // prevent crafting wooden axes (worldedit)
         Iterator<Recipe> it = getServer().recipeIterator();

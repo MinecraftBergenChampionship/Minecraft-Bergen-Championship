@@ -31,6 +31,8 @@ commands:
     description: admin set game number
   checkbuild:
     description: checks a build during build mart
+  invincible:
+      description: debug to toggle invincibility
   spawnNPC:
     description: spawns a npc at that location
     permission: minecraft.command.op
