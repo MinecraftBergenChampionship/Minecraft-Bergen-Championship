@@ -153,22 +153,23 @@ public class TGTTOS extends Game {
 
         getLogger().log(ChatColor.AQUA.toString() + ChatColor.BOLD + "New Map: " + ChatColor.WHITE + map.getName());
 
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getInventory().clear();
-            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().setVelocity(new Vector(0, 0, 0));
             p.getPlayer().teleport(map.getSpawnLocation());
-
-            if (p.getPlayer().getAllowFlight()) {
-                removeWinEffect(p);
-            }
-
             if (p.getPlayer().hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
                 p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             }
-
             if (map instanceof Meatball) {
                 p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
+            }
+        }
+
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().getInventory().clear();
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+
+            if (p.getPlayer().getAllowFlight()) {
+                removeWinEffect(p);
             }
 
             if (map.getItems() == null) continue;
@@ -413,14 +414,8 @@ public class TGTTOS extends Game {
             // if block was wool, give appropriate amount back
             String wool = e.getBlock().getType().toString();
             // check item slot
-            assert wool != null;
             int index = p.getInventory().getHeldItemSlot();
-            if (Objects.requireNonNull(p.getInventory().getItem(index)).getType().toString().equals(wool)) {
-                int amt = Objects.requireNonNull(p.getInventory().getItem(index)).getAmount();
-                p.getInventory().setItem(index, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
-                return;
-            }
-            if (p.getInventory().getItem(40) != null) {
+            if (p.getInventory().getItem(40) != null && p.getInventory().getItem(index) == null) {
                 if (Objects.requireNonNull(p.getInventory().getItem(40)).getType().toString().equals(wool)) {
                     int amt;
                     // "some wacky bullshit prevention" - me several months ago
@@ -431,6 +426,9 @@ public class TGTTOS extends Game {
                     }
                     p.getInventory().setItem(40, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
                 }
+            } else if (p.getInventory().getItem(index).getType().toString().equals(wool)) {
+                int amt = p.getInventory().getItem(index).getAmount();
+                p.getInventory().setItem(index, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
             }
         }
     }

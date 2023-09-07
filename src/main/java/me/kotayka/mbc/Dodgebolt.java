@@ -215,7 +215,7 @@ public class Dodgebolt extends Minigame {
             } else {
                 if (timeRemaining == 16) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_CHIRP, 1, 1);
+                        p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
                     }
                 }
                 startingCountdown();
@@ -409,13 +409,11 @@ public class Dodgebolt extends Minigame {
             a1.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
             a1.setGlowing(true);
             middleArrows.add(a1);
-            Bukkit.broadcastMessage("middleArrows.size() == " + middleArrows.size());
         } else {
             Arrow a2 = world.spawnArrow(TEAM_TWO_ARROW_SPAWN, SPAWN_ARROW_VELOCITY, (float) 0.3, 0);
             a2.setPickupStatus(AbstractArrow.PickupStatus.ALLOWED);
             a2.setGlowing(true);
             middleArrows.add(a2);
-            Bukkit.broadcastMessage("middleArrows.size() == " + middleArrows.size());
         }
     }
 
@@ -424,7 +422,7 @@ public class Dodgebolt extends Minigame {
         for (Player p : Bukkit.getOnlinePlayers()) {
             createScoreboard();
             p.sendTitle(t.teamNameFormat() + " win MBC!", " ", 0, 100, 20);
-            p.stopSound(Sound.MUSIC_DISC_CHIRP);
+            p.stopSound(Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS);
             p.playSound(p, Sound.ENTITY_ENDER_DRAGON_DEATH, 1, 1);
             p.setInvulnerable(true);
         }
@@ -439,9 +437,9 @@ public class Dodgebolt extends Minigame {
     private void endRound() {
         createScoreboard();
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.stopSound(Sound.MUSIC_DISC_CHIRP);
+            p.stopSound(Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS);
             p.setInvulnerable(true);
-            p.playSound(p, Sound.MUSIC_DISC_CHIRP, 1, 1);
+            p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
         }
         setTimerLine = false;
         createLineAll(21, ChatColor.RED.toString()+ChatColor.BOLD+"Next Round:");
@@ -464,13 +462,12 @@ public class Dodgebolt extends Minigame {
     @EventHandler
     public void onHit(ProjectileHitEvent e) {
         if (!(e.getEntity() instanceof Arrow)) return;
-        if (!(e.getEntity().getShooter() instanceof Player)) return;
+        if (!(e.getEntity().getShooter() instanceof Player)) { e.setCancelled(true); return; }
 
         Arrow arrow = (Arrow) e.getEntity();
         firedArrows.remove(arrow);
 
         if (e.getHitBlock() != null && e.getHitBlockFace() != null) {
-            Bukkit.broadcastMessage("middleArrows == " + middleArrows.toString());
             if (middleArrows.contains(arrow)) return;
             Block b = e.getHitBlock();
             Location l = b.getLocation();
@@ -546,7 +543,7 @@ public class Dodgebolt extends Minigame {
     public void onRespawn(PlayerRespawnEvent e) {
         e.getPlayer().getInventory().clear();
         e.setRespawnLocation(SPAWN);
-        e.getPlayer().playSound(e.getPlayer(), Sound.MUSIC_DISC_CHIRP, 1, 1);
+        e.getPlayer().playSound(e.getPlayer(), Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
     }
 
     @EventHandler
@@ -578,7 +575,6 @@ public class Dodgebolt extends Minigame {
     @EventHandler
     public void onArrowPickup(PlayerPickupArrowEvent e) {
         middleArrows.remove((Arrow) e.getArrow());
-        Bukkit.broadcastMessage("middleArrows == " + middleArrows);
     }
 
     @EventHandler
@@ -791,7 +787,7 @@ public class Dodgebolt extends Minigame {
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
         setGameState(GameState.INACTIVE);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
-        for (Participant p : MBC.getInstance().getPlayers()) {
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);

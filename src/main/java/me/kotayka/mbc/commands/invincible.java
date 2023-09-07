@@ -1,7 +1,5 @@
 package me.kotayka.mbc.commands;
 
-import me.kotayka.mbc.MBC;
-import me.kotayka.mbc.Participant;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -70,8 +68,8 @@ public class invincible implements CommandExecutor {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             if (p.isOp()) {
                                 p.sendMessage(ChatColor.GREEN+sender.getName() + " changed " + target.getName() + "'s invulnerability to true. ");
-                                sender.sendMessage(ChatColor.GREEN+target.getName() + "'s current invulnerability status: " + target.isInvulnerable());
                             }
+                            sender.sendMessage(ChatColor.GREEN+target.getName() + "'s current invulnerability status: " + target.isInvulnerable());
                         }
                         return true;
                     } else if (args[1].equalsIgnoreCase("false")) {
@@ -79,8 +77,8 @@ public class invincible implements CommandExecutor {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             if (p.isOp()) {
                                 p.sendMessage(ChatColor.GREEN + sender.getName() + " changed " + target.getName() + "'s invulnerability to false. ");
-                                sender.sendMessage(ChatColor.GREEN + target.getName() + "'s current invulnerability status: " + target.isInvulnerable());
                             }
+                            sender.sendMessage(ChatColor.GREEN + target.getName() + "'s current invulnerability status: " + target.isInvulnerable());
                         }
                         return true;
                     } else {

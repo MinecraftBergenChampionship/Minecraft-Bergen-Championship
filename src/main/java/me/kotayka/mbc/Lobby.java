@@ -164,7 +164,7 @@ public class Lobby extends Minigame {
                         flag = true;
                     }
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_WAIT, 1, 1);
+                        p.playSound(p, Sound.MUSIC_DISC_WAIT, SoundCategory.RECORDS, 1, 1);
                         p.setGameMode(GameMode.ADVENTURE);
                         p.teleport(LOBBY);
                         if (flag) {
@@ -364,7 +364,7 @@ public class Lobby extends Minigame {
             }
         }
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().dodgebolt, MBC.getInstance().plugin);
-        for (Participant p : MBC.getInstance().getPlayers()) {
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
