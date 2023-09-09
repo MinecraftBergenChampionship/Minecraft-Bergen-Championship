@@ -812,6 +812,7 @@ public class Dodgebolt extends Minigame {
                 playersAlive[0]--;
             } else {
                 p.getPlayer().teleport(SPAWN);
+                p.dead = true;
                 score[1]++;
                 playersAlive[0] = firstPlace.teamPlayers.size();
                 playersAlive[1] = secondPlace.teamPlayers.size();

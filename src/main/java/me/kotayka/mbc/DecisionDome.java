@@ -81,6 +81,9 @@ public class DecisionDome extends Minigame {
 
     @Override
     public void loadPlayers() {
+        if (!voters.isEmpty()) {
+            voters.clear();
+        }
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {
             Location l;
             switch (t.getChatColor()) {
@@ -257,7 +260,7 @@ public class DecisionDome extends Minigame {
      * TODO
      */
     public void Powerups() {
-        Bukkit.broadcastMessage("[Debug] Powerups not implemented yet!");
+        //Bukkit.broadcastMessage("[Debug] Powerups not implemented yet!");
     }
 
     /**
@@ -452,14 +455,17 @@ public class DecisionDome extends Minigame {
             return; // remove if powerup spawns a chicken turret or something
         }
 
+        if (e.getHitEntity() != null && e.getHitEntity().getType().equals(EntityType.ARMOR_STAND)) {
+            e.setCancelled(true);
+        }
 
         if (e.getEntity().getType().equals(EntityType.EGG)) {
             Egg egg = (Egg) e.getEntity();
             Participant p = Participant.getParticipant(((Player) e.getEntity().getShooter()));
-            Bukkit.broadcastMessage("Shooter == " + p.getPlayer().getName());
-           // if (!(voters.add(p.getPlayer()))) {
-            //    return;
-            //}
+            if (p == null) return;
+            if (!(voters.add(p.getPlayer()))) {
+                return;
+            }
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
             chickens.add(new VoteChicken(p.getTeam(), chicken));
             egg.remove();

@@ -56,8 +56,10 @@ public class Spleef extends Game {
     public void createScoreboard(Participant p) {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
-        if (roundNum == 1) {
-            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+getSpleefPlayer(p.getPlayer()).getKills(), p);
+        if (roundNum != 1) {
+            if (getSpleefPlayer(p.getPlayer()) != null) {
+                createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+getSpleefPlayer(p.getPlayer()).getKills(), p);
+            }
         } else {
             createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+"0", p);
         }
@@ -288,8 +290,6 @@ public class Spleef extends Game {
         if (!(getState().equals(GameState.ACTIVE))) return;
 
         Player p = e.getPlayer();
-        if (!p.getGameMode().equals(GameMode.SURVIVAL)) return;
-
         if (p.getLocation().getY() < map.getDeathY()) {
             SpleefPlayer s = getSpleefPlayer(p);
             handleDeath(s);
@@ -302,6 +302,7 @@ public class Spleef extends Game {
         if (!e.getBlock().getLocation().getWorld().equals(map.getWorld())) return;
 
         Block b = e.getBlock();
+        if (b.getType().equals(Material.PACKED_ICE)) return;
         b.breakNaturally();
         map.getWorld().playSound(b.getLocation(), b.getBlockSoundGroup().getBreakSound(), 1, 1);
         e.getPlayer().getInventory().addItem(new ItemStack(Material.SNOWBALL));
