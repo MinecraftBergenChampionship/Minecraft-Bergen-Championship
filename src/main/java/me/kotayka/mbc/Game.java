@@ -1,5 +1,6 @@
 package me.kotayka.mbc;
 
+import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.gamePlayers.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,6 +14,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -106,7 +108,6 @@ public abstract class Game extends Minigame {
         updatePlayersAlive(victim);
     }
 
-    /*
     public void playerDeathEffectsDisconnect(Participant victim, @Nullable Participant killer) {
         String deathMessage = victim.getFormattedName() + " disconnected!";
 
@@ -116,8 +117,6 @@ public abstract class Game extends Minigame {
         }
         updatePlayersAlive(victim);
     }
-     */
-
 
     /**
      * Variant of playerDeathEffects() but where the death message is displayed as:

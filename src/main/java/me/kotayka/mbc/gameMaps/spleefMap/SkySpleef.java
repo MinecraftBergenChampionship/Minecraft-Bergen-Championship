@@ -90,7 +90,6 @@ public class SkySpleef extends SpleefMap {
         for (int i = 0; i < 15 && blocks.size() > 1; i++) {
             int rand = (int) (Math.random() * blocks.size());
             decaying.add(blocks.get(rand));
-            Bukkit.broadcastMessage(decaying.size() + "");
         }
     }
 }

@@ -1,6 +1,8 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.NPCs.NPCManager;
+import me.kotayka.mbc.comparators.TeamScoreSorter;
+import me.kotayka.mbc.comparators.TotalIndividualComparator;
 import me.kotayka.mbc.games.*;
 import me.kotayka.mbc.teams.*;
 import org.bukkit.*;

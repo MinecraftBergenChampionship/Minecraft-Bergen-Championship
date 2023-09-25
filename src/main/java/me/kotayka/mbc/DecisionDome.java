@@ -1,5 +1,6 @@
 package me.kotayka.mbc;
 
+import me.kotayka.mbc.teams.Spectator;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -114,9 +115,14 @@ public class DecisionDome extends Minigame {
                 default -> l = new Location(world, 0, -27, 0);
             }
             for (Participant p : t.getPlayers()) {
-                //p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_CAT, (float) 0.5, (float) 1.0)
+                p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_CAT,SoundCategory.RECORDS, 1, 1);
                 p.getPlayer().teleport(l);
                 p.getPlayer().getInventory().clear();
+                if (!(t instanceof Spectator)) {
+                    p.getPlayer().setGameMode(GameMode.ADVENTURE);
+                } else {
+                    p.getPlayer().setGameMode(GameMode.SPECTATOR);
+                }
             }
         }
     }
@@ -210,6 +216,9 @@ public class DecisionDome extends Minigame {
             }
             switch (timeRemaining) {
                 case 0 -> {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.stopSound(Sound.MUSIC_DISC_CAT, SoundCategory.RECORDS);
+                    }
                     // start game
                     stopTimer();
                     MBC.getInstance().startGame(winner.game);

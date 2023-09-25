@@ -1,5 +1,6 @@
 package me.kotayka.mbc;
 
+import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.gamePlayers.DodgeboltPlayer;
 import org.bukkit.*;
 import org.bukkit.block.Block;

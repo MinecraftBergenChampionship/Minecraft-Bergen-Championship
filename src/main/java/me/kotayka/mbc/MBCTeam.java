@@ -327,25 +327,6 @@ class TeamUnMultipliedScoreSorter implements Comparator<MBCTeam> {
     }
 }
 
-// TODO i fucked something up and now teamscore and teamround sorters are like inverted logically which is kind of weird
-class TeamScoreSorter implements Comparator<MBCTeam> {
-    public TeamScoreSorter() {}
-
-    public int compare(MBCTeam a, MBCTeam b)
-    {
-        if (a.getMultipliedTotalScore() == b.getMultipliedTotalScore()) {
-            if (a.getRawTotalScore() != b.getRawTotalScore()) {
-                // compare by unmultiplied score before colors; this will be the tiebreaker for Dodgebolt as well
-                return (a.getRawTotalScore() - b.getRawTotalScore());
-            }
-
-            // compare colors
-            return b.getSortID() - a.getSortID();
-        }
-        return (int) (a.getMultipliedTotalScore() - b.getMultipliedTotalScore()); // reverse so bigger numbers are at the top when sorted
-    }
-}
-
 class TeamRoundSorter implements Comparator<MBCTeam> {
     public TeamRoundSorter() {}
 

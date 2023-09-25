@@ -232,7 +232,12 @@ public class Skybattle extends Game {
             String concrete = e.getBlock().getType().toString();
             // check item slot
             int index = p.getInventory().getHeldItemSlot();
-            if (p.getInventory().getItem(40) != null && p.getInventory().getItem(index) == null) {
+            if (Objects.requireNonNull(p.getInventory().getItem(index)).getType().toString().equals(concrete)) {
+                int amt = Objects.requireNonNull(p.getInventory().getItem(index)).getAmount();
+                p.getInventory().setItem(index, new ItemStack(Objects.requireNonNull(Material.getMaterial(concrete)), amt));
+                return;
+            }
+            if (p.getInventory().getItem(40) != null) {
                 if (Objects.requireNonNull(p.getInventory().getItem(40)).getType().toString().equals(concrete)) {
                     int amt;
                     // "some wacky bullshit prevention" - me several months ago
@@ -243,9 +248,6 @@ public class Skybattle extends Game {
                     }
                     p.getInventory().setItem(40, new ItemStack(Objects.requireNonNull(Material.getMaterial(concrete)), amt));
                 }
-            } else if (Objects.requireNonNull(p.getInventory().getItem(index)).getType().toString().equals(concrete)) {
-                int amt = Objects.requireNonNull(p.getInventory().getItem(index)).getAmount();
-                p.getInventory().setItem(index, new ItemStack(Objects.requireNonNull(Material.getMaterial(concrete)), amt));
             }
         }
     }

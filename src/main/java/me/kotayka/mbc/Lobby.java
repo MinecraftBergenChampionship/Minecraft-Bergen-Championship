@@ -1,6 +1,8 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.NPCs.NPC;
+import me.kotayka.mbc.comparators.TeamScoreSorter;
+import me.kotayka.mbc.comparators.TotalIndividualComparator;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -98,6 +100,7 @@ public class Lobby extends Minigame {
                 case 127 -> {
                     reveal = getValidTeams();
                     reveal.sort(new TeamScoreSorter());
+                    Bukkit.broadcastMessage("[Debug] reveal == " + reveal);
                 }
                 case 95 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"Now for the Dodgebolt Qualifiers!");
@@ -343,7 +346,7 @@ public class Lobby extends Minigame {
             } else {
                 p.getPlayer().teleport(new Location(world, 38.5, -3, 0.5, -90, 0));
             }
-            p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_WARD, 1, 1);
+            p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_WARD, SoundCategory.RECORDS, 1, 1);
         }
     }
 

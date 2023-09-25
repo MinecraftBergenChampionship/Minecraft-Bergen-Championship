@@ -66,6 +66,8 @@ public class Plugin extends JavaPlugin implements Listener {
             recipe = it.next();
             if (recipe != null && recipe.getResult().getType() == Material.WOODEN_AXE)
                 it.remove();
+            if (recipe != null && recipe.getResult().getType() == Material.SNOW_BLOCK)
+                it.remove();
         }
     }
 

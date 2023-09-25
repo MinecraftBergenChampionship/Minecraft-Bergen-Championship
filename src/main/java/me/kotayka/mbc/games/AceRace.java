@@ -203,7 +203,7 @@ public class AceRace extends Game {
    public void topLaps() {
         StringBuilder topFive = new StringBuilder();
         int counter = 0;
-        Bukkit.broadcastMessage("[Debug] fastestLaps.keySet().size() == " + fastestLaps.keySet().size());
+        //Bukkit.broadcastMessage("[Debug] fastestLaps.keySet().size() == " + fastestLaps.keySet().size());
         for (Long l : fastestLaps.keySet()) {
             for (int i = 0; i < fastestLaps.get(l).size(); i++) {
                 topFive.append(String.format((counter+1) + ". %-18s %-9s\n", fastestLaps.get(l).get(i), new SimpleDateFormat("m:ss.S").format(new Date(l))));
