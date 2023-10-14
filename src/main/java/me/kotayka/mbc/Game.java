@@ -279,12 +279,10 @@ public abstract class Game extends Minigame {
     }
 
     public static String getPlace(int place) {
-        int temp = place;
-        if (temp > 10) {
-            temp %= 10;
+        if (place > 10 && place < 21) {
+            return (place + "th");
         }
-
-        return switch (temp) {
+        return switch (place) {
             case 1 -> place + "st";
             case 2 -> place + "nd";
             case 3 -> place + "rd";
