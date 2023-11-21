@@ -40,7 +40,7 @@ public class TGTTOS extends Game {
             ));
 
     private List<Participant> finishedParticipants;
-    private String[] deathMessages = new String[44];
+    private String[] deathMessages = new String[45];
     private List<Location> placedBlocks = new ArrayList<Location>(20);
     private boolean firstTeamBonus = false;  // determine whether or not a full team has completed yet
     private boolean secondTeamBonus = false;
@@ -375,7 +375,7 @@ public class TGTTOS extends Game {
     public void chickenRightClick(PlayerInteractEntityEvent event) {
         if (!isGameActive()) return;
 
-        if (event.getRightClicked() instanceof Chicken) {
+        if (event.getRightClicked() instanceof Chicken && event.getPlayer().getGameMode() == GameMode.SURVIVAL) {
             chickenClick(Participant.getParticipant(event.getPlayer()), event.getRightClicked());
         }
     }
