@@ -1,6 +1,7 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
+import net.minecraft.world.entity.EntityLiving;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -21,6 +22,7 @@ public class Participant {
     private double multipliedCurrentScore = 0;
     private MBCTeam team;
     private Player player;
+    private String name;
 
     public Scoreboard board = MBC.getInstance().manager.getNewScoreboard();
     public Objective objective;
@@ -39,11 +41,33 @@ public class Participant {
 
     public Participant(Player p) {
         player=p;
+        name = p.getName();
         p.setScoreboard(board);
 
-        Bukkit.broadcastMessage("[Debug] assigning team");
         changeTeam(MBC.getInstance().spectator);
         MBC.getInstance().participants.add(this);
+    }
+
+    /*
+     * Create Dummy Participant for debug
+     */
+    public Participant(String name) {
+        player = null;
+        this.name = name;
+
+        changeTeam(MBC.getInstance().spectator);
+        MBC.getInstance().participants.add(this);
+    }
+
+    /*
+     * Create Dummy Participant with team for debug
+     */
+    public Participant(String name, String team) {
+        player = null;
+        this.name = name;
+
+        MBC.getInstance().participants.add(this);
+        changeTeam(MBC.getInstance().getTeam(team));
     }
 
     public void changeTeam(MBCTeam t) {
@@ -64,6 +88,9 @@ public class Participant {
     }
 
     public Player getPlayer() {
+        if (player == null) {
+            return Bukkit.getPlayer("rspacerr");
+        }
         return player;
     }
 
@@ -80,8 +107,8 @@ public class Participant {
     /**
      * @return player's username
      */
-    public String getPlayerName() {
-        return getPlayer().getName();
+    public String getName() {
+        return name;
     }
 
     /**
@@ -89,7 +116,7 @@ public class Participant {
      * @return team icon + player's username with color
      */
     public String getFormattedName() {
-        return (ChatColor.WHITE + "" + getTeam().getIcon() + " " + getTeam().getChatColor() + getPlayer().getName()) + ChatColor.WHITE;
+        return (ChatColor.WHITE + "" + getTeam().getIcon() + " " + getTeam().getChatColor() + name) + ChatColor.WHITE;
     }
 
     public int getRawCurrentScore() {
@@ -207,6 +234,10 @@ public class Participant {
         multipliedTotalScore = amount;
         team.resetTotalScores();
         team.addTotalScoreManual(amount);
+    }
+
+    public String toString(){
+        return String.format("{Name: %s, Team: %s, Total_Score: %d, Placement: %d}", name, team.getTeamFullName(), rawTotalScore, totalPlacement);
     }
 
     /**

@@ -42,8 +42,8 @@ public class MBC implements Listener {
      * Players are added to the list when they join a team, if that team is not Spectator.
      * Players are removed from the list when they log off.
      */
-    public List<Participant> players = new ArrayList<>(16); // every player
-    public List<Participant> participants = new ArrayList<>(16); // every player + spectators
+    public List<Participant> players = new ArrayList<>(); // every player
+    public List<Participant> participants = new ArrayList<>(); // every player + spectators
     //public TreeSet<Participant> individual = new TreeSet<>(Participant.rawTotalScoreComparator);
     //public TreeSet<MBCTeam> teamScores = new TreeSet<>(new TeamScoreSorter());
 
@@ -56,6 +56,7 @@ public class MBC implements Listener {
     public Spectator spectator = new Spectator();
 
     public List<MBCTeam> teams = new ArrayList<>(Arrays.asList(red, yellow, green, blue, purple, pink, spectator));
+    // public Map<String, MBCTeam> team_map = new HashMap<>();
     //public List<MBCTeam> validTeams = new ArrayList<>();
     //public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets", "Spectator"));
     public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets", "Spectator"));
@@ -78,7 +79,8 @@ public class MBC implements Listener {
     public boolean finalGame = false;
 
     public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt"));
-    public final List<Game> gameList = new ArrayList<Game>(6);
+    //public final List<Game> gameList = new ArrayList<Game>(6);
+    //public final Map<String, Game> gameMap = new HashMap<String, Game>();
 
     // Define Special Blocks
     // NOTE: ALWAYS USE `getBlock().getRelative(BlockFace.DOWN)` or equivalent
@@ -94,6 +96,17 @@ public class MBC implements Listener {
         this.plugin = plugin;
         currentGame = lobby;
         npcManager = new NPCManager((JavaPlugin) plugin);
+
+        /*
+        team_map.put("red", red);
+        team_map.put("yellow", yellow);
+        team_map.put("green", green);
+        team_map.put("blue", blue);
+        team_map.put("purple", purple);
+        team_map.put("pink", pink);
+         */
+
+        //gameMap.put()
     }
 
     // ensure singular instance to remove static overuse
@@ -207,10 +220,15 @@ public class MBC implements Listener {
      */
     public Game getGame() {
         if (!(currentGame instanceof Game)) {
+            Bukkit.broadcastMessage(ChatColor.RED+"ERROR! No current game active!");
             System.err.print("Tried to access Game when no game was active!");
             return null;
         }
         return (Game) currentGame;
+    }
+
+    public void setMultiplier(float n) {
+        multiplier = n;
     }
 
     public void incrementMultiplier() {
@@ -446,6 +464,19 @@ public class MBC implements Listener {
         }
     }
 
+    public MBCTeam getTeam(String str) {
+        String s = str.toLowerCase();
+        return switch (s) {
+            case "redrabbits", "red" -> red;
+            case "yellowyaks", "yellow" -> yellow;
+            case "green", "greenguardians" -> green;
+            case "blue", "bluebats" -> blue;
+            case "purple", "purplepandas" -> purple;
+            case "pink", "pinkpiglets", "pinkparrots" -> pink;
+            default -> spectator;
+        };
+    }
+
     public void getPlacementInfo(Player sender) {
         Participant p = Participant.getParticipant(sender);
 
@@ -512,7 +543,10 @@ public class MBC implements Listener {
     public void setLogStats(boolean b) { enable_stat_logging = b; }
     public boolean logStats() { return enable_stat_logging; }
     public void setMultiplier(double multiplier) { this.multiplier = multiplier; }
-    public static String statDirectory() { return "stat_archive"+File.separator+"MBC1";}
+    public static String statDirectory() {
+        return "stat_archive"+File.separator+"testing";
+        //return "stat_archive"+File.separator+"MBC2";
+    }
     /**
      * ArrayList of all Participants including Spectators.
      * @return Copy of list of current players with spectators.

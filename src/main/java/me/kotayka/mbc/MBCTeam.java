@@ -296,6 +296,14 @@ public abstract class MBCTeam {
         }, 5L);
     }
 
+    public String debugInfo() {
+        StringBuilder str = new StringBuilder(String.format("{Name: %s, Size: %d, Score: %.1f}", teamNameFormat(), teamPlayers.size(), getMultipliedTotalScore()));
+        for (Participant p : teamPlayers) {
+            str.append(p.toString());
+        }
+        return str.toString();
+    }
+
     public void setPlace(int place) {
         currentPlace = place;
     }

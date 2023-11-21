@@ -566,7 +566,7 @@ public class Skybattle extends Game {
                 SkybattlePlayer killer = skybattlePlayerMap.get(p.getPlayer().getUniqueId());
                 if (killer == null) return;
                 killer.getParticipant().addCurrentScore(KILL_POINTS);
-                killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + p.getParticipant().getPlayerName() + "!");
+                killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + p.getParticipant().getName() + "!");
                 killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + p.getParticipant().getFormattedName(), 0, 60, 20);
                 killer.kills++;
             }

@@ -94,6 +94,14 @@ public class Spleef extends Game {
     }
 
     @Override
+    public String getDebugInfo() {
+        StringBuilder str = new StringBuilder(String.format("{Name: %s, Players: %d}", gameName, spleefPlayers.size()));
+        for (SpleefPlayer p : spleefPlayers.values()) {
+            str.append(p.)
+        }
+    }
+
+    @Override
     public void loadPlayers() {
         setPVP(false);
         if (map != null) {
@@ -394,7 +402,7 @@ public class Spleef extends Game {
         Participant killer = p.getLastDamager();
         if (killer != null) {
             killer.addCurrentScore(KILL_POINTS);
-            killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + p.getParticipant().getPlayerName() + "!");
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + p.getParticipant().getName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + p.getParticipant().getFormattedName(), 0, 60, 20);
             getSpleefPlayer(killer.getPlayer()).incrementKills();
         }

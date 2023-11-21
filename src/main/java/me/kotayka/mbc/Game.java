@@ -94,12 +94,12 @@ public abstract class Game extends Minigame {
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
         MBC.spawnFirework(victim);
-        deathMessage = deathMessage.replace(victim.getPlayerName(), victim.getFormattedName());
+        deathMessage = deathMessage.replace(victim.getName(), victim.getFormattedName());
 
         if (killer != null) {
-            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayerName() + "!");
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
-            deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName());
+            deathMessage = deathMessage.replace(killer.getName(), killer.getFormattedName());
         }
 
         e.setDeathMessage(deathMessage);
@@ -112,7 +112,7 @@ public abstract class Game extends Minigame {
         String deathMessage = victim.getFormattedName() + " disconnected!";
 
         if (killer != null){
-            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed "+victim.getPlayerName()+"!");
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed "+victim.getName()+"!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
         }
         updatePlayersAlive(victim);
@@ -133,13 +133,13 @@ public abstract class Game extends Minigame {
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
         MBC.spawnFirework(victim);
-        deathMessage = deathMessage.replace(victim.getPlayerName(), victim.getFormattedName());
+        deathMessage = deathMessage.replace(victim.getName(), victim.getFormattedName());
 
         if (killer != null) {
-            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayerName() + "!");
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getName() + "!");
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
             String health = String.format(" ["+ChatColor.RED+"♥ %.2f"+ChatColor.RESET+"]", killer.getPlayer().getHealth());
-            deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName()+health);
+            deathMessage = deathMessage.replace(killer.getName(), killer.getFormattedName()+health);
         }
 
         e.setDeathMessage(deathMessage);
@@ -680,6 +680,8 @@ public abstract class Game extends Minigame {
      * variables are properly initialized
      */
     public abstract void onRestart();
+
+    public abstract String getDebugInfo();
 
     public StatLogger getLogger() {
         return logger;
