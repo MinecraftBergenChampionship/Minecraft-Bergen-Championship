@@ -409,6 +409,13 @@ public class TGTTOS extends Game {
         Player p = e.getPlayer();
 
         if (e.getBlock().getType().toString().endsWith("WOOL")) {
+            // if block was placed too close to spawn, don't place it (only for Meatball for now)
+            if (map instanceof Meatball && e.getBlock().getLocation().distanceSquared(map.getSpawnLocation()) < 9) {
+                p.sendMessage(ChatColor.RED+"Move further away from spawn before building!");
+                e.setCancelled(true);
+                return;
+            }
+
             // add to placed blocks
             placedBlocks.add(e.getBlock().getLocation());
             // if block was wool, give appropriate amount back
