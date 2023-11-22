@@ -50,15 +50,16 @@ public class SurvivalGames extends Game {
     private boolean dropLocation = false;
     private int crateNum = 0;
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
+    private boolean firstRound = true;
 
     // Enchantment
     private final GUIItem[] guiItems = setupGUIItems();
 
     // SCORING
-    public final int KILL_POINTS = 35;
-    public final int SURVIVAL_POINTS = 3;
-    public final int[] TEAM_BONUSES = {72, 60, 48, 36, 24, 12};
-    public final int WIN_POINTS = 36; // shared amongst all remaining players
+    public final int KILL_POINTS = 25;
+    public final int SURVIVAL_POINTS = 5;
+    public final int[] TEAM_BONUSES = {36, 24, 24, 12, 12, 12};
+    //public final int WIN_POINTS = 36; // shared amongst all remaining players
 
     public SurvivalGames() {
         super("SurvivalGames");
@@ -88,6 +89,10 @@ public class SurvivalGames extends Game {
     @Override
     public void loadPlayers() {
         setPVP(false);
+        // possibly redundant
+        if (!teamsAlive.isEmpty()) {
+            teamsAlive.clear();
+        }
         teamsAlive.addAll(getValidTeams());
         map.setBarriers(true);
         map.spawnPlayers();
@@ -119,9 +124,7 @@ public class SurvivalGames extends Game {
         crateNum = 0;
         deadTeams = 0;
 
-        resetCrates();
         map.resetMap();
-        map.resetBorder();
     }
 
     @Override
@@ -169,16 +172,20 @@ public class SurvivalGames extends Game {
                     setGameState(GameState.OVERTIME);
                     timeRemaining = 45;
                 } else {
-                    gameOverGraphics();
-                    roundWinners(0);
                     for (Participant p : playersAlive) {
                         MBCTeam t = p.getTeam();
                         teamPlacements.put(t, 1);
                     }
                     placementPoints();
-                    setGameState(GameState.END_GAME);
                     createLineAll(23, "");
-                    timeRemaining = 37;
+                    if (!firstRound) {
+                        setGameState(GameState.END_GAME);
+                        timeRemaining = 37;
+                    } else {
+                        setGameState(GameState.END_ROUND);
+                        firstRound = false;
+                        timeRemaining = 10;
+                    }
                 }
             }
 
@@ -225,12 +232,30 @@ public class SurvivalGames extends Game {
                     teamPlacements.put(t, 1);
                 }
                 placementPoints();
-                setGameState(GameState.END_GAME);
                 createLineAll(23, "");
-                timeRemaining = 37;
+                if (!firstRound) {
+                    setGameState(GameState.END_GAME);
+                    timeRemaining = 37;
+                } else {
+                    setGameState(GameState.END_ROUND);
+                    firstRound = false;
+                    timeRemaining = 10;
+                }
+            }
+        } else if (getState().equals(GameState.END_ROUND)) {
+            if (timeRemaining == 1) {
+                map.resetMap();
+                loadPlayers();
+                setGameState(GameState.STARTING);
+                timeRemaining = 30;
+            } else if (timeRemaining == 9) {
+                roundOverGraphics();
+                roundWinners(0);
             }
         } else if (getState().equals(GameState.END_GAME)) {
-            if (timeRemaining == 35) {
+            if (timeRemaining == 36) {
+                gameOverGraphics();
+                roundWinners(0);
                 map.resetMap();
             }
 
@@ -372,7 +397,7 @@ public class SurvivalGames extends Game {
             for (Participant p : t.getPlayers()) {
                 int placement = teamPlacements.get(t);
                 p.addCurrentScore(TEAM_BONUSES[placement] / getValidTeams().size());
-                p.getPlayer().sendMessage(ChatColor.GREEN+"Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES[placement] * MBC.getInstance().multiplier) + " points!");
+                p.getPlayer().sendMessage(ChatColor.GREEN+"Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES[placement-1] * MBC.getInstance().multiplier) + " points!");
             }
         }
     }
