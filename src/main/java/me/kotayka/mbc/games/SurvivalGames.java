@@ -56,8 +56,8 @@ public class SurvivalGames extends Game {
     private final GUIItem[] guiItems = setupGUIItems();
 
     // SCORING
-    public final int KILL_POINTS = 25;
-    public final int SURVIVAL_POINTS = 5;
+    public final int KILL_POINTS = 7;
+    public final int SURVIVAL_POINTS = 2;
     public final int[] TEAM_BONUSES = {36, 24, 24, 12, 12, 12};
     //public final int WIN_POINTS = 36; // shared amongst all remaining players
 
@@ -89,6 +89,7 @@ public class SurvivalGames extends Game {
     @Override
     public void loadPlayers() {
         setPVP(false);
+        deadTeams = 0;
         // possibly redundant
         if (!teamsAlive.isEmpty()) {
             teamsAlive.clear();
@@ -96,9 +97,14 @@ public class SurvivalGames extends Game {
         teamsAlive.addAll(getValidTeams());
         map.setBarriers(true);
         map.spawnPlayers();
+        if (!playersAlive.isEmpty()) {
+            playersAlive.clear();
+        }
         for (Participant p : MBC.getInstance().getPlayers()) {
             playersAlive.add(p);
             p.getPlayer().getInventory().clear();
+            p.getPlayer().setInvulnerable(true);
+            p.getPlayer().setAllowFlight(false);
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 30, 10, false, false));
@@ -150,18 +156,17 @@ public class SurvivalGames extends Game {
                 }
                 setGameState(GameState.ACTIVE);
                 Bukkit.broadcastMessage(ChatColor.RED+"Grace ends in 1 minute!");
-                timeRemaining = 720;
+                timeRemaining = 450;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             /*
              * Event timeline:
-             *  12 mins: Game Starts
-             *  11 mins: Grace Ends
-             *  10 mins: First supply crate announced; border begins to move
-             *   9 mins: First supply crate spawns
-             *   8 mins: 1 minute to chest refill, 2nd supply crate announced
-             *   7 mins: Chest Refill, 2nd supply crate spawns, 3rd supply crate announced
-             *   6 mins: Last supply crate lands
+             *  7:30: Game Starts
+             *  7:00: Grace Ends, 1st supply crate announced, border starts to move
+             *  6:00: First supply crate spawns, 1 minute to chest refill, 2nd supply crate announced
+             *  5:00: Chest Refill, Second supply crate drops, 3rd supply crate drops
+             *  4:00: 2nd supply crate spawns, 3rd supply crate announced
+             *  3:00: Last supply crate lands
              */
             if (crates.size() > 0) { crateParticles(); }
 
@@ -177,7 +182,7 @@ public class SurvivalGames extends Game {
                         teamPlacements.put(t, 1);
                     }
                     placementPoints();
-                    createLineAll(23, "");
+                    createLineAll(23, "\n");
                     if (!firstRound) {
                         setGameState(GameState.END_GAME);
                         timeRemaining = 37;
@@ -189,36 +194,38 @@ public class SurvivalGames extends Game {
                 }
             }
 
-            if (timeRemaining == 660) {
+            if (timeRemaining == 420) {
                 event = SurvivalGamesEvent.SUPPLY_CRATE;
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+                    p.getPlayer().setInvulnerable(false);
                 }
                 setPVP(true);
                 getLogger().log(ChatColor.DARK_RED+"Grace period is now over.");
                 Bukkit.broadcastMessage(ChatColor.DARK_RED+"Grace period is now over.");
                 map.startBorder();
                 Bukkit.broadcastMessage(ChatColor.RED+"Border will continue to shrink!");
-            } else if (timeRemaining == 600) {
                 crateLocation();
-            } else if (timeRemaining == 540) {
+            } else if (timeRemaining == 360) {
                 spawnSupplyCrate();
-            } else if (timeRemaining == 480) {
                 event = SurvivalGamesEvent.CHEST_REFILL;
-                crateLocation();
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests will refill in one minute!");
-            } else if (timeRemaining == 420) {
-                spawnSupplyCrate();
+                crateLocation();
+            } else if (timeRemaining == 300) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     player.sendTitle("", ChatColor.RED+"Chests refilled!", 20, 60, 20);
                     player.playSound(player, Sound.BLOCK_CHEST_OPEN, 1, 1);
                 }
+                regenChest();
                 getLogger().log(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
-                regenChest();
                 event = SurvivalGamesEvent.SUPPLY_CRATE;
                 crateLocation();
-            } else if (timeRemaining == 360) {
+            } else if (timeRemaining == 240) {
+                spawnSupplyCrate();
+            } else if (timeRemaining == 239) {
+                crateLocation();
+            } else if (timeRemaining == 180) {
                 spawnSupplyCrate();
                 event = SurvivalGamesEvent.DEATHMATCH;
             }
@@ -232,7 +239,7 @@ public class SurvivalGames extends Game {
                     teamPlacements.put(t, 1);
                 }
                 placementPoints();
-                createLineAll(23, "");
+                createLineAll(23, "\n");
                 if (!firstRound) {
                     setGameState(GameState.END_GAME);
                     timeRemaining = 37;
@@ -396,7 +403,7 @@ public class SurvivalGames extends Game {
         for (MBCTeam t : getValidTeams()) {
             for (Participant p : t.getPlayers()) {
                 int placement = teamPlacements.get(t);
-                p.addCurrentScore(TEAM_BONUSES[placement] / getValidTeams().size());
+                p.addCurrentScore(TEAM_BONUSES[placement] / p.getTeam().teamPlayers.size());
                 p.getPlayer().sendMessage(ChatColor.GREEN+"Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES[placement-1] * MBC.getInstance().multiplier) + " points!");
             }
         }
