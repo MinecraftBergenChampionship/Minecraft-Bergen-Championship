@@ -224,7 +224,7 @@ public abstract class Game extends Minigame {
      *  Loops for all players by default.
      */
     public void updatePlayersAliveScoreboard() {
-        createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS);
+        createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.getInstance().getPlayers().size());
         createLineAll(2, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
     }
 
@@ -481,22 +481,23 @@ public abstract class Game extends Minigame {
      * @see Participant addRoundScoreToGame()
      */
     public String getScores() {
-        int num = 0; // separate var incase there is an absurd amount of ties
         StringBuilder topFive = new StringBuilder();
+        int num = 0;
         int lastScore = -1;
-        int counter = 0;
+        int ties = 0;
 
         gameIndividual.addAll(MBC.getInstance().getPlayers());
         gameIndividual.sort(Participant.multipliedCurrentScoreComparator);
         Collections.reverse(gameIndividual);
 
         for (Participant p : gameIndividual) {
-            num++;
-            if (p.getRawCurrentScore() == lastScore) {
-                num--;
-                if (counter == 4) {
-                    counter--; // keep going until no ties
-                }
+            if (ties > 0 && p.getRawCurrentScore() != lastScore) {
+                num+=ties;
+                ties = 0;
+            } else if (p.getRawCurrentScore() == lastScore) {
+                ties++;
+            } else {
+                num++;
             }
 
             String score = String.format(
@@ -504,9 +505,8 @@ public abstract class Game extends Minigame {
             );
             logger.logIndividual(score);
             individual.put(p, p.getRawCurrentScore());
-            if (counter < 5) {
+            if (num <= 5) {
                 topFive.append(score);
-                counter++;
             }
             lastScore = p.getRawCurrentScore();
             p.addCurrentScoreToTotal();

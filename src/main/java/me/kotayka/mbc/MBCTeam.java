@@ -277,7 +277,6 @@ public abstract class MBCTeam {
 
     /**
      * Announces team death.
-     * TODO: maybe a sound effect
      */
     public void announceTeamDeath() {
         // small delay to sync messages correctly
