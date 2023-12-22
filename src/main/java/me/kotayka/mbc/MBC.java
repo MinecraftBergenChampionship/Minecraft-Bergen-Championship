@@ -5,11 +5,13 @@ import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
 import me.kotayka.mbc.games.*;
 import me.kotayka.mbc.teams.*;
+import com.destroystokyo.paper.event.player.*;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -316,30 +318,34 @@ public class MBC implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
-            Player p = e.getPlayer();
-            Location l = p.getLocation();
-            l.setPitch(-25);
-            Vector d = l.getDirection().multiply(4);
-            p.setVelocity(d.setY(1.65));
-            return;
-        }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
-            Player p = e.getPlayer();
-            Bukkit.broadcastMessage("Before: " + p.getVelocity());
-            Location l = p.getLocation();
-            l.setPitch(-25);
-            Vector d = l.getDirection().multiply(2);
-            p.setVelocity(d.setY(1.25));
-            Bukkit.broadcastMessage("After: " + p.getVelocity());
-            return;
-        }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
-            e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
-            return;
-        }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
+        if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
+        } else if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
+            e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
+        }
+    }
+
+    @EventHandler
+    public void onJump(PlayerJumpEvent e) {
+        Player p = e.getPlayer();
+        if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
+            Location l = p.getLocation();
+            l.setPitch(-45);
+            l.set(2.5D, 2.5D,2.5D);
+            Vector d = l.getDirection();
+            Bukkit.broadcastMessage("d == " + d);
+            p.setVelocity(d);
+            return;
+        }
+        if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
+            Location l = p.getLocation();
+            l.setPitch(-45);
+            Vector d = l.getDirection();
+            Bukkit.broadcastMessage("d == " + d);
+            p.setVelocity(d.add(new Vector(0, 100, 0)));
+            Bukkit.broadcastMessage("After: d == " + d);
+            p.setVelocity(d.multiply(2));
+            Bukkit.broadcastMessage("Final Velocity: " + d.multiply(2));
         }
     }
 
@@ -355,7 +361,9 @@ public class MBC implements Listener {
         }
 
         if (!(currentGame instanceof Game)) return;
-        if (!getGame().PVP() && e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
+        if (getGame().PVP()) return;
+        if (!(e.getEntity() instanceof Player)) return;
+        if ((e.getDamager() instanceof Player || (e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof Player))) {
             e.setCancelled(true);
         }
     }

@@ -8,6 +8,7 @@ import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
 import me.kotayka.mbc.gameMaps.aceRaceMap.Biomes;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
 import me.kotayka.mbc.teams.Spectator;
+import com.destroystokyo.paper.event.player.*;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
@@ -168,10 +169,24 @@ public class AceRace extends Game {
 
         if (map.checkDeath(e.getPlayer().getLocation())) {
             int checkpoint = player.checkpoint;
-            e.getPlayer().teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength-1 : checkpoint-1));
+            e.getPlayer().teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength - 1 : checkpoint - 1));
             e.getPlayer().setFireTicks(0);
         }
 
+        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
+            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
+            return;
+        }
+        if (e.getTo().getBlock().getType().toString().toLowerCase().contains("carpet")) {
+            player.setCheckpoint();
+        }
+    }
+
+    @EventHandler
+    public void onJump(PlayerJumpEvent e) {
+        if (Participant.getParticipant(e.getPlayer()).getTeam() instanceof Spectator) return;
+
+        AceRacePlayer player = getGamePlayer(e.getPlayer());
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
             e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(4));
             e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.65, e.getPlayer().getVelocity().getZ()));
@@ -185,14 +200,6 @@ public class AceRace extends Game {
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
             e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
-            return;
-        }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
-            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
-            return;
-        }
-        if (e.getTo().getBlock().getType().toString().toLowerCase().contains("carpet")) {
-            player.setCheckpoint();
         }
     }
 
