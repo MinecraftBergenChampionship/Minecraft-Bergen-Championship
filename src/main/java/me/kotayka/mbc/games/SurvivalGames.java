@@ -55,10 +55,12 @@ public class SurvivalGames extends Game {
     private final GUIItem[] guiItems = setupGUIItems();
 
     // SCORING
-    public final int KILL_POINTS = 35;
-    public final int SURVIVAL_POINTS = 3;
-    public final int[] TEAM_BONUSES = {72, 60, 48, 36, 24, 12};
-    public final int WIN_POINTS = 36; // shared amongst all remaining players
+    public final int KILL_POINTS = 10;
+    public final int SURVIVAL_POINTS = 2;
+    // Shared amongst each team: 10, 8, 7, 6, 5, 4 points for each player
+    public final int[] TEAM_BONUSES_4 = {40, 32, 28, 24, 20, 16};
+    public final int[] TEAM_BONUSES_3 = {30, 24, 21, 18, 15, 12};
+    // public final int WIN_POINTS = 36; // shared amongst all remaining players
 
     public SurvivalGames() {
         super("SurvivalGames");
@@ -371,8 +373,13 @@ public class SurvivalGames extends Game {
         for (MBCTeam t : getValidTeams()) {
             for (Participant p : t.getPlayers()) {
                 int placement = teamPlacements.get(t);
-                p.addCurrentScore(TEAM_BONUSES[placement] / getValidTeams().size());
-                p.getPlayer().sendMessage(ChatColor.GREEN+"Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES[placement] * MBC.getInstance().multiplier) + " points!");
+                if (t.getPlayers().size() == 4) {
+                    p.addCurrentScore(TEAM_BONUSES_4[placement] / getValidTeams().size());
+                    p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_4[placement] * MBC.getInstance().multiplier) + " points!");
+                } else {
+                    p.addCurrentScore(TEAM_BONUSES_3[placement] / getValidTeams().size());
+                    p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_3[placement] * MBC.getInstance().multiplier) + " points!");
+                }
             }
         }
     }
