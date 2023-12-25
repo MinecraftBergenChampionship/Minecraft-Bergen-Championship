@@ -325,27 +325,26 @@ public class MBC implements Listener {
         }
     }
 
+
     @EventHandler
     public void onJump(PlayerJumpEvent e) {
         Player p = e.getPlayer();
         if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
-            Location l = p.getLocation();
-            l.setPitch(-45);
-            l.set(2.5D, 2.5D,2.5D);
-            Vector d = l.getDirection();
-            Bukkit.broadcastMessage("d == " + d);
-            p.setVelocity(d);
+            // wip
+            p.getVelocity().add(new Vector(0, 5, 0));
+            p.setVelocity(p.getLocation().getDirection().multiply(4));
+            p.setVelocity(new Vector(p.getVelocity().getX(), 1.65, p.getVelocity().getZ()));
             return;
         }
         if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
+            p.getVelocity().add(new Vector(0, 7, 0));
             Location l = p.getLocation();
-            l.setPitch(-45);
-            Vector d = l.getDirection();
-            Bukkit.broadcastMessage("d == " + d);
-            p.setVelocity(d.add(new Vector(0, 100, 0)));
-            Bukkit.broadcastMessage("After: d == " + d);
-            p.setVelocity(d.multiply(2));
-            Bukkit.broadcastMessage("Final Velocity: " + d.multiply(2));
+            l.setPitch(-30);
+            Vector d = l.getDirection().normalize();
+            //Bukkit.broadcastMessage(d.getY()+"");
+            p.setVelocity(d.multiply(2.5));
+            Vector v = new Vector(p.getVelocity().getX(), 5, p.getVelocity().getZ());
+            p.setVelocity(v);
         }
     }
 
