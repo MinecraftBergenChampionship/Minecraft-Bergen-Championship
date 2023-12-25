@@ -63,7 +63,7 @@ public class AceRacePlayer extends GamePlayer {
             List<String> t = new ArrayList<String>();
             t.add(this.getParticipant().getFormattedName());
             ACE_RACE.fastestLaps.put(lapTime,t);
-        } else if (lapTime <= ACE_RACE.fastestLaps.lastKey()) {
+        } else if (lapTime <= ACE_RACE.fastestLaps.lastKey() || ACE_RACE.fastestLaps.size() < 5) {
             Set<Long> times = ACE_RACE.fastestLaps.keySet();
             if (times.contains(lapTime)) {
                 ACE_RACE.fastestLaps.get(lapTime).add(this.getParticipant().getFormattedName());
