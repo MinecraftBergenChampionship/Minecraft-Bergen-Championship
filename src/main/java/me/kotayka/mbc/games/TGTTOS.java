@@ -36,7 +36,7 @@ public class TGTTOS extends Game {
     private List<TGTTOSMap> maps = new ArrayList<>(
             Arrays.asList(new Pit(), new Meatball(), new Walls(),
                     new Cliffs(), new Glide(), new Skydive(),
-                    new Boats()
+                    new Boats(), new Skydive(), new Skydive(), new Skydive()
             ));
 
     private List<Participant> finishedParticipants;
@@ -386,36 +386,47 @@ public class TGTTOS extends Game {
     }
 
     @EventHandler
-    public void boatExit(VehicleExitEvent event) {
+    public void boatExit(VehicleExitEvent e) {
         if (!isGameActive()) return;
+        if (!(e.getVehicle() instanceof Boat)) return;
+        if (!(e.getExited() instanceof Player)) return;
 
-        if (event.getVehicle() instanceof Boat && event.getExited() instanceof Player) {
-            Boat boat = (Boat) event.getVehicle();
-            boat.remove();
+        Boat boat = (Boat) e.getVehicle();
+        if (boat.getPassengers().size() > 1) {
+            for (Entity en : boat.getPassengers()) {
+                Location l = en.getLocation().add(0, 1, 0);
+                en.teleport(l);
 
-            ItemStack boatItem = new ItemStack(Material.OAK_BOAT);
-            Player p = (Player) event.getExited();
-            p.getInventory().addItem(boatItem);
+                // give boat to all players
+                if (en instanceof Player) {
+                    ((Player) en).getInventory().addItem(new ItemStack(Material.OAK_BOAT));
+                }
+            }
+        } else {
+            ((Player) e.getExited()).getInventory().addItem(new ItemStack(Material.OAK_BOAT));
         }
+        boat.remove();
     }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        // Check if the interaction is placing a boat
-        if (event.getItem() != null && event.getItem().getType() == Material.OAK_BOAT && !getState().equals(GameState.ACTIVE)) {
+        // Check if the interaction is placing a boat or throwing meatball
+        if (event.getItem() != null && (event.getItem().getType() == Material.OAK_BOAT || event.getItem().getType() == Material.SNOWBALL) && !getState().equals(GameState.ACTIVE)) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void blockPlaceEvent(BlockPlaceEvent e) {
-        if (!isGameActive()) return;
+        if (!isGameActive()) {
+            e.setCancelled(true);
+        }
 
         Player p = e.getPlayer();
 
         if (e.getBlock().getType().toString().endsWith("WOOL")) {
-            // if block was placed too close to spawn, don't place it (only for Meatball for now)
-            if (map instanceof Meatball && e.getBlock().getLocation().distanceSquared(map.getSpawnLocation()) < 9) {
+            // if block was placed too close to spawn, don't place it (only for Meatball+Skydive for now)
+            if ((map instanceof Meatball || map instanceof Skydive) && e.getBlock().getLocation().distanceSquared(map.getSpawnLocation()) < 9) {
                 p.sendMessage(ChatColor.RED+"Move further away from spawn before building!");
                 e.setCancelled(true);
                 return;

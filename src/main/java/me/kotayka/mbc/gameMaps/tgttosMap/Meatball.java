@@ -10,7 +10,7 @@ public class Meatball extends TGTTOSMap {
         super("Meatball", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.SHEARS), new ItemStack(Material.LEATHER_BOOTS)});
         super.loadMap(
                 new Location(getWorld(), -100, 70, 100),
-                new Location[]{new Location(getWorld(), -104, 144, 101), new Location(getWorld(), -108, 144, 105)},
+                new Location[]{new Location(getWorld(), -105, 144, 104), new Location(getWorld(), -107, 144, 102)},
                 64
         );
     }
