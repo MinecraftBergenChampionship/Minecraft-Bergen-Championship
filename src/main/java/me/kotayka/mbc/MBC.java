@@ -317,13 +317,21 @@ public class MBC implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
-            e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(4));
-            e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.65, e.getPlayer().getVelocity().getZ()));
+            Player p = e.getPlayer();
+            Location l = p.getLocation();
+            l.setPitch(-30);
+            Vector d = l.getDirection();
+            p.setVelocity(d.multiply(4));
+            p.setVelocity(new Vector(p.getVelocity().getX(), 1.65, p.getVelocity().getZ()));
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
-            e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(2));
-            e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
+            Player p = e.getPlayer();
+            Location l = p.getLocation();
+            l.setPitch(-30);
+            Vector d = l.getDirection();
+            p.setVelocity(d.multiply(2.5));
+            p.setVelocity(new Vector(p.getVelocity().getX(), 1.25, p.getVelocity().getZ()));
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
