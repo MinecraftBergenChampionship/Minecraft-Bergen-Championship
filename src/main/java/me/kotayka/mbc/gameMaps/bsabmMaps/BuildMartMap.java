@@ -114,6 +114,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
         addBreakArea(new BreakArea(Material.DIORITE, new Location(w, -8, 67, -100), new Location(w, 2, 73, -90), new Location(w, -11, 74, -87, -90, 0)));
         addBreakArea(new BreakArea(Material.GRANITE, new Location(w, -30, 67, -84), new Location(w, -20, 73, -74), new Location(w, -17, 74, -87, 90, 0)));
         addBreakArea(new BreakArea(Material.ANDESITE, new Location(w, -30, 67, -100), new Location(w, -20, 73, -90), new Location(w, -17, 74, -87, 90, 0)));
+        addBreakArea(new BreakArea(Material.MOSSY_COBBLESTONE, new Location(w, -19, 67, -115), new Location(w, -9, 73, -105), new Location(w, -14, 74, -101, 180, 0)));
 
         // bricks
         Location spawn_bricks = new Location(w, -43, 73, 63, 45, 0);
@@ -121,13 +122,14 @@ public class BuildMartMap extends AbstractBuildMartMap {
         addBreakArea(new BreakArea(Material.BRICKS, new Location(w, -50, 66, 71), new Location(w, -40, 72, 81), spawn_bricks));
         addBreakArea(new BreakArea(Material.CHISELED_STONE_BRICKS, new Location(w, -62, 66, 71), new Location(w, -52, 72, 81), spawn_bricks));
         addBreakArea(new BreakArea(Material.PRISMARINE_BRICKS, new Location(w, -62, 66, 59), new Location(w, -52, 72, 69), spawn_bricks));
-        addBreakArea(new BreakArea(Material.MOSSY_COBBLESTONE, new Location(w, -62, 66, 47), new Location(w, -52, 72, 57), spawn_bricks));
+        addBreakArea(new BreakArea(Material.NETHER_BRICKS, new Location(w, -62, 66, 47), new Location(w, -52, 72, 57), spawn_bricks));
 
         // nether
         addBreakArea(new BreakArea(Material.WARPED_WART_BLOCK, new Location(w, 20, 66, 69), new Location(w, 30, 72, 79), new Location(w, 17, 73, 82, -90, 0)));
         addBreakArea(new BreakArea(Material.BLACKSTONE, new Location(w, 20, 66, 85), new Location(w, 30, 72, 95), new Location(w, 17, 73, 82, -90, 0)));
         addBreakArea(new BreakArea(Material.NETHER_WART_BLOCK, new Location(w, -2, 66, 69), new Location(w, 8, 72, 79), new Location(w, 11, 73, 82, 90, 0)));
         addBreakArea(new BreakArea(Material.NETHER_BRICKS, new Location(w, -2, 66, 85), new Location(w, 8, 72, 95), new Location(w, 11, 73, 82, 90, 0)));
+        addBreakArea(new BreakArea(Material.QUARTZ_BLOCK, new Location(w, 9, 66, 100), new Location(w, 19, 72, 110), new Location(w, 14,73, 97, 180, 0)));
     }
 
     @Override

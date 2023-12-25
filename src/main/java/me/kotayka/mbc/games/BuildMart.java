@@ -189,8 +189,7 @@ public class BuildMart extends Game {
         if (m.toString().endsWith("FAN") || m.toString().endsWith("CORAL")) {
             map.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(m));
             e.setCancelled(true);
-        }
-        if (m.toString().contains("POTTED")){
+        } else if (m.toString().contains("POTTED")){
             for (ItemStack i : e.getBlock().getDrops()) {
                 map.getWorld().dropItemNaturally(b.getLocation(), i);
             }
@@ -203,10 +202,8 @@ public class BuildMart extends Game {
             for (BreakArea area : breakAreas) {
                 // assuming no break areas overlap, which would be pointless
                 if (!(area.inArea(b.getLocation()))) continue;
-                if (area.lastBlock()) {
-                    area.Replace();
-                }
                 breakBlock(e.getPlayer(), b);
+                area.breakBlock();
                 return;
             }
         } else {
@@ -215,10 +212,8 @@ public class BuildMart extends Game {
                 e.setCancelled(true);
                 return;
             }
-            if (area.lastBlock()) {
-                area.Replace();
-            }
             breakBlock(e.getPlayer(), b);
+            area.breakBlock();
             return;
         }
         e.setCancelled(true);

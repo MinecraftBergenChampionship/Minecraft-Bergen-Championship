@@ -15,6 +15,7 @@ public class BreakArea {
     private final Location DISLOCATE_LOCATION; // Where to teleport players inside radius to prevent suffocation during replacement
     private final BreakAreaType TYPE;
     private final int VOLUME;
+    private int brokenBlocks = 0;
 
     public BreakArea(Material material, Location lowNW, Location highSE, Location dislocateLocation) {
         this.MATERIAL = material;
@@ -53,7 +54,8 @@ public class BreakArea {
                     }
                 }
             }
-        } else {
+        } else if (TYPE.toString().contains("LOGS")) {
+            // ^^ this might be bad form but keeping it for now
             Location replicationLowNW = map.replicationLocations.get(TYPE);
             int copyY = replicationLowNW.getBlockY();
             int copyX = replicationLowNW.getBlockX();
@@ -64,12 +66,28 @@ public class BreakArea {
                         Block copy = world.getBlockAt(copyX, copyY, copyZ);
                         if (!copy.getType().equals(Material.AIR)) {
                             Block b = world.getBlockAt(x,y,z);
-                            // this is bad form but keeping it for now
-                            if (TYPE.toString().contains("LOGS")) {
-                                b.setBlockData(copy.getBlockData());
-                            } else {
-                                b.setType(MATERIAL);
-                            }
+                            b.setBlockData(copy.getBlockData());
+                        }
+                        copyZ++;
+                    }
+                    copyX++;
+                    copyZ = replicationLowNW.getBlockZ();
+                }
+                copyY++;
+                copyX = replicationLowNW.getBlockX();
+            }
+        } else {
+            Location replicationLowNW = map.replicationLocations.get(TYPE);
+            int copyY = replicationLowNW.getBlockY();
+            int copyX = replicationLowNW.getBlockX();
+            int copyZ = replicationLowNW.getBlockZ();
+            for (int y = LOW_NW.getBlockY(); y <= HIGH_SE.getY(); y++) {
+                for (int x = LOW_NW.getBlockX(); x <= HIGH_SE.getX(); x++) {
+                    for (int z = LOW_NW.getBlockZ(); z <= HIGH_SE.getBlockZ(); z++) {
+                        Block copy = world.getBlockAt(copyX, copyY, copyZ);
+                        if (!copy.getType().equals(Material.AIR)) {
+                            Block b = world.getBlockAt(x, y, z);
+                            b.setType(MATERIAL);
                         }
                         copyZ++;
                     }
@@ -92,6 +110,15 @@ public class BreakArea {
         }
     }
 
+    public void breakBlock() {
+        brokenBlocks++;
+        if (brokenBlocks == VOLUME) {
+            Replace();
+            brokenBlocks = 0;
+        }
+    }
+
+    /*
     public boolean lastBlock() {
         int count = 0;
         if (TYPE == BreakAreaType.REGULAR) {
@@ -129,6 +156,7 @@ public class BreakArea {
         //Bukkit.broadcastMessage("[Debug] VOLUME == " + VOLUME);
         return count == VOLUME;
     }
+     */
 
     public boolean inArea(Block b) { return inArea(b.getLocation()); }
     public boolean inArea(Location l) {
@@ -138,6 +166,7 @@ public class BreakArea {
     }
 
     public Material getType() { return MATERIAL; }
+    public int getVolume() { return VOLUME; }
     public Location getLowNW() { return LOW_NW; }
     public Location getHigh_SE() { return HIGH_SE; }
 }
