@@ -182,10 +182,10 @@ public class BuildMart extends Game {
         for (int i = 0; i < NUM_PLOTS_PER_TEAM; i++) {
             BuildPlot plot = t.getPlots()[i][1];
             if (!(plot.inBuildPlot(b.getLocation()))) continue;
+            breakBlock(e.getPlayer(), b);
             if ((plot.getBuild().checkBuildBreak(plot.getMIDPOINT(), b.getLocation()))) {
                 completeBuild(t, plot);
             }
-            breakBlock(e.getPlayer(), b);
             return;
         }
 
