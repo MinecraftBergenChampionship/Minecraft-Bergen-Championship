@@ -17,11 +17,7 @@ public class SpleefPlayer extends GamePlayer {
     public void incrementKills() { kills++; }
     public void resetKills() { kills = 0; }
     public Participant getLastDamager() { return lastDamager; }
-    public void setLastDamager(Participant p) {
-        if (p.getTeam().equals(this.getParticipant().getTeam())) return;
-
-        lastDamager = p;
-    }
+    public void setLastDamager(Participant p) { lastDamager = p; }
     public void resetKiller() { lastDamager = null; }
     public void setPlacement(int p) { placement = p; }
     public int getResetTime() { return resetTime; }

@@ -43,6 +43,7 @@ public class Spleef extends Game {
     private final int SURVIVAL_POINTS = 2;
     private final int KILL_POINTS = 2;
     private final int LAST_TEAM_BONUS = 5;
+    private Map<Location, SpleefBlock> brokenBlocks = new HashMap<>();
     private final int[] BONUS_POINTS = {20, 15, 15, 10, 10, 8, 8, 8, 5, 5, 3, 3}; // 24 player; these numbers are arbitrary
     // NOTE: 16 player bonus is probably different
 
@@ -90,6 +91,7 @@ public class Spleef extends Game {
         maps = new ArrayList<>(
                 Arrays.asList(new Classic(), new Space(), new SkySpleef())
         );
+        brokenBlocks.clear();
         map.resetMap();
     }
 
@@ -253,16 +255,22 @@ public class Spleef extends Game {
     public void handleDeath(SpleefPlayer victim) {
         String deathMessage;
         if (victim.getLastDamager() == null) {
-            deathMessage = victim.getParticipant().getFormattedName()+" fell into the void.";
+            deathMessage = victim.getParticipant().getFormattedName()+" fell into the void";
         } else {
             SpleefPlayer killer = getSpleefPlayer(victim.getLastDamager().getPlayer());
-            killer.incrementKills();
-            killer.getParticipant().addCurrentScore(KILL_POINTS);
-            killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + victim.getPlayer().getName() + "!");
-            killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
-            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+killer.getKills(), killer.getParticipant());
+            if (killer.getPlayer().getUniqueId().equals(victim.getPlayer().getUniqueId())) {
+                deathMessage = victim.getParticipant().getFormattedName() + " spleefed themselves! How silly.";
+            } else if (killer.getParticipant().getTeam().equals(victim.getParticipant().getTeam())) {
+                deathMessage = victim.getParticipant().getFormattedName()+" was spleefed by their teammate, " + killer.getParticipant().getFormattedName() + "! How silly.";
+            } else {
+                killer.incrementKills();
+                killer.getParticipant().addCurrentScore(KILL_POINTS);
+                killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + victim.getPlayer().getName() + "!");
+                killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
+                createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+killer.getKills(), killer.getParticipant());
 
-            deathMessage = victim.getParticipant().getFormattedName()+" was spleefed by " + killer.getParticipant().getFormattedName();
+                deathMessage = victim.getParticipant().getFormattedName()+" was spleefed by " + killer.getParticipant().getFormattedName();
+            }
         }
 
         getLogger().log(deathMessage);
@@ -290,6 +298,14 @@ public class Spleef extends Game {
         if (!(getState().equals(GameState.ACTIVE))) return;
 
         Player p = e.getPlayer();
+        SpleefPlayer sp = getSpleefPlayer(p);
+        if (e.getTo().getY() < e.getFrom().getY()) {
+            Location l = e.getFrom().getBlock().getLocation();
+            if (brokenBlocks.containsKey(l)) {
+                sp.setLastDamager(brokenBlocks.get(l).breaker.getParticipant());
+            }
+        }
+
         if (p.getLocation().getY() < map.getDeathY()) {
             SpleefPlayer s = getSpleefPlayer(p);
             handleDeath(s);
@@ -306,6 +322,8 @@ public class Spleef extends Game {
         b.breakNaturally();
         map.getWorld().playSound(b.getLocation(), b.getBlockSoundGroup().getBreakSound(), 1, 1);
         e.getPlayer().getInventory().addItem(new ItemStack(Material.SNOWBALL));
+        SpleefPlayer sp = getSpleefPlayer(e.getPlayer());
+        brokenBlocks.put(b.getLocation(), new SpleefBlock(b.getLocation(), sp, timeRemaining-RESET_DAMAGE_TIME));
     }
 
     @EventHandler
@@ -333,6 +351,8 @@ public class Spleef extends Game {
 
                 b.breakNaturally();
                 map.getWorld().playSound(b.getLocation(), b.getBlockSoundGroup().getBreakSound(), 1, 1);
+                SpleefPlayer shooter = getSpleefPlayer((Player) e.getEntity().getShooter());
+                brokenBlocks.put(b.getLocation(), new SpleefBlock(b.getLocation(), shooter, timeRemaining-RESET_DAMAGE_TIME));
             }
         } else {
             Fireball f = (Fireball) e.getEntity();
@@ -452,8 +472,32 @@ public class Spleef extends Game {
         }
     }
 
+    public void checkBlocks() {
+        ArrayList<SpleefBlock> toRemove = new ArrayList<>();
+        for (SpleefBlock sb : brokenBlocks.values()) {
+            if (sb.time >= timeRemaining) {
+                toRemove.add(sb);
+            }
+        }
+
+        for (SpleefBlock sb : toRemove) {
+            brokenBlocks.remove(sb.l);
+        }
+    }
+
 
     public SpleefPlayer getSpleefPlayer(Player p) {
         return spleefPlayers.get(p.getUniqueId());
+    }
+}
+
+class SpleefBlock {
+    Location l;
+    int time;
+    SpleefPlayer breaker;
+    public SpleefBlock(Location l, SpleefPlayer s, int t) {
+        this.l = l;
+        breaker = s;
+        this.time = t;
     }
 }
