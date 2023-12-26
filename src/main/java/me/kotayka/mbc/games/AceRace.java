@@ -68,7 +68,7 @@ public class AceRace extends Game {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.getPlayer().sendTitle(ChatColor.GOLD+""+ChatColor.BOLD+"Practice Starting!", "", 20, 60, 20);
         }
-        setTimer(180);
+        setTimer(210);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class AceRace extends Game {
                 setGameState(GameState.ACTIVE);
                 map.setBarriers(false);
                 setPVP(true);
-                timeRemaining = 600;
+                timeRemaining = 720;
                 startingTime = System.currentTimeMillis();
             }
         } else if (getState().equals(GameState.ACTIVE)) {
