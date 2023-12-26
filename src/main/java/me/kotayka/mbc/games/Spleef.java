@@ -37,13 +37,17 @@ public class Spleef extends Game {
     private final Location lobby;
     private final Location spawnpoint;
     private final int RESET_DAMAGE_TIME = 5;
+    private Map<UUID, Long> damageMap = new HashMap<>();
     private List<MBCTeam> fullyAliveTeams = getValidTeams();
 
     // scoring
     private final int SURVIVAL_POINTS = 2;
     private final int KILL_POINTS = 2;
     private final int LAST_TEAM_BONUS = 5;
+
+    // Misc
     private Map<Location, SpleefBlock> brokenBlocks = new HashMap<>();
+    private final long DAMAGE_COOLDOWN = 1000;
     private final int[] BONUS_POINTS = {20, 15, 15, 10, 10, 8, 8, 8, 5, 5, 3, 3}; // 24 player; these numbers are arbitrary
     // NOTE: 16 player bonus is probably different
 
@@ -88,6 +92,8 @@ public class Spleef extends Game {
     public void onRestart() {
         roundNum = 0;
         resetPlayers();
+        damageMap.clear();
+        brokenBlocks.clear();
         maps = new ArrayList<>(
                 Arrays.asList(new Classic(), new Space(), new SkySpleef())
         );
@@ -106,6 +112,8 @@ public class Spleef extends Game {
             teamsAlive.addAll(getValidTeams());
         }
         openFloor(false);
+        damageMap.clear();
+        brokenBlocks.clear();
 
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().teleport(lobby);
@@ -178,6 +186,7 @@ public class Spleef extends Game {
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             checkResetDamagers();
+            checkBlocks();
             map.Border(timeRemaining);
             if (timeRemaining == 0) {
                 setPVP(false);
@@ -380,11 +389,26 @@ public class Spleef extends Game {
         if (!getState().equals(GameState.ACTIVE)) return;
 
         Player p = (Player) e.getEntity();
+
+        if (!(damageMap.containsKey(p.getUniqueId()))) {
+            SpleefPlayer hit = getSpleefPlayer(p);
+            Vector velocity = e.getDamager().getLocation().getDirection();
+            p.setVelocity(new Vector(velocity.getX()*0.1, 0.1, velocity.getZ()*0.1));
+            p.damage(0.5);
+            damageMap.put(p.getUniqueId(), System.currentTimeMillis());
+            hit.setLastDamager(Participant.getParticipant((Player) e.getDamager()));
+            hit.setResetTime(timeRemaining - RESET_DAMAGE_TIME);
+            e.setCancelled(true);
+            return;
+        }
+        if (System.currentTimeMillis() - damageMap.get(p.getUniqueId()) <= DAMAGE_COOLDOWN) return;
+
         SpleefPlayer hit = getSpleefPlayer(p);
 
         Vector velocity = e.getDamager().getLocation().getDirection();
         p.setVelocity(new Vector(velocity.getX()*0.1, 0.1, velocity.getZ()*0.1));
         p.damage(0.5);
+        damageMap.put(p.getUniqueId(), System.currentTimeMillis());
         hit.setLastDamager(Participant.getParticipant((Player) e.getDamager()));
         hit.setResetTime(timeRemaining - RESET_DAMAGE_TIME);
         e.setCancelled(true);
