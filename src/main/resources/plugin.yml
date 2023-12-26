@@ -9,10 +9,13 @@ commands:
     description: Changing a team
   start:
     description: start a game
+    permission: minecraft.command.op
   pause:
     description: pause game/event
+    permission: minecraft.command.op
   unpause:
     description: unpause game/event
+    permission: minecraft.command.op
   ping:
     description: gets player's ping
   placement:
@@ -21,18 +24,27 @@ commands:
     description: gets top 8 individual
   playerscore:
     description: admin command to set player scores in case of emergency restart
+    permission: minecraft.command.op
   teamscore:
     description: admin command to set team scores in case of emergency restart
+    permission: minecraft.command.op
   endgame:
     description: stops a game immediately without carrying scores over
+    permission: minecraft.command.op
   statlogs:
     description: for admin stat archive
+    permission: minecraft.command.op
   gamenum:
     description: admin set game number
+    permission: minecraft.command.op
   checkbuild:
     description: checks a build during build mart
   invincible:
       description: debug to toggle invincibility
+      permission: minecraft.command.op
   spawnNPC:
     description: spawns a npc at that location
+    permission: minecraft.command.op
+  removeSection:
+    description: removes a decision dome section of that game name
     permission: minecraft.command.op

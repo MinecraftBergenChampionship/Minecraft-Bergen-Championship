@@ -216,11 +216,12 @@ public class MBC implements Listener {
     public void incrementMultiplier() {
         /*
          * Game 1: 1x
-         * Game 2, 3: 1.5x
-         * Game 4, 5: 2x
-         * Game 6: 2.5x
+         * Game 2: 1.5x
+         * Game 3, 4: 2x
+         * Game 5: 2.5x
+         * Game 6: 3x
          */
-        if (gameNum % 2 == 0) {
+        if (gameNum != 4) {
             Bukkit.broadcastMessage("The point multiplier has increased from " + multiplier + " to " + (multiplier+0.5) + "!");
             multiplier+=0.5;
         }

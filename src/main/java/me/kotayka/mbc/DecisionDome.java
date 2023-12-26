@@ -19,7 +19,7 @@ import java.util.*;
 public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
     private boolean revealedGames;
-    private List<String> gameNames = new ArrayList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle", "Spleef","BuildMart"));
+    public List<String> gameNames = new ArrayList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle", "Spleef","Build Mart"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
     public Set<Player> voters = new HashSet<>();
@@ -66,9 +66,6 @@ public class DecisionDome extends Minigame {
             setGameState(GameState.END_GAME);
             setTimer(13);
         } else {
-            // debug
-            for (Section s : sections.values()) {
-            }
             setGameState(GameState.STARTING);
             stopTimer();
             if (revealedGames) {
@@ -301,6 +298,22 @@ public class DecisionDome extends Minigame {
             }
             s.setGameDisplay();
             return;
+        }
+    }
+
+    public void removeSection(String gameName) {
+        Material key = null;
+        for (Section s : sections.values()) {
+            if (s.game.equals(gameName)) {
+                for (Location l : s.sectionLocs) {
+                    l.getBlock().setType(Material.RED_GLAZED_TERRACOTTA);
+                    if (key == null) {
+                        key = world.getBlockAt(new Location(world, l.getBlockX(), l.getBlockY()-1, l.getBlockZ())).getType();
+                    }
+                }
+                s.removeDisplay();
+                break;
+            }
         }
     }
 
