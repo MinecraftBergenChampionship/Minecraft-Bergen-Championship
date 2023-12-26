@@ -7,12 +7,12 @@ import me.kotayka.mbc.games.*;
 import me.kotayka.mbc.teams.*;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
@@ -343,6 +343,16 @@ public class MBC implements Listener {
         }
     }
 
+    // Prevent breaking paintings
+    @EventHandler
+    public void hangingBreak(HangingBreakByEntityEvent e) {
+        if (e.getRemover() instanceof Player && ((Player) e.getRemover()).getGameMode() == GameMode.CREATIVE) return;
+
+        if (e.getEntity() instanceof Painting) {
+            e.setCancelled(true);
+        }
+    }
+
     /**
      * Prevent players from taking damage from fireworks
      * Until this ever becomes a feature in a game
@@ -355,7 +365,26 @@ public class MBC implements Listener {
         }
 
         if (!(currentGame instanceof Game)) return;
-        if (!getGame().PVP() && e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
+        if (getGame().PVP()) return;
+        if (e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
+            e.setCancelled(true);
+        }
+    }
+
+    /**
+     * Prevent Players from taking damage from player fired projectiles if PVP is off
+     */
+    @EventHandler
+    public void onProjHit(ProjectileHitEvent e) {
+        // I don't even know if this is necessary
+        if (e.getHitEntity() instanceof Painting || e.getHitEntity() instanceof ItemFrame) {
+            e.setCancelled(true);
+            return;
+        }
+
+        if (!(currentGame instanceof Game)) return;
+        if (getGame().PVP()) return;
+        if (e.getEntity().getShooter() instanceof Player && e.getHitEntity() instanceof Player) {
             e.setCancelled(true);
         }
     }

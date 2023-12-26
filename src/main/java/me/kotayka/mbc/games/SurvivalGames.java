@@ -10,10 +10,13 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -107,6 +110,10 @@ public class SurvivalGames extends Game {
     @Override
     public void start() {
         super.start();
+
+        for (ItemFrame i : map.getWorld().getEntitiesByClass(ItemFrame.class)) {
+            i.setFixed(true);
+        }
 
         // setGameState(TUTORIAL);
         setGameState(GameState.STARTING);
@@ -407,11 +414,6 @@ public class SurvivalGames extends Game {
      */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if (e.getAction().isLeftClick() && e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.PAINTING)) {
-            e.setCancelled(true);
-            return;
-        }
-
         if (!(e.getAction().isRightClick())) return;
         Player p = e.getPlayer();
 
