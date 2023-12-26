@@ -365,9 +365,20 @@ public class MBC implements Listener {
             e.setCancelled(true);
         }
 
-        if (!(currentGame instanceof Game)) return;
-        if (getGame().PVP()) return;
-        if (e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
+        if (!(currentGame instanceof Game)) { e.setCancelled(true); return; }
+        if (getGame().PVP()) {
+            // I'm not sure if Team Attack was on before, but just in case
+            if (!(e.getDamager() instanceof Player)) return;
+            if (!(e.getEntity() instanceof Player)) return;
+
+            Player p1 = (Player) e.getDamager();
+            Player p2 = (Player) e.getEntity();
+            if (Participant.getParticipant(p1).getTeam().equals(Participant.getParticipant(p2).getTeam())) {
+                e.setCancelled(true);
+            }
+            return;
+        }
+        if (!(getGame().PVP()) && e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
             e.setCancelled(true);
         }
     }
