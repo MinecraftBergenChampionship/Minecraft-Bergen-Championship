@@ -111,8 +111,7 @@ public class TGTTOS extends Game {
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 36) {
                 gameOverGraphics();
-            }
-            if (timeRemaining == 0) {
+            } else if (timeRemaining == 0) {
                 removePlacedBlocks();
             }
             gameEndEvents();

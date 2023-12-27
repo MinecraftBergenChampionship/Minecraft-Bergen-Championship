@@ -53,6 +53,7 @@ public class SurvivalGames extends Game {
     private boolean dropLocation = false;
     private int crateNum = 0;
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
+    private boolean firstRound = true;
 
     // Enchantment
     private final GUIItem[] guiItems = setupGUIItems();
@@ -93,17 +94,28 @@ public class SurvivalGames extends Game {
     @Override
     public void loadPlayers() {
         setPVP(false);
+        deadTeams = 0;
+        // possibly redundant
+        if (!teamsAlive.isEmpty()) {
+            teamsAlive.clear();
+        }
         teamsAlive.addAll(getValidTeams());
         map.setBarriers(true);
         map.spawnPlayers();
+        if (!playersAlive.isEmpty()) {
+            playersAlive.clear();
+        }
         for (Participant p : MBC.getInstance().getPlayers()) {
             playersAlive.add(p);
             p.getPlayer().getInventory().clear();
+            p.getPlayer().setInvulnerable(true);
+            p.getPlayer().setAllowFlight(false);
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 30, 10, false, false));
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
         }
+        updatePlayersAliveScoreboard();
         regenChest();
     }
 
@@ -128,9 +140,7 @@ public class SurvivalGames extends Game {
         crateNum = 0;
         deadTeams = 0;
 
-        resetCrates();
         map.resetMap();
-        map.resetBorder();
     }
 
     @Override
@@ -156,18 +166,17 @@ public class SurvivalGames extends Game {
                 }
                 setGameState(GameState.ACTIVE);
                 Bukkit.broadcastMessage(ChatColor.RED+"Grace ends in 1 minute!");
-                timeRemaining = 720;
+                timeRemaining = 450;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             /*
              * Event timeline:
-             *  12 mins: Game Starts
-             *  11 mins: Grace Ends
-             *  10 mins: First supply crate announced; border begins to move
-             *   9 mins: First supply crate spawns
-             *   8 mins: 1 minute to chest refill, 2nd supply crate announced
-             *   7 mins: Chest Refill, 2nd supply crate spawns, 3rd supply crate announced
-             *   6 mins: Last supply crate lands
+             *  7:30: Game Starts
+             *  7:00: Grace Ends, border starts to move
+             *  6:00: 1 minute to chest refill, 1st supply crate announced
+             *  5:00: Chest Refill, 1st supply crate drops, 2nd supply crate announced
+             *  4:00: 2nd supply crate drops, 3rd supply crate announced
+             *  3:00: Last supply crate lands
              */
             if (crates.size() > 0) { crateParticles(); }
 
@@ -178,51 +187,55 @@ public class SurvivalGames extends Game {
                     setGameState(GameState.OVERTIME);
                     timeRemaining = 45;
                 } else {
-                    gameOverGraphics();
-                    roundWinners(0);
                     for (Participant p : playersAlive) {
                         MBCTeam t = p.getTeam();
                         teamPlacements.put(t, 1);
                     }
                     placementPoints();
-                    setGameState(GameState.END_GAME);
-                    createLineAll(23, "");
-                    timeRemaining = 37;
+                    createLineAll(23, "\n");
+                    if (!firstRound) {
+                        setGameState(GameState.END_GAME);
+                        timeRemaining = 37;
+                    } else {
+                        setGameState(GameState.END_ROUND);
+                        firstRound = false;
+                        timeRemaining = 10;
+                    }
                 }
             }
 
-            if (timeRemaining == 660) {
+            if (timeRemaining == 420) {
                 event = SurvivalGamesEvent.SUPPLY_CRATE;
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+                    p.getPlayer().setInvulnerable(false);
                 }
                 setPVP(true);
                 getLogger().log(ChatColor.DARK_RED+"Grace period is now over.");
                 Bukkit.broadcastMessage(ChatColor.DARK_RED+"Grace period is now over.");
                 map.startBorder();
                 Bukkit.broadcastMessage(ChatColor.RED+"Border will continue to shrink!");
-            } else if (timeRemaining == 600) {
-                crateLocation();
-            } else if (timeRemaining == 540) {
-                spawnSupplyCrate();
-            } else if (timeRemaining == 480) {
+            } else if (timeRemaining == 360) {
                 event = SurvivalGamesEvent.CHEST_REFILL;
-                crateLocation();
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests will refill in one minute!");
-            } else if (timeRemaining == 420) {
+                crateLocation();
+            } else if (timeRemaining == 300) {
                 spawnSupplyCrate();
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     player.sendTitle("", ChatColor.RED+"Chests refilled!", 20, 60, 20);
                     player.playSound(player, Sound.BLOCK_CHEST_OPEN, 1, 1);
                 }
+                regenChest();
                 getLogger().log(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
-                regenChest();
                 event = SurvivalGamesEvent.SUPPLY_CRATE;
                 crateLocation();
-            } else if (timeRemaining == 360) {
+            } else if (timeRemaining == 240) {
                 spawnSupplyCrate();
-                event = SurvivalGamesEvent.DEATHMATCH;
+            } else if (timeRemaining == 239) {
+                crateLocation();
+            } else if (timeRemaining == 180) {
+                spawnSupplyCrate();
             }
             UpdateEvent();
         } else if (getState().equals(GameState.OVERTIME)) {
@@ -234,12 +247,30 @@ public class SurvivalGames extends Game {
                     teamPlacements.put(t, 1);
                 }
                 placementPoints();
-                setGameState(GameState.END_GAME);
-                createLineAll(23, "");
-                timeRemaining = 37;
+                createLineAll(23, "\n");
+                if (!firstRound) {
+                    setGameState(GameState.END_GAME);
+                    timeRemaining = 37;
+                } else {
+                    setGameState(GameState.END_ROUND);
+                    firstRound = false;
+                    timeRemaining = 10;
+                }
+            }
+        } else if (getState().equals(GameState.END_ROUND)) {
+            if (timeRemaining == 1) {
+                map.resetMap();
+                loadPlayers();
+                setGameState(GameState.STARTING);
+                timeRemaining = 30;
+            } else if (timeRemaining == 9) {
+                roundOverGraphics();
+                roundWinners(0);
             }
         } else if (getState().equals(GameState.END_GAME)) {
-            if (timeRemaining == 35) {
+            if (timeRemaining == 36) {
+                gameOverGraphics();
+                roundWinners(0);
                 map.resetMap();
             }
 
@@ -261,14 +292,14 @@ public class SurvivalGames extends Game {
 
             switch (event) {
                 case GRACE_OVER ->
-                        createLine(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Grace ends in: " + ChatColor.RESET + getFormattedTime(timeRemaining - 660), p);
+                        createLineAll(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Grace ends in: " + ChatColor.RESET + getFormattedTime(timeRemaining - 420));
                 case CHEST_REFILL ->
-                        createLineAll(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Chest refill: " + ChatColor.RESET + getFormattedTime(timeRemaining - 420));
+                        createLineAll(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Chest refill: " + ChatColor.RESET + getFormattedTime(timeRemaining - 300));
                 case DEATHMATCH ->
                         createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD + "Deathmatch: " + ChatColor.WHITE + "Active");
                 case SUPPLY_CRATE -> {
                     // hard coded times; the 2nd supply drop coincides with chest refill
-                    int nextTime = (timeRemaining > 540) ? timeRemaining - 540 : timeRemaining - 360;
+                    int nextTime = (timeRemaining > 240) ? timeRemaining - 240 : timeRemaining - 180;
                     createLineAll(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Next supply crate: " + ChatColor.RESET + getFormattedTime(nextTime));
                 }
             }
@@ -296,8 +327,8 @@ public class SurvivalGames extends Game {
      * @see SurvivalGames crateLocation()
      */
     public void spawnSupplyCrate() {
-        // delete this once it is final
         double totalWeight = 42;
+        // delete this once it is final
         /*for (SurvivalGamesItem item : supply_items) {
             totalWeight += item.getWeight();
         }
@@ -340,8 +371,8 @@ public class SurvivalGames extends Game {
      * If empty, updates list of eligible Super Chests.
      */
     public void regenChest() {
-        // delete when final.
         double totalWeight = 114;
+        // delete when final.
         /*for (SurvivalGamesItem item : items) {
             totalWeight += item.getWeight();
         }
@@ -737,6 +768,7 @@ public class SurvivalGames extends Game {
         for (SupplyCrate crate : crates) {
             crate.getLocation().getBlock().setType(Material.CHEST);
         }
+        crates.clear();
     }
 }
 
