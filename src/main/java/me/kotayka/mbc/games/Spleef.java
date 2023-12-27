@@ -316,7 +316,7 @@ public class Spleef extends Game {
         }
 
         if (p.getLocation().getY() < map.getDeathY()) {
-            if (p.getGameMode() != GameMode.SPECTATOR) {
+            if (p.getGameMode() == GameMode.SPECTATOR) {
                 p.teleport(spawnpoint);
             } else {
                 SpleefPlayer s = getSpleefPlayer(p);

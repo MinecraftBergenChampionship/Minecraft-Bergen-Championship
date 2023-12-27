@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -442,21 +443,15 @@ public class TGTTOS extends Game {
             // if block was wool, give appropriate amount back
             String wool = e.getBlock().getType().toString();
             // check item slot
-            int index = p.getInventory().getHeldItemSlot();
-            if (p.getInventory().getItem(40) != null && p.getInventory().getItem(index) == null) {
-                if (Objects.requireNonNull(p.getInventory().getItem(40)).getType().toString().equals(wool)) {
-                    int amt;
-                    // "some wacky bullshit prevention" - me several months ago
-                    if (Objects.requireNonNull(p.getInventory().getItem(40)).getAmount() + 63 > 100) {
-                        amt = 64;
-                    } else {
-                        amt = Objects.requireNonNull(p.getInventory().getItem(40)).getAmount() + 63;
-                    }
-                    p.getInventory().setItem(40, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
-                }
-            } else if (p.getInventory().getItem(index).getType().toString().equals(wool)) {
-                int amt = p.getInventory().getItem(index).getAmount();
+            if (e.getHand() == EquipmentSlot.HAND) {
+                int index = p.getInventory().getHeldItemSlot();
+                int amt = Objects.requireNonNull(p.getInventory().getItem(index)).getAmount();
                 p.getInventory().setItem(index, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
+                return;
+            }
+            if (e.getHand() == EquipmentSlot.OFF_HAND) {
+                int amt = Objects.requireNonNull(p.getInventory().getItem(40)).getAmount();
+                p.getInventory().setItem(40, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
             }
         }
     }
