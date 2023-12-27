@@ -47,7 +47,7 @@ public class Spleef extends Game {
 
     // Misc
     private Map<Location, SpleefBlock> brokenBlocks = new HashMap<>();
-    private final long DAMAGE_COOLDOWN = 1000;
+    private final long DAMAGE_COOLDOWN = 850;
     private final int[] BONUS_POINTS = {20, 15, 15, 10, 10, 8, 8, 8, 5, 5, 3, 3}; // 24 player; these numbers are arbitrary
     // NOTE: 16 player bonus is probably different
 
@@ -316,8 +316,12 @@ public class Spleef extends Game {
         }
 
         if (p.getLocation().getY() < map.getDeathY()) {
-            SpleefPlayer s = getSpleefPlayer(p);
-            handleDeath(s);
+            if (p.getGameMode() != GameMode.SPECTATOR) {
+                p.teleport(spawnpoint);
+            } else {
+                SpleefPlayer s = getSpleefPlayer(p);
+                handleDeath(s);
+            }
         }
     }
 

@@ -162,7 +162,10 @@ public class AceRace extends Game {
 
     @EventHandler
     public void PlayerMoveEvent(PlayerMoveEvent e) {
-        if (Participant.getParticipant(e.getPlayer()).getTeam() instanceof Spectator) return;
+        if (e.getPlayer().getGameMode() == GameMode.SPECTATOR && map.checkDeath(e.getPlayer().getLocation())) {
+            e.getPlayer().teleport(map.respawns.get(0));
+            return;
+        }
 
         Player p = e.getPlayer();
         AceRacePlayer player = getGamePlayer(p);

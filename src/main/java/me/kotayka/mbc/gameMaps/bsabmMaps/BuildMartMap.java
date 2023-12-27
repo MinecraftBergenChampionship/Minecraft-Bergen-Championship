@@ -4,10 +4,7 @@ import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameTeams.BuildMartTeam;
 import me.kotayka.mbc.games.BuildMart;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Furnace;
 import org.bukkit.entity.Player;
@@ -135,6 +132,12 @@ public class BuildMartMap extends AbstractBuildMartMap {
     @Override
     public void onMove(PlayerMoveEvent e) {
         if (e.getPlayer().getLocation().getY() <= deathY) {
+            if (e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
+                Location l = e.getPlayer().getLocation();
+                l.add(0, 120, 0);
+                e.getPlayer().teleport(l);
+                return;
+            }
             BUILD_MART.getBuildMartPlayer(e.getPlayer()).respawn();
             return;
         }

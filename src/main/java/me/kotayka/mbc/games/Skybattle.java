@@ -540,6 +540,10 @@ public class Skybattle extends Game {
 
         // kill players immediately in void
         if (player.getPlayer().getLocation().getY() <= map.getVoidHeight()) {
+            if (player.getPlayer().getGameMode() == GameMode.SPECTATOR) {
+                player.getPlayer().teleport(map.getCenter());
+                return;
+            }
             player.voidDeath = true;
             player.getPlayer().damage(50);
         }

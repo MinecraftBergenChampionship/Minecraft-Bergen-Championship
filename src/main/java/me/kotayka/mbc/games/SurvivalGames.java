@@ -18,10 +18,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -236,6 +233,7 @@ public class SurvivalGames extends Game {
                 crateLocation();
             } else if (timeRemaining == 180) {
                 spawnSupplyCrate();
+                event = SurvivalGamesEvent.DEATHMATCH;
             }
             UpdateEvent();
         } else if (getState().equals(GameState.OVERTIME)) {
@@ -412,11 +410,11 @@ public class SurvivalGames extends Game {
             for (Participant p : t.getPlayers()) {
                 int placement = teamPlacements.get(t);
                 if (t.getPlayers().size() == 4) {
-                    p.addCurrentScore(TEAM_BONUSES_4[placement] / getValidTeams().size());
-                    p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_4[placement] * MBC.getInstance().multiplier) + " points!");
+                    p.addCurrentScore(TEAM_BONUSES_4[placement-1] / getValidTeams().size());
+                    p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_4[placement-1] * MBC.getInstance().multiplier) + " points!");
                 } else {
-                    p.addCurrentScore(TEAM_BONUSES_3[placement] / getValidTeams().size());
-                    p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_3[placement] * MBC.getInstance().multiplier) + " points!");
+                    p.addCurrentScore(TEAM_BONUSES_3[placement-1] / getValidTeams().size());
+                    p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_3[placement-1] * MBC.getInstance().multiplier) + " points!");
                 }
             }
         }
@@ -552,6 +550,13 @@ public class SurvivalGames extends Game {
     @EventHandler
     public void onPlayerEntityInteract(PlayerInteractEntityEvent e) {
         if (e.getRightClicked().getType().equals(EntityType.ITEM_FRAME)) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        if (e.getPlayer().getLocation().getY() <= -25) {
+            e.getPlayer().teleport(map.Center());
+        }
     }
 
     @EventHandler

@@ -7,6 +7,8 @@ import me.kotayka.mbc.gameMaps.MBCMap;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +59,10 @@ public abstract class SurvivalGamesMap extends MBCMap {
 
         for (java.util.Map.Entry<Location,Material> entry : brokenBlocks.entrySet()) {
             getWorld().getBlockAt(entry.getKey()).setType(entry.getValue());
+        }
+
+        for (Entity e : getWorld().getEntitiesByClass(Item.class)) {
+            e.remove();
         }
 
         MBC.getInstance().sg.resetCrates();

@@ -279,9 +279,12 @@ public class TGTTOS extends Game {
     public void PlayerMoveEvent(PlayerMoveEvent e) {
         if (!isGameActive()) return;
         if (map == null) return;
-        if (!e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) return;
 
         if (e.getPlayer().getLocation().getY() < map.getDeathY()) {
+            if (e.getPlayer().getGameMode() != GameMode.SURVIVAL) {
+                e.getPlayer().teleport(map.getSpawnLocation());
+                return;
+            }
             e.getPlayer().setVelocity(new Vector(0, 0, 0));
             e.getPlayer().teleport(map.getSpawnLocation());
             printDeathMessage(Participant.getParticipant(e.getPlayer()));
