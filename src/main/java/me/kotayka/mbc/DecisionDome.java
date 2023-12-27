@@ -2,8 +2,11 @@ package me.kotayka.mbc;
 
 import me.kotayka.mbc.teams.Spectator;
 import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.inventory.ItemStack;
@@ -22,6 +25,9 @@ public class DecisionDome extends Minigame {
     public List<String> gameNames = new ArrayList<>(Arrays.asList("TGTTOS", "Ace Race", "Survival Games", "Skybattle", "Spleef","Build Mart"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
+    private List<MBCTeam> powerupTeams = new ArrayList<>();
+    private Participant mega_cow_shooter;
+    private Player dunker;
     public Set<Player> voters = new HashSet<>();
     private final int[][] coordsForBorder = {
             {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}, {0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7},
@@ -83,34 +89,7 @@ public class DecisionDome extends Minigame {
             voters.clear();
         }
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {
-            Location l;
-            switch (t.getChatColor()) {
-                case RED -> {
-                    l = new Location(world, 7, -27, 13);
-                    l.setYaw((float) 155.5);
-                }
-                case YELLOW -> {
-                    l = new Location(world, -7, -27, 13);
-                    l.setYaw((float) -145.5);
-                }
-                case GREEN -> {
-                    l = new Location(world, -14, -27, 0);
-                    l.setYaw((float) -90);
-                }
-                case BLUE -> {
-                    l = new Location(world, -7, -27, -13);
-                    l.setYaw((float) -25.5);
-                }
-                case DARK_PURPLE -> {
-                    l = new Location(world, 7, -27, -13);
-                    l.setYaw((float) 25.5);
-                }
-                case LIGHT_PURPLE -> {
-                    l = new Location(world, 14, -27, 0);
-                    l.setYaw((float) 90);
-                }
-                default -> l = new Location(world, 0, -27, 0);
-            }
+            Location l = getTeleportLocation(t.getChatColor());
             for (Participant p : t.getPlayers()) {
                 p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_CAT,SoundCategory.RECORDS, 1, 1);
                 p.getPlayer().teleport(l);
@@ -124,9 +103,43 @@ public class DecisionDome extends Minigame {
         }
     }
 
-    @Override
-    public void events() {
-        if (getState().equals(GameState.STARTING)) {
+    private Location getTeleportLocation(ChatColor color) {
+        Location l;
+        switch (color) {
+            case RED -> {
+                l = new Location(world, 7, -27, 13);
+                l.setYaw((float) 155.5);
+            }
+            case YELLOW -> {
+                l = new Location(world, -7, -27, 13);
+                l.setYaw((float) -145.5);
+            }
+            case GREEN -> {
+                l = new Location(world, -14, -27, 0);
+                l.setYaw((float) -90);
+            }
+            case BLUE -> {
+                l = new Location(world, -7, -27, -13);
+                l.setYaw((float) -25.5);
+            }
+            case DARK_PURPLE -> {
+                l = new Location(world, 7, -27, -13);
+                l.setYaw((float) 25.5);
+            }
+            case LIGHT_PURPLE -> {
+                l = new Location(world, 14, -27, 0);
+                l.setYaw((float) 90);
+            }
+            default -> {
+                l = new Location(world, 0, -5, 0);
+            }
+        }
+        return l;
+    }
+
+        @Override
+        public void events() {
+            if (getState().equals(GameState.STARTING)) {
             if (timeRemaining == 0) {
                 timeRemaining = 45;
                 // if (!revealedGames) revealedGames = true; the old object doesn't seem to persist but i can't exactly prove that
@@ -145,6 +158,7 @@ public class DecisionDome extends Minigame {
             } else {
                 if (timeRemaining == 9) {
                     MBC.getInstance().incrementMultiplier();
+                } else if (timeRemaining == 8) {
                     Powerups();
                 }
             }
@@ -260,13 +274,95 @@ public class DecisionDome extends Minigame {
             p.getPlayer().getInventory().addItem(new ItemStack(Material.EGG, 1));
             p.getPlayer().sendTitle(p.getTeam().getChatColor() + "" + ChatColor.BOLD + "Vote!", "", 20, 60, 20);
         }
+
+        List<VotePowerup> powerups = Arrays.asList(VotePowerup.EGGSTRA_VOTES, VotePowerup.CROSSBOWS, VotePowerup.DUNK, VotePowerup.MEGA_COW);
+        for (MBCTeam t : powerupTeams) {
+            // Randomly get powerup
+            VotePowerup powerup = powerups.get((int) (Math.random()*powerups.size()));
+            if (powerup == VotePowerup.DUNK || powerup == VotePowerup.MEGA_COW) {
+                for (Participant p : t.getPlayers()) {
+                    // TODO: improve format of powerup string
+                    p.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Your team got the powerup: " + powerup);
+                    getPowerup(powerup, p);
+                }
+            } else {
+                Participant p = t.getPlayers().get((int)(Math.random()*t.getPlayers().size()));
+                for (Participant pl : t.getPlayers()) {
+                    if (pl.getPlayer().getUniqueId().equals(p.getPlayer().getUniqueId())) {
+                        p.getPlayer().sendMessage("You got the powerup: " + powerup.toString());
+                        getPowerup(powerup, p);
+                    } else {
+                        p.getPlayer().sendMessage(p.getFormattedName() + ChatColor.LIGHT_PURPLE+" received the powerup: " + powerup);
+                    }
+                }
+            }
+        }
+    }
+
+    private void getPowerup(VotePowerup pu, Participant p) {
+        switch (pu) {
+            case EGGSTRA_VOTES -> {
+                p.getPlayer().getInventory().addItem(new ItemStack(Material.EGG, 1));
+            }
+            case CROSSBOWS -> {
+                p.getPlayer().getInventory().addItem(new ItemStack(Material.CROSSBOW, 1));
+                p.getPlayer().getInventory().addItem(new ItemStack(Material.ARROW, 1));
+            }
+            case DUNK -> {
+                dunker = p.getPlayer();
+                p.getPlayer().getInventory().addItem(new ItemStack(Material.BOW, 1));
+                p.getPlayer().getInventory().addItem(new ItemStack(Material.TIPPED_ARROW, 1));
+            }
+            case MEGA_COW -> {
+                mega_cow_shooter = p;
+                for (ItemStack i : p.getPlayer().getInventory()) {
+                    if (i.getType().equals(Material.EGG)) {
+                        i.addEnchantment(Enchantment.LUCK, 10);
+                    }
+                }
+            }
+        }
     }
 
     /**
-     * TODO
+     * TODO: make this less uggers holy
      */
     public void Powerups() {
-        //Bukkit.broadcastMessage("[Debug] Powerups not implemented yet!");
+        // TODO: make this look better/more efficient (maybe assign when game scores are given in previous game)
+        List<MBCTeam> teams = MBC.getInstance().getValidTeams();
+        if (teams.size() <= 4) {
+            // give last place a powerup
+            for (MBCTeam t : teams) {
+                if (t.getPlace() == teams.size()) {
+                    powerupTeams.add(t);
+                }
+            }
+        } else {
+            for (MBCTeam t : MBC.getInstance().getValidTeams()) {
+                MBCTeam candidates[] = new MBCTeam[3];
+                if (t.getPlace() >= teams.size()-2) {
+                    candidates[teams.size()-t.getPlace()] = t;
+                }
+                // this is very silly but trust
+                List<Integer> rand = Arrays.asList(0, 0, 0, 0, 0, 1, 1, 1, 2, 2);
+                int r = (int)(Math.random()*rand.size());
+                int choice = rand.get(r);
+                powerupTeams.add(candidates[choice]);
+                while (rand.contains(choice)) {
+                    rand.remove(choice);
+                }
+                r = (int)(Math.random()*rand.size());
+                choice = rand.get(r);
+                powerupTeams.add(candidates[choice]);
+            }
+        }
+
+        for (MBCTeam t : powerupTeams) {
+            Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.LIGHT_PURPLE + " was chosen to receive a powerup!");
+            for (Participant p : t.getPlayers()) {
+                p.getPlayer().spawnParticle(Particle.VILLAGER_HAPPY, p.getPlayer().getEyeLocation(), 3);
+            }
+        }
     }
 
     /**
@@ -473,7 +569,7 @@ public class DecisionDome extends Minigame {
     @EventHandler
     public void eggThrow(ProjectileHitEvent e) {
         if (!(e.getEntity().getShooter() instanceof Player)) {
-            Bukkit.broadcastMessage(e.getEntity().getShooter().toString());
+            //Bukkit.broadcastMessage(e.getEntity().getShooter().toString());
             return; // remove if powerup spawns a chicken turret or something
         }
 
@@ -488,10 +584,48 @@ public class DecisionDome extends Minigame {
             if (!(voters.add(p.getPlayer()))) {
                 return;
             }
+
+            if (p.getPlayer().getUniqueId().equals(mega_cow_shooter.getPlayer().getUniqueId())) {
+                Cow cow = (Cow) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.COW);
+                egg.remove();
+                VoteChicken mega_cow = new VoteChicken(p.getTeam(), cow);
+                chickens.add(mega_cow);
+                chickens.add(mega_cow);
+                chickens.add(mega_cow);
+                return;
+            }
+
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
             chickens.add(new VoteChicken(p.getTeam(), chicken));
             egg.remove();
+        } else if (e.getEntity().getType().equals(EntityType.ARROW)) {
+            if (e.getHitBlock() == null) return;
+            String type = e.getHitBlock().getType().toString();
+            if (type.contains("RED_")) {
+                Dunk(ChatColor.RED);
+            } else if (type.contains("YELLOW_")) {
+                Dunk(ChatColor.YELLOW);
+            } else if (type.contains("GREEN_")) {
+                Dunk(ChatColor.GREEN);
+            } else if (type.contains("BLUE_")) {
+                Dunk(ChatColor.BLUE);
+            } else if (type.contains("PURPLE_")) {
+                Dunk(ChatColor.DARK_PURPLE);
+            } else if (type.contains("PINK_")) {
+                Dunk(ChatColor.LIGHT_PURPLE);
+            }
         }
+    }
+
+    private void Dunk(ChatColor color) {
+        Bukkit.broadcastMessage("Dunk not implemented! But " + color + " team would have been dunked");
+        /*
+        switch(color) {
+            case RED -> {
+
+            }
+        }
+         */
     }
 
     @EventHandler
@@ -500,9 +634,86 @@ public class DecisionDome extends Minigame {
         e.setNumHatches((byte) 0);
     }
 
+    @EventHandler
+    public void onDamage(EntityDamageByEntityEvent e) {
+        if (e.getEntity() instanceof Chicken) {
+            // Crossbows Powerup used on Chickens
+            if (e.getDamager() instanceof Arrow && ((Arrow) e.getDamager()).getShooter() instanceof Player) {
+                Chicken c = (Chicken) e.getEntity();
+                c.setHealth(0);
+                Participant shooter = Participant.getParticipant((Player) ((Arrow) e.getDamager()).getShooter());
+                Bukkit.broadcastMessage(shooter.getFormattedName() + ChatColor.RED + " shot a chicken with a crossbow!");
+                VoteChicken rm = null;
+                for (VoteChicken vc : chickens) {
+                    if (vc.chicken != null && vc.chicken.equals(c)) {
+                        rm = vc;
+                    }
+                }
+                chickens.remove(rm);
+            }
+            return;
+        }
+        if (e.getEntity() instanceof Cow) {
+            // Crossbows Powerup used on Mega Cow
+            if (e.getDamager() instanceof Arrow && ((Arrow) e.getDamager()).getShooter() instanceof Player) {
+                Cow c = (Cow) e.getEntity();
+                c.setHealth(0);
+                Participant shooter = Participant.getParticipant((Player) ((Arrow) e.getDamager()).getShooter());
+                Bukkit.broadcastMessage(shooter.getFormattedName() + ChatColor.RED + " shot a chicken with a crossbow!");
+                VoteChicken rm = null;
+                for (VoteChicken vc : chickens) {
+                    if (vc.cow != null && vc.cow.equals(c)) {
+                        rm = vc;
+                    }
+                }
+                chickens.remove(rm);
+            }
+            return;
+        }
+        if (e.getEntity() instanceof Player) {
+            // Dunk powerup
+            if (e.getDamager() instanceof Arrow && ((Arrow) e.getDamager()).getShooter() instanceof Player) {
+                Player p = (Player) ((Arrow) e.getDamager()).getShooter();
+                if (!(p.getUniqueId().equals(dunker.getUniqueId()))) {
+                    e.setCancelled(true);
+                    return;
+                }
+
+                Participant hit = Participant.getParticipant((Player) e.getEntity());
+                Dunk(hit.getTeam().getChatColor());
+            }
+        }
+    }
+
+    @EventHandler
+    public void onDeath(EntityDeathEvent e) {
+        if (e.getEntity() instanceof Chicken) {
+            Chicken c = (Chicken) e.getEntity();
+            VoteChicken rm = null;
+            for (VoteChicken vc : chickens) {
+                if (vc.chicken != null && vc.chicken.equals(c)) {
+                    rm = vc;
+                }
+            }
+            chickens.remove(rm);
+            return;
+        }
+
+        if (e.getEntity() instanceof Cow) {
+            Cow c = (Cow) e.getEntity();
+            VoteChicken rm = null;
+            for (VoteChicken vc : chickens) {
+                if (vc.cow != null && vc.cow.equals(c)) {
+                    rm = vc;
+                }
+            }
+            chickens.remove(rm);
+        }
+    }
+
     public void removeEntities() {
         for (Entity e : world.getEntities()) {
-            if (e.getType().equals(EntityType.CHICKEN)) {
+            if (e.getType().equals(EntityType.CHICKEN) || e.getType().equals(EntityType.COW)) {
                 ((Damageable) e).setHealth(0);
             }
             if (e.getType().equals(EntityType.DROPPED_ITEM)) {
@@ -630,10 +841,18 @@ class Section {
 class VoteChicken {
     public MBCTeam team;
     public Chicken chicken;
+    public Cow cow;
 
     public VoteChicken(MBCTeam team, Chicken chicken) {
         this.team = team;
         this.chicken = chicken;
+        this.cow = null;
+    }
+
+    public VoteChicken(MBCTeam team, Cow cow) {
+        this.team = team;
+        this.cow = cow;
+        this.chicken = null;
     }
 
     public Chicken getChicken() {

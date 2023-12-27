@@ -222,7 +222,7 @@ public class MBC implements Listener {
          * Game 6: 3x
          */
         if (gameNum != 4) {
-            Bukkit.broadcastMessage("The point multiplier has increased from " + multiplier + " to " + (multiplier+0.5) + "!");
+            Bukkit.broadcastMessage(ChatColor.BOLD + "The point multiplier has increased from " + multiplier + " to " + (multiplier+0.5) + "!");
             multiplier+=0.5;
         }
     }
