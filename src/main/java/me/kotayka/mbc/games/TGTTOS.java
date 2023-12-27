@@ -36,7 +36,7 @@ public class TGTTOS extends Game {
     private List<TGTTOSMap> maps = new ArrayList<>(
             Arrays.asList(new Pit(), new Meatball(), new Walls(),
                     new Cliffs(), new Glide(), new Skydive(),
-                    new Boats(), new Skydive(), new Skydive(), new Skydive()
+                    new Boats()
             ));
 
     private List<Participant> finishedParticipants;
@@ -158,6 +158,9 @@ public class TGTTOS extends Game {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().setVelocity(new Vector(0, 0, 0));
             p.getPlayer().teleport(map.getSpawnLocation());
+            if (p.getTeam().equals(MBC.getInstance().spectator)) {
+                p.getPlayer().setGameMode(GameMode.SPECTATOR);
+            }
             if (p.getPlayer().hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
                 p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             }

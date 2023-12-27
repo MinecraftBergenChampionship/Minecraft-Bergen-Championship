@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -230,23 +231,15 @@ public class Skybattle extends Game {
             // if block was concrete, give appropriate amount back
             String concrete = e.getBlock().getType().toString();
             // check item slot
-            int index = p.getInventory().getHeldItemSlot();
-            if (Objects.requireNonNull(p.getInventory().getItem(index)).getType().toString().equals(concrete)) {
+            if (e.getHand() == EquipmentSlot.HAND) {
+                int index = p.getInventory().getHeldItemSlot();
                 int amt = Objects.requireNonNull(p.getInventory().getItem(index)).getAmount();
                 p.getInventory().setItem(index, new ItemStack(Objects.requireNonNull(Material.getMaterial(concrete)), amt));
                 return;
             }
-            if (p.getInventory().getItem(40) != null) {
-                if (Objects.requireNonNull(p.getInventory().getItem(40)).getType().toString().equals(concrete)) {
-                    int amt;
-                    // "some wacky bullshit prevention" - me several months ago
-                    if (Objects.requireNonNull(p.getInventory().getItem(40)).getAmount() + 63 > 100) {
-                        amt = 64;
-                    } else {
-                        amt = Objects.requireNonNull(p.getInventory().getItem(40)).getAmount() + 63;
-                    }
-                    p.getInventory().setItem(40, new ItemStack(Objects.requireNonNull(Material.getMaterial(concrete)), amt));
-                }
+            if (e.getHand() == EquipmentSlot.OFF_HAND) {
+                int amt = Objects.requireNonNull(p.getInventory().getItem(40)).getAmount();
+                p.getInventory().setItem(40, new ItemStack(Objects.requireNonNull(Material.getMaterial(concrete)), amt));
             }
         }
     }
@@ -423,23 +416,30 @@ public class Skybattle extends Game {
             }
         }
 
-        if (e.getEntity().getKiller() == null || e.getPlayer().getLastDamageCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
-            // used to determine the death message (ie, void, fall damage, or border?)
-            @Nullable EntityDamageEvent damageCause = e.getPlayer().getLastDamageCause();
-            skybattleDeathGraphics(e, damageCause.getCause());
-        } else {
-            SkybattlePlayer killer = skybattlePlayerMap.get(e.getPlayer().getKiller().getUniqueId());
-            killer.getParticipant().addCurrentScore(KILL_POINTS);
-            killer.kills++;
-            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
-            playerDeathEffects(e); // if there was a killer, just send over to default
+        SkybattlePlayer killer = skybattlePlayerMap.get(e.getEntity().getUniqueId());
+        if (player.lastDamager != null) {
+            killer = skybattlePlayerMap.get(player.lastDamager.getUniqueId());
         }
 
+        EntityDamageEvent damageEvent = e.getPlayer().getLastDamageCause();
+        if (damageEvent == null) {
+            if (killer == null) {
+                e.setDeathMessage(player.getParticipant().getFormattedName() + " died mysteriously!");
+            } else {
+                e.setDeathMessage(player.getParticipant().getFormattedName() + " mysteriously died to " + killer.getParticipant().getFormattedName());
+                killer.getParticipant().addCurrentScore(KILL_POINTS);
+                killer.kills++;
+                createLine(1, ChatColor.YELLOW + "" + ChatColor.BOLD + "Your kills: " + ChatColor.RESET + killer.kills, killer.getParticipant());
+            }
+            updatePlayersAlive(player.getParticipant());
+        } else {
+            skybattleDeathGraphics(e, damageEvent.getCause());
+        }
         e.setCancelled(true);
 
         getLogger().log(e.getDeathMessage());
 
-        Bukkit.broadcastMessage(e.getDeathMessage());
+        // Drop Player's Items
         for (ItemStack i : player.getPlayer().getInventory()) {
             if (i == null) continue;
             if (i.getType().toString().endsWith("CONCRETE")) continue;
@@ -447,11 +447,13 @@ public class Skybattle extends Game {
             map.getWorld().dropItemNaturally(player.getPlayer().getLocation(), i);
         }
 
+        // Dealing with now dead player
         player.getPlayer().setGameMode(GameMode.SPECTATOR);
         if (player.getPlayer().getLocation().getY() < map.getVoidHeight()) {
             player.getPlayer().teleport(map.getCenter());
         }
 
+        // Scoring
         for (Participant p : playersAlive) {
             p.addCurrentScore(SURVIVAL_POINTS);
         }
@@ -483,6 +485,13 @@ public class Skybattle extends Game {
             killer.getParticipant().addCurrentScore(KILL_POINTS);
 
             switch (damageCause) {
+                case ENTITY_ATTACK:
+                case ENTITY_SWEEP_ATTACK:
+                    deathMessage = victim.getParticipant().getFormattedName() + " was slain by " + killer.getParticipant().getFormattedName();
+                    break;
+                case PROJECTILE:
+                    deathMessage = victim.getParticipant().getFormattedName() + " was shot by " + killer.getParticipant().getFormattedName();
+                    break;
                 case CUSTOM:
                     if (victim.voidDeath) {
                         deathMessage = victim.getParticipant().getFormattedName() + " didn't want to live in the same world as " + killer.getParticipant().getFormattedName();
@@ -495,19 +504,32 @@ public class Skybattle extends Game {
                     }
                     break;
                 case ENTITY_EXPLOSION:
-                    deathMessage = victim.getParticipant().getFormattedName()+ " was blown up by " + killer.getParticipant().getFormattedName();
+                case BLOCK_EXPLOSION:
+                    deathMessage = victim.getParticipant().getFormattedName() + " was blown up by " + killer.getParticipant().getFormattedName();
                     break;
                 case FALL:
                     deathMessage = victim.getParticipant().getFormattedName() + " hit the ground too hard whilst trying to escape from " + killer.getParticipant().getFormattedName();
                     break;
                 case SUFFOCATION:
-                    deathMessage+= " whilst fighting " + killer.getParticipant().getFormattedName();
+                case FALLING_BLOCK:
+                    deathMessage += " whilst fighting " + killer.getParticipant().getFormattedName();
                     break;
                 default:
                     deathMessage = victim.getParticipant().getFormattedName() + " has died to " + killer.getParticipant().getFormattedName();
                     break;
             }
+        } else if (victim.getPlayer().getKiller() != null) {
+            SkybattlePlayer killer = skybattlePlayerMap.get(victim.getPlayer().getKiller().getUniqueId());
+            killer.kills++;
 
+            createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!");
+            killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
+            killer.getParticipant().addCurrentScore(KILL_POINTS);
+
+            if (!(deathMessage.contains(" " + killer.getPlayer().getName()))) {
+                deathMessage += " whilst fighting " + killer.getParticipant().getFormattedName();
+            }
         } else {
             // if no killer, the player killed themselves
             if (damageCause.equals(EntityDamageEvent.DamageCause.CUSTOM)) {

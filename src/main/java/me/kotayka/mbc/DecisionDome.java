@@ -26,8 +26,8 @@ public class DecisionDome extends Minigame {
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
     private List<MBCTeam> powerupTeams = new ArrayList<>();
-    private Participant mega_cow_shooter;
-    private Player dunker;
+    private Participant mega_cow_shooter = null;
+    private Player dunker = null;
     public Set<Player> voters = new HashSet<>();
     private final int[][] coordsForBorder = {
             {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}, {0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7},
@@ -91,7 +91,6 @@ public class DecisionDome extends Minigame {
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {
             Location l = getTeleportLocation(t.getChatColor());
             for (Participant p : t.getPlayers()) {
-                p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_CAT,SoundCategory.RECORDS, 1, 1);
                 p.getPlayer().teleport(l);
                 p.getPlayer().getInventory().clear();
                 if (!(t instanceof Spectator)) {
@@ -99,6 +98,7 @@ public class DecisionDome extends Minigame {
                 } else {
                     p.getPlayer().setGameMode(GameMode.SPECTATOR);
                 }
+                p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_CAT,SoundCategory.RECORDS, 1, 1);
             }
         }
     }
@@ -165,7 +165,13 @@ public class DecisionDome extends Minigame {
         } else if (getState().equals(GameState.ACTIVE)) {
             switch (timeRemaining) {
                 case 0 -> {
-                    for (Participant p : MBC.getInstance().getPlayers()) p.getPlayer().getInventory().clear();
+                    for (Participant p : MBC.getInstance().getPlayers()) {
+                        for (ItemStack i : p.getPlayer().getInventory()) {
+                            if (i != null && i.getType() == Material.EGG) {
+                                p.getInventory().remove(i);
+                            }
+                        }
+                    }
                     setGameState(GameState.END_ROUND);
                     createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Deciding game...");
                     timeRemaining = 20;
@@ -175,6 +181,7 @@ public class DecisionDome extends Minigame {
         } else if (getState().equals(GameState.END_ROUND)) {
             switch (timeRemaining) {
                 case 9 -> {
+                    for (Participant p : MBC.getInstance().getPlayers()) p.getPlayer().getInventory().clear();
                     raiseWalls(true);
                     Bukkit.broadcastMessage(ChatColor.GREEN + "Counting votes...");
                     createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Chosen game revealed: ");
@@ -279,17 +286,19 @@ public class DecisionDome extends Minigame {
         for (MBCTeam t : powerupTeams) {
             // Randomly get powerup
             VotePowerup powerup = powerups.get((int) (Math.random()*powerups.size()));
-            if (powerup == VotePowerup.DUNK || powerup == VotePowerup.MEGA_COW) {
+            // whole team powerups
+            if (powerup == VotePowerup.EGGSTRA_VOTES || powerup == VotePowerup.CROSSBOWS) {
                 for (Participant p : t.getPlayers()) {
                     // TODO: improve format of powerup string
                     p.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Your team got the powerup: " + powerup);
                     getPowerup(powerup, p);
                 }
             } else {
+                // single player powerups
                 Participant p = t.getPlayers().get((int)(Math.random()*t.getPlayers().size()));
                 for (Participant pl : t.getPlayers()) {
                     if (pl.getPlayer().getUniqueId().equals(p.getPlayer().getUniqueId())) {
-                        p.getPlayer().sendMessage("You got the powerup: " + powerup.toString());
+                        p.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD+"You got the powerup: " + powerup.toString());
                         getPowerup(powerup, p);
                     } else {
                         p.getPlayer().sendMessage(p.getFormattedName() + ChatColor.LIGHT_PURPLE+" received the powerup: " + powerup);
@@ -316,8 +325,8 @@ public class DecisionDome extends Minigame {
             case MEGA_COW -> {
                 mega_cow_shooter = p;
                 for (ItemStack i : p.getPlayer().getInventory()) {
-                    if (i.getType().equals(Material.EGG)) {
-                        i.addEnchantment(Enchantment.LUCK, 10);
+                    if (i != null && i.getType().equals(Material.EGG)) {
+                        i.addUnsafeEnchantment(Enchantment.LUCK, 5);
                     }
                 }
             }
@@ -438,7 +447,7 @@ public class DecisionDome extends Minigame {
         // count votes
         int currentMax = 0;
         for (VoteChicken chicken : chickens) {
-            Location chickenLoc = chicken.getChicken().getLocation();
+            Location chickenLoc = chicken.getMob().getLocation();
             Location matLoc = new Location(world, chickenLoc.getBlockX(), chickenLoc.getBlockY()-2, chickenLoc.getBlockZ());
             Location secLoc = new Location(world, chickenLoc.getBlockX(), chickenLoc.getBlockY()-1, chickenLoc.getBlockZ());
 
@@ -585,7 +594,7 @@ public class DecisionDome extends Minigame {
                 return;
             }
 
-            if (p.getPlayer().getUniqueId().equals(mega_cow_shooter.getPlayer().getUniqueId())) {
+            if (mega_cow_shooter != null && p.getPlayer().getUniqueId().equals(mega_cow_shooter.getPlayer().getUniqueId())) {
                 Cow cow = (Cow) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.COW);
                 egg.remove();
                 VoteChicken mega_cow = new VoteChicken(p.getTeam(), cow);
@@ -674,7 +683,7 @@ public class DecisionDome extends Minigame {
             // Dunk powerup
             if (e.getDamager() instanceof Arrow && ((Arrow) e.getDamager()).getShooter() instanceof Player) {
                 Player p = (Player) ((Arrow) e.getDamager()).getShooter();
-                if (!(p.getUniqueId().equals(dunker.getUniqueId()))) {
+                if (dunker != null && !(p.getUniqueId().equals(dunker.getUniqueId()))) {
                     e.setCancelled(true);
                     return;
                 }
@@ -855,7 +864,11 @@ class VoteChicken {
         this.chicken = null;
     }
 
-    public Chicken getChicken() {
-        return chicken;
+    public Entity getMob() {
+        if (chicken != null) {
+            return chicken;
+        } else {
+            return cow;
+        }
     }
 }

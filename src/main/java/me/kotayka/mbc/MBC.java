@@ -113,7 +113,7 @@ public class MBC implements Listener {
         switch(gameNameList.get(gameNum)) {
             case "DecisionDome":
                 if (decisionDome == null) {
-                    Bukkit.broadcastMessage("Making new decisiondome!");
+                    //Bukkit.broadcastMessage("Making new decisiondome!");
                     decisionDome = new DecisionDome(gameNum > 1); // NOTE: if we get > 8 games available per event, this must change.
                     // NOTE NOTE: this is kind of redundant now
                 }

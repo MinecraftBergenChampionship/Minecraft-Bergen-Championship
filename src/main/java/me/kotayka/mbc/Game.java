@@ -492,7 +492,7 @@ public abstract class Game extends Minigame {
 
         for (Participant p : gameIndividual) {
             if (ties > 0 && p.getRawCurrentScore() != lastScore) {
-                num+=ties;
+                num+=ties+1;
                 ties = 0;
             } else if (p.getRawCurrentScore() == lastScore) {
                 ties++;
