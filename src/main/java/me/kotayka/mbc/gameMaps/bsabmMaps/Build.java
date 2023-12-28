@@ -2,7 +2,13 @@ package me.kotayka.mbc.gameMaps.bsabmMaps;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Orientable;
+import org.bukkit.block.data.type.Chain;
+import org.bukkit.block.data.type.Slab;
+import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.Player;
 
 public class Build {
@@ -114,12 +120,36 @@ public class Build {
         return (((1.0 * count) / total));
     }
 
+    private boolean matches(Block b, Block toMatch) {
+        if (!b.getType().equals(toMatch.getType())) {
+            return false;
+        }
+
+        /*
+        // Check if stairs, slabs, and  are in the right orientation
+        if (b.getType().toString().endsWith("STAIRS")) {
+            if (((Stairs) b.getBlockData()).getFacing() != ((Stairs) toMatch.getBlockData()).getFacing()) {
+                return false;
+            }
+        }
+
+        if (b.getType() == Material.CHAIN) {
+            if (((Chain) b.getBlockData()).getAxis() != ((Chain) toMatch.getBlockData()).getAxis()) {
+                return false;
+            }
+        }*/
+
+        return true;
+    }
+
+
     public boolean checkBuild(Location midBlock) {
         for (int y = 1; y < 6; y++) {
             for (int x = 0; x < 7; x++) {
                 for (int z = 0; z < 7; z++) {
                     Block b = blocks[y][x][z];
-                    if (!midBlock.getWorld().getBlockAt(midBlock.getBlockX()+3-x, midBlock.getBlockY()+y, midBlock.getBlockZ()+3-z).getType().equals(b.getType())) {
+                    Block toMatch = midBlock.getWorld().getBlockAt(midBlock.getBlockX()+3-x, midBlock.getBlockY()+y, midBlock.getBlockZ()+3-z);
+                    if (!matches(b, toMatch)) {
                         return false;
                     }
                 }
@@ -135,7 +165,7 @@ public class Build {
                     Block b = blocks[y][x][z];
                     Block toMatch = midBlock.getWorld().getBlockAt(midBlock.getBlockX()+3-x, midBlock.getBlockY()+y, midBlock.getBlockZ()+3-z);
                     if (toMatch.getLocation().equals(brokeBlock)) continue;
-                    if (!(toMatch.getType().equals(b.getType()))) {
+                    if (!matches(b, toMatch)) {
                         return false;
                     }
                 }
@@ -150,7 +180,7 @@ public class Build {
      * @param midBlock Location of the middle of the block.
      */
     public void checkBuildCommand(Player sender, Location midBlock) {
-        sender.sendMessage(ChatColor.GREEN+"[checkbuild] The first 5 mistakes will be outputted.");
+        //sender.sendMessage(ChatColor.GREEN+"[checkbuild] The first 5 mistakes will be outputted.");
         sender.sendMessage(ChatColor.GREEN+"[checkbuild] Searching plot...");
         int i = 0;
         for (int y = 1; y < 6; y++) {
@@ -166,16 +196,30 @@ public class Build {
                                 String.format("%s[checkbuild] %sFound block %s which should be %s at (%d, %d, %d)",
                                         ChatColor.GREEN, ChatColor.RESET, check.getType(), b.getType(), checkX, checkY, checkZ)
                         );
-                    } else if (!check.getState().equals(b.getState())) {
-                        sender.sendMessage(
-                                String.format("%s[checkbuild] %sFound block with block state %s which should be %s at (%d, %d, %d)",
-                                        ChatColor.GREEN, ChatColor.RESET, check.getState(), b.getState(), checkX, checkY, checkZ)
-                        );
+                    //    i++;
                     }
-                    i++;
+                    /*
+                    else if (b.getType().toString().endsWith("STAIRS")) {
+                        if (((Stairs) check.getBlockData()).getFacing() != ((Stairs) b.getBlockData()).getFacing()) {
+                            sender.sendMessage(
+                                    String.format("%s[checkbuild] %sFound stair block facing %s which should be %s at (%d, %d, %d)",
+                                            ChatColor.GREEN, ChatColor.RESET, ((Stairs) b).getFacing(), ((Stairs) check).getFacing(), checkX, checkY, checkZ)
+                            );
+                            i++;
+                        }
+                    } else if (b.getType() == Material.CHAIN) {
+                        if (((Chain) b.getBlockData()).getAxis() != ((Chain) check.getBlockData()).getAxis()) {
+                            sender.sendMessage(
+                                    String.format("%s[checkbuild] %sFound chain block with axis %s which should be %s at (%d, %d, %d)",
+                                            ChatColor.GREEN, ChatColor.RESET, ((Chain) b).getAxis(), ((Chain) check).getAxis(), checkX, checkY, checkZ)
+                            );
+                            i++;
+                        }
+                    }
                     if (i >= 5) {
                         return;
                     }
+                     */
                 }
             }
         }

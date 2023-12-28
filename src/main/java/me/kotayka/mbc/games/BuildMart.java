@@ -235,7 +235,6 @@ public class BuildMart extends Game {
         }
     }
 
-    // TODO: Check build when stripping block
     @EventHandler
     public void blockPlace(BlockPlaceEvent e) {
         if (!(e.getBlock().getLocation().getWorld().equals(map.getWorld()))) return;
@@ -340,6 +339,24 @@ public class BuildMart extends Game {
         else {
             hotbarSelector.put(p, e.getPlayer().getTargetBlock(null, 5).getType());
             e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+ "" + ChatColor.BOLD+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(p))))));
+        }
+    }
+
+    // Check build when stripping logs
+    @EventHandler
+    public void onInteract(PlayerInteractEvent e) {
+        if (e.getClickedBlock() == null) return;
+        if ((e.getClickedBlock().getType().toString().endsWith("LOG") && e.getPlayer().getInventory().getItemInMainHand().getType().toString().endsWith("AXE"))) {
+            Block b = e.getClickedBlock();
+            BuildMartTeam t = getTeam(Participant.getParticipant(e.getPlayer()));
+            for (int i = 0; i < NUM_PLOTS_PER_TEAM; i++) {
+                BuildPlot plot = t.getPlots()[i][1];
+                if (!(plot.inBuildPlot(b.getLocation()))) continue;
+                if ((plot.getBuild().checkBuild(plot.getMIDPOINT()))) {
+                    completeBuild(t, plot);
+                }
+                return;
+            }
         }
     }
 
