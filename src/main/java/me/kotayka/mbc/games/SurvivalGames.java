@@ -709,7 +709,7 @@ public class SurvivalGames extends Game {
     }
 
     private GUIItem[] setupGUIItems() {
-        GUIItem[] items = new GUIItem[6];
+        GUIItem[] items = new GUIItem[7];
 
         ItemStack sharpness = new ItemStack(Material.DIAMOND_SWORD);
         sharpness.addEnchantment(Enchantment.DAMAGE_ALL, 1);
@@ -759,9 +759,13 @@ public class SurvivalGames extends Game {
         quickCharge.setLore(List.of("Cost: 1 XP"));
         items[5] = new GUIItem(quickCharge, Enchantment.QUICK_CHARGE, 1);
 
-        //ItemStack multishot = new ItemStack(Material.ARROW, 3);
-        //multishot.addEnchantment(Enchantment.MULTISHOT, 1); unfortunately arrows cannot get multishot
-        //items[6] = new GUIItem(multishot, Enchantment.MULTISHOT, 2);
+        ItemStack multishot = new ItemStack(Material.ARROW, 3);
+        multishot.addUnsafeEnchantment(Enchantment.MULTISHOT, 1);
+        ItemMeta msMeta = multishot.getItemMeta();
+        msMeta.setDisplayName(ChatColor.BLUE+"Multishot");
+        multishot.setItemMeta(msMeta);
+        multishot.setLore(List.of("Cost: 2 XP"));
+        items[6] = new GUIItem(multishot, Enchantment.MULTISHOT, 2);
 
         return items;
     }

@@ -5,6 +5,7 @@ import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -12,6 +13,7 @@ import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -59,6 +61,11 @@ public class DecisionDome extends Minigame {
         tie = false;
         winner = null;
 
+        // Powerups
+        if (!powerupTeams.isEmpty()) powerupTeams.clear();
+        if (dunker != null) dunker = null;
+        if (mega_cow_shooter != null) mega_cow_shooter = null;
+
         // Deal with players
         loadPlayers();
         createScoreboard();
@@ -92,6 +99,8 @@ public class DecisionDome extends Minigame {
             Location l = getTeleportLocation(t.getChatColor());
             for (Participant p : t.getPlayers()) {
                 p.getPlayer().teleport(l);
+                p.getPlayer().setVelocity(new Vector(0, 0, 0));
+                p.getPlayer().removePotionEffect(PotionEffectType.SPEED);
                 p.getPlayer().getInventory().clear();
                 if (!(t instanceof Spectator)) {
                     p.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -199,7 +208,11 @@ public class DecisionDome extends Minigame {
                     if (tie) {
                         Bukkit.broadcastMessage("If that is still tied, the chosen game is random...");
                     } else {
-                        Bukkit.broadcastMessage("with " + winner.votes.size() + " votes...");
+                        if (winner.votes.size() == 1) {
+                            Bukkit.broadcastMessage("with 1 vote...");
+                        } else {
+                            Bukkit.broadcastMessage("with " + winner.votes.size() + " votes...");
+                        }
                     }
                     for (Player p : Bukkit.getOnlinePlayers()) p.playSound(p, Sound.ENTITY_CHICKEN_EGG, 1, 2);
                 }
@@ -223,6 +236,7 @@ public class DecisionDome extends Minigame {
                     createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Warping to game: ");
                     if (!revealedGames) revealedGames = true;
                     setGameState(GameState.END_GAME);
+                    HandlerList.unregisterAll(this);
                     timeRemaining = 13;
                 }
             }
@@ -282,12 +296,12 @@ public class DecisionDome extends Minigame {
             p.getPlayer().sendTitle(p.getTeam().getChatColor() + "" + ChatColor.BOLD + "Vote!", "", 20, 60, 20);
         }
 
-        List<VotePowerup> powerups = Arrays.asList(VotePowerup.EGGSTRA_VOTES, VotePowerup.CROSSBOWS, VotePowerup.DUNK, VotePowerup.MEGA_COW);
+        List<VotePowerup> powerups = Arrays.asList(VotePowerup.CROSSBOWS, VotePowerup.DUNK, VotePowerup.MEGA_COW);
         for (MBCTeam t : powerupTeams) {
             // Randomly get powerup
             VotePowerup powerup = powerups.get((int) (Math.random()*powerups.size()));
             // whole team powerups
-            if (powerup == VotePowerup.EGGSTRA_VOTES || powerup == VotePowerup.CROSSBOWS) {
+            if (powerup == VotePowerup.CROSSBOWS) {
                 for (Participant p : t.getPlayers()) {
                     // TODO: improve format of powerup string
                     p.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Your team got the powerup: " + powerup);
@@ -310,9 +324,11 @@ public class DecisionDome extends Minigame {
 
     private void getPowerup(VotePowerup pu, Participant p) {
         switch (pu) {
+            /*
             case EGGSTRA_VOTES -> {
                 p.getPlayer().getInventory().addItem(new ItemStack(Material.EGG, 1));
             }
+             */
             case CROSSBOWS -> {
                 p.getPlayer().getInventory().addItem(new ItemStack(Material.CROSSBOW, 1));
                 p.getPlayer().getInventory().addItem(new ItemStack(Material.ARROW, 1));
@@ -579,15 +595,17 @@ public class DecisionDome extends Minigame {
     public void eggThrow(ProjectileHitEvent e) {
         if (!(e.getEntity().getShooter() instanceof Player)) {
             //Bukkit.broadcastMessage(e.getEntity().getShooter().toString());
+            e.setCancelled(true);
             return; // remove if powerup spawns a chicken turret or something
         }
 
         if (e.getHitEntity() != null && e.getHitEntity().getType().equals(EntityType.ARMOR_STAND)) {
-            e.setCancelled(true);
+            return;
         }
 
         if (e.getEntity().getType().equals(EntityType.EGG)) {
             Egg egg = (Egg) e.getEntity();
+            egg.remove();
             Participant p = Participant.getParticipant(((Player) e.getEntity().getShooter()));
             if (p == null) return;
             if (!(voters.add(p.getPlayer()))) {
@@ -596,7 +614,6 @@ public class DecisionDome extends Minigame {
 
             if (mega_cow_shooter != null && p.getPlayer().getUniqueId().equals(mega_cow_shooter.getPlayer().getUniqueId())) {
                 Cow cow = (Cow) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.COW);
-                egg.remove();
                 VoteChicken mega_cow = new VoteChicken(p.getTeam(), cow);
                 chickens.add(mega_cow);
                 chickens.add(mega_cow);
@@ -606,9 +623,17 @@ public class DecisionDome extends Minigame {
 
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
             chickens.add(new VoteChicken(p.getTeam(), chicken));
-            egg.remove();
         } else if (e.getEntity().getType().equals(EntityType.ARROW)) {
-            if (e.getHitBlock() == null) return;
+            if (e.getHitEntity() != null && e.getEntity().getShooter() instanceof Player) {
+                shootVotes(e.getHitEntity(), (Player) e.getEntity().getShooter());
+                e.getEntity().remove();
+                return;
+            }
+
+            if (e.getHitBlock() == null) {
+                return;
+            }
+            if (e.getHitBlock().getLocation().getY() <= -35) return;
             String type = e.getHitBlock().getType().toString();
             if (type.contains("RED_")) {
                 Dunk(ChatColor.RED);
@@ -623,6 +648,7 @@ public class DecisionDome extends Minigame {
             } else if (type.contains("PINK_")) {
                 Dunk(ChatColor.LIGHT_PURPLE);
             }
+            e.getEntity().remove();
         }
     }
 
@@ -643,80 +669,43 @@ public class DecisionDome extends Minigame {
         e.setNumHatches((byte) 0);
     }
 
-    @EventHandler
-    public void onDamage(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof Chicken) {
+    public void shootVotes(Entity e, Player damager) {
+        if (e instanceof Chicken) {
             // Crossbows Powerup used on Chickens
-            if (e.getDamager() instanceof Arrow && ((Arrow) e.getDamager()).getShooter() instanceof Player) {
-                Chicken c = (Chicken) e.getEntity();
-                c.setHealth(0);
-                Participant shooter = Participant.getParticipant((Player) ((Arrow) e.getDamager()).getShooter());
-                Bukkit.broadcastMessage(shooter.getFormattedName() + ChatColor.RED + " shot a chicken with a crossbow!");
-                VoteChicken rm = null;
-                for (VoteChicken vc : chickens) {
-                    if (vc.chicken != null && vc.chicken.equals(c)) {
-                        rm = vc;
-                    }
-                }
-                chickens.remove(rm);
-            }
-            return;
-        }
-        if (e.getEntity() instanceof Cow) {
-            // Crossbows Powerup used on Mega Cow
-            if (e.getDamager() instanceof Arrow && ((Arrow) e.getDamager()).getShooter() instanceof Player) {
-                Cow c = (Cow) e.getEntity();
-                c.setHealth(0);
-                Participant shooter = Participant.getParticipant((Player) ((Arrow) e.getDamager()).getShooter());
-                Bukkit.broadcastMessage(shooter.getFormattedName() + ChatColor.RED + " shot a chicken with a crossbow!");
-                VoteChicken rm = null;
-                for (VoteChicken vc : chickens) {
-                    if (vc.cow != null && vc.cow.equals(c)) {
-                        rm = vc;
-                    }
-                }
-                chickens.remove(rm);
-            }
-            return;
-        }
-        if (e.getEntity() instanceof Player) {
-            // Dunk powerup
-            if (e.getDamager() instanceof Arrow && ((Arrow) e.getDamager()).getShooter() instanceof Player) {
-                Player p = (Player) ((Arrow) e.getDamager()).getShooter();
-                if (dunker != null && !(p.getUniqueId().equals(dunker.getUniqueId()))) {
-                    e.setCancelled(true);
-                    return;
-                }
-
-                Participant hit = Participant.getParticipant((Player) e.getEntity());
-                Dunk(hit.getTeam().getChatColor());
-            }
-        }
-    }
-
-    @EventHandler
-    public void onDeath(EntityDeathEvent e) {
-        if (e.getEntity() instanceof Chicken) {
-            Chicken c = (Chicken) e.getEntity();
+            Chicken c = (Chicken) e;
+            c.setHealth(0);
+            Participant shooter = Participant.getParticipant(damager);
+            Bukkit.broadcastMessage(shooter.getFormattedName() + ChatColor.RED + " shot a chicken with a crossbow!");
             VoteChicken rm = null;
             for (VoteChicken vc : chickens) {
                 if (vc.chicken != null && vc.chicken.equals(c)) {
                     rm = vc;
+                    break;
                 }
             }
             chickens.remove(rm);
-            return;
-        }
-
-        if (e.getEntity() instanceof Cow) {
-            Cow c = (Cow) e.getEntity();
+        } else if (e instanceof Cow) {
+            // Crossbows Powerup used on Mega Cow
+            Cow c = (Cow) e;
+            c.setHealth(0);
+            Participant shooter = Participant.getParticipant(damager);
+            Bukkit.broadcastMessage(shooter.getFormattedName() + ChatColor.RED + " shot a Mega Cow with a crossbow!");
             VoteChicken rm = null;
             for (VoteChicken vc : chickens) {
                 if (vc.cow != null && vc.cow.equals(c)) {
                     rm = vc;
+                    break;
                 }
             }
             chickens.remove(rm);
+        } else if (e instanceof Player) {
+            // Dunk powerup
+            if (dunker != null && !(damager.getUniqueId().equals(dunker.getUniqueId()))) {
+                return;
+            }
+
+            Participant hit = Participant.getParticipant((Player) e);
+            Dunk(hit.getTeam().getChatColor());
         }
     }
 

@@ -235,6 +235,7 @@ public class BuildMart extends Game {
         }
     }
 
+    // TODO: Check build when stripping block
     @EventHandler
     public void blockPlace(BlockPlaceEvent e) {
         if (!(e.getBlock().getLocation().getWorld().equals(map.getWorld()))) return;

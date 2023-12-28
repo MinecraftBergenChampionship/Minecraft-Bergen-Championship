@@ -437,6 +437,8 @@ public class Skybattle extends Game {
         }
         e.setCancelled(true);
 
+        Bukkit.broadcastMessage(e.getDeathMessage());
+
         getLogger().log(e.getDeathMessage());
 
         // Drop Player's Items

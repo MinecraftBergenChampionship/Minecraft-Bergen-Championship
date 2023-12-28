@@ -37,6 +37,7 @@ public class Spleef extends Game {
     private final Location lobby;
     private final Location spawnpoint;
     private final int RESET_DAMAGE_TIME = 5;
+    private final int RESET_SPLEEF_TIME = 3;
     private Map<UUID, Long> damageMap = new HashMap<>();
     private List<MBCTeam> fullyAliveTeams = getValidTeams();
 
@@ -312,6 +313,7 @@ public class Spleef extends Game {
             Location l = e.getFrom().getBlock().getLocation();
             if (brokenBlocks.containsKey(l)) {
                 sp.setLastDamager(brokenBlocks.get(l).breaker.getParticipant());
+                sp.setResetTime(timeRemaining-RESET_SPLEEF_TIME);
             }
         }
 
@@ -336,7 +338,7 @@ public class Spleef extends Game {
         map.getWorld().playSound(b.getLocation(), b.getBlockSoundGroup().getBreakSound(), 1, 1);
         e.getPlayer().getInventory().addItem(new ItemStack(Material.SNOWBALL));
         SpleefPlayer sp = getSpleefPlayer(e.getPlayer());
-        brokenBlocks.put(b.getLocation(), new SpleefBlock(b.getLocation(), sp, timeRemaining-RESET_DAMAGE_TIME));
+        brokenBlocks.put(b.getLocation(), new SpleefBlock(b.getLocation(), sp, timeRemaining-RESET_SPLEEF_TIME));
     }
 
     @EventHandler
@@ -365,7 +367,7 @@ public class Spleef extends Game {
                 b.breakNaturally();
                 map.getWorld().playSound(b.getLocation(), b.getBlockSoundGroup().getBreakSound(), 1, 1);
                 SpleefPlayer shooter = getSpleefPlayer((Player) e.getEntity().getShooter());
-                brokenBlocks.put(b.getLocation(), new SpleefBlock(b.getLocation(), shooter, timeRemaining-RESET_DAMAGE_TIME));
+                brokenBlocks.put(b.getLocation(), new SpleefBlock(b.getLocation(), shooter, timeRemaining-RESET_SPLEEF_TIME));
             }
         } else {
             Fireball f = (Fireball) e.getEntity();

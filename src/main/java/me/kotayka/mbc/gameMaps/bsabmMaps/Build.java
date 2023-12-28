@@ -114,7 +114,6 @@ public class Build {
         return (((1.0 * count) / total));
     }
 
-
     public boolean checkBuild(Location midBlock) {
         for (int y = 1; y < 6; y++) {
             for (int x = 0; x < 7; x++) {
@@ -151,7 +150,9 @@ public class Build {
      * @param midBlock Location of the middle of the block.
      */
     public void checkBuildCommand(Player sender, Location midBlock) {
+        sender.sendMessage(ChatColor.GREEN+"[checkbuild] The first 5 mistakes will be outputted.");
         sender.sendMessage(ChatColor.GREEN+"[checkbuild] Searching plot...");
+        int i = 0;
         for (int y = 1; y < 6; y++) {
             for (int x = 0; x < 7; x++) {
                 for (int z = 0; z < 7; z++) {
@@ -165,6 +166,14 @@ public class Build {
                                 String.format("%s[checkbuild] %sFound block %s which should be %s at (%d, %d, %d)",
                                         ChatColor.GREEN, ChatColor.RESET, check.getType(), b.getType(), checkX, checkY, checkZ)
                         );
+                    } else if (!check.getState().equals(b.getState())) {
+                        sender.sendMessage(
+                                String.format("%s[checkbuild] %sFound block with block state %s which should be %s at (%d, %d, %d)",
+                                        ChatColor.GREEN, ChatColor.RESET, check.getState(), b.getState(), checkX, checkY, checkZ)
+                        );
+                    }
+                    i++;
+                    if (i >= 5) {
                         return;
                     }
                 }
