@@ -268,7 +268,7 @@ public class Participant {
                 Objective h2 = board.registerNewObjective("showhealth", Criterias.HEALTH, ChatColor.DARK_RED + "❤");
                 h2.setDisplaySlot(DisplaySlot.BELOW_NAME);
             } else {
-                Objective h2 = board.registerNewObjective("showhealth", Criterias.HEALTH, ChatColor.RED + "❤");
+                Objective h2 = board.getObjective("showhealth");
                 h2.setDisplaySlot(DisplaySlot.BELOW_NAME);
             }
         }

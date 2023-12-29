@@ -172,30 +172,36 @@ public abstract class MBCTeam {
     }
 
     public static MBCTeam getTeam(String team) {
-        switch (team.toLowerCase()) {
+        switch (team.strip().toLowerCase()) {
             case "redrabbits":
             case "redrabbit":
             case "red":
+            case "red_":
                 return MBC.getInstance().red;
             case "yellowyaks":
             case "yellowyak":
             case "yellow":
+            case "yellow_":
                 return MBC.getInstance().yellow;
             case "greenguardians":
             case "greenguardian":
             case "green":
+            case "green_":
                 return MBC.getInstance().green;
             case "bluebats":
             case "bluebat":
             case "blue":
+            case "blue_":
                 return MBC.getInstance().blue;
             case "purplepandas":
             case "purplepanda":
             case "purple":
+            case "purple_":
                 return MBC.getInstance().purple;
             case "pinkpiglets":
             case "pinkpiglet":
             case "pink":
+            case "pink_":
                 return MBC.getInstance().pink;
             case "spectator":
             case "spectators":

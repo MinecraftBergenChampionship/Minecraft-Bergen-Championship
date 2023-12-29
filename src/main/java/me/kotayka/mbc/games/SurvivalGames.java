@@ -109,7 +109,7 @@ public class SurvivalGames extends Game {
             p.getPlayer().setAllowFlight(false);
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 30, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 10, false, false));
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
         }
         updatePlayersAliveScoreboard();
@@ -146,7 +146,7 @@ public class SurvivalGames extends Game {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         updatePlayersAliveScoreboard();
-        createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0", p);
+        createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0", p);
 
         updateInGameTeamScoreboard();
     }
@@ -410,10 +410,10 @@ public class SurvivalGames extends Game {
             for (Participant p : t.getPlayers()) {
                 int placement = teamPlacements.get(t);
                 if (t.getPlayers().size() == 4) {
-                    p.addCurrentScore(TEAM_BONUSES_4[placement-1] / getValidTeams().size());
+                    p.addCurrentScore(TEAM_BONUSES_4[placement-1] / t.getPlayers().size());
                     p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_4[placement-1] * MBC.getInstance().multiplier) + " points!");
                 } else {
-                    p.addCurrentScore(TEAM_BONUSES_3[placement-1] / getValidTeams().size());
+                    p.addCurrentScore(TEAM_BONUSES_3[placement-1] / t.getPlayers().size());
                     p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_3[placement-1] * MBC.getInstance().multiplier) + " points!");
                 }
             }
@@ -485,11 +485,11 @@ public class SurvivalGames extends Game {
             killer.addCurrentScore(KILL_POINTS);
             if (playerKills.get(victim.getKiller()) == null) {
                 playerKills.put(victim.getKiller(), 1);
-                createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your Kills: "+ChatColor.RESET+"1", killer);
+                createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your Kills: "+ChatColor.RESET+"1", killer);
             } else {
                 int kills = playerKills.get(victim.getKiller());
                 playerKills.put(e.getPlayer().getKiller(), kills++);
-                createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
+                createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
             }
             deathEffectsWithHealth(e);
         } else {

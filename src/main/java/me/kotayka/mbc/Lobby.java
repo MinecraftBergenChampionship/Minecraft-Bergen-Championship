@@ -100,7 +100,7 @@ public class Lobby extends Minigame {
                 case 127 -> {
                     reveal = getValidTeams();
                     reveal.sort(new TeamScoreSorter());
-                    Bukkit.broadcastMessage("[Debug] reveal == " + reveal);
+                    //Bukkit.broadcastMessage("[Debug] reveal == " + reveal);
                 }
                 case 95 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"Now for the Dodgebolt Qualifiers!");

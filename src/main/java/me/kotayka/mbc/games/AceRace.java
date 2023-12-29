@@ -161,7 +161,7 @@ public class AceRace extends Game {
     }
 
     @EventHandler
-    public void PlayerMoveEvent(PlayerMoveEvent e) {
+    public void onMove(PlayerMoveEvent e) {
         if (e.getPlayer().getGameMode() == GameMode.SPECTATOR && map.checkDeath(e.getPlayer().getLocation())) {
             e.getPlayer().teleport(map.respawns.get(0));
             return;
@@ -191,8 +191,8 @@ public class AceRace extends Game {
             Location l = p.getLocation();
             l.setPitch(-30);
             Vector d = l.getDirection();
-            p.setVelocity(d.multiply(4));
-            p.setVelocity(new Vector(p.getVelocity().getX(), 1.65, p.getVelocity().getZ()));
+            p.setVelocity(d.multiply(2.5));
+            p.setVelocity(new Vector(p.getVelocity().getX(), 1.25, p.getVelocity().getZ()));
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {

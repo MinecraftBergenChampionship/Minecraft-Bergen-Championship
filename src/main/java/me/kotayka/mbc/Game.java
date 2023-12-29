@@ -13,6 +13,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.units.qual.C;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -218,14 +219,17 @@ public abstract class Game extends Minigame {
      * computed by the function call.
      *
      * Standardizes the following:
-     *  Players Remaining is on line 2
-     *  Teams Remaining is on line 1
+     *  Players & Teams Remaining on line 3
      *
      *  Loops for all players by default.
      */
     public void updatePlayersAliveScoreboard() {
+        createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players: " + ChatColor.RESET+playersAlive.size() + "/"+MBC.getInstance().getPlayers().size() + ", " +
+                                    ChatColor.GREEN+", "+ ChatColor.BOLD+"Teams: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
+        /*
         createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.getInstance().getPlayers().size());
         createLineAll(2, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
+         */
     }
 
     /**
@@ -234,14 +238,17 @@ public abstract class Game extends Minigame {
      * computed by the function call.
      *
      * Standardizes the following:
-     *  Players Remaining is on line 2
-     *  Teams Remaining is on line 1
+     *  Players & Teams Remaining on line 3
      *
      * @param p Specific participant to update scoreboard
      */
     public void updatePlayersAliveScoreboard(Participant p) {
+        createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players: " + ChatColor.RESET+playersAlive.size() + "/"+MBC.getInstance().getPlayers().size() + ", " +
+                ChatColor.GREEN+", "+ ChatColor.BOLD+"Teams: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
+        /*
         createLine(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS, p);
         createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS, p);
+         */
     }
 
     /**
