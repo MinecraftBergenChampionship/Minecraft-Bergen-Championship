@@ -11,6 +11,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.*;
@@ -355,11 +356,22 @@ public class MBC implements Listener {
     }
 
     /**
+     * No Drowning, I guess?
+     */
+    @EventHandler
+    public void onDamage(EntityDamageEvent e) {
+        if (!(e.getEntity() instanceof Player)) return;
+        if (e.getCause() == EntityDamageEvent.DamageCause.DROWNING) {
+            e.setCancelled(true);
+        }
+    }
+
+    /**
      * Prevent players from taking damage from fireworks
      * Until this ever becomes a feature in a game
      */
     @EventHandler
-    public void onDamage(EntityDamageByEntityEvent e) {
+    public void onAttack(EntityDamageByEntityEvent e) {
         // players or chickens should never get damaged by fireworks
         if (e.getDamager() instanceof Firework) {
             e.setCancelled(true);

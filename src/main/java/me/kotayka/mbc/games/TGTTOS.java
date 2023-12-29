@@ -289,6 +289,9 @@ public class TGTTOS extends Game {
                 e.getPlayer().teleport(map.getSpawnLocation());
                 return;
             }
+            if (map instanceof Boats) {
+                e.getPlayer().getInventory().addItem(new ItemStack(Material.OAK_BOAT));
+            }
             e.getPlayer().setVelocity(new Vector(0, 0, 0));
             e.getPlayer().teleport(map.getSpawnLocation());
             printDeathMessage(Participant.getParticipant(e.getPlayer()));

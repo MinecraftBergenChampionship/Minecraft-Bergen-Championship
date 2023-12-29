@@ -259,11 +259,6 @@ public class Participant {
             }
 
             // add to health scoreboard
-            Bukkit.broadcastMessage("player == " + p.getPlayer().getName());
-            for (Objective o : p.board.getObjectives()) {
-                Bukkit.broadcastMessage("o == " + o.getName());
-                Bukkit.broadcastMessage("o == " + o.getCriteria());
-            }
             if (p.board.getObjective("showhealth") == null) {
                 Objective h2 = board.registerNewObjective("showhealth", Criterias.HEALTH, ChatColor.DARK_RED + "❤");
                 h2.setDisplaySlot(DisplaySlot.BELOW_NAME);

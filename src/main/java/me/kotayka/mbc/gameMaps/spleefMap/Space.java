@@ -6,13 +6,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Space extends SpleefMap {
     private List<Block> blocks = new ArrayList<>();
+    private List<Block> moons = new ArrayList<>();
+    private List<Block> rings = new ArrayList<>();
+    private List<Block> planet = new ArrayList<>();
     private Set<Block> decaying = new HashSet<>();
     private Set<Block> toRemove = new HashSet<>();
     int erosion = -1;
@@ -36,9 +36,15 @@ public class Space extends SpleefMap {
                     if (paste.getType().equals(Material.AIR) || paste.getType().equals(Material.GOLD_BLOCK)) continue;
 
                     Block paste_to = getWorld().getBlockAt(paste_to_x, y, paste_to_z);
-                    paste_to.setType(paste.getType());
-                    blocks.add(paste_to);
-
+                    Material type = paste_to.getType();
+                    paste_to.setType(type);
+                    if (type == Material.END_STONE) {
+                        moons.add(paste_to);
+                    } else if (type.toString().endsWith("TERRACOTTA")) {
+                        rings.add(paste_to);
+                    } else {
+                        blocks.add(paste_to);
+                    }
                 }
                 copy_from_z++;
             }
@@ -62,10 +68,33 @@ public class Space extends SpleefMap {
     @Override
     public void Border(int timeRemaining) {
         if (timeRemaining == 210) {
-            Bukkit.broadcastMessage(ChatColor.RED+"The map is decaying!");
+            Bukkit.broadcastMessage(ChatColor.RED+"The outside moons are decaying!");
         }
         if (timeRemaining < 210) {
+            for (int i = 0; i < 3 && moons.size() > 1; i++) {
+                int rand = (int)(Math.random()*moons.size());
+                blocks.add(moons.get(rand));
+            }
             erodeMap();
+        }
+
+        if (timeRemaining == 150) {
+            Bukkit.broadcastMessage(ChatColor.RED+"The outer rings are decaying!");
+        }
+        if (timeRemaining < 150) {
+            for (int i = 0; i < 3 && rings.size() > 1; i++) {
+                int rand = (int)(Math.random() * rings.size());
+                blocks.add(rings.get(rand));
+            }
+        }
+        if (timeRemaining == 60) {
+            Bukkit.broadcastMessage(ChatColor.RED+"The planet is decaying!");
+        }
+        if (timeRemaining < 60) {
+            for (int i = 0; i < 5 && planet.size() > 1; i++) {
+                int rand = (int) (Math.random() * planet.size());
+                blocks.add(planet.get(rand));
+            }
         }
     }
 
@@ -89,7 +118,7 @@ public class Space extends SpleefMap {
                 }
             }, 40, 40);
         }
-        for (int i = 0; i < 15 && blocks.size() > 1; i++) {
+        for (int i = 0; i < 5 && blocks.size() > 1; i++) {
             int rand = (int) (Math.random() * blocks.size());
             decaying.add(blocks.get(rand));
         }
