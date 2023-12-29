@@ -268,11 +268,7 @@ public class Spleef extends Game {
             deathMessage = victim.getParticipant().getFormattedName()+" fell into the void";
         } else {
             SpleefPlayer killer = getSpleefPlayer(victim.getLastDamager().getPlayer());
-            if (killer.getPlayer().getUniqueId().equals(victim.getPlayer().getUniqueId())) {
-                deathMessage = victim.getParticipant().getFormattedName() + " spleefed themselves! How silly.";
-            } else if (killer.getParticipant().getTeam().equals(victim.getParticipant().getTeam())) {
-                deathMessage = victim.getParticipant().getFormattedName()+" was spleefed by their teammate, " + killer.getParticipant().getFormattedName() + "! How silly.";
-            } else {
+            if (!killer.getParticipant().getTeam().equals(victim.getParticipant().getTeam())) {
                 killer.incrementKills();
                 killer.getParticipant().addCurrentScore(KILL_POINTS);
                 killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + victim.getPlayer().getName() + "!");
@@ -280,6 +276,8 @@ public class Spleef extends Game {
                 createLine(1, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+killer.getKills(), killer.getParticipant());
 
                 deathMessage = victim.getParticipant().getFormattedName()+" was spleefed by " + killer.getParticipant().getFormattedName();
+            } else {
+                deathMessage = victim.getParticipant().getFormattedName() + " fell into the void";
             }
         }
 

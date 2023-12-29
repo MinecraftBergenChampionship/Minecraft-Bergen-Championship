@@ -81,6 +81,14 @@ public abstract class Minigame implements Scoreboard, Listener {
     }
 
     public void Pause() {
+        if (this instanceof Lobby && timeRemaining != -1) {
+            Bukkit.broadcastMessage("Event Paused!");
+            gameState = GameState.PAUSED;
+            stopTimer();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.sendTitle("PAUSED", "", 20, 60, 20);
+            }
+        }
         if (!(gameState == GameState.STARTING) || this instanceof DecisionDome || this instanceof Lobby) {
             // don't pause if game has started or minigame
             return;

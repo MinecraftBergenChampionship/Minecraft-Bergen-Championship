@@ -196,7 +196,7 @@ public class Build {
                                 String.format("%s[checkbuild] %sFound block %s which should be %s at (%d, %d, %d)",
                                         ChatColor.GREEN, ChatColor.RESET, check.getType(), b.getType(), checkX, checkY, checkZ)
                         );
-                    //    i++;
+                        i++;
                     }
                     /*
                     else if (b.getType().toString().endsWith("STAIRS")) {
@@ -216,10 +216,12 @@ public class Build {
                             i++;
                         }
                     }
+
+                     */
                     if (i >= 5) {
                         return;
                     }
-                     */
+
                 }
             }
         }

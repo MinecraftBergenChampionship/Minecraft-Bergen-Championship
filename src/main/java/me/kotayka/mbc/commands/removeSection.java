@@ -35,10 +35,10 @@ public class removeSection implements CommandExecutor {
         ArrayList<String> names = new ArrayList<>();
         for (int i = 0; i < dd.gameNames.size(); i++) {
             String s = dd.gameNames.get(i);
-            names.add(s.replace(" ", "_"));
+            names.add(s.replace(" ", "_").toLowerCase());
         }
 
-        if (!(names.contains(args[0]))) {
+        if (!(names.contains(args[0].toLowerCase()))) {
             sender.sendMessage(ChatColor.RED+"Invalid game name!");
             return false;
         } else {
