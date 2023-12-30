@@ -310,8 +310,11 @@ public class Spleef extends Game {
         if (e.getTo().getY() < e.getFrom().getY()) {
             Location l = e.getFrom().getBlock().getLocation();
             if (brokenBlocks.containsKey(l)) {
-                sp.setLastDamager(brokenBlocks.get(l).breaker.getParticipant());
-                sp.setResetTime(timeRemaining-RESET_SPLEEF_TIME);
+                Participant damager = brokenBlocks.get(l).breaker.getParticipant();
+                if (!damager.getTeam().equals(sp.getParticipant().getTeam())) {
+                    sp.setLastDamager(brokenBlocks.get(l).breaker.getParticipant());
+                    sp.setResetTime(timeRemaining-RESET_SPLEEF_TIME);
+                }
             }
         }
 

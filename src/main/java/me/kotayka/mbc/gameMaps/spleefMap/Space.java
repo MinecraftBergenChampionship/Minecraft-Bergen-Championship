@@ -32,18 +32,18 @@ public class Space extends SpleefMap {
         for (int paste_to_x = -31; paste_to_x <= 24; paste_to_x++) {
             for (int paste_to_z = -27; paste_to_z <= 30; paste_to_z++) {
                 for (int y = 90; y<= 120; y++) {
-                    Block paste = getWorld().getBlockAt(copy_from_x, y, copy_from_z);
-                    if (paste.getType().equals(Material.AIR) || paste.getType().equals(Material.GOLD_BLOCK)) continue;
+                    Block copy = getWorld().getBlockAt(copy_from_x, y, copy_from_z);
+                    if (copy.getType().equals(Material.AIR) || copy.getType().equals(Material.GOLD_BLOCK)) continue;
 
                     Block paste_to = getWorld().getBlockAt(paste_to_x, y, paste_to_z);
-                    Material type = paste_to.getType();
+                    Material type = copy.getType();
                     paste_to.setType(type);
                     if (type == Material.END_STONE) {
                         moons.add(paste_to);
                     } else if (type.toString().endsWith("TERRACOTTA")) {
                         rings.add(paste_to);
                     } else {
-                        blocks.add(paste_to);
+                        planet.add(paste_to);
                     }
                 }
                 copy_from_z++;
@@ -71,9 +71,10 @@ public class Space extends SpleefMap {
             Bukkit.broadcastMessage(ChatColor.RED+"The outside moons are decaying!");
         }
         if (timeRemaining < 210) {
-            for (int i = 0; i < 3 && moons.size() > 1; i++) {
+            for (int i = 0; i < 10 && moons.size() > 1; i++) {
                 int rand = (int)(Math.random()*moons.size());
-                blocks.add(moons.get(rand));
+                decaying.add(moons.get(rand));
+                moons.remove(rand);
             }
             erodeMap();
         }
@@ -82,18 +83,20 @@ public class Space extends SpleefMap {
             Bukkit.broadcastMessage(ChatColor.RED+"The outer rings are decaying!");
         }
         if (timeRemaining < 150) {
-            for (int i = 0; i < 3 && rings.size() > 1; i++) {
+            for (int i = 0; i < 8 && rings.size() > 1; i++) {
                 int rand = (int)(Math.random() * rings.size());
-                blocks.add(rings.get(rand));
+                decaying.add(rings.get(rand));
+                rings.remove(rand);
             }
         }
-        if (timeRemaining == 60) {
+        if (timeRemaining == 90) {
             Bukkit.broadcastMessage(ChatColor.RED+"The planet is decaying!");
         }
-        if (timeRemaining < 60) {
-            for (int i = 0; i < 5 && planet.size() > 1; i++) {
+        if (timeRemaining < 90) {
+            for (int i = 0; i < 10 && planet.size() > 1; i++) {
                 int rand = (int) (Math.random() * planet.size());
-                blocks.add(planet.get(rand));
+                decaying.add(planet.get(rand));
+                planet.remove(rand);
             }
         }
     }

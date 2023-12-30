@@ -164,7 +164,15 @@ public class Build {
                 for (int z = 0; z < 7; z++) {
                     Block b = blocks[y][x][z];
                     Block toMatch = midBlock.getWorld().getBlockAt(midBlock.getBlockX()+3-x, midBlock.getBlockY()+y, midBlock.getBlockZ()+3-z);
-                    if (toMatch.getLocation().equals(brokeBlock)) continue;
+                    if (toMatch.getLocation().equals(brokeBlock)) {
+                        // if air where broken block supposed to be, keep checking
+                        if (b.getType() == Material.AIR) {
+                            continue;
+                        } else {
+                            // otherwise, it cannot possibly be correct
+                            return false;
+                        }
+                    }
                     if (!matches(b, toMatch)) {
                         return false;
                     }

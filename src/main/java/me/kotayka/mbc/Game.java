@@ -224,8 +224,8 @@ public abstract class Game extends Minigame {
      *  Loops for all players by default.
      */
     public void updatePlayersAliveScoreboard() {
-        createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players: " + ChatColor.RESET+playersAlive.size() + "/"+MBC.getInstance().getPlayers().size() + ", " +
-                                    ChatColor.GREEN+", "+ ChatColor.BOLD+"Teams: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
+        createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players: " + ChatColor.RESET+playersAlive.size() + "/"+MBC.getInstance().getPlayers().size() + " | " +
+                                    ChatColor.GREEN + "" + ChatColor.BOLD+"Teams: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
         /*
         createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.getInstance().getPlayers().size());
         createLineAll(2, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
@@ -243,8 +243,8 @@ public abstract class Game extends Minigame {
      * @param p Specific participant to update scoreboard
      */
     public void updatePlayersAliveScoreboard(Participant p) {
-        createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players: " + ChatColor.RESET+playersAlive.size() + "/"+MBC.getInstance().getPlayers().size() + ", " +
-                ChatColor.GREEN+", "+ ChatColor.BOLD+"Teams: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
+        createLine(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players: " + ChatColor.RESET+playersAlive.size() + "/"+MBC.getInstance().getPlayers().size() + " | " +
+                ChatColor.GREEN + "" + ChatColor.BOLD+"Teams: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS, p);
         /*
         createLine(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.MAX_PLAYERS, p);
         createLine(2, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS, p);

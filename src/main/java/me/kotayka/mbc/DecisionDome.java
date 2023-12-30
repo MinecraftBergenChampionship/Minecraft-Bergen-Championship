@@ -736,7 +736,7 @@ public class DecisionDome extends Minigame {
                     Block copyFrom = world.getBlockAt(x,y,z);
                     Block pasteTo = world.getBlockAt(pasteToX, pasteToY, pasteToZ);
                     pasteTo.setType(copyFrom.getType());
-                    world.getBlockAt(x,y,z).breakNaturally(null);
+                    world.getBlockAt(x,y,z).breakNaturally(new ItemStack(Material.WOODEN_SHOVEL));
                     pasteToZ++;
                 }
                 pasteToY++;
