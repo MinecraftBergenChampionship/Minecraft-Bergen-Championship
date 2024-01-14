@@ -718,7 +718,7 @@ public class DecisionDome extends Minigame {
         dunked_corners[1] = l2;
 
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
-            p.getPlayer().sendTitle("", team.teamNameFormat() + ChatColor.RESET + " were dunked!", 0, 60, 20);
+            p.getPlayer().sendTitle(" ", team.teamNameFormat() + ChatColor.RESET + " were dunked!", 0, 60, 30);
             if (p.getTeam().equals(team)) {
                 p.getPlayer().teleport(getTeleportLocation(p.getTeam().getChatColor()));
                 p.getPlayer().setVelocity(new Vector(0, 0, 0));

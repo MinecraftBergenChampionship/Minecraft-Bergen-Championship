@@ -366,7 +366,7 @@ public class Lobby extends Minigame {
                 MBC.getInstance().dodgebolt = new Dodgebolt(reveal.get(reveal.size()-1), reveal.get(reveal.size()-2));
             }
         }
-        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().dodgebolt, MBC.getInstance().plugin);
+        //MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().dodgebolt, MBC.getInstance().plugin);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);

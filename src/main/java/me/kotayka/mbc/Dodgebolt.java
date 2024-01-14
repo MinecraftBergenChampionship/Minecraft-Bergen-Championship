@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -83,19 +84,23 @@ public class Dodgebolt extends Minigame {
         playersAlive = new int[]{firstPlace.teamPlayers.size(), secondPlace.teamPlayers.size()};
     }
 
-    public Dodgebolt(MBCTeam firstPlace, MBCTeam secondPlace) {
+    public Dodgebolt(@NotNull MBCTeam firstPlace, @NotNull MBCTeam secondPlace) {
         super("Dodgebolt");
         this.firstPlace = firstPlace;
+        Bukkit.broadcastMessage("firstPlace == " + this.firstPlace.teamNameFormat());
         this.secondPlace = secondPlace;
+        Bukkit.broadcastMessage("secondPlace == " + this.secondPlace.teamNameFormat());
 
         ItemMeta bowMeta = BOW.getItemMeta();
         bowMeta.setUnbreakable(true);
         BOW.setItemMeta(bowMeta);
 
         for (Participant p : firstPlace.teamPlayers) {
+            Bukkit.broadcastMessage("In constructor, p (firstPlace) == " + p);
             teamOnePlayers.add(new DodgeboltPlayer(p, true));
         }
         for (Participant p : secondPlace.teamPlayers) {
+            Bukkit.broadcastMessage("In constructor, p (secondPlace) == " + p);
             teamTwoPlayers.add(new DodgeboltPlayer(p, false));
         }
 
@@ -148,10 +153,24 @@ public class Dodgebolt extends Minigame {
         // for when the game starts
         if (roundNum == 1) {
             for (Participant p : firstPlace.teamPlayers) {
-                teamOnePlayers.add(new DodgeboltPlayer(p, true));
+                if (teamOnePlayers.size() < firstPlace.teamPlayers.size()) {
+                    /*
+                    Bukkit.broadcastMessage("p == " + p.getFormattedName());
+                    Bukkit.broadcastMessage("teamOnePlayers.size() == " + teamOnePlayers.size());
+                    Bukkit.broadcastMessage("firstPlace.teamPlayers.size() == " + firstPlace.teamPlayers.size());
+                    */
+                    teamOnePlayers.add(new DodgeboltPlayer(p, true));
+                }
             }
             for (Participant p : secondPlace.teamPlayers) {
-                teamTwoPlayers.add(new DodgeboltPlayer(p, false));
+                /*
+                Bukkit.broadcastMessage("p == " + p.getFormattedName());
+                Bukkit.broadcastMessage("teamTwoPlayers.size() == " + teamTwoPlayers.size());
+                Bukkit.broadcastMessage("secondPlace.teamPlayers.size() == " + secondPlace.teamPlayers.size());
+                */
+                if (teamTwoPlayers.size() < secondPlace.teamPlayers.size()) {
+                    teamTwoPlayers.add(new DodgeboltPlayer(p, false));
+                }
             }
             for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -211,6 +230,13 @@ public class Dodgebolt extends Minigame {
         if (getState().equals(GameState.STARTING)) {
             if (timeRemaining == 0) {
                 startRound();
+                // remove all arrows
+                for (Entity e : world.getEntitiesByClass(Item.class)) {
+                    e.remove();
+                }
+                for (Entity e : world.getEntitiesByClass(Arrow.class)) {
+                    e.remove();
+                }
                 setGameState(GameState.ACTIVE);
                 createLineAll(20, ChatColor.RED.toString()+ChatColor.BOLD+"Finale Active");
             } else {

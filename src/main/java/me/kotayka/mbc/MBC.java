@@ -574,7 +574,7 @@ public class MBC implements Listener {
     public void setLogStats(boolean b) { enable_stat_logging = b; }
     public boolean logStats() { return enable_stat_logging; }
     public void setMultiplier(double multiplier) { this.multiplier = multiplier; }
-    public static String statDirectory() { return "stat_archive"+File.separator+"MBC1";}
+    public static String statDirectory() { return "stat_archive"+File.separator+"MBC2";}
     /**
      * ArrayList of all Participants including Spectators.
      * @return Copy of list of current players with spectators.
