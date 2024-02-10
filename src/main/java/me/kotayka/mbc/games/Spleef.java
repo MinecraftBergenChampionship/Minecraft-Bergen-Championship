@@ -44,12 +44,13 @@ public class Spleef extends Game {
     // scoring
     private final int SURVIVAL_POINTS = 2;
     private final int KILL_POINTS = 2;
-    private final int LAST_TEAM_BONUS = 5;
+    private final int LAST_TEAM_BONUS = 4;
 
     // Misc
     private Map<Location, SpleefBlock> brokenBlocks = new HashMap<>();
     private final long DAMAGE_COOLDOWN = 850;
-    private final int[] BONUS_POINTS = {20, 15, 15, 10, 10, 8, 8, 8, 5, 5, 3, 3}; // 24 player; these numbers are arbitrary
+    //private final int[] BONUS_POINTS = {20, 15, 15, 10, 10, 8, 8, 8, 5, 5, 3, 3}; // 24 player; these numbers are arbitrary
+    private final int[] BONUS_POINTS = {20, 15, 10, 8, 8, 5, 5, 3, 3};
     // NOTE: 16 player bonus is probably different
 
     public Spleef() {

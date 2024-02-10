@@ -139,7 +139,7 @@ public class AceRacePlayer extends GamePlayer {
             p.addCurrentScore(beatPlayers * AceRace.PLACEMENT_LAP_POINTS);
         } else {
             // final points are worth more
-            p.addCurrentScore(beatPlayers * AceRace.PLACEMENT_FINAL_LAP_POINTS);
+            p.addCurrentScore(beatPlayers * AceRace.PLACEMENT_FINAL_LAP_POINTS + AceRace.LAP_COMPLETION_POINTS);
             p.addCurrentScore(AceRace.FINISH_RACE_POINTS);
 
             // final placement bonuses

@@ -7,7 +7,6 @@ import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
 import me.kotayka.mbc.gameMaps.aceRaceMap.Biomes;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
-import me.kotayka.mbc.teams.Spectator;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
@@ -39,6 +38,7 @@ public class AceRace extends Game {
     // SCORING VARIABLES
     public static final int FINISH_RACE_POINTS = 8;           // points for finishing the race
     public static final int PLACEMENT_LAP_POINTS = 1;         // points for placement for first laps
+    public static final int LAP_COMPLETION_POINTS = 1;
     public static final int PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
     public static final int[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
 

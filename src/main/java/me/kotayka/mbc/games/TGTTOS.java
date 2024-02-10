@@ -49,8 +49,8 @@ public class TGTTOS extends Game {
     // Scoring
     public static int PLACEMENT_POINTS = 1; // awarded multiplied by the amount of players who havent finished yet
     public static int COMPLETION_POINTS = 1; // awarded for completing the course
-    public static int FIRST_TEAM_BONUS = 5; // awarded per player on team
-    public static int SECOND_TEAM_BONUS = 3; // awarded per player on team
+    public static int FIRST_TEAM_BONUS = 4; // awarded per player on team
+    public static int SECOND_TEAM_BONUS = 2; // awarded per player on team
     public static int TOP_THREE_BONUS = 5; // bonus for placing top 3
 
     public TGTTOS() {
