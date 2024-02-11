@@ -171,6 +171,7 @@ public class DecisionDome extends Minigame {
             if (!revealedGames) {
                 if (timeRemaining == 47) {
                     Bukkit.broadcastMessage(ChatColor.GREEN+""+ChatColor.BOLD+"Time to reveal the games!");
+                    deleteOldNames();
                 }
 
                 if (timeRemaining % 5 == 0 && timeRemaining != 0) {
@@ -893,6 +894,12 @@ public class DecisionDome extends Minigame {
             removeSection(s);
         }
         //Bukkit.broadcastMessage("[Debug] after: sections.size() == " + sections.size());
+    }
+
+    public void deleteOldNames() {
+        for (ArmorStand a : world.getEntitiesByClass(ArmorStand.class)) {
+            a.remove();
+        }
     }
 }
 
