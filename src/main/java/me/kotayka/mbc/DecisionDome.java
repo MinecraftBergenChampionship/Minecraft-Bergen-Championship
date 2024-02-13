@@ -82,6 +82,7 @@ public class DecisionDome extends Minigame {
             for (Section s : sections.values()) {
                 winner = s;
             }
+            MBC.getInstance().incrementMultiplier();
             createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Warping to game: ");
             setGameState(GameState.END_GAME);
             setTimer(13);
