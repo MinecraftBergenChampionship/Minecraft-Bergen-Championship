@@ -19,17 +19,17 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Classic extends SkybattleMap {
-    private final Location CENTER = new Location(getWorld(), -157, 100, -266);
+    private final Location CENTER = new Location(getWorld(), 0, 100, 0);
     public final double RADIUS_SHRINK_AMOUNT = 0.37;
     public final double HEIGHT_SHRINK_AMOUNT = 0.22;
     private float borderRadius = 80;
     private final Location[] SPAWNS = {
-        new Location(getWorld(), -220, 71, -266),
-        new Location(getWorld(), -190, 71, -212),
-        new Location(getWorld(), -124, 71, -212),
-        new Location(getWorld(), -94, 71, -266),
-        new Location(getWorld(), -124, 71, -320),
-        new Location(getWorld(), -190, 71, -320),
+        new Location(getWorld(), 33, 71, 54),
+        new Location(getWorld(), -33, 71, 54),
+        new Location(getWorld(), -63, 71, 0),
+        new Location(getWorld(), 63, 71, 0),
+        new Location(getWorld(), -33, 71, -54),
+        new Location(getWorld(), 33, 71, -54),
     };
 
     private List<ItemStack> spawnItems = new ArrayList<>(5);
@@ -53,13 +53,13 @@ public class Classic extends SkybattleMap {
         setBorderRadius(80);
 
         // reset world
-        int x = 225;
-        int y = -16;
-        int z = 322;
+        int x = -368;
+        int y = 63;
+        int z = 241;
         World world = getWorld(); // convenience
-        for (int mapX = -225; mapX <= -87; mapX++) {
+        for (int mapX = -68; mapX <= 70; mapX++) {
             for (int mapY = 63; mapY <= 96; mapY++) {
-                for (int mapZ = -325; mapZ <= -207; mapZ++) {
+                for (int mapZ = -59; mapZ <= 59; mapZ++) {
                     Block originalBlock = world.getBlockAt(x, y, z);
                     Block possiblyChangedBlock = world.getBlockAt(mapX, mapY, mapZ);
                     if (!(originalBlock.getType().name().equals(possiblyChangedBlock.getType().name()))) {
@@ -102,8 +102,8 @@ public class Classic extends SkybattleMap {
             }
         }
 
-        for (int x = -170; x < -142; x+=2) {
-            for (int z = -278; z < -252; z+=2) {
+        for (int x = -14; x < 14; x+=2) {
+            for (int z = -13; z < 13; z+=2) {
                 getWorld().spawnParticle(Particle.REDSTONE, x, getBorderHeight(), z, 1, SKYBATTLE.TOP_BORDER_PARTICLE);
             }
         }
@@ -204,9 +204,9 @@ public class Classic extends SkybattleMap {
         // TODO ?
         // since this goes through the whole map, there's a lot of redundant checking going on.
         // if anyone is stumbling across this in the future, feel free to write more code to reduce this.
-        for (int x = -222; x <= -92; x++) {
+        for (int x = -65; x <= 65; x++) {
             for (int y = 71; y <= 73; y++) {
-                for (int z = -322; z <= -210; z++) {
+                for (int z = -56; z <= 56; z++) {
                     if (getWorld().getBlockAt(x, y, z).getType().equals(Material.BARRIER)) {
                         getWorld().getBlockAt(x, y, z).setType(Material.AIR);
                     }

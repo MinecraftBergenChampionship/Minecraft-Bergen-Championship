@@ -13,7 +13,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.units.qual.C;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -381,7 +380,7 @@ public abstract class Game extends Minigame {
     */
     public void gameEndEvents() {
         if (MBC.getInstance().finalGame) {
-            gameEndEventsFinal();
+            finalGameEndEvents();
             return;
         }
         // GAME_END should have ~35 seconds by default
@@ -399,7 +398,7 @@ public abstract class Game extends Minigame {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Current event standings:");
                 TO_PRINT = printEventScores();
             }
-            case 1 -> Bukkit.broadcastMessage(ChatColor.RED + "Returning to lobby...");
+            case 2 -> Bukkit.broadcastMessage(ChatColor.RED + "Returning to lobby...");
             case 28, 20, 12 -> Bukkit.broadcastMessage(TO_PRINT);
             case 0 -> {
                 logger.logStats();
@@ -414,7 +413,7 @@ public abstract class Game extends Minigame {
      */
     public void teamGameEndEvents() {
         if (MBC.getInstance().finalGame) {
-            teamGameEndEventsFinal();
+            finalGameEndEvents();
             return;
         }
         // Team Games should leave at least 25 seconds for GAME_END
@@ -423,14 +422,14 @@ public abstract class Game extends Minigame {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
                 TO_PRINT = printRoundScores();
             }
-            case 16 -> getScoresNoPrint();
+            case 16 -> getIndivScoresNoPrint();
             case 14 -> {
                 Bukkit.broadcastMessage(ChatColor.BOLD+"Current event standings:");
                 TO_PRINT = printEventScores();
             }
             case 11 -> MBC.getInstance().updatePlacings();
             case 18, 12 -> Bukkit.broadcastMessage(TO_PRINT);
-            case 1 -> Bukkit.broadcastMessage(ChatColor.RED+"Returning to lobby...");
+            case 2 -> Bukkit.broadcastMessage(ChatColor.RED+"Returning to lobby...");
             case 0 -> {
                 logger.logStats();
                 returnToLobby();
@@ -438,42 +437,20 @@ public abstract class Game extends Minigame {
         }
     }
 
-    public void gameEndEventsFinal() {
-        if (timeRemaining > 26) {
-            timeRemaining = 26;
-        }
-        switch (timeRemaining) {
-            case 23 -> {
-                Bukkit.broadcastMessage(ChatColor.BOLD+"Each team scored this game: ");
-                TO_PRINT = printRoundScores();
-            }
-            case 13 -> {
-                Bukkit.broadcastMessage(ChatColor.BOLD+"Top 5 players this game: ");
-                TO_PRINT = getScores();
-            }
-            case 20, 10 -> Bukkit.broadcastMessage(TO_PRINT);
-            case 8 -> MBC.getInstance().updatePlacings();
-            case 1 -> Bukkit.broadcastMessage(ChatColor.RED+"Preparing finale...");
-            case 0 -> {
-                logger.logStats();
-                returnToLobby();
-            }
-        }
-    }
-
-    public void teamGameEndEventsFinal() {
+    public void finalGameEndEvents() {
         if (timeRemaining > 12) {
             timeRemaining = 12;
         }
 
         switch (timeRemaining) {
             case 10 -> {
-                Bukkit.broadcastMessage(ChatColor.BOLD + "Each team scored this game:");
-                TO_PRINT = printRoundScores();
+                Bukkit.broadcastMessage(ChatColor.BOLD + "Skipping score report for last game!");
+                getTeamScoresNoPrint();
+                getIndivScoresNoPrint();
             }
-            case 8 -> Bukkit.broadcastMessage(TO_PRINT);
-            case 5 -> getScoresNoPrint();
-            case 1 -> Bukkit.broadcastMessage(ChatColor.RED + "Preparing finale...");
+            case 8 -> Bukkit.broadcastMessage(ChatColor.BOLD+"Check with admins or <implemented command> to find your score post-reveal!");
+            case 5 -> getIndivScoresNoPrint();
+            case 2 -> Bukkit.broadcastMessage(ChatColor.RED + "Preparing finale...");
             case 3 -> MBC.getInstance().updatePlacings();
             case 0 -> {
                 logger.logStats();
@@ -556,7 +533,7 @@ public abstract class Game extends Minigame {
         return teamString.toString();
     }
 
-    public void getScoresNoPrint() {
+    public void getIndivScoresNoPrint() {
         for (Participant p : MBC.getInstance().getPlayers()) {
             String score = String.format(
                     "%s: %.1f (%d x %.1f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier
@@ -564,6 +541,22 @@ public abstract class Game extends Minigame {
             logger.logIndividual(score);
 
             p.addCurrentScoreToTotal();
+        }
+    }
+
+    public void getTeamScoresNoPrint() {
+        List<MBCTeam> gameScores = new ArrayList<>(getValidTeams());
+        gameScores.sort(new TeamRoundSorter());
+        StringBuilder teamString = new StringBuilder();
+
+        for (int i = 0; i < gameScores.size(); i++) {
+            MBCTeam t = gameScores.get(i);
+            String str = ChatColor.BOLD+""+(i+1)+". "+String.format("%s: %.1f\n", t.teamNameFormat(), t.getMultipliedCurrentScore());
+            teamString.append(ChatColor.BOLD+""+(i+1)+". ").append(String.format(
+                    "%s: %.1f\n", t.teamNameFormat(), t.getMultipliedCurrentScore()
+            ));
+            logger.logTeamScores(str);
+            scoreMap.put(t, t.getMultipliedCurrentScore());
         }
     }
 
