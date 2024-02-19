@@ -52,7 +52,7 @@ public class Classic extends SkybattleMap {
         setBorderHeight(120);
         setBorderRadius(80);
 
-        // reset world
+        // reset world (center @ -300 75 300)
         int x = -368;
         int y = 63;
         int z = 241;
@@ -78,10 +78,10 @@ public class Classic extends SkybattleMap {
                     }
                     z++;
                 }
-                z = 322;
+                z = 241;
                 y++;
             }
-            y = -16;
+            y = 63;
             x++;
         }
         removeEntities();
