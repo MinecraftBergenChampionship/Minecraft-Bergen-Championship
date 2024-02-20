@@ -43,8 +43,8 @@ public class SurvivalGames extends Game {
     private final File CHEST_FILE = new File("survival_games_items.json");
     private final File SUPPLY_FILE = new File("supply_crate_items.json");
     private SurvivalGamesEvent event = SurvivalGamesEvent.GRACE_OVER;
-    private final List<Location> chestLocations = new ArrayList<Location>(50);
-    private final List<SupplyCrate> crates = new ArrayList<SupplyCrate>(3);
+    //private final List<Location> chestLocations = new ArrayList<Location>(50);
+    //private final List<SupplyCrate> crates = new ArrayList<SupplyCrate>(3);
     private Map<Player, Integer> playerKills = new HashMap<>();
     private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
     private boolean dropLocation = false;
@@ -175,7 +175,7 @@ public class SurvivalGames extends Game {
              *  4:00: 2nd supply crate drops, 3rd supply crate announced
              *  3:00: Last supply crate lands
              */
-            if (crates.size() > 0) { crateParticles(); }
+            //if (crates.size() > 0) { crateParticles(); }
 
             if (timeRemaining == 0) {
                 if (teamsAlive.size() > 1) {
@@ -202,7 +202,8 @@ public class SurvivalGames extends Game {
             }
 
             if (timeRemaining == 420) {
-                event = SurvivalGamesEvent.SUPPLY_CRATE;
+                //event = SurvivalGamesEvent.SUPPLY_CRATE;
+                event = SurvivalGamesEvent.CHEST_REFILL;
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
                     p.getPlayer().setInvulnerable(false);
@@ -215,9 +216,9 @@ public class SurvivalGames extends Game {
             } else if (timeRemaining == 360) {
                 event = SurvivalGamesEvent.CHEST_REFILL;
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests will refill in one minute!");
-                crateLocation();
+                //crateLocation();
             } else if (timeRemaining == 300) {
-                spawnSupplyCrate();
+                //spawnSupplyCrate();
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     player.sendTitle("", ChatColor.RED+"Chests refilled!", 20, 60, 20);
                     player.playSound(player, Sound.BLOCK_CHEST_OPEN, 1, 1);
@@ -225,15 +226,19 @@ public class SurvivalGames extends Game {
                 regenChest();
                 getLogger().log(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
-                event = SurvivalGamesEvent.SUPPLY_CRATE;
-                crateLocation();
-            } else if (timeRemaining == 240) {
-                spawnSupplyCrate();
-            } else if (timeRemaining == 239) {
-                crateLocation();
-            } else if (timeRemaining == 180) {
-                spawnSupplyCrate();
+                //event = SurvivalGamesEvent.SUPPLY_CRATE;
                 event = SurvivalGamesEvent.DEATHMATCH;
+                //crateLocation();
+                /*
+            } else if (timeRemaining == 240) {
+                //spawnSupplyCrate();
+            } else if (timeRemaining == 239) {
+                //crateLocation();
+            } else if (timeRemaining == 180) {
+                //spawnSupplyCrate();
+
+                //event = SurvivalGamesEvent.DEATHMATCH;
+                 */
             }
             UpdateEvent();
         } else if (getState().equals(GameState.OVERTIME)) {
@@ -271,7 +276,6 @@ public class SurvivalGames extends Game {
                 roundWinners(0);
                 map.resetMap();
             }
-
             gameEndEvents();
         }
     }
@@ -282,11 +286,13 @@ public class SurvivalGames extends Game {
     private void UpdateEvent() {
         for (Participant p : MBC.getInstance().getPlayers()) {
             // display coordinates of each drop separately
+            /*
             if (dropLocation && crates.size() > 0) {
                 Location l = crates.get(crateNum).getLocation();
                 createLine(22, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Supply drop: " + ChatColor.RESET + "(" + l.getX() + ", " + l.getY() + ", " + l.getZ() + ")", p);
                 dropLocation = false;
             }
+             */
 
             switch (event) {
                 case GRACE_OVER ->
@@ -307,6 +313,7 @@ public class SurvivalGames extends Game {
     /**
      * Generate location of supply crate
      */
+    /*
     public void crateLocation() {
         int index = (int) (Math.random()*chestLocations.size());
 
@@ -318,12 +325,15 @@ public class SurvivalGames extends Game {
         getLogger().log(s);
         Bukkit.broadcastMessage(s);
     }
+     */
 
     /**
      * Given the location of the crate is predetermined, replace the block
      * with the crate block and generate loot
      * @see SurvivalGames crateLocation()
+     * TODO: Improve implementation of crates
      */
+    /*
     public void spawnSupplyCrate() {
         double totalWeight = 42;
         // delete this once it is final
@@ -333,6 +343,7 @@ public class SurvivalGames extends Game {
         Bukkit.broadcastMessage("[Debug] Total Supply Weight == " + totalWeight);
          */
 
+            /*
         Location l = crates.get(crateNum).getLocation();
         l.getBlock().setType(Material.BLACK_SHULKER_BOX);
         ShulkerBox crate = (ShulkerBox) map.getWorld().getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()).getState();
@@ -349,10 +360,12 @@ public class SurvivalGames extends Game {
             crate.getInventory().setItem((int) (Math.random()*27), supply_items.get(idx).getItem());
         }
     }
+    */
 
     /**
      * Spawn particles at super chest spawning location
      */
+    /*
     private void crateParticles() {
         for (SupplyCrate crate : crates) {
             if (!crate.beenOpened()) {
@@ -363,6 +376,7 @@ public class SurvivalGames extends Game {
             }
         }
     }
+     */
 
     /**
      * Regenerates the loot within every chest in the map.
@@ -384,9 +398,11 @@ public class SurvivalGames extends Game {
                 if (chunk.getTileEntities()[x] instanceof Chest) {
                     Chest chest = (Chest) chunk.getTileEntities()[x];
 
+                    /*
                     if (crates.size() < 1 && map.checkChest(chest)) {
                         chestLocations.add(chest.getLocation());
                     }
+                     */
 
                     chest.getInventory().clear();
                     int chestItems = rand.nextInt(2) + 5;
@@ -459,13 +475,18 @@ public class SurvivalGames extends Game {
         }
 
         // Track opened crates
+        /*
         if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.BLACK_SHULKER_BOX)) {
+            if (crates.size() < 1) {
+                return;
+            }
             crates.get(crateNum).setOpened(true);
             dropLocation = false;
             createLineAll(22, "");
             crateNum++;
             return;
         }
+         */
 
         // prevent stripping trees :p
         if (e.getClickedBlock() == null) return;
@@ -539,9 +560,12 @@ public class SurvivalGames extends Game {
 
         // this solution might be temporary, not sure if other maps or other blocks are necessary to add.
         String brokenBlock = e.getBlock().getType().toString();
-        if (!(brokenBlock.contains("GLASS")) && !(e.getBlock().getType().equals(Material.TALL_GRASS)))  e.setCancelled(true);
+        if (brokenBlock.contains("GLASS") || e.getBlock().getType().equals(Material.TALL_GRASS) || e.getBlock().getType().equals(Material.FIRE)) {
+            map.brokenBlocks.put(e.getBlock().getLocation(), e.getBlock().getType());
+            return;
+        }
 
-        map.brokenBlocks.put(e.getBlock().getLocation(), e.getBlock().getType());
+        e.setCancelled(true);
     }
 
     /**
@@ -675,7 +699,7 @@ public class SurvivalGames extends Game {
     // TODO
     private void handleEnchantGUI(InventoryClickEvent e) {
         Material type = e.getCurrentItem().getType();
-        if (type == null) return;
+        //if (type == null) return;
 
         Player p = (Player) e.getWhoClicked();
         GUIItem item = null;
@@ -691,9 +715,12 @@ public class SurvivalGames extends Game {
 
         ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
         int level = p.getLevel();
-        if (level < item.cost) {
+        if (p.getInventory().firstEmpty() == -1) {
             p.playSound(p, Sound.ENTITY_ITEM_BREAK, 1, 1);
-            p.sendMessage(ChatColor.RED+"Not enough levels!");
+            p.sendMessage(ChatColor.RED + "Full inventory!");
+        } else if (level < item.cost) {
+            p.playSound(p, Sound.ENTITY_ITEM_BREAK, 1, 1);
+            p.sendMessage(ChatColor.RED + "Not enough levels!");
         } else {
             EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
             meta.addStoredEnchant(item.enchantment, 1, true);
@@ -701,6 +728,7 @@ public class SurvivalGames extends Game {
             p.getInventory().addItem(book);
             p.setLevel(level-item.cost);
             p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
+            p.getInventory().addItem(book);
             p.closeInventory();
             //p.updateInventory();
         }
@@ -773,12 +801,14 @@ public class SurvivalGames extends Game {
     /**
      * Reset all transformed crates
      */
+    /*
     public void resetCrates() {
         for (SupplyCrate crate : crates) {
             crate.getLocation().getBlock().setType(Material.CHEST);
         }
         crates.clear();
     }
+     */
 }
 
 class SurvivalGamesItem {

@@ -65,7 +65,7 @@ public abstract class SurvivalGamesMap extends MBCMap {
             e.remove();
         }
 
-        MBC.getInstance().sg.resetCrates();
+        //MBC.getInstance().sg.resetCrates();
     }
 
     public Location Center() { return CENTER; }
