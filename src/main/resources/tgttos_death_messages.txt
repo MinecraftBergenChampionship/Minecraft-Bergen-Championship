@@ -1,12 +1,12 @@
-{player} didn't go to mid at 15 mins
-{player} is gonna get 1st, 2nd, and 3rd
+{player} didn't go to mid at 15 mins.
+{player} is gonna get 1st, 2nd, and 3rd.
 {player} didn't say "It's morbin' time."
 {player} regrets buying Eggcoin.
 {player} was sued for being too annoying.
 {player}! This is not the time to pee!
 {player} found Nikola's last trap.
 {player} put an eraser on a hot plate.
-{player} reached the other, other side
+{player} reached the other, other side.
 {player}: "Next round's my round!"
 {player} has fallen! A cannon can be heard in the distance.
 Blame it on the lag, {player}.
@@ -43,3 +43,10 @@ Legends say {player} is still falling.
 {player} didn't immediately recognize that round was Madagascar.
 {player} is loading Valorant as we speak.
 {player} is gonna get 11st, 12nd, and 13rd.
+{player} was not here before Parth said 8:30.
+Maybe {player} wouldn't have died if they used Heron's formula.
+{player} caught bruh disease.
+{player} got caught playing FNAF in the commons breakout room.
+{player} wasn't wearing their id during school hours.
+{player} got the furnace in Build Mart.
+Wrong way, {player}!
