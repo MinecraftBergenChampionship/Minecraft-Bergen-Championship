@@ -18,6 +18,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -564,7 +565,7 @@ public class Skybattle extends Game {
 
         // kill players immediately in void
         if (player.getPlayer().getLocation().getY() <= map.getVoidHeight()) {
-            if (player.getPlayer().getGameMode() == GameMode.SPECTATOR) {
+            if (player.getPlayer().getGameMode() == GameMode.SPECTATOR || !(getState().equals(GameState.OVERTIME) || getState().equals(GameState.ACTIVE))) {
                 player.getPlayer().teleport(map.getCenter());
                 return;
             }
