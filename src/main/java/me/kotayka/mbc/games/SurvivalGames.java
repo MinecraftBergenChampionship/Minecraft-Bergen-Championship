@@ -244,7 +244,6 @@ public class SurvivalGames extends Game {
         } else if (getState().equals(GameState.OVERTIME)) {
             if (timeRemaining == 0) {
                 gameOverGraphics();
-                roundWinners(0);
                 for (Participant p : playersAlive) {
                     MBCTeam t = p.getTeam();
                     teamPlacements.put(t, 1);
