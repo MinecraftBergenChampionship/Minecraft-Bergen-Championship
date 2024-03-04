@@ -62,7 +62,7 @@ public abstract class Game extends Minigame {
     public void Introduction() {
         Bukkit.broadcastMessage(ChatColor.GREEN + "---------------------------------------");
         Bukkit.broadcastMessage("\n");
-        Bukkit.broadcastMessage(ChatColor.BOLD + INTRODUCTION[introLine++]);
+        Bukkit.broadcastMessage(INTRODUCTION[introLine++]);
         Bukkit.broadcastMessage("\n");
         Bukkit.broadcastMessage(ChatColor.GREEN + "---------------------------------------");
         for (Player p : Bukkit.getOnlinePlayers()) {

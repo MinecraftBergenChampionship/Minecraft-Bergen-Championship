@@ -121,7 +121,6 @@ public class SurvivalGames extends Game {
             p.getPlayer().setLevel(0);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 10, false, false));
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
-            p.getPlayer().teleport(map.getIntroLocation());
         }
         updatePlayersAliveScoreboard();
         regenChest();

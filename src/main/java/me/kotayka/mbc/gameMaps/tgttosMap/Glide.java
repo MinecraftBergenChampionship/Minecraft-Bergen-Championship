@@ -22,15 +22,23 @@ public class Glide extends TGTTOSMap {
     @Override
     public void Barriers(boolean barriers) {
         Material block = (barriers) ? Material.BARRIER : Material.AIR;
-        // TODO
-        for (int y = 70; y <= 72; y++) {
-            for (int x = 193; x <= 204; x++) {
-                getWorld().getBlockAt(x, y, 201).setType(block);
-            }
+        for (int y = 70; y <= 73; y++) {
+            if (y == 73) {
+                // set roof to prevent elytra hopping
+                for (int x = 193; x <= 204; x++) {
+                    for (int z = 196; z <= 201; z++) {
+                        getWorld().getBlockAt(x, y, z).setType(block);
+                    }
+                }
+            } else {
+                for (int x = 193; x <= 204; x++) {
+                    getWorld().getBlockAt(x, y, 201).setType(block);
+                }
 
-            for (int z = 196; z <= 201; z++) {
-                getWorld().getBlockAt(205, y, z).setType(block);
-                getWorld().getBlockAt(192, y, z).setType(block);
+                for (int z = 196; z <= 201; z++) {
+                    getWorld().getBlockAt(205, y, z).setType(block);
+                    getWorld().getBlockAt(192, y, z).setType(block);
+                }
             }
         }
     }

@@ -93,7 +93,8 @@ public class TGTTOS extends Game {
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
                 }
-                startRound();
+                setGameState(GameState.STARTING);
+                timeRemaining = 20;
             } else if (timeRemaining % 7 == 0 && timeRemaining != 7) {
                 Introduction();
             }
@@ -146,6 +147,9 @@ public class TGTTOS extends Game {
         super.start();
 
         setDeathMessages();
+
+        startFirstRound();
+
         setGameState(GameState.TUTORIAL);
 
         setTimer(60);
@@ -187,7 +191,52 @@ public class TGTTOS extends Game {
                 p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
             }
         }
-        // Moved giving items to @startRound()
+    }
+
+    private void startFirstRound() {
+        roundNum++;
+
+        finishedParticipants = new ArrayList<>(MBC.getInstance().players.size());
+        map = maps.get((int) (Math.random() * maps.size()));
+        maps.remove(map);
+        map.Barriers(true);
+
+        createLineAll(22, ChatColor.AQUA + "" + ChatColor.BOLD + "Map: " + ChatColor.RESET + map.getName());
+        createLineAll(21, ChatColor.GREEN + "Round: " + ChatColor.RESET + roundNum + "/6");
+        updateFinishedPlayers();
+
+        if (map != null) {
+            loadPlayers();
+        }
+
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().getInventory().clear();
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            map.getWorld().spawnEntity(map.getEndLocation(), EntityType.CHICKEN);
+
+            if (p.getPlayer().getAllowFlight()) {
+                removeWinEffect(p);
+            }
+
+            if (map.getItems() == null) continue;
+
+            for (ItemStack i : map.getItems()) {
+                if (i.getType().equals(Material.WHITE_WOOL)) {
+                    ItemStack wool = p.getTeam().getColoredWool();
+                    wool.setAmount(64);
+                    p.getInventory().addItem(wool);
+                } else if (i.getType().equals(Material.SHEARS)) {
+                    ItemMeta meta = i.getItemMeta();
+                    meta.setUnbreakable(true);
+                    i.setItemMeta(meta);
+                    p.getInventory().addItem(i);
+                } else if (i.getType().equals(Material.LEATHER_BOOTS)) {
+                    p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(i));
+                } else {
+                    p.getInventory().addItem(i);
+                }
+            }
+        }
     }
 
     /**

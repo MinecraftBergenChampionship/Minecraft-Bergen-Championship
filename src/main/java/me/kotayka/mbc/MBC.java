@@ -312,11 +312,12 @@ public class MBC implements Listener {
         for (Participant p : players) {
             if (e.getPlayer().getUniqueId().equals(p.getPlayer().getUniqueId())) {
                 msg = msg.replace("%", "%%");
+                msg = p.getFormattedName() + ": " + msg;
                 e.setFormat(p.getFormattedName() + ": " + msg);
                 break;
             }
         }
-        if (currentGame != null && currentGame != lobby && !currentGame.getState().equals(GameState.TUTORIAL)) {
+        if (currentGame != null && currentGame != lobby && currentGame.getState().equals(GameState.TUTORIAL)) {
             mutedMessages.add(msg);
             e.getPlayer().sendMessage(ChatColor.RED + "Chat is currently muted, your message will send after!");
             e.setCancelled(true);
