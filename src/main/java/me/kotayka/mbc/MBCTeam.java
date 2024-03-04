@@ -286,7 +286,7 @@ public abstract class MBCTeam {
      */
     public void announceTeamDeath() {
         // small delay to sync messages correctly
-        String s = teamNameFormat() + " have been eliminated!";
+        String s = "\n" + teamNameFormat() + " have been eliminated!\n";
 
         MBC.getInstance().getGame().getLogger().log(s);
 

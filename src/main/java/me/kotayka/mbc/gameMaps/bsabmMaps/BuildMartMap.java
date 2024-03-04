@@ -18,7 +18,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
     private final BuildMart BUILD_MART;
 
     public BuildMartMap(BuildMart buildMart) {
-        super(-20, 1);
+        super(-20, 1, new Location(Bukkit.getWorld("BSABM"), 0, 161, 0));
         World w = Bukkit.getWorld("BSABM");
         super.replicationLocations.put(BreakAreaType.JUNGLE_LOGS, new Location(w, -13, -16, 159));
         super.replicationLocations.put(BreakAreaType.ACACIA_LOGS, new Location(w, -22, -16, 159));
@@ -142,6 +142,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
             return;
         }
 
+        // Cause player to fly when they are close to the central fan
         if (Math.sqrt(Math.pow((e.getPlayer().getLocation().getX()+3),2)+(Math.pow(e.getPlayer().getLocation().getZ(),2))) <= 8 && e.getPlayer().getLocation().getY() < 10) {
             e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1000, e.getPlayer().getVelocity().getZ()));
             MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().plugin, new Runnable() {

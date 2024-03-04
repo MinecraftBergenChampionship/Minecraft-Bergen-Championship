@@ -32,7 +32,7 @@ public class Biomes extends AceRaceMap {
     };
 
     public Biomes() {
-        super(0, "Lava");
+        super(0, new Location(Bukkit.getWorld("AceRace"), 2, 45, 116), "Lava");
         mapName = "Biomes";
         loadCheckpoints(respawns, checkpoints);
     }

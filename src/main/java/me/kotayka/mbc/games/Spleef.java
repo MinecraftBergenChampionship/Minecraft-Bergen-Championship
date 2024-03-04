@@ -54,7 +54,19 @@ public class Spleef extends Game {
     // NOTE: 16 player bonus is probably different
 
     public Spleef() {
-        super("Spleef");
+        super("Spleef", new String[] {
+                "Spleef is a game where you try to get other players into the void and be the last player standing.",
+                "Using your hands, you can break blocks instantly. Breaking blocks gives you meatballs (don't question it), which can also break blocks instantly.",
+                "Punch knockback has been reduced, so break blocks under players using your hands and meatballs to make them fall into the abyss!",
+                "Knocking a player out of the arena will give you kill points, however the most points will come from outliving other players.",
+                "The map will slowly decay, so make sure to be careful where you step - if the block is red concrete, it’s about to disappear!",
+                "Besides surviving, winning, and spleefing, points are awarded to the last full team alive and to the top half of players as a bonus.",
+                "Scoring: \n" + ChatColor.RESET +
+                        "- +2 points for outliving another player\n" +
+                        "- +2 points for spleefing another player\n" +
+                        "- +4 points for every player on the last fully alive team\n" +
+                        "- Placement Bonuses - 1st: +20, 2nd: +15, 3rd: +10, 4th,5th: +8, 6th,7th: +5, 8th,9th: +3"
+        });
         lobby = new Location(Bukkit.getWorld("spleef"), 0, 126, 0);
         spawnpoint = new Location(Bukkit.getWorld("spleef"), 0, 115, 0);
     }
@@ -77,17 +89,8 @@ public class Spleef extends Game {
     @Override
     public void start() {
         super.start();
-
-        //setGameState(GameState.TUTORIAL);
-        setGameState(GameState.STARTING);
-
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
-            p.getPlayer().setGameMode(GameMode.ADVENTURE);
-        }
-
-        startRound();
+        setGameState(GameState.TUTORIAL);
+        setTimer(60);
     }
 
     @Override
@@ -128,6 +131,7 @@ public class Spleef extends Game {
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
             if (roundNum == 0) {
                 spleefPlayers.put(p.getPlayer().getUniqueId(), new SpleefPlayer(p));
                 playersAlive.add(p);
@@ -174,7 +178,20 @@ public class Spleef extends Game {
 
     @Override
     public void events() {
-        if (getState().equals(GameState.STARTING)) {
+        if (getState().equals(GameState.TUTORIAL)) {
+            if (timeRemaining == 0) {
+                Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
+                for (Participant p : MBC.getInstance().getPlayers()) {
+                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
+                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
+                    p.getPlayer().setGameMode(GameMode.ADVENTURE);
+                }
+                setGameState(GameState.STARTING);
+                startRound();
+            } else if (timeRemaining % 7 == 0 && timeRemaining != 7) {
+                Introduction();
+            }
+        } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
                 startingCountdown();
             } else {

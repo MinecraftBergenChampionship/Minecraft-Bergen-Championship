@@ -30,18 +30,19 @@ public abstract class Game extends Minigame {
 
     public List<MBCTeam> teamScores = new ArrayList<>(MBC.getInstance().getValidTeams().size());
     public Map<MBCTeam, Double> scoreMap = new HashMap<>();
-
-    public Game(String gameName) {
-        super(gameName);
-        initLogger();
-    }
-
     public List<Participant> playersAlive = new ArrayList<>();
     public List<MBCTeam> teamsAlive = new ArrayList<>();
     private StatLogger logger;
     // Used to signal whether or not there has been a disconnect when moving from any state -> starting; if so, pause
     public boolean disconnect = false;
+    protected final String[] INTRODUCTION;
+    protected int introLine = 0;
 
+    public Game(String gameName, String[] INTRO) {
+        super(gameName);
+        this.INTRODUCTION= INTRO;
+        initLogger();
+    }
 
     public void createScoreboard() {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
@@ -58,8 +59,16 @@ public abstract class Game extends Minigame {
     /**
      * Provide game explanation
      */
-    //public abstract void Introduction();
-
+    public void Introduction() {
+        Bukkit.broadcastMessage(ChatColor.GREEN + "---------------------------------------");
+        Bukkit.broadcastMessage("\n");
+        Bukkit.broadcastMessage(ChatColor.BOLD + INTRODUCTION[introLine++]);
+        Bukkit.broadcastMessage("\n");
+        Bukkit.broadcastMessage(ChatColor.GREEN + "---------------------------------------");
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.playSound(p, Sound.ENTITY_CHICKEN_EGG, 1, 1);
+        }
+    }
 
     public void addPlayerScore(Participant p, int score) {
 
@@ -362,7 +371,12 @@ public abstract class Game extends Minigame {
            p.getPlayer().setLevel(0);
            p.getPlayer().setExp(0);
            //MBC.getInstance().individual.add(p);
+
+           // for intro
+           p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 300, 255, true, false));
+           p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 300, 255, true, false));
        }
+
 
        loadPlayers();
        createScoreboard();

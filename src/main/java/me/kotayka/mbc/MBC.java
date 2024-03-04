@@ -80,6 +80,7 @@ public class MBC implements Listener {
 
     public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt"));
     public final List<Game> gameList = new ArrayList<Game>(6);
+    public static final String MBC_STRING_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "MBC" + ChatColor.WHITE + "]: ";
 
     // Define Special Blocks
     // NOTE: ALWAYS USE `getBlock().getRelative(BlockFace.DOWN)` or equivalent

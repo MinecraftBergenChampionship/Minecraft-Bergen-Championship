@@ -15,7 +15,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -54,7 +53,20 @@ public class TGTTOS extends Game {
     public static int TOP_THREE_BONUS = 5; // bonus for placing top 3
 
     public TGTTOS() {
-        super("TGTTOS");
+        super("TGTTOS", new String[] {
+                "Why did the MBC Player cross the road? To get to the other side!!!",
+                "To get to the other side, or TGTTOS, is a game about, well, getting to the other side of a map.",
+                "Make sure to look up, down, left and right; the finish could basically be anywhere.",
+                "Also make sure to look at the items in your inventory, as these could be the key to finishing ahead of the competition if used right.",
+                "Once you do get to the end of the map, punch or right click a chicken to finish (I hope you're reading, Jeremy).",
+                "Points are counted for however many people you finish ahead of, and extra points are given to the first full team to finish the course.",
+                "Scoring: \n" + ChatColor.RESET +
+                        "- +1 point for completing the course\n" +
+                        "- +1 point for every player outplaced\n" +
+                        "- +4 points for each player on the first full team to finish a course" +
+                        "- +2 points for each player on the second full team to finish a course" +
+                        "- +5 bonus points for placing Top 3 in a course"
+        });
     }
 
     public void createScoreboard(Participant p) {
@@ -74,7 +86,17 @@ public class TGTTOS extends Game {
     }
 
     public void events() {
-        if (getState().equals(GameState.STARTING)) {
+        if (getState().equals(GameState.TUTORIAL)) {
+            if (timeRemaining == 0) {
+                Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
+                for (Participant p : MBC.getInstance().getPlayers()) {
+                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
+                }
+                startRound();
+            } else if (timeRemaining % 7 == 0 && timeRemaining != 7) {
+                Introduction();
+            }
+        } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining == 0) {
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
@@ -123,14 +145,9 @@ public class TGTTOS extends Game {
         super.start();
 
         setDeathMessages();
-        //setGameState(GameState.TUTORIAL);
-        setGameState(GameState.STARTING);
+        setGameState(GameState.TUTORIAL);
 
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-        }
-
-        startRound();
+        setTimer(60);
     }
 
     @Override
@@ -169,34 +186,7 @@ public class TGTTOS extends Game {
                 p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
             }
         }
-
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().getInventory().clear();
-            p.getPlayer().setGameMode(GameMode.ADVENTURE);
-
-            if (p.getPlayer().getAllowFlight()) {
-                removeWinEffect(p);
-            }
-
-            if (map.getItems() == null) continue;
-
-            for (ItemStack i : map.getItems()) {
-                if (i.getType().equals(Material.WHITE_WOOL)) {
-                    ItemStack wool = p.getTeam().getColoredWool();
-                    wool.setAmount(64);
-                    p.getInventory().addItem(wool);
-                } else if (i.getType().equals(Material.SHEARS)) {
-                    ItemMeta meta = i.getItemMeta();
-                    meta.setUnbreakable(true);
-                    i.setItemMeta(meta);
-                    p.getInventory().addItem(i);
-                } else if (i.getType().equals(Material.LEATHER_BOOTS)) {
-                    p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(i));
-                } else {
-                    p.getInventory().addItem(i);
-                }
-            }
-        }
+        // Moved giving items to @startRound()
     }
 
     /**
@@ -227,10 +217,35 @@ public class TGTTOS extends Game {
         if (map != null) {
             loadPlayers();
         }
-        for (int i = 0; i < MBC.getInstance().getPlayers().size(); i++) {
-            map.getWorld().spawnEntity(map.getEndLocation(), EntityType.CHICKEN);
-        }
 
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().getInventory().clear();
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            map.getWorld().spawnEntity(map.getEndLocation(), EntityType.CHICKEN);
+
+            if (p.getPlayer().getAllowFlight()) {
+                removeWinEffect(p);
+            }
+
+            if (map.getItems() == null) continue;
+
+            for (ItemStack i : map.getItems()) {
+                if (i.getType().equals(Material.WHITE_WOOL)) {
+                    ItemStack wool = p.getTeam().getColoredWool();
+                    wool.setAmount(64);
+                    p.getInventory().addItem(wool);
+                } else if (i.getType().equals(Material.SHEARS)) {
+                    ItemMeta meta = i.getItemMeta();
+                    meta.setUnbreakable(true);
+                    i.setItemMeta(meta);
+                    p.getInventory().addItem(i);
+                } else if (i.getType().equals(Material.LEATHER_BOOTS)) {
+                    p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(i));
+                } else {
+                    p.getInventory().addItem(i);
+                }
+            }
+        }
         setGameState(GameState.STARTING);
         setTimer(20);
     }

@@ -7,6 +7,7 @@ import me.kotayka.mbc.games.BuildMart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -16,19 +17,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractBuildMartMap extends MBCMap {
+public abstract class AbstractBuildMartMap {
     // Material corresponds to list since some materials may have multiple break areas (stained glass & concrete)
     // Note Note: it may be better to use a separate class, since these won't require BreakArea.replicaXYZ
     private final HashMap<Material, List<BreakArea>> breakAreas = new HashMap<Material, List<BreakArea>>();
     public final Map<BreakAreaType, Location> replicationLocations = new HashMap<>();
     public final int deathY;
     public final int FIRST_LAYER_Y;
+    public final Location INTRO_LOC;
+    private final World world = Bukkit.getWorld("BSABM");
 
-    public AbstractBuildMartMap(int deathY, int firstLayerY) {
-        super(Bukkit.getWorld("BSABM"));
+    public AbstractBuildMartMap(int deathY, int firstLayerY, Location INTRO_LOC) {
         this.deathY = deathY;
         this.FIRST_LAYER_Y = firstLayerY;
+        this.INTRO_LOC = INTRO_LOC;
     }
+
+    public World getWorld() { return world; }
 
     public void addBreakArea(BreakArea area) {
         Material m = area.getType();

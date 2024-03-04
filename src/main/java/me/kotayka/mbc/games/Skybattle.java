@@ -18,7 +18,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -36,7 +35,18 @@ public class Skybattle extends Game {
     private final int WIN_POINTS = 15;
 
     public Skybattle() {
-        super("Skybattle");
+        super("Skybattle", new String[] {
+                "Wwwwelcome guys, to another episode of Skywars.",
+                "Skybattle is all about kills. Make your way to the center with your team, you have infinite blocks!",
+                "Make sure to TURN ON PARTICLES to see the border. There is also a height border, visible at the center, which lowers over time.",
+                "Make use of the items you find in chests-fishing rods, TNT, cobwebs, bows, to name a few-to kill other players or send them into the void!",
+                "Most points come from kills, however there are still survival points if you want to play safer.",
+                "There are three total rounds, and who you're next to is random. Kills are worth a lot, so don't fret if you have a bad round!",
+                "Scoring: \n" + ChatColor.RESET +
+                        "- +15 points for eliminations\n" +
+                        "- +15 points for winning the round\n" +
+                        "- +1 point for outliving another player"
+        });
     }
     private int roundNum = 1;
 
@@ -107,10 +117,10 @@ public class Skybattle extends Game {
     public void start() {
         super.start();
 
-        //setGameState(GameState.TUTORIAL);
-        setGameState(GameState.STARTING);
+        setGameState(GameState.TUTORIAL);
+        //setGameState(GameState.STARTING);
 
-        setTimer(20);
+        setTimer(60);
     }
 
     @Override
@@ -121,11 +131,16 @@ public class Skybattle extends Game {
 
     @Override
     public void events() {
-        /*
         if (getState().equals(GameState.TUTORIAL)) {
-            // do introduction
-        } else*/
-        if (getState().equals(GameState.STARTING)) {
+            if (timeRemaining == 0) {
+                Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
+                setGameState(GameState.STARTING);
+                timeRemaining = 20;
+            }
+            else if (timeRemaining % 7 == 0 && timeRemaining != 7){
+                Introduction();
+            }
+        } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
                 startingCountdown();
             } else {
@@ -159,9 +174,9 @@ public class Skybattle extends Game {
                 for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
                     p.getPlayer().sendTitle(" ", ChatColor.DARK_RED+"Border shrinking", 0, 60, 20);
                 }
-                Bukkit.broadcastMessage(ChatColor.DARK_RED+"Horizontal border is shrinking!");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED+"Horizontal border is shrinking!");
             } else if (timeRemaining == 180) {
-                Bukkit.broadcastMessage(ChatColor.DARK_RED+"Vertical border is falling!");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED+"Vertical border is falling!");
             }
 
             if (timeRemaining <= 210) {

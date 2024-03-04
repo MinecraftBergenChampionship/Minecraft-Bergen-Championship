@@ -42,8 +42,24 @@ public class AceRace extends Game {
     public static final int PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
     public static final int[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
 
+    private boolean finishedIntro = false;
+
     public AceRace() {
-        super("Ace Race");
+        super("Ace Race",
+            new String[] {
+                    "In Ace Race, your objective is to complete a race course as fast as you can.",
+                    "There are boost pads across the map: red ones launch you, orange ones launch you higher, and green ones give you a jump boost.",
+                    "You spawn in with a riptide trident, so if you’re in water, just hold right click and let go to go flying!",
+                    "If you fall into the void or into lava, don’t worry; you'll be transported to the start of the section you fell on.",
+                    "If you’ve never practiced the course before, your first lap will probably suck.",
+                    "When the game starts, you’ll get a few minutes of practice time. Make sure you use this to learn the course!",
+                    "Scoring:\n" + ChatColor.RESET +
+                            "- +1 point for completing a lap\n" +
+                            "- +1 point for every player beaten on a lap\n" +
+                            "- +8 points for finishing the course\n" +
+                            "- +4 points for every player beaten on the final lap\n" +
+                            "- Top 8 Bonuses- 1st:+25, 2nd,3rd:+15, 4th,5th:+10, 6th-8th:+5"
+            });
     }
 
     public void createScoreboard(Participant p) {
@@ -59,16 +75,11 @@ public class AceRace extends Game {
         super.start();
         setGameState(GameState.TUTORIAL);
 
-        Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
-
-        for (AceRacePlayer p : aceRacePlayerMap.values()) {
-            p.reset();
-        }
-
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.getPlayer().sendTitle(ChatColor.GOLD+""+ChatColor.BOLD+"Practice Starting!", "", 20, 60, 20);
+            p.teleport(map.getIntroLocation());
         }
-        setTimer(210);
+
+        setTimer(60);
     }
 
     @Override
@@ -80,7 +91,22 @@ public class AceRace extends Game {
 
     public void events() {
         if (getState().equals(GameState.TUTORIAL)) {
-            if (timeRemaining == 60) {
+            if (!finishedIntro && timeRemaining > 0 && introLine < INTRODUCTION.length && timeRemaining % 7 == 0) {
+                Introduction();
+            } else if (!finishedIntro && timeRemaining == 0){
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
+
+                for (AceRacePlayer p : aceRacePlayerMap.values()) {
+                    p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
+                    p.reset();
+                }
+
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.getPlayer().sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "Practice Starting!", "", 20, 60, 20);
+                }
+                finishedIntro = true;
+                setTimer(210);
+            } else if (timeRemaining == 60) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "One minute left of practice!");
             } else if (timeRemaining <= 0) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.YELLOW + "Practice Over!");
@@ -154,7 +180,7 @@ public class AceRace extends Game {
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-            p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
+            //p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
 
             aceRacePlayerMap.put(p.getPlayer().getUniqueId(), new AceRacePlayer(p, this));
         }

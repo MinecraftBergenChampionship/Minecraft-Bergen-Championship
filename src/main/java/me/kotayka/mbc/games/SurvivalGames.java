@@ -7,16 +7,13 @@ import me.kotayka.mbc.gameMaps.sgMaps.BCA;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
@@ -37,7 +34,7 @@ import java.util.*;
 public class SurvivalGames extends Game {
     private final SurvivalGamesMap map = new BCA();
     private List<SurvivalGamesItem> items;
-    private List<SurvivalGamesItem> supply_items;
+    //private List<SurvivalGamesItem> supply_items;
 
     // This file must be in /home/MBCAdmin/MBC/ and re-added each time an update is made
     private final File CHEST_FILE = new File("survival_games_items.json");
@@ -47,8 +44,8 @@ public class SurvivalGames extends Game {
     //private final List<SupplyCrate> crates = new ArrayList<SupplyCrate>(3);
     private Map<Player, Integer> playerKills = new HashMap<>();
     private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
-    private boolean dropLocation = false;
-    private int crateNum = 0;
+    //private boolean dropLocation = false;
+    //private int crateNum = 0;
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
     private boolean firstRound = true;
 
@@ -64,7 +61,19 @@ public class SurvivalGames extends Game {
     // public final int WIN_POINTS = 36; // shared amongst all remaining players
 
     public SurvivalGames() {
-        super("SurvivalGames");
+        super("SurvivalGames", new String[] {
+                "Survival Games is all about surviving and killing to get that #1 Victory Royale.",
+                "Spawning in with nothing, gain items by searching through chests across the map. There's a short grace period!",
+                "Watch out for the fast border: you won't be able to open doors or break glass behind it!",
+                "Enchanting tables can also be used to purchase enchants. Drag and click the books to enchant items!",
+                "At the end of each round, your team will receive a point bonus with increases with placement, so live as long as you can!",
+                "Survival Games is two rounds, so make sure to remember who killed you...",
+                "Scoring: \n" + ChatColor.RESET +
+                        "- +10 points for eliminations\n" +
+                        "- +2 points for every player outlived\n" +
+                        "- Team Bonuses (split amongst team): " +
+                        "     - 1st: +10 points, 2nd:+8 points, 3rd: +7 points, 4th: +6 points, 5th: +5 points, 6th: +4 points"
+        });
 
         for (MBCTeam t : getValidTeams()) {
             teamPlacements.put(t, getValidTeams().size());
@@ -83,8 +92,8 @@ public class SurvivalGames extends Game {
         Type listType = new TypeToken<List<SurvivalGamesItem>>() {}.getType();
         Reader reader = new FileReader(CHEST_FILE);
         items = gson.fromJson(reader, listType);
-        reader = new FileReader(SUPPLY_FILE);
-        supply_items = gson.fromJson(reader, listType);
+        //reader = new FileReader(SUPPLY_FILE);
+        //supply_items = gson.fromJson(reader, listType);
         reader.close();
     }
 
@@ -98,6 +107,7 @@ public class SurvivalGames extends Game {
         }
         teamsAlive.addAll(getValidTeams());
         map.setBarriers(true);
+
         map.spawnPlayers();
         if (!playersAlive.isEmpty()) {
             playersAlive.clear();
@@ -111,6 +121,7 @@ public class SurvivalGames extends Game {
             p.getPlayer().setLevel(0);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 10, false, false));
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            p.getPlayer().teleport(map.getIntroLocation());
         }
         updatePlayersAliveScoreboard();
         regenChest();
@@ -124,17 +135,17 @@ public class SurvivalGames extends Game {
             i.setFixed(true);
         }
 
-        // setGameState(TUTORIAL);
-        setGameState(GameState.STARTING);
+         setGameState(GameState.TUTORIAL);
+        //setGameState(GameState.STARTING);
 
-        setTimer(30);
+        setTimer(60);
     }
 
     @Override
     public void onRestart() {
         teamPlacements.clear();
         playerKills.clear();
-        crateNum = 0;
+        //crateNum = 0;
         deadTeams = 0;
 
         map.resetMap();
@@ -142,7 +153,7 @@ public class SurvivalGames extends Game {
 
     @Override
     public void createScoreboard(Participant p) {
-        createLineAll(21, ChatColor.AQUA+""+ChatColor.BOLD+"Map: " + ChatColor.RESET+ map.mapName);
+        //createLineAll(21, ChatColor.AQUA+""+ChatColor.BOLD+"Map: " + ChatColor.RESET+ map.mapName);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         updatePlayersAliveScoreboard();
@@ -153,7 +164,15 @@ public class SurvivalGames extends Game {
 
     @Override
     public void events() {
-        if (getState().equals(GameState.STARTING)) {
+        if (getState().equals(GameState.TUTORIAL)) {
+            if (timeRemaining == 0) {
+                Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
+                setGameState(GameState.STARTING);
+                timeRemaining = 20;
+            } else if (timeRemaining % 7 == 0 && timeRemaining != 7) {
+                Introduction();
+            }
+        } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
                 startingCountdown();
             } else {
@@ -162,7 +181,7 @@ public class SurvivalGames extends Game {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
                 setGameState(GameState.ACTIVE);
-                Bukkit.broadcastMessage(ChatColor.RED+"Grace ends in 1 minute!");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Grace ends in 1 minute!");
                 timeRemaining = 450;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
@@ -179,7 +198,7 @@ public class SurvivalGames extends Game {
 
             if (timeRemaining == 0) {
                 if (teamsAlive.size() > 1) {
-                    Bukkit.broadcastMessage(ChatColor.RED+"Border shrinking!");
+                    Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Border shrinking!");
                     map.Overtime();
                     setGameState(GameState.OVERTIME);
                     timeRemaining = 45;
@@ -189,7 +208,7 @@ public class SurvivalGames extends Game {
                         teamPlacements.put(t, 1);
                     }
                     placementPoints();
-                    createLineAll(23, "\n");
+                    //createLineAll(23, "\n");
                     if (!firstRound) {
                         setGameState(GameState.END_GAME);
                         timeRemaining = 37;
@@ -210,22 +229,22 @@ public class SurvivalGames extends Game {
                 }
                 setPVP(true);
                 getLogger().log(ChatColor.DARK_RED+"Grace period is now over.");
-                Bukkit.broadcastMessage(ChatColor.DARK_RED+"Grace period is now over.");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED+"Grace period is now over.");
                 map.startBorder();
-                Bukkit.broadcastMessage(ChatColor.RED+"Border will continue to shrink!");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Border will continue to shrink!");
             } else if (timeRemaining == 360) {
                 event = SurvivalGamesEvent.CHEST_REFILL;
-                Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests will refill in one minute!");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+""+ChatColor.BOLD+"Chests will refill in one minute!");
                 //crateLocation();
             } else if (timeRemaining == 300) {
                 //spawnSupplyCrate();
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    player.sendTitle("", ChatColor.RED+"Chests refilled!", 20, 60, 20);
+                    player.sendTitle("", MBC.MBC_STRING_PREFIX + ChatColor.RED+"Chests refilled!", 20, 60, 20);
                     player.playSound(player, Sound.BLOCK_CHEST_OPEN, 1, 1);
                 }
                 regenChest();
                 getLogger().log(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
-                Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 //event = SurvivalGamesEvent.SUPPLY_CRATE;
                 event = SurvivalGamesEvent.DEATHMATCH;
                 //crateLocation();

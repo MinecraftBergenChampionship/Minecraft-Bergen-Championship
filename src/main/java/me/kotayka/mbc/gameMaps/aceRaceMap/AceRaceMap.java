@@ -26,8 +26,8 @@ public abstract class AceRaceMap extends MBCMap {
 
     private final int deathY;
 
-    public AceRaceMap(int deathY, String... deathObject) {
-        super(Bukkit.getWorld("AceRace"));
+    public AceRaceMap(int deathY, Location intro, String... deathObject) {
+        super(Bukkit.getWorld("AceRace"), intro);
         this.deathY = deathY;
         deathObjects=new ArrayList<>(Arrays.asList(deathObject));
     }

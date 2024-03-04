@@ -46,7 +46,17 @@ public class BuildMart extends Game {
     private Map<Participant, Material> hotbarSelector = new HashMap<Participant, Material>();
 
     public BuildMart() {
-        super("BuildMart");
+        super("BuildMart", new String[] {
+                "Build Mart is a game where your team is trying to recreate builds as fast as possible by gathering materials on islands outside your base.",
+                "Inside your base (accessed via Nether Portal in the center), you'll find three builds with a square empty plot, where you'll recreate it.",
+                "Use the middle fan, boost pads, and your elytra to fy around to each island to gather resources! Everything will be located on these islands.",
+                "When you have everything, get back to base and recreate the build; you may need to use the chests, crafting tables, and furnaces in your base-you might have to!",
+                "Recreate builds as fast as you can! You'll earn more points for completing builds faster than other teams, although there's some partial credit if you don't finish.",
+                "Scoring: \n" + ChatColor.RESET +
+                        "- +3 points **per player** for completing a build\n" +
+                        "- +3 points **per player** for each team outplaced\n" +
+                        "- Max +3 points **per player** for each build partially completed at game end"
+        });
     }
 
     public void createScoreboard(Participant p) {
@@ -77,8 +87,8 @@ public class BuildMart extends Game {
         map.resetBlockInventories();
         map.resetBreakAreas();
 
-        setGameState(GameState.STARTING);
-        setTimer(30);
+        setGameState(GameState.TUTORIAL);
+        setTimer(60);
     }
 
     @Override
@@ -92,7 +102,18 @@ public class BuildMart extends Game {
     }
 
     public void events() {
-        if (getState().equals(GameState.STARTING)) {
+        if (getState().equals(GameState.TUTORIAL)) {
+            if (timeRemaining == 0) {
+                Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
+                for (BuildMartPlayer bmp : buildMartPlayers) {
+                    bmp.respawn();
+                }
+                setGameState(GameState.STARTING);
+                timeRemaining = 30;
+            } else if (timeRemaining != 7 && timeRemaining % 7 == 0) {
+                Introduction();
+            }
+        } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining == 0) {
                 map.openPortals(true);
                 for (Participant p : MBC.getInstance().getPlayers()) {
@@ -148,7 +169,8 @@ public class BuildMart extends Game {
             BuildMartPlayer buildMartPlayer = new BuildMartPlayer(p, this);
             buildMartPlayers.add(buildMartPlayer);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
-            buildMartPlayer.respawn();
+            //buildMartPlayer.respawn();
+            p.getPlayer().teleport(map.INTRO_LOC);
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().setAllowFlight(true);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
