@@ -68,7 +68,7 @@ public class SurvivalGames extends Game {
                 "Enchanting tables can also be used to purchase enchants. Drag and click the books to enchant items!",
                 "At the end of each round, your team will receive a point bonus with increases with placement, so live as long as you can!",
                 "Survival Games is two rounds, so make sure to remember who killed you...",
-                "Scoring: \n" + ChatColor.RESET +
+                ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +10 points for eliminations\n" +
                         "- +2 points for every player outlived\n" +
                         "- Team Bonuses (split amongst team):\n" +

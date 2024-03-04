@@ -1,6 +1,5 @@
 package me.kotayka.mbc.gameMaps.tgttosMap;
 
-import me.kotayka.mbc.games.TGTTOS;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

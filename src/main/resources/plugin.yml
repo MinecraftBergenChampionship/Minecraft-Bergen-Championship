@@ -48,3 +48,5 @@ commands:
   removeSection:
     description: removes a decision dome section of that game name
     permission: minecraft.command.op
+  scoring:
+    description: retrieves scoring for the specified game

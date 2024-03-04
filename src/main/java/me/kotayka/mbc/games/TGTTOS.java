@@ -60,7 +60,7 @@ public class TGTTOS extends Game {
                 "Also make sure to look at the items in your inventory, as these could be the key to finishing ahead of the competition if used right.",
                 "Once you do get to the end of the map, punch or right click a chicken to finish (I hope you're reading, Jeremy).",
                 "Points are counted for however many people you finish ahead of, and extra points are given to the first full team to finish the course.",
-                "Scoring: \n" + ChatColor.RESET +
+                ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +1 point for completing the course\n" +
                         "- +1 point for every player outplaced\n" +
                         "- +4 points for each player on the first full team to finish a course\n" +

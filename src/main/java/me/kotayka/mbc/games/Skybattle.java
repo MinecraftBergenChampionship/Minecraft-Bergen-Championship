@@ -42,7 +42,7 @@ public class Skybattle extends Game {
                 "Make use of the items you find in chests-fishing rods, TNT, cobwebs, bows, to name a few-to kill other players or send them into the void!",
                 "Most points come from kills, however there are still survival points if you want to play safer.",
                 "There are three total rounds, and who you're next to is random. Kills are worth a lot, so don't fret if you have a bad round!",
-                "Scoring: \n" + ChatColor.RESET +
+                ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +15 points for eliminations\n" +
                         "- +15 points for winning the round\n" +
                         "- +1 point for outliving another player"

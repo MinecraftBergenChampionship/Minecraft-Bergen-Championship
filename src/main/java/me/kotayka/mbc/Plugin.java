@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.lang.reflect.Field;
 import java.util.Iterator;
 
 public class Plugin extends JavaPlugin implements Listener {
@@ -60,6 +59,9 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("invincible").setExecutor(new invincible());
 
         getCommand("removeSection").setExecutor(new removeSection());
+
+        getCommand("scoring").setExecutor(new scoring());
+        getCommand("scoring").setTabCompleter(new startTabCompletion());
 
         // prevent crafting wooden axes (worldedit)
         Iterator<Recipe> it = getServer().recipeIterator();

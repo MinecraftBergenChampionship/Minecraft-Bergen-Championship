@@ -52,7 +52,8 @@ public class BuildMart extends Game {
                 "Use the middle fan, boost pads, and your elytra to fy around to each island to gather resources! Everything will be located on these islands.",
                 "When you have everything, get back to base and recreate the build; you may need to use the chests, crafting tables, and furnaces in your base-you might have to!",
                 "Recreate builds as fast as you can! You'll earn more points for completing builds faster than other teams, although there's some partial credit if you don't finish.",
-                "Scoring: \n" + ChatColor.RESET +
+                "Unsure on how your build is incomplete? Run the command " + ChatColor.BOLD + "/checkbuild" + ChatColor.RESET + " within your replication plot!",
+                ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +3 points **per player** for completing a build\n" +
                         "- +3 points **per player** for each team outplaced\n" +
                         "- Max +3 points **per player** for each build partially completed at game end"

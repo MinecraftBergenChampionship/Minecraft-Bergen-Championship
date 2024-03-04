@@ -70,6 +70,15 @@ public abstract class Game extends Minigame {
         }
     }
 
+    /**
+     * Returns a string detailing how the game is scored.
+     * @requires Scoring string is the last string of an introduction.
+     * @return String of how the game will be scored.
+     */
+    public String getScoring() {
+        return INTRODUCTION[INTRODUCTION.length-1];
+    }
+
     public void addPlayerScore(Participant p, int score) {
 
     }

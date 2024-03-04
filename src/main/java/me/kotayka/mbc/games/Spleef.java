@@ -61,7 +61,7 @@ public class Spleef extends Game {
                 "Knocking a player out of the arena will give you kill points, however the most points will come from outliving other players.",
                 "The map will slowly decay, so make sure to be careful where you step - if the block is red concrete, it’s about to disappear!",
                 "Besides surviving, winning, and spleefing, points are awarded to the last full team alive and to the top half of players as a bonus.",
-                "Scoring: \n" + ChatColor.RESET +
+                ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +2 points for outliving another player\n" +
                         "- +2 points for spleefing another player\n" +
                         "- +4 points for every player on the last fully alive team\n" +

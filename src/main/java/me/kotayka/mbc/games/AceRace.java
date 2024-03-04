@@ -53,7 +53,7 @@ public class AceRace extends Game {
                     "If you fall into the void or into lava, don’t worry; you'll be transported to the start of the section you fell on.",
                     "If you’ve never practiced the course before, your first lap will probably suck.",
                     "When the game starts, you’ll get a few minutes of practice time. Make sure you use this to learn the course!",
-                    "Scoring:\n" + ChatColor.RESET +
+                    ChatColor.BOLD + "Scoring:\n" + ChatColor.RESET +
                             "- +1 point for completing a lap\n" +
                             "- +1 point for every player beaten on a lap\n" +
                             "- +8 points for finishing the course\n" +
