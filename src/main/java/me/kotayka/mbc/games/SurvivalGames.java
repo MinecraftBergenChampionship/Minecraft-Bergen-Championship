@@ -71,7 +71,7 @@ public class SurvivalGames extends Game {
                 "Scoring: \n" + ChatColor.RESET +
                         "- +10 points for eliminations\n" +
                         "- +2 points for every player outlived\n" +
-                        "- Team Bonuses (split amongst team): " +
+                        "- Team Bonuses (split amongst team):\n" +
                         "     - 1st: +10 points, 2nd:+8 points, 3rd: +7 points, 4th: +6 points, 5th: +5 points, 6th: +4 points"
         });
 

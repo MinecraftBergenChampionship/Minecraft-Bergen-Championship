@@ -63,9 +63,9 @@ public class TGTTOS extends Game {
                 "Scoring: \n" + ChatColor.RESET +
                         "- +1 point for completing the course\n" +
                         "- +1 point for every player outplaced\n" +
-                        "- +4 points for each player on the first full team to finish a course" +
-                        "- +2 points for each player on the second full team to finish a course" +
-                        "- +5 bonus points for placing Top 3 in a course"
+                        "- +4 points for each player on the first full team to finish a course\n" +
+                        "- +2 points for each player on the second full team to finish a course\n" +
+                        "- +5 bonus points for placing Top 3 in a course\n"
         });
     }
 
