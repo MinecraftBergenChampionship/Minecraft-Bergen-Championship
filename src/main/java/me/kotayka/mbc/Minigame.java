@@ -1,10 +1,15 @@
 package me.kotayka.mbc;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
+import io.papermc.paper.event.player.ChatEvent;
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 
@@ -25,6 +30,7 @@ public abstract class Minigame implements Scoreboard, Listener {
 
     // GLOBAL STRING STORAGE FOR STORING STRINGS TO PRINT WHILE PERFORMING TASKS (ie sorting through game scores)
     protected String TO_PRINT = "";
+    private List<String> mutedMessages = new LinkedList<String>();
 
     public Minigame(String name) {
         gameName = name;
@@ -94,7 +100,7 @@ public abstract class Minigame implements Scoreboard, Listener {
             return;
         }
 
-        Bukkit.broadcastMessage("Event Paused!");
+        Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + " Event has been paused!");
         gameState = GameState.PAUSED;
         stopTimer();
         createLineAll(20, "EVENT PAUSED");

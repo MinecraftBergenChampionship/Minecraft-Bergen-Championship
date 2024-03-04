@@ -88,6 +88,7 @@ public class TGTTOS extends Game {
     public void events() {
         if (getState().equals(GameState.TUTORIAL)) {
             if (timeRemaining == 0) {
+                MBC.getInstance().sendMutedMessages();
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));

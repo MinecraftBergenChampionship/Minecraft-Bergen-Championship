@@ -94,6 +94,7 @@ public class AceRace extends Game {
             if (!finishedIntro && timeRemaining > 0 && introLine < INTRODUCTION.length && timeRemaining % 7 == 0) {
                 Introduction();
             } else if (!finishedIntro && timeRemaining == 0){
+                MBC.getInstance().sendMutedMessages();
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
 
                 for (AceRacePlayer p : aceRacePlayerMap.values()) {

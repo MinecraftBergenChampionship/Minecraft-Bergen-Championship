@@ -1,6 +1,5 @@
 package me.kotayka.mbc;
 
-import it.unimi.dsi.fastutil.Pair;
 import me.kotayka.mbc.teams.Spectator;
 import org.bukkit.*;
 import org.bukkit.block.Block;

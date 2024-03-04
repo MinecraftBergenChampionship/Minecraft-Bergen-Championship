@@ -80,7 +80,8 @@ public class MBC implements Listener {
 
     public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt"));
     public final List<Game> gameList = new ArrayList<Game>(6);
-    public static final String MBC_STRING_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "MBC" + ChatColor.WHITE + "]: ";
+    public static final String MBC_STRING_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "MBC" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: ";
+    private List<String> mutedMessages = new LinkedList<String>();
 
     // Define Special Blocks
     // NOTE: ALWAYS USE `getBlock().getRelative(BlockFace.DOWN)` or equivalent
@@ -315,6 +316,18 @@ public class MBC implements Listener {
                 break;
             }
         }
+        if (currentGame != null && currentGame != lobby && !currentGame.getState().equals(GameState.TUTORIAL)) {
+            mutedMessages.add(msg);
+            e.getPlayer().sendMessage(ChatColor.RED + "Chat is currently muted, your message will send after!");
+            e.setCancelled(true);
+        }
+    }
+
+    public void sendMutedMessages() {
+        for (String s : mutedMessages) {
+            Bukkit.broadcastMessage(s);
+        }
+        mutedMessages.clear();
     }
 
     @EventHandler
