@@ -5,6 +5,8 @@ api-version: 1.18
 authors: [ Kotayka, rspacerr ]
 description: Minecraft Bruh Championship
 commands:
+  mbchelp:
+    description: list all commands
   changeTeam:
     description: Changing a team
   start:
@@ -20,8 +22,13 @@ commands:
     description: gets player's ping
   placement:
     description: gets player's individual placement information
+    aliases: [place, score, standing]
   individual:
     description: gets top 8 individual
+    aliases: [lb, indiv, leaderboard]
+  scores:
+    description: gets top 8 individual and player placement
+    aliases: [placements, places, standings]
   playerscore:
     description: admin command to set player scores in case of emergency restart
     permission: minecraft.command.op
@@ -40,8 +47,8 @@ commands:
   checkbuild:
     description: checks a build during build mart
   invincible:
-      description: debug to toggle invincibility
-      permission: minecraft.command.op
+    description: debug to toggle invincibility
+    permission: minecraft.command.op
   spawnNPC:
     description: spawns a npc at that location
     permission: minecraft.command.op

@@ -26,10 +26,8 @@ public class Plugin extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(MBC.getInstance(), this);
         getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, this);
-        //TODO: start registering events in game start
-        //getServer().getPluginManager().registerEvents(MBC.getInstance().aceRace, this);
-        //getServer().getPluginManager().registerEvents(MBC.getInstance().tgttos, this);
-        //getServer().getPluginManager().registerEvents(MBC.getInstance().skybattle, this);
+
+        getCommand("mbchelp").setExecutor(new mbchelp());
 
         getCommand("changeTeam").setExecutor(new changeTeam());
         getCommand("changeTeam").setTabCompleter(new changeTeamTabCompletion());
@@ -39,12 +37,15 @@ public class Plugin extends JavaPlugin implements Listener {
 
         getCommand("pause").setExecutor(new pause());
         getCommand("unpause").setExecutor(new unpause());
+        getCommand("gamenum").setExecutor(new gamenum());
 
         getCommand("ping").setExecutor(new ping());
+
         getCommand("checkbuild").setExecutor(new checkbuild());
+
         getCommand("placement").setExecutor(new placement());
         getCommand("individual").setExecutor(new individual());
-        getCommand("gamenum").setExecutor(new gamenum());
+        getCommand("scores").setExecutor(new scores());
 
         getCommand("playerscore").setExecutor(new playerscore());
         getCommand("playerscore").setTabCompleter(new playerscoreTabCompletion());

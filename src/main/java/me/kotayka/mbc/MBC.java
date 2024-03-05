@@ -545,6 +545,7 @@ public class MBC implements Listener {
         }
 
         StringBuilder msg = new StringBuilder(ChatColor.AQUA+"+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n"+ChatColor.RESET);
+        // TODO: make ties not look stupid
         msg.append(ChatColor.YELLOW+"Your placement: " + Game.getColorStringFromPlacement(placement) + Game.getPlace(placement) + ChatColor.RESET + "\n");
         msg.append(ChatColor.YELLOW+"Your score: " + ChatColor.RESET+ p.getRawTotalScore()+"\n");
         if (placement != 1) {
@@ -569,6 +570,31 @@ public class MBC implements Listener {
             }
         }
         sender.sendMessage(msg.toString());
+    }
+
+    public void getTopIndividualAndPlacement(Player sender) {
+        List<Participant> individual = getPlayers();
+        individual.sort(new TotalIndividualComparator());
+        int placement;
+        StringBuilder msg = new StringBuilder(ChatColor.AQUA.toString()+ChatColor.BOLD+"Player scores: \n"+ChatColor.RESET);
+        StringBuilder yourPlace = new StringBuilder(ChatColor.AQUA+"+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n"+ChatColor.RESET);
+        for (Participant p : individual) {
+            placement = p.getPlacement();
+            if (placement < 9) {
+                msg.append(placement).append(". ").append(p.getFormattedName()).append(": ").append(p.getRawTotalScore()).append("\n");
+            }
+            if (p.getPlayer().equals(sender)) {
+                yourPlace.append(ChatColor.YELLOW+"Your placement: " + Game.getColorStringFromPlacement(placement) + Game.getPlace(placement) + ChatColor.RESET + "\n");
+                yourPlace.append(ChatColor.YELLOW+"Your score: " + ChatColor.RESET+ p.getRawTotalScore()+"\n");
+                // TODO: make ties not look stupid
+                if (placement != 1) {
+                    List<Participant> aheadPlayers = Participant.getParticipant(placement-1);
+                    yourPlace.append("The player one place above you has " + (aheadPlayers.get(0).getRawTotalScore() - p.getRawTotalScore()) + " more coins.\n");
+                }
+                yourPlace.append(ChatColor.AQUA+"+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
+            }
+        }
+        sender.sendMessage(msg + "\n" + yourPlace);
     }
 
     public static void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
