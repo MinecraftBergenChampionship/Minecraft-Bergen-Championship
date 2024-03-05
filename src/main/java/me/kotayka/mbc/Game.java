@@ -180,6 +180,7 @@ public abstract class Game extends Minigame {
 
     /**
      * If only one team remains, "cancel" game by setting timeRemaining to 1
+     * @modifies timeRemaining
      * @param t Team to check whether any players remain.
      */
     public void checkLastTeam(MBCTeam t) {

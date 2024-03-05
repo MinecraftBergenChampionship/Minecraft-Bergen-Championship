@@ -262,7 +262,6 @@ public class SurvivalGames extends Game {
             UpdateEvent();
         } else if (getState().equals(GameState.OVERTIME)) {
             if (timeRemaining == 0) {
-                gameOverGraphics();
                 for (Participant p : playersAlive) {
                     MBCTeam t = p.getTeam();
                     teamPlacements.put(t, 1);
@@ -270,9 +269,13 @@ public class SurvivalGames extends Game {
                 placementPoints();
                 createLineAll(23, "\n");
                 if (!firstRound) {
+                    gameOverGraphics();
+                    roundWinners(0);
                     setGameState(GameState.END_GAME);
                     timeRemaining = 37;
                 } else {
+                    roundOverGraphics();
+                    roundWinners(0);
                     setGameState(GameState.END_ROUND);
                     firstRound = false;
                     timeRemaining = 10;
@@ -284,14 +287,9 @@ public class SurvivalGames extends Game {
                 loadPlayers();
                 setGameState(GameState.STARTING);
                 timeRemaining = 30;
-            } else if (timeRemaining == 9) {
-                roundOverGraphics();
-                roundWinners(0);
             }
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 36) {
-                gameOverGraphics();
-                roundWinners(0);
                 map.resetMap();
             }
             gameEndEvents();

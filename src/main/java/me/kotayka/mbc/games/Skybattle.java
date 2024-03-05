@@ -163,9 +163,13 @@ public class Skybattle extends Game {
                 } else {
                     if (roundNum < 3) {
                         timeRemaining = 10;
+                        roundOverGraphics();
+                        roundWinners(WIN_POINTS);
                         setGameState(GameState.END_ROUND);
                     } else {
                         timeRemaining = 38;
+                        gameOverGraphics();
+                        roundWinners(WIN_POINTS);
                         setGameState(GameState.END_GAME);
                     }
                 }
@@ -192,16 +196,17 @@ public class Skybattle extends Game {
             map.Overtime();
             if (timeRemaining == 0 && roundNum < 3) {
                 timeRemaining = 10;
+                roundOverGraphics();
+                roundWinners(WIN_POINTS);
                 setGameState(GameState.END_ROUND);
             } else if (timeRemaining == 0) {
                 timeRemaining = 38;
+                gameOverGraphics();
+                roundWinners(WIN_POINTS);
                 setGameState(GameState.END_GAME);
             }
         } else if (getState().equals(GameState.END_ROUND)) {
-            if (timeRemaining == 9) {
-                roundOverGraphics();
-                roundWinners(WIN_POINTS);
-            } else if (timeRemaining == 1) {
+            if (timeRemaining == 1) {
                 roundNum++;
                 map.resetMap();
                 loadPlayers();

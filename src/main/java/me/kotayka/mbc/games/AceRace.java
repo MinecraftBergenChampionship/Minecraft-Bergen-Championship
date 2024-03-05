@@ -136,7 +136,7 @@ public class AceRace extends Game {
             } else {
                 setGameState(GameState.ACTIVE);
                 map.setBarriers(false);
-                setPVP(true);
+                //setPVP(true);
                 timeRemaining = 720;
                 startingTime = System.currentTimeMillis();
             }
