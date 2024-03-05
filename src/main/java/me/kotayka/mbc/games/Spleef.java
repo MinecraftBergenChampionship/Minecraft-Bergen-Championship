@@ -90,7 +90,7 @@ public class Spleef extends Game {
     public void start() {
         super.start();
         setGameState(GameState.TUTORIAL);
-        setTimer(60);
+        setTimer(53);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class Spleef extends Game {
                 }
                 setGameState(GameState.STARTING);
                 startRound();
-            } else if (timeRemaining % 7 == 0 && timeRemaining != 7) {
+            } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
         } else if (getState().equals(GameState.STARTING)) {

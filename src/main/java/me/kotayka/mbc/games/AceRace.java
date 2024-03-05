@@ -79,7 +79,7 @@ public class AceRace extends Game {
             p.teleport(map.getIntroLocation());
         }
 
-        setTimer(60);
+        setTimer(53);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class AceRace extends Game {
 
     public void events() {
         if (getState().equals(GameState.TUTORIAL)) {
-            if (!finishedIntro && timeRemaining > 0 && introLine < INTRODUCTION.length && timeRemaining % 7 == 0) {
+            if (!finishedIntro && timeRemaining > 0 && timeRemaining % 7 == 0) {
                 Introduction();
             } else if (!finishedIntro && timeRemaining == 0){
                 MBC.getInstance().sendMutedMessages();

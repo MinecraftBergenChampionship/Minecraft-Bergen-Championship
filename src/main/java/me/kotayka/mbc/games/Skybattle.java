@@ -120,7 +120,7 @@ public class Skybattle extends Game {
         setGameState(GameState.TUTORIAL);
         //setGameState(GameState.STARTING);
 
-        setTimer(60);
+        setTimer(53);
     }
 
     @Override
@@ -137,8 +137,7 @@ public class Skybattle extends Game {
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
                 setGameState(GameState.STARTING);
                 timeRemaining = 20;
-            }
-            else if (timeRemaining % 7 == 0 && timeRemaining != 7){
+            } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
         } else if (getState().equals(GameState.STARTING)) {
@@ -162,14 +161,14 @@ public class Skybattle extends Game {
                     setGameState(GameState.OVERTIME);
                 } else {
                     if (roundNum < 3) {
-                        timeRemaining = 10;
                         roundOverGraphics();
                         roundWinners(WIN_POINTS);
+                        timeRemaining = 10;
                         setGameState(GameState.END_ROUND);
                     } else {
-                        timeRemaining = 38;
                         gameOverGraphics();
                         roundWinners(WIN_POINTS);
+                        timeRemaining = 38;
                         setGameState(GameState.END_GAME);
                     }
                 }
@@ -195,14 +194,14 @@ public class Skybattle extends Game {
         } else if (getState().equals(GameState.OVERTIME)) {
             map.Overtime();
             if (timeRemaining == 0 && roundNum < 3) {
-                timeRemaining = 10;
                 roundOverGraphics();
                 roundWinners(WIN_POINTS);
+                timeRemaining = 10;
                 setGameState(GameState.END_ROUND);
             } else if (timeRemaining == 0) {
-                timeRemaining = 38;
                 gameOverGraphics();
                 roundWinners(WIN_POINTS);
+                timeRemaining = 38;
                 setGameState(GameState.END_GAME);
             }
         } else if (getState().equals(GameState.END_ROUND)) {
@@ -215,10 +214,7 @@ public class Skybattle extends Game {
                 setGameState(GameState.STARTING);
             }
         } else if (getState().equals(GameState.END_GAME)) {
-            if (timeRemaining == 37) {
-                gameOverGraphics();
-                roundWinners(WIN_POINTS);
-            } else if (timeRemaining <= 35) {
+            if (timeRemaining <= 35) {
                 gameEndEvents();
             }
         }

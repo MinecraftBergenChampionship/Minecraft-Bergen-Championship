@@ -95,7 +95,7 @@ public class TGTTOS extends Game {
                 }
                 setGameState(GameState.STARTING);
                 timeRemaining = 20;
-            } else if (timeRemaining % 7 == 0 && timeRemaining != 7) {
+            } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
         } else if (getState().equals(GameState.STARTING)) {
@@ -152,7 +152,7 @@ public class TGTTOS extends Game {
 
         setGameState(GameState.TUTORIAL);
 
-        setTimer(60);
+        setTimer(53);
     }
 
     @Override

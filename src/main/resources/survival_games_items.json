@@ -4,6 +4,7 @@
   { "material": "STONE_SWORD", "stack_max": 1, "weight": 3},
   { "material": "IRON_SWORD", "stack_max": 1, "weight": 2.5},
 
+  { "material": "GOLDEN_AXE", "stack_max": 1, "weight": 2.5},
   { "material": "STONE_AXE", "stack_max": 1, "weight": 2.5},
   { "material": "IRON_AXE", "stack_max": 1, "weight": 1.5},
 

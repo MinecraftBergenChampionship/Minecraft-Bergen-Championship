@@ -89,7 +89,7 @@ public class BuildMart extends Game {
         map.resetBreakAreas();
 
         setGameState(GameState.TUTORIAL);
-        setTimer(60);
+        setTimer(53);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class BuildMart extends Game {
                 }
                 setGameState(GameState.STARTING);
                 timeRemaining = 30;
-            } else if (timeRemaining != 7 && timeRemaining % 7 == 0) {
+            } else if (timeRemaining != 7) {
                 Introduction();
             }
         } else if (getState().equals(GameState.STARTING)) {

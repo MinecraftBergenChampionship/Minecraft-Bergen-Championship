@@ -66,7 +66,7 @@ public class SurvivalGames extends Game {
                 "Spawning in with nothing, gain items by searching through chests across the map. There's a short grace period!",
                 "Watch out for the fast border: you won't be able to open doors or break glass behind it!",
                 "Enchanting tables can also be used to purchase enchants. Drag and click the books to enchant items!",
-                "At the end of each round, your team will receive a point bonus with increases with placement, so live as long as you can!",
+                "At the end of each round, your team will receive a point bonus that increases with placement, so live as long as you can!",
                 "Survival Games is two rounds, so make sure to remember who killed you...",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +10 points for eliminations\n" +
@@ -137,7 +137,7 @@ public class SurvivalGames extends Game {
          setGameState(GameState.TUTORIAL);
         //setGameState(GameState.STARTING);
 
-        setTimer(60);
+        setTimer(53);
     }
 
     @Override
@@ -169,7 +169,7 @@ public class SurvivalGames extends Game {
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
                 setGameState(GameState.STARTING);
                 timeRemaining = 20;
-            } else if (timeRemaining % 7 == 0 && timeRemaining != 7) {
+            } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
         } else if (getState().equals(GameState.STARTING)) {
@@ -181,7 +181,7 @@ public class SurvivalGames extends Game {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
                 setGameState(GameState.ACTIVE);
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Grace ends in 1 minute!");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Grace ends in 30 seconds!");
                 timeRemaining = 450;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
@@ -210,9 +210,13 @@ public class SurvivalGames extends Game {
                     placementPoints();
                     //createLineAll(23, "\n");
                     if (!firstRound) {
+                        gameOverGraphics();
+                        roundWinners(0);
                         setGameState(GameState.END_GAME);
                         timeRemaining = 37;
                     } else {
+                        roundOverGraphics();
+                        roundWinners(0);
                         setGameState(GameState.END_ROUND);
                         firstRound = false;
                         timeRemaining = 10;
@@ -267,7 +271,7 @@ public class SurvivalGames extends Game {
                     teamPlacements.put(t, 1);
                 }
                 placementPoints();
-                createLineAll(23, "\n");
+                //createLineAll(23, "\n");
                 if (!firstRound) {
                     gameOverGraphics();
                     roundWinners(0);
@@ -399,13 +403,13 @@ public class SurvivalGames extends Game {
      * If empty, updates list of eligible Super Chests.
      */
     public void regenChest() {
-        double totalWeight = 114;
+        double totalWeight = 0;
         // delete when final.
-        /*for (SurvivalGamesItem item : items) {
+        for (SurvivalGamesItem item : items) {
             totalWeight += item.getWeight();
         }
         Bukkit.broadcastMessage("[Debug] Total Weight == " + totalWeight);
-         */
+
 
         Random rand = new Random();
         Chunk[] c = map.getWorld().getLoadedChunks();
@@ -741,7 +745,6 @@ public class SurvivalGames extends Game {
             EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
             meta.addStoredEnchant(item.enchantment, 1, true);
             book.setItemMeta(meta);
-            p.getInventory().addItem(book);
             p.setLevel(level-item.cost);
             p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
             p.getInventory().addItem(book);
