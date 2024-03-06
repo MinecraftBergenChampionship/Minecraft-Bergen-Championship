@@ -468,11 +468,11 @@ public abstract class Game extends Minigame {
 
         switch (timeRemaining) {
             case 10 -> {
-                Bukkit.broadcastMessage(ChatColor.BOLD + "Skipping score report for last game!");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX +  ChatColor.BOLD + "Skipping score report for last game!");
                 getTeamScoresNoPrint();
                 getIndivScoresNoPrint();
             }
-            case 8 -> Bukkit.broadcastMessage(ChatColor.BOLD+"Check with admins or <implemented command> to find your score post-reveal!");
+            case 8 -> Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.BOLD+"Check with admins or <implemented command> to find your score post-reveal!");
             case 5 -> getIndivScoresNoPrint();
             case 2 -> Bukkit.broadcastMessage(ChatColor.RED + "Preparing finale...");
             case 3 -> MBC.getInstance().updatePlacings();
@@ -617,9 +617,8 @@ public abstract class Game extends Minigame {
                 MBC.getInstance().finalGame = true;
             }
             MBC.getInstance().lobby.start();
+            MBC.getInstance().lobby.populatePodium();
         }
-
-        MBC.getInstance().lobby.populatePodium();
     }
 
     /**

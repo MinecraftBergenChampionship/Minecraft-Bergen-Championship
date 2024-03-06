@@ -29,6 +29,7 @@ public class Lobby extends Minigame {
     private int revealCounter = 0;
 
     private List<NPC> podiumNPCS = new ArrayList<>();
+    private List<NPC> outsideNPCs = new ArrayList<>(); // separate just cus
 
     public Lobby() {
         super("Lobby");
@@ -171,6 +172,7 @@ public class Lobby extends Minigame {
                         p.setGameMode(GameMode.ADVENTURE);
                         p.teleport(LOBBY);
                         if (flag) {
+                            populatePodium();
                             p.sendTitle("Final Duel!", reveal.get(reveal.size()-1).teamNameFormat() + " vs. " + reveal.get(reveal.size()-2).teamNameFormat(), 20, 60, 20);
                         }
                     }
@@ -423,15 +425,15 @@ public class Lobby extends Minigame {
 
         podiumNPCS = new ArrayList<>();
 
-        Location[] locs = {
-                new Location(this.world, -62.5, 15, -7.5, -90, 0),
-                new Location(this.world, -65.5, 14, -5.5, -90, 0),
-                new Location(this.world, -67.5, 13, -2.5, -90, 0),
-                new Location(this.world, -67.5, 12, .5, -90, 0),
-                new Location(this.world, -67.5, 12, 3.5, -90, 0),
-                new Location(this.world, -65.5, 11, 6.5, -90, 0),
-                new Location(this.world, -62.5, 11, 8.5, -90, 0),
-                new Location(this.world, -59.5, 11, 9.5, -90, 0),
+        Location[][] locs = {
+                { new Location(this.world, -62.5, 15, -7.5, -90, 0), new Location(this.world, -9.5, 3, -33.5, -0, 0)},
+                { new Location(this.world, -65.5, 14, -5.5, -90, 0), new Location(this.world, -7.5, 2, -36.5, -0, 0)},
+                { new Location(this.world, -67.5, 13, -2.5, -90, 0), new Location(this.world, -4.5, 1, -38.5, -0, 0)},
+                { new Location(this.world, -67.5, 12, .5, -90, 0), new Location(this.world, -1.5, 0, -39.5, -0, 0)},
+                { new Location(this.world, -67.5, 12, 3.5, -90, 0), new Location(this.world, 2.5, 0, -39.5, -0, 0)},
+                { new Location(this.world, -65.5, 11, 6.5, -90, 0), new Location(this.world, 5.5, 0, -38.5, -0, 0)},
+                { new Location(this.world, -62.5, 11, 8.5, -90, 0), new Location(this.world, 8.5, 0, -36.5, -0, 0)},
+                { new Location(this.world, -59.5, 11, 9.5, -90, 0), new Location(this.world, 10.5, 0, -33.5, -0, 0)},
         };
 
         List<Participant> individual = MBC.getInstance().getPlayers();
@@ -445,12 +447,16 @@ public class Lobby extends Minigame {
                 return;
             }
 
-            Location l = locs[i];
+            Location l_0 = locs[i][0];
+            Location l_1 = locs[i][1];
 
-            NPC npc = MBC.npcManager.createNPC(p,l);
+            NPC npc1 = MBC.npcManager.createNPC(p,l_0);
+            NPC npc2 = MBC.npcManager.createNPC(p,l_1);
 
-            MBC.npcManager.showAll(npc);
-            podiumNPCS.add(npc);
+            MBC.npcManager.showAll(npc1);
+            MBC.npcManager.showAll(npc2);
+            podiumNPCS.add(npc1);
+            podiumNPCS.add(npc2);
         }
     }
 

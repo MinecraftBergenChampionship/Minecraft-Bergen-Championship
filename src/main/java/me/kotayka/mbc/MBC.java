@@ -313,7 +313,7 @@ public class MBC implements Listener {
             if (e.getPlayer().getUniqueId().equals(p.getPlayer().getUniqueId())) {
                 msg = msg.replace("%", "%%");
                 msg = p.getFormattedName() + ": " + msg;
-                e.setFormat(p.getFormattedName() + ": " + msg);
+                e.setFormat(msg);
                 break;
             }
         }
