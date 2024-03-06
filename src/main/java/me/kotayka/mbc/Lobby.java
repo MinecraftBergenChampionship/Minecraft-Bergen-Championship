@@ -353,7 +353,7 @@ public class Lobby extends Minigame {
     }
 
     public void colorPodiumsWhite() {
-        for (int i = 0; i < 6; i++) {
+        for (int i = 1; i < 7; i++) {
             colorPodium(i, Material.WHITE_CONCRETE);
         }
     }
