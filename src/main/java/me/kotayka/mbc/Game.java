@@ -627,11 +627,11 @@ public abstract class Game extends Minigame {
      * @param p Participant that has won a round/game.
      */
     public void winEffects(Participant p) {
+        p.getPlayer().setInvulnerable(true);
         MBC.spawnFirework(p);
         p.getPlayer().setGameMode(GameMode.ADVENTURE);
         p.getPlayer().setAllowFlight(true);
         p.getPlayer().setFlying(true);
-        p.getPlayer().setInvulnerable(true);
     }
 
     /**
@@ -641,10 +641,10 @@ public abstract class Game extends Minigame {
      * @param p Participant to give effects.
      */
     public void flightEffects(Participant p) {
+        p.getPlayer().setInvulnerable(true);
         p.getPlayer().setGameMode(GameMode.ADVENTURE);
         p.getPlayer().setAllowFlight(true);
         p.getPlayer().setFlying(true);
-        p.getPlayer().setInvulnerable(true);
     }
 
     /**

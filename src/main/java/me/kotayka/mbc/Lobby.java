@@ -79,7 +79,7 @@ public class Lobby extends Minigame {
             }
         } else if (getState().equals(GameState.END_ROUND)) {
             if (timeRemaining == 0) {
-                toDodgebolt();
+                toFinale();
             }
             if (revealCounter < 3) {
                 if (timeRemaining % 10 == 0) {
@@ -358,9 +358,40 @@ public class Lobby extends Minigame {
         }
     }
 
-    public void toDodgebolt() {
+    public void toFinale() {
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
         setGameState(GameState.INACTIVE);
+
+        toQuickfire();
+        // toDodgebolt();
+    }
+
+    public void toQuickfire() {
+        if (MBC.getInstance().quickfire == null) {
+            if (reveal.size() < 2) {
+                MBC.getInstance().quickfire = new Quickfire();
+            } else {
+                MBC.getInstance().quickfire = new Quickfire(reveal.get(reveal.size()-1), reveal.get(reveal.size()-2));
+            }
+        }
+
+        //MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().dodgebolt, MBC.getInstance().plugin);
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+            p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000, 255, false, false));
+            p.getPlayer().getInventory().clear();
+            p.getPlayer().setExp(0);
+            p.getPlayer().setLevel(0);
+        }
+
+        //MBC.getInstance().dodgebolt.start();
+        MBC.getInstance().quickfire.start();
+    }
+    /*
+    public void toDodgebolt() {
         if (MBC.getInstance().dodgebolt == null) {
             if (reveal.size() < 2) {
                 MBC.getInstance().dodgebolt = new Dodgebolt();
@@ -381,6 +412,7 @@ public class Lobby extends Minigame {
 
         MBC.getInstance().dodgebolt.start();
     }
+     */
 
     public void colorPodiums() {
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {

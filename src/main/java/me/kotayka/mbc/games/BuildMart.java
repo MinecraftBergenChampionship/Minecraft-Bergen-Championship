@@ -353,7 +353,7 @@ public class BuildMart extends Game {
             if (e.getPlayer().getTargetBlock(null, 5).getType() != hotbarSelector.get(p)) {
                 hotbarSelector.put(p, e.getPlayer().getTargetBlock(null, 5).getType());
                 if (e.getPlayer().getTargetBlock(null, 5).getType() != Material.AIR) {
-                    e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+ "" + ChatColor.BOLD+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(p))))));
+                    e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+ "" + ChatColor.BOLD+ createActionBarString(String.valueOf(hotbarSelector.get(p)))));
                 }
                 else {
                     e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
@@ -362,7 +362,7 @@ public class BuildMart extends Game {
         }
         else {
             hotbarSelector.put(p, e.getPlayer().getTargetBlock(null, 5).getType());
-            e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+ "" + ChatColor.BOLD+String.valueOf(createActionBarString(String.valueOf(hotbarSelector.get(p))))));
+            e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN+ "" + ChatColor.BOLD+ createActionBarString(String.valueOf(hotbarSelector.get(p)))));
         }
     }
 

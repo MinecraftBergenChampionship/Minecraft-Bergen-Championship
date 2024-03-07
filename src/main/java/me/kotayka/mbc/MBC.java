@@ -75,11 +75,13 @@ public class MBC implements Listener {
     public Skybattle skybattle = null;
     public SurvivalGames sg = null;
     public Spleef spleef = null;
-    public Dodgebolt dodgebolt = null;
+    //public Dodgebolt dodgebolt = null;
+    public Quickfire quickfire = null;
     public boolean finalGame = false;
 
-    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt"));
-    public final List<Game> gameList = new ArrayList<Game>(6);
+    //public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt","Quickfire"));
+    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire"));
+    //public final List<Game> gameList = new ArrayList<Game>(6);
     public static final String MBC_STRING_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "MBC" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: ";
     private List<String> mutedMessages = new LinkedList<String>();
 
@@ -151,6 +153,7 @@ public class MBC implements Listener {
                     spleef = new Spleef();
                 }
                 return spleef;
+                /*
             case "Dodgebolt":
                 if (dodgebolt == null) {
                     if (getValidTeams().size() < 2) {
@@ -163,6 +166,19 @@ public class MBC implements Listener {
                     }
                 }
                 return dodgebolt;
+                 */
+            case "Quickfire":
+                if (quickfire == null) {
+                    if (getValidTeams().size() < 2 ) {
+                        quickfire = new Quickfire();
+                    } else {
+                        // TODO: this is a sin against man
+                        List<MBCTeam> temp = getValidTeams();
+                        temp.sort(new TeamScoreSorter());
+                        quickfire = new Quickfire(temp.get(temp.size()-1), temp.get(temp.size()-2));
+                    }
+                }
+                return quickfire;
             default:
                 return lobby;
         }

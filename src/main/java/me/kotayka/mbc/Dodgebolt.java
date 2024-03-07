@@ -19,10 +19,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class Dodgebolt extends Minigame {
+public class Dodgebolt extends FinaleGame {
     private World world = Bukkit.getWorld("Dodgebolt");
-    private MBCTeam firstPlace = null;
-    private MBCTeam secondPlace = null;
+
     // {1st place, 2nd place}
     public int[] score = {0, 0};
     int roundNum = 1;
@@ -50,26 +49,15 @@ public class Dodgebolt extends Minigame {
     int trailTask = -1;
 
     public Dodgebolt() {
-        super("Dodgebolt");
+        super("Dodgebolt", new String[] {
+
+        });
 
         /*
         if (MBC.getInstance().getValidTeams().size() < 2) {
             Bukkit.broadcastMessage("[Dodgebolt] Not enough teams!");
             return;
         }*/
-
-        if (MBC.getInstance().getValidTeams().size() == 1) {
-            // only for debug
-            firstPlace = getValidTeams().get(0);
-            secondPlace = MBC.getInstance().spectator;
-        } else {
-            List<MBCTeam> teams = getValidTeams();
-            teams.sort(new TeamScoreSorter());
-            Collections.reverse(teams);
-            firstPlace = teams.get(0);
-            secondPlace = teams.get(1);
-        }
-
         for (Participant p : firstPlace.teamPlayers) {
             teamOnePlayers.add(new DodgeboltPlayer(p, true));
         }
@@ -85,7 +73,9 @@ public class Dodgebolt extends Minigame {
     }
 
     public Dodgebolt(@NotNull MBCTeam firstPlace, @NotNull MBCTeam secondPlace) {
-        super("Dodgebolt");
+        super("Dodgebolt", new String[] {
+
+        });
         this.firstPlace = firstPlace;
         Bukkit.broadcastMessage("firstPlace == " + this.firstPlace.teamNameFormat());
         this.secondPlace = secondPlace;
@@ -195,7 +185,7 @@ public class Dodgebolt extends Minigame {
             Location spawn = TEAM_ONE_SPAWNS.get(rand);
             p.getPlayer().teleport(spawn);
             p.getPlayer().getInventory().clear();
-            p.getPlayer().getInventory().setBoots(p.getParticipant().getTeam().getColoredLeatherArmor(BOOTS));
+            p.getPlayer().getInventory().setBoots(firstPlace.getColoredLeatherArmor(BOOTS));
             TEAM_ONE_SPAWNS.remove(spawn);
             p.getPlayer().getInventory().addItem(BOW);
         }
@@ -210,7 +200,7 @@ public class Dodgebolt extends Minigame {
             Location spawn = TEAM_TWO_SPAWNS.get(rand);
             p.getPlayer().teleport(spawn);
             p.getPlayer().getInventory().clear();
-            p.getPlayer().getInventory().setBoots(p.getParticipant().getTeam().getColoredLeatherArmor(BOOTS));
+            p.getPlayer().getInventory().setBoots(secondPlace.getColoredLeatherArmor(BOOTS));
             TEAM_TWO_SPAWNS.remove(spawn);
             p.getPlayer().getInventory().addItem(BOW);
         }
@@ -482,6 +472,7 @@ public class Dodgebolt extends Minigame {
 
     @Override
     public void Unpause() {
+        disconnect = false;
         setGameState(GameState.END_ROUND);
         setTimer(6);
     }
@@ -533,7 +524,7 @@ public class Dodgebolt extends Minigame {
             arrow.remove();
         }
 
-        if (e.getHitEntity() instanceof Player && e.getEntity().getShooter() instanceof Player) {
+        if (e.getHitEntity() instanceof Player) {
             Participant shooter = Participant.getParticipant((Player) e.getEntity().getShooter());
             DodgeboltPlayer p = getDodgeboltPlayer((Player) e.getHitEntity());
             if (p == null) {
