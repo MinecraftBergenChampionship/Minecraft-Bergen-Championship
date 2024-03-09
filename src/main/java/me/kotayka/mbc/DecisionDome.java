@@ -157,7 +157,7 @@ public class DecisionDome extends Minigame {
         public void events() {
             if (getState().equals(GameState.STARTING)) {
             if (timeRemaining == 0) {
-                timeRemaining = 45;
+                timeRemaining = 40;
                 // if (!revealedGames) revealedGames = true; the old object doesn't seem to persist but i can't exactly prove that
                 setGameState(GameState.ACTIVE);
                 /*
@@ -181,7 +181,7 @@ public class DecisionDome extends Minigame {
             } else {
                 if (timeRemaining == 9) {
                     MBC.getInstance().incrementMultiplier();
-                } else if (timeRemaining == 8) {
+                } else if (timeRemaining == 7) {
                     Powerups();
                 }
             }
@@ -197,7 +197,7 @@ public class DecisionDome extends Minigame {
                     }
                     setGameState(GameState.END_ROUND);
                     createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Deciding game...");
-                    timeRemaining = 20;
+                    timeRemaining = 17;
                 }
                 case 44 -> startVoting();
             }
@@ -640,6 +640,7 @@ public class DecisionDome extends Minigame {
             }
 
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
+            chicken.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10000, 1, false, false));
             chickens.add(new VoteChicken(p.getTeam(), chicken));
         } else if (e.getEntity().getType().equals(EntityType.ARROW)) {
             if (!(e.getEntity().getShooter() instanceof Player) || e.getEntity().getShooter() == null) return;

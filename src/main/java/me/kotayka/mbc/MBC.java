@@ -57,6 +57,7 @@ public class MBC implements Listener {
     public Spectator spectator = new Spectator();
 
     public List<MBCTeam> teams = new ArrayList<>(Arrays.asList(red, yellow, green, blue, purple, pink, spectator));
+    public Set<MBCTeam> ready = new HashSet<>();
     //public List<MBCTeam> validTeams = new ArrayList<>();
     //public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets", "Spectator"));
     public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets", "Spectator"));
@@ -78,6 +79,7 @@ public class MBC implements Listener {
     //public Dodgebolt dodgebolt = null;
     public Quickfire quickfire = null;
     public boolean finalGame = false;
+    public boolean readyCheck = false;
 
     //public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt","Quickfire"));
     public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire"));
@@ -333,7 +335,8 @@ public class MBC implements Listener {
                 break;
             }
         }
-        if (currentGame != null && currentGame != lobby && currentGame.getState().equals(GameState.TUTORIAL)) {
+        if (currentGame != null && (currentGame != lobby && currentGame.getState().equals(GameState.TUTORIAL)) ||
+                (currentGame == lobby && lobby.getState().equals(GameState.END_ROUND) && lobby.timeRemaining <= 80 && lobby.timeRemaining > 69)) {
             mutedMessages.add(msg);
             e.getPlayer().sendMessage(ChatColor.RED + "Chat is currently muted, your message will send after!");
             e.setCancelled(true);
@@ -626,6 +629,20 @@ public class MBC implements Listener {
             finalGame = true;
         }
         gameNum = num;
+    }
+
+    public void ready(MBCTeam t) {
+        ready.add(t);
+
+        if (ready.size() == getValidTeams().size()) {
+            // start event
+            startEvent();
+        }
+    }
+
+    private void startEvent() {
+        lobby.setGameState(GameState.STARTING);
+        lobby.setTimer(65);
     }
 
     public void setLogStats(boolean b) { enable_stat_logging = b; }

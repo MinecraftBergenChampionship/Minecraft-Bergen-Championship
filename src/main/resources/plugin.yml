@@ -20,6 +20,15 @@ commands:
     permission: minecraft.command.op
   ping:
     description: gets player's ping
+  announcement:
+    description: announce a message server wide.
+    permission: minecraft.command.op
+    aliases: [shout]
+  readycheck:
+    description: announce to players to ready up.
+    permission: minecraft.command.op
+  ready:
+    description: indicate a team is ready.
   placement:
     description: gets player's individual placement information
     aliases: [place, score, standing]

@@ -29,7 +29,6 @@ public class Lobby extends Minigame {
     private int revealCounter = 0;
 
     private List<NPC> podiumNPCS = new ArrayList<>();
-    private List<NPC> outsideNPCs = new ArrayList<>(); // separate just cus
 
     public Lobby() {
         super("Lobby");
@@ -42,12 +41,14 @@ public class Lobby extends Minigame {
         newObjective(p);
         if (MBC.getInstance().gameNum > 1) {
             createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Event resumes in: ", p);
+            createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team: " + p.getTeam().teamNameFormat(), p);
         } else {
-            createLine(21, ChatColor.RED+""+ChatColor.BOLD + "Event begins in:", p);
+            createLine(21, ChatColor.RED+""+ChatColor.BOLD + "Waiting for players...", p);
+            createLine(18, "Teams Ready: ", p);
         }
         createLine(19, ChatColor.RESET.toString(), p);
-        createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team:", p);
-        createLine(17, p.getTeam().getChatColor()+p.getTeam().getTeamFullName(), p);
+        //createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team: " + p.getTeam().teamNameFormat(), p);
+        //createLine(17, p.getTeam().getChatColor()+p.getTeam().getTeamFullName(), p);
         createLine(16, ChatColor.RESET+ChatColor.RESET.toString()+ChatColor.RESET, p);
         createLine(15, ChatColor.GREEN+"Team Leaderboard: ", p);
         createLine(4, ChatColor.RESET.toString()+ChatColor.RESET, p);
@@ -78,6 +79,7 @@ public class Lobby extends Minigame {
                 toVoting();
             }
         } else if (getState().equals(GameState.END_ROUND)) {
+            // TODO: Moving this to another function would probably be cleaner
             if (timeRemaining == 0) {
                 toFinale();
             }
@@ -94,7 +96,7 @@ public class Lobby extends Minigame {
                 } else if (timeRemaining % 5 == 0) {
                     String title = ChatColor.BOLD+"In " + Game.getPlace(MBC.MAX_TEAMS-revealCounter);
                     MBC.sendTitle(title," ", 20, 140, 20);
-                    Bukkit.broadcastMessage(title+"...");
+                    Bukkit.broadcastMessage("\n"+title+"...\n");
                 }
             }
             switch (timeRemaining) {
@@ -104,11 +106,11 @@ public class Lobby extends Minigame {
                     //Bukkit.broadcastMessage("[Debug] reveal == " + reveal);
                 }
                 case 95 -> {
-                    Bukkit.broadcastMessage(ChatColor.BOLD+"Now for the Dodgebolt Qualifiers!");
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nNow for the Dodgebolt Qualifiers!\n");
                 }
                 case 90 -> {
                     String title = String.format("In %s1st", ChatColor.GOLD);
-                    Bukkit.broadcastMessage(title+"...");
+                    Bukkit.broadcastMessage("\n" + title+ ChatColor.RESET + ChatColor.BOLD + "...\n");
                     MBC.sendTitle(title, " ", 20, 140, 20);
                 }
                 case 85 -> {
@@ -121,24 +123,26 @@ public class Lobby extends Minigame {
                     }
                 }
                 case 80 -> {
-                    Bukkit.broadcastMessage(ChatColor.BOLD+"Finally...");
+                    Bukkit.broadcastMessage(ChatColor.RED + "Chat has temporarily been muted.");
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nFinally...\n");
                 }
                 case 79 -> {
-                    Bukkit.broadcastMessage(ChatColor.BOLD+"The team in " + ChatColor.GRAY+ "2nd"+ ChatColor.WHITE + ChatColor.BOLD+" place...");
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nThe team in " + ChatColor.GRAY+ "2nd"+ ChatColor.WHITE + ChatColor.BOLD+" place...\n");
                     MBC.sendTitle(ChatColor.BOLD+"In " + ChatColor.GRAY+"2nd", " ", 20, 140, 20);
                 }
                 case 77 -> {
                     if (reveal.size() <= 2) { return; }
                     MBCTeam two = reveal.get(reveal.size()-2);
                     MBCTeam third = reveal.get(reveal.size()-3);
-                    Bukkit.broadcastMessage("With a gap of " + (two.getMultipliedTotalScore() - third.getMultipliedTotalScore()) + " points...");
-                    MBC.sendTitle(ChatColor.BOLD+"In " + ChatColor.GRAY+"2nd", "With " + two.getMultipliedTotalScore() + " points", 0, 140, 20);
+                    double gap = two.getMultipliedTotalScore() - third.getMultipliedTotalScore();
+                    Bukkit.broadcastMessage("\nWith a gap of " + ChatColor.BOLD + gap + ChatColor.RESET + " points...\n");
+                    MBC.sendTitle(ChatColor.BOLD+"In " + ChatColor.GRAY+"2nd", "By " + gap + " points", 0, 140, 20);
                 }
                 case 75 -> {
-                    Bukkit.broadcastMessage(ChatColor.BOLD+"Playing in dodgebolt...");
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nPlaying in dodgebolt...\n");
                 }
                 case 73 -> {
-                    Bukkit.broadcastMessage(ChatColor.BOLD+"is...");
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nare...\n");
                 }
                 case 70 -> {
                     if (reveal.size() <= 1) {
@@ -149,8 +153,12 @@ public class Lobby extends Minigame {
                         revealTeam(reveal.get(reveal.size()-2), 2);
                     }
                 }
+                case 69 -> {
+                    Bukkit.broadcastMessage(ChatColor.GREEN + "Chat has been unmuted!");
+                    MBC.getInstance().sendMutedMessages();
+                }
                 case 66 -> {
-                    Bukkit.broadcastMessage("Which leaves us with " + ChatColor.DARK_RED + "3rd"+ChatColor.WHITE+",");
+                    Bukkit.broadcastMessage("\nWhich leaves us with " + ChatColor.DARK_RED + "3rd"+ChatColor.WHITE+".\n");
                 }
                 case 65 -> {
                     if (reveal.size() <= 2) {
@@ -247,7 +255,7 @@ public class Lobby extends Minigame {
     public void revealTeam(MBCTeam t, int place) {
         colorPodium(place, t.getConcrete().getType());
         MBC.sendTitle(t.teamNameFormat(), "with " + t.getMultipliedTotalScore() + " points", 20, 90, 20);
-        Bukkit.broadcastMessage(t.teamNameFormat() + " with " + t.getMultipliedTotalScore() + " points!");
+        Bukkit.broadcastMessage("\n" + t.teamNameFormat() + " with " + t.getMultipliedTotalScore() + " points!\n");
         MBC.spawnFirework(placeLocation(place), t.getColor());
         for (Participant p : MBC.getInstance().participants) {
             if (p.getTeam().getIcon().equals(t.getIcon())) {
