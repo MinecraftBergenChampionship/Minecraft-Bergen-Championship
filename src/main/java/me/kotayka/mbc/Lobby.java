@@ -19,6 +19,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Lobby extends Minigame {
@@ -27,6 +28,8 @@ public class Lobby extends Minigame {
     public ArmorStand cameraman;
     private List<MBCTeam> reveal;
     private int revealCounter = 0;
+    private int introCounter = 0;
+    private List<Participant> lastIntro = new LinkedList<>();
 
     private List<NPC> podiumNPCS = new ArrayList<>();
 
@@ -74,7 +77,9 @@ public class Lobby extends Minigame {
     }
 
     public void events() {
-        if (getState().equals(GameState.ACTIVE)) {
+        if (getState().equals(GameState.STARTING)) {
+            startingEvents(timeRemaining);
+        } else if (getState().equals(GameState.ACTIVE)) {
             if (timeRemaining == 0) {
                 toVoting();
             }
@@ -303,7 +308,7 @@ public class Lobby extends Minigame {
     // prevent leaving cutscenes
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent e) {
-        if (!getState().equals(GameState.END_ROUND)) return;
+        if (!(getState().equals(GameState.END_ROUND) || getState().equals(GameState.STARTING))) return;
 
         if (e.getPlayer().getSpectatorTarget() != null && e.getPlayer().getSpectatorTarget().equals(cameraman)) {
             e.setCancelled(true);
@@ -398,6 +403,36 @@ public class Lobby extends Minigame {
         //MBC.getInstance().dodgebolt.start();
         MBC.getInstance().quickfire.start();
     }
+
+    public void startingEvents(int timeRemaining) {
+        if (timeRemaining == 0) {
+            toVoting();
+        } else if (timeRemaining == 63) {
+            world.setTime(23225);
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1, false, false));
+            }
+        } else if (timeRemaining == 60) {
+            cameraman = (ArmorStand) world.spawnEntity(new Location(world, -8.5, 0, 0, -90, -11), EntityType.ARMOR_STAND);
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.removePotionEffect(PotionEffectType.BLINDNESS);
+                p.setGameMode(GameMode.SPECTATOR);
+                p.setSpectatorTarget(cameraman);
+            }
+        } else if (timeRemaining == 59) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.sendTitle(ChatColor.GOLD.toString() + ChatColor.BOLD + "Introducing:", " ", 20, 60, 20);
+            }
+        } else if (timeRemaining < 60 && timeRemaining > 20 && timeRemaining % 7 == 0) {
+            introTeam();
+        } else if (timeRemaining == 20) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.setGameMode(GameMode.ADVENTURE);
+                p.teleport(LOBBY);
+            }
+            cameraman.remove();
+        }
+    }
     /*
     public void toDodgebolt() {
         if (MBC.getInstance().dodgebolt == null) {
@@ -421,6 +456,30 @@ public class Lobby extends Minigame {
         MBC.getInstance().dodgebolt.start();
     }
      */
+
+    private void introTeam() {
+        List<MBCTeam> teams = getValidTeams();
+        if (introCounter >= teams.size()) {
+            timeRemaining = 20;
+        } else {
+            MBCTeam intro = teams.get(introCounter++);
+            if (lastIntro.size() != 0) {
+                for (Participant p : lastIntro) {
+                    p.getPlayer().setGameMode(GameMode.SPECTATOR);
+                    p.getPlayer().setSpectatorTarget(cameraman);
+                }
+                lastIntro.clear();
+            }
+            lastIntro.addAll(intro.getPlayers());
+            for (Participant p : intro.getPlayers()) {
+                p.getPlayer().setGameMode(GameMode.ADVENTURE);
+                p.getPlayer().teleport(new Location(world, 0, 1, 0, 90, 0));
+            }
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.getPlayer().sendTitle(intro.teamNameFormat(), " ", 20, 60, 20);
+            }
+        }
+    }
 
     public void colorPodiums() {
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {

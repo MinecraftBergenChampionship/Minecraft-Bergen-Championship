@@ -631,8 +631,24 @@ public class MBC implements Listener {
         gameNum = num;
     }
 
-    public void ready(MBCTeam t) {
-        ready.add(t);
+    /**
+     * Create an announcement with string s.
+     * @param s String to be broadcasted; should not end with a newline.
+     */
+    public void announce(String s) {
+        StringBuilder str = new StringBuilder();
+        str.append(ChatColor.GREEN + "\n+=+=+=+=+=+=+=+=+=+=" + MBC.MBC_STRING_PREFIX + "+=+=+=+=+=+=+=+=+=+=\n");
+        str.append(s);
+        str.append(ChatColor.GREEN + "\n\n+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+\n");
+        Bukkit.broadcastMessage(str.toString());
+    }
+
+    public void ready(MBCTeam t, Player p) {
+        if (ready.add(t)) {
+            p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.GREEN + " Successfully readied up!");
+        } else {
+            p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + " Your team was already ready!");
+        }
 
         if (ready.size() == getValidTeams().size()) {
             // start event
@@ -642,6 +658,7 @@ public class MBC implements Listener {
 
     private void startEvent() {
         lobby.setGameState(GameState.STARTING);
+        announce(ChatColor.BOLD + "The event is starting!" + ChatColor.RESET + "\nYou may want to turn JUKEBOX sounds down.");
         lobby.setTimer(65);
     }
 

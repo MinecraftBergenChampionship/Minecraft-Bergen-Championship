@@ -22,14 +22,8 @@ public class announcement implements CommandExecutor {
             return false;
         }
 
-        StringBuilder str = new StringBuilder();
-        str.append(ChatColor.GREEN + "\n+=+=+=+=+=+=+=+=+=+=" + MBC.MBC_STRING_PREFIX + "+=+=+=+=+=+=+=+=+=+=\n");
-        for (int i = 1; i < args.length; i++) {
-            str.append(args[i] + " ");
-        }
-        str.append(ChatColor.GREEN + "\n\n+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+\n");
-
-        Bukkit.broadcastMessage(str.toString());
+        String s = String.join(" ", args);
+        MBC.getInstance().announce(s);
 
         return true;
     }

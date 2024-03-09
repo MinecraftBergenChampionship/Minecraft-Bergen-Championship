@@ -23,12 +23,7 @@ public class ready implements CommandExecutor {
         }
 
         Participant par = Participant.getParticipant(p);
-        if (MBC.getInstance().ready.add(par.getTeam())) {
-            p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.GREEN + " Successfully readied up!");
-        } else {
-            p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + " Your team was already ready!");
-        }
+        MBC.getInstance().ready(par.getTeam(), p);
         return true;
-
     }
 }
