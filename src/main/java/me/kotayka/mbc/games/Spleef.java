@@ -1,10 +1,7 @@
 package me.kotayka.mbc.games;
 
 import me.kotayka.mbc.*;
-import me.kotayka.mbc.gameMaps.spleefMap.Classic;
-import me.kotayka.mbc.gameMaps.spleefMap.SkySpleef;
-import me.kotayka.mbc.gameMaps.spleefMap.Space;
-import me.kotayka.mbc.gameMaps.spleefMap.SpleefMap;
+import me.kotayka.mbc.gameMaps.spleefMap.*;
 import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -28,7 +25,8 @@ import java.util.*;
 public class Spleef extends Game {
     private SpleefMap map = null;
     private List<SpleefMap> maps = new ArrayList<>(
-            Arrays.asList(new Classic(), new Space(), new SkySpleef())
+            Arrays.asList(new Classic(), new SkySpleef(), new HotSprings())
+            //Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings())
     );
     //private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
     //public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
