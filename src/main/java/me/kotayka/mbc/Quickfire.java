@@ -1,6 +1,5 @@
 package me.kotayka.mbc;
 
-import me.kotayka.mbc.comparators.TeamScoreSorter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
@@ -17,9 +16,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.UUID;
 
 
 public class Quickfire extends FinaleGame {
@@ -29,7 +28,7 @@ public class Quickfire extends FinaleGame {
     private World world = Bukkit.getWorld("Quickfire");
     private final Location TEAM_ONE_SPAWN = new Location(world, 19.5, -60, 0);
     private final Location TEAM_TWO_SPAWN = new Location(world, -19.5,  -60, 0);
-    private final Location SPAWN = new Location(world, 1.5, -35, 0.5);
+    private final Location SPAWN = new Location(Bukkit.getWorld("Quickfire"), 1.5, -35, 0.5, -90, 90);
     private int[] playersAlive;
     private int timeElapsed = 0;
     private int roundNum = 0;
@@ -83,6 +82,9 @@ public class Quickfire extends FinaleGame {
 
     @Override
     public void start() {
+        if (firstPlace == null) { return; }
+        MBC.getInstance().setCurrentGame(this);
+        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
         loadPlayers();
         setGameState(GameState.TUTORIAL);
         setTimer(53);
@@ -113,6 +115,7 @@ public class Quickfire extends FinaleGame {
             if (timeRemaining == 0) {
                 Barriers(false);
                 setGameState(GameState.STARTING);
+                timeRemaining = 8000;
             } else {
                 startingCountdown();
             }
@@ -144,6 +147,7 @@ public class Quickfire extends FinaleGame {
     }
 
     public void startRound() {
+        Barriers(true);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getInventory().clear();
             p.getPlayer().setInvulnerable(false);
@@ -196,13 +200,22 @@ public class Quickfire extends FinaleGame {
         if (!(e.getEntity() instanceof Arrow)) return;
         Arrow arrow = (Arrow) e.getEntity();
         if (!(arrow.getShooter() instanceof Player)) return;
-        if (e.getHitEntity() != null) return;
 
-        if (e.getHitBlock() != null && e.getHitBlockFace() != null) {
-            arrow.remove();
+        if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
+            Participant shot = Participant.getParticipant((Player) e.getHitEntity());
+            Participant damager = Participant.getParticipant((Player) arrow.getShooter());
+            damager.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(shot.getFormattedName() + " - " + ChatColor.RED + shot.getPlayer().getHealth() + " ♥"));
+            if (shot.getPlayer().getHealth() <= 2) {
+                Death(shot, damager);
+            } else {
+                shot.getPlayer().damage(2);
+                shot.getPlayer().setVelocity(new Vector(arrow.getVelocity().getX()*0.1, 0.3, arrow.getVelocity().getY()*0.1));
+                damager.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(shot.getFormattedName() + " - " + ChatColor.RED + shot.getPlayer().getHealth() + " ♥"));
+            }
         }
     }
 
+    /*
     @EventHandler
     public void arrowHitPlayer(EntityDamageByEntityEvent e) {
         if (!(e.getEntity() instanceof Player)) return;
@@ -226,6 +239,7 @@ public class Quickfire extends FinaleGame {
             }
         }
     }
+     */
 
     private void Death(Participant victim, Participant killer) {
         MBC.spawnFirework(victim);
@@ -347,13 +361,11 @@ public class Quickfire extends FinaleGame {
         int[] blocks_x = new int[] {15, 15, 16, 17, 18, 19, 20, 21, 22, 23, 23};
         int[] blocks_z = new int[] { 0,  1,  2,  3,  4,  4,  4,  3,  2,  1,  0};
         for (int y = -60; y <= -59; y++) {
-            for (int x : blocks_x) {
-                for (int z : blocks_z) {
-                    world.getBlockAt(x, y, z).setType(m);
-                    world.getBlockAt(-x, y, z).setType(m);
-                    world.getBlockAt(x, y, -z).setType(m);
-                    world.getBlockAt(-x, y, -z).setType(m);
-                }
+            for (int i = 0; i < blocks_z.length; i++) {
+                world.getBlockAt(blocks_x[i], y, blocks_z[i]).setType(m);
+                world.getBlockAt(-blocks_x[i], y, blocks_z[i]).setType(m);
+                world.getBlockAt(blocks_x[i], y, -blocks_z[i]).setType(m);
+                world.getBlockAt(-blocks_x[i], y, -blocks_z[i]).setType(m);
             }
         }
     }

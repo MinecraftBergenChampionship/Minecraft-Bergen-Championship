@@ -72,10 +72,10 @@ public class Skybattle extends Game {
         if (roundNum == 1)
             teamsAlive.addAll(getValidTeams());
         for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().setInvulnerable(true);
             p.getPlayer().getInventory().clear();
             p.getPlayer().setFlying(false);
             p.getPlayer().setAllowFlight(false);
-            p.getPlayer().setInvulnerable(false);
             p.getPlayer().setHealth(20);
 
             p.getPlayer().removePotionEffect(PotionEffectType.JUMP);
@@ -148,6 +148,7 @@ public class Skybattle extends Game {
                 map.removeBarriers();
                 setPVP(true);
                 for (SkybattlePlayer p : skybattlePlayerMap.values()) {
+                    p.getPlayer().setInvulnerable(false);
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
                 timeRemaining = 240;
@@ -575,7 +576,7 @@ public class Skybattle extends Game {
      */
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (!isGameActive()) return;
+        if (!getState().equals(GameState.ACTIVE) && !getState().equals(GameState.END_ROUND) && !getState().equals(GameState.END_GAME) && !getState().equals(GameState.OVERTIME)) return;
         if (!(e.getPlayer().getWorld().equals(map.getWorld()))) return;
 
         SkybattlePlayer player = skybattlePlayerMap.get(e.getPlayer().getUniqueId());

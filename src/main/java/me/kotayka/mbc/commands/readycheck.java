@@ -22,6 +22,11 @@ public class readycheck implements CommandExecutor {
             return false;
         }
 
+        if (MBC.getInstance().getValidTeams().size() == 0) {
+            p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "There are no non-spectator teams.");
+            return false;
+        }
+
         MBC.getInstance().readyCheck = true;
 
         StringBuilder readyString = new StringBuilder();

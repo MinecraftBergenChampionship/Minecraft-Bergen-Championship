@@ -23,7 +23,7 @@ commands:
   announcement:
     description: announce a message server wide.
     permission: minecraft.command.op
-    aliases: [shout]
+    aliases: [shout, announce]
   readycheck:
     description: announce to players to ready up.
     permission: minecraft.command.op

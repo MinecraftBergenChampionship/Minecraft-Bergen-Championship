@@ -214,6 +214,49 @@ public class MBC implements Listener {
         }
     }
 
+    public static String getScoring(String str) {
+        switch(str) {
+            case "AceRace":
+                return ChatColor.BOLD + "Scoring:\n" + ChatColor.RESET +
+                    "- +1 point for completing a lap\n" +
+                    "- +1 point for every player beaten on a lap\n" +
+                    "- +8 points for finishing the course\n" +
+                    "- +4 points for every player beaten on the final lap\n" +
+                    "- Top 8 Bonuses- 1st:+25, 2nd,3rd:+15, 4th,5th:+10, 6th-8th:+5";
+            case "BuildMart":
+                return ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                    "- +3 points **per player** for completing a build\n" +
+                    "- +3 points **per player** for each team outplaced\n" +
+                    "- Max +3 points **per player** for each build partially completed at game end";
+            case "Skybattle":
+                return ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                    "- +15 points for eliminations\n" +
+                    "- +15 points for winning the round\n" +
+                    "- +1 point for outliving another player";
+            case "Spleef":
+                return ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                        "- +2 points for outliving another player\n" +
+                        "- +2 points for spleefing another player\n" +
+                        "- +4 points for every player on the last fully alive team\n" +
+                        "- Placement Bonuses - 1st: +20, 2nd: +15, 3rd: +10, 4th,5th: +8, 6th,7th: +5, 8th,9th: +3";
+            case "SurvivalGames":
+                return ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                        "- +10 points for eliminations\n" +
+                        "- +2 points for every player outlived\n" +
+                        "- Team Bonuses (split amongst team):\n" +
+                        "     - 1st: +10 points, 2nd:+8 points, 3rd: +7 points, 4th: +6 points, 5th: +5 points, 6th: +4 points";
+            case "TGTTOS":
+                return ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                                "- +1 point for completing the course\n" +
+                                "- +1 point for every player outplaced\n" +
+                                "- +4 points for each player on the first full team to finish a course\n" +
+                                "- +2 points for each player on the second full team to finish a course\n" +
+                                "- +5 bonus points for placing Top 3 in a course\n";
+            default:
+                return ChatColor.RED + "Invalid game!\n" + ChatColor.RESET;
+        }
+    }
+
     /**
      * Access to current event activity
      * @return Minigame currentGame
@@ -637,8 +680,8 @@ public class MBC implements Listener {
      */
     public void announce(String s) {
         StringBuilder str = new StringBuilder();
-        str.append(ChatColor.GREEN + "\n+=+=+=+=+=+=+=+=+=+=" + MBC.MBC_STRING_PREFIX + "+=+=+=+=+=+=+=+=+=+=\n");
-        str.append(s);
+        str.append(ChatColor.GREEN + "\n+=+=+=+=+=+=+=+=+=+=" + MBC.MBC_STRING_PREFIX + ChatColor.GREEN + "+=+=+=+=+=+=+=+=+=+\n");
+        str.append("\n" + ChatColor.RESET + s);
         str.append(ChatColor.GREEN + "\n\n+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+\n");
         Bukkit.broadcastMessage(str.toString());
     }
@@ -650,14 +693,20 @@ public class MBC implements Listener {
             p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + " Your team was already ready!");
         }
 
+
         if (ready.size() == getValidTeams().size()) {
-            // start event
-            startEvent();
+            if (getValidTeams().size() == 0) {
+                // awwwwwww
+                announce("There are no teams! You may want to assign teams first!");
+            } else {
+                // WOOOOOOO
+                startEvent();
+            }
         }
     }
 
     private void startEvent() {
-        lobby.setGameState(GameState.STARTING);
+        lobby.setGameState(GameState.TUTORIAL);
         announce(ChatColor.BOLD + "The event is starting!" + ChatColor.RESET + "\nYou may want to turn JUKEBOX sounds down.");
         lobby.setTimer(65);
     }

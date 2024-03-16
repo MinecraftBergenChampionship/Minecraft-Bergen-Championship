@@ -3,7 +3,11 @@ package me.kotayka.mbc;
 import me.kotayka.mbc.NPCs.NPC;
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -47,7 +51,7 @@ public class Lobby extends Minigame {
             createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team: " + p.getTeam().teamNameFormat(), p);
         } else {
             createLine(21, ChatColor.RED+""+ChatColor.BOLD + "Waiting for players...", p);
-            createLine(18, "Teams Ready: ", p);
+            createLine(18, ChatColor.GREEN + "Teams Ready: ", p);
         }
         createLine(19, ChatColor.RESET.toString(), p);
         //createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team: " + p.getTeam().teamNameFormat(), p);
@@ -73,12 +77,21 @@ public class Lobby extends Minigame {
     }
 
     public void changeTeam(Participant p) {
-        createLine(17, p.getTeam().getChatColor()+p.getTeam().getTeamFullName(), p);
+        //createLine(17, p.getTeam().getChatColor()+p.getTeam().getTeamFullName(), p);
     }
 
     public void events() {
-        if (getState().equals(GameState.STARTING)) {
-            startingEvents(timeRemaining);
+        if (getState().equals(GameState.TUTORIAL)) {
+            if (timeRemaining == 0) {
+                setGameState(GameState.STARTING);
+                timeRemaining = 16;
+            } else {
+                startingEvents(timeRemaining);
+            }
+        } else if (getState().equals(GameState.STARTING)) {
+            if (timeRemaining == 0) {
+                toVoting();
+            }
         } else if (getState().equals(GameState.ACTIVE)) {
             if (timeRemaining == 0) {
                 toVoting();
@@ -205,8 +218,12 @@ public class Lobby extends Minigame {
 
     public void toVoting() {
         HandlerList.unregisterAll(this);
-        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().decisionDome, MBC.getInstance().plugin);
-        MBC.getInstance().decisionDome.start();
+        if (MBC.getInstance().decisionDome == null) {
+            MBC.getInstance().startGame(0);
+        } else {
+            MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().decisionDome, MBC.getInstance().plugin);
+            MBC.getInstance().decisionDome.start();
+        }
     }
 
     @EventHandler
@@ -225,7 +242,17 @@ public class Lobby extends Minigame {
         if (!e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
         if (!e.getPlayer().getLocation().getWorld().equals(world)) return;
         if (e.getClickedBlock() == null) return;
-        if (e.getClickedBlock().getType().equals(Material.DAYLIGHT_DETECTOR)) {
+        if (e.getClickedBlock().getType().equals(Material.OAK_WALL_SIGN)) {
+            Block sign = e.getClickedBlock();
+            String[] lines = ((Sign) sign.getState()).getLines();
+            if (lines.length != 4) return;
+
+            if (lines[1].equals("External")) {
+                e.getPlayer().setResourcePack("https://download.mc-packs.net/pack/befa3f484caa75efa3a540342491e43082c346ea.zip", "befa3f484caa75efa3a540342491e43082c346ea");
+            } else if (lines[1].equals("our custom")) {
+                e.getPlayer().setResourcePack("https://download.mc-packs.net/pack/29992d6ccc406ad11e0550b17126ac1cb8f72b8a.zip", "29992d6ccc406ad11e0550b17126ac1cb8f72b8a");
+            }
+        } else if (e.getClickedBlock().getType().equals(Material.DAYLIGHT_DETECTOR)) {
             e.setCancelled(true);
         }
     }
@@ -326,6 +353,7 @@ public class Lobby extends Minigame {
 
     @Override
     public void loadPlayers() {
+        world.setTime(6000);
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(LOBBY);
         }
@@ -405,9 +433,7 @@ public class Lobby extends Minigame {
     }
 
     public void startingEvents(int timeRemaining) {
-        if (timeRemaining == 0) {
-            toVoting();
-        } else if (timeRemaining == 63) {
+        if (timeRemaining == 63) {
             world.setTime(23225);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1, false, false));
@@ -415,6 +441,7 @@ public class Lobby extends Minigame {
         } else if (timeRemaining == 60) {
             cameraman = (ArmorStand) world.spawnEntity(new Location(world, -8.5, 0, 0, -90, -11), EntityType.ARMOR_STAND);
             for (Player p : Bukkit.getOnlinePlayers()) {
+                p.playSound(p, Sound.MUSIC_DISC_STRAD, SoundCategory.RECORDS, 1, 1);
                 p.removePotionEffect(PotionEffectType.BLINDNESS);
                 p.setGameMode(GameMode.SPECTATOR);
                 p.setSpectatorTarget(cameraman);
@@ -676,11 +703,17 @@ public class Lobby extends Minigame {
 
     @EventHandler
     public void onReconnect(PlayerJoinEvent e) {
-        if (getState().equals(GameState.END_ROUND) && timeRemaining > 60) {
+        if (getState().equals(GameState.END_ROUND) && timeRemaining > 60 || getState().equals(GameState.TUTORIAL) && timeRemaining > 20) {
             e.getPlayer().setGameMode(GameMode.SPECTATOR);
             e.getPlayer().setSpectatorTarget(cameraman);
         } else {
-            e.getPlayer().teleport(LOBBY);
+            Player p = e.getPlayer();
+            p.teleport(LOBBY);
+            p.getInventory().clear();
+            p.setInvulnerable(false);
+            p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+            p.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 99999999, 255, false, false));
         }
     }
 }

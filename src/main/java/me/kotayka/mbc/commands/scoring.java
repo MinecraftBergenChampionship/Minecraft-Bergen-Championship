@@ -19,10 +19,10 @@ public class scoring implements CommandExecutor {
                 sender.sendMessage("[" + ChatColor.GREEN + "scoring" + ChatColor.RESET + "] Invalid game name!");
                 return true;
             }
-            Game game = MBC.getInstance().getGame(MBC.gameNameList.get(MBC.gameNameList.indexOf(args[0])));
+            String game = MBC.getInstance().getGame(MBC.gameNameList.get(MBC.gameNameList.indexOf(args[0]))).gameName;
             sender.sendMessage(ChatColor.GREEN + "---------------------------------------");
             sender.sendMessage("\n");
-            sender.sendMessage(game.getScoring());
+            sender.sendMessage(MBC.getScoring(game));
             sender.sendMessage("\n");
             sender.sendMessage(ChatColor.GREEN + "---------------------------------------");
             return true;
@@ -31,10 +31,10 @@ public class scoring implements CommandExecutor {
                 sender.sendMessage("[" + ChatColor.GREEN + "scoring" + ChatColor.RESET + "] Usage: /scoring <game> or use during a game.");
                 return true;
             }
-            Game curr = MBC.getInstance().getGame();
+            String curr = MBC.getInstance().getGame().gameName;
             sender.sendMessage(ChatColor.GREEN + "---------------------------------------");
             sender.sendMessage("\n");
-            sender.sendMessage(curr.getScoring());
+            sender.sendMessage(MBC.getScoring(curr));
             sender.sendMessage("\n");
             sender.sendMessage(ChatColor.GREEN + "---------------------------------------");
             return true;
