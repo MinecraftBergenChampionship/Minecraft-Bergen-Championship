@@ -8,7 +8,6 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -121,7 +120,7 @@ public class Quickfire extends FinaleGame {
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             createLineAll(20, ChatColor.RED.toString() + ChatColor.BOLD + "Time: " + getFormattedTime(timeElapsed));
-            if (timeElapsed == 90) {
+            if (timeElapsed == 60) {
                 for (Participant p : firstPlace.teamPlayers) {
                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 100000, 2, false, false));
                 }
@@ -173,8 +172,13 @@ public class Quickfire extends FinaleGame {
         }
     }
 
-    private void endRound() {
+    private void endRound(MBCTeam winner) {
+        for (Arrow a : world.getEntitiesByClass(Arrow.class)) {
+            a.remove();
+        }
+
         timeElapsed = 0;
+        Bukkit.broadcastMessage("\n"+winner.teamNameFormat() + " have won the round!\n");
         createScoreboard();
         for (Participant p : firstPlace.teamPlayers) {
             p.getPlayer().setInvulnerable(true);
@@ -196,7 +200,8 @@ public class Quickfire extends FinaleGame {
     }
 
     @EventHandler
-    public void arrowHitWall(ProjectileHitEvent e) {
+    public void arrowHit(ProjectileHitEvent e) {
+        if (!getState().equals(GameState.ACTIVE)) return;
         if (!(e.getEntity() instanceof Arrow)) return;
         Arrow arrow = (Arrow) e.getEntity();
         if (!(arrow.getShooter() instanceof Player)) return;
@@ -205,44 +210,19 @@ public class Quickfire extends FinaleGame {
             Participant shot = Participant.getParticipant((Player) e.getHitEntity());
             Participant damager = Participant.getParticipant((Player) arrow.getShooter());
             damager.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(shot.getFormattedName() + " - " + ChatColor.RED + shot.getPlayer().getHealth() + " ♥"));
+            damager.getPlayer().playSound(damager.getPlayer(), Sound.ENTITY_ARROW_HIT, 1, 1);
             if (shot.getPlayer().getHealth() <= 2) {
                 Death(shot, damager);
             } else {
                 shot.getPlayer().damage(2);
-                shot.getPlayer().setVelocity(new Vector(arrow.getVelocity().getX()*0.1, 0.3, arrow.getVelocity().getY()*0.1));
-                damager.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(shot.getFormattedName() + " - " + ChatColor.RED + shot.getPlayer().getHealth() + " ♥"));
+                shot.getPlayer().setVelocity(new Vector(arrow.getVelocity().getX()*0.15, 0.3, arrow.getVelocity().getZ()*0.15));
             }
         }
     }
-
-    /*
-    @EventHandler
-    public void arrowHitPlayer(EntityDamageByEntityEvent e) {
-        if (!(e.getEntity() instanceof Player)) return;
-        Participant victim = Participant.getParticipant((Player) e.getEntity());
-        if (!(e.getDamager() instanceof Arrow)) return;
-        Arrow arrow = (Arrow) e.getDamager();
-        if (!(arrow.getShooter() instanceof Player)) return;
-        Participant shooter = Participant.getParticipant((Player) arrow.getShooter());
-        e.setDamage(2);
-
-        if (victim.getPlayer().getHealth() <= 2) {
-            Death(victim, shooter);
-            arrow.remove();
-            e.setCancelled(true);
-        } else {
-            shooter.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(victim.getFormattedName() + " - " + ChatColor.RED + victim.getPlayer().getHealth() + " ♥"));
-            for (Participant p : MBC.mbc.getPlayersAndSpectators()) {
-                if (!(p.getTeam().equals(firstPlace)) && !(p.getTeam().equals(secondPlace))) {
-                    p.getPlayer().sendMessage(shooter.getFormattedName() + ChatColor.RED + " has shot " + victim.getFormattedName() + "!");
-                }
-            }
-        }
-    }
-     */
 
     private void Death(Participant victim, Participant killer) {
         MBC.spawnFirework(victim);
+        victim.getPlayer().setGameMode(GameMode.SPECTATOR);
         killer.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(victim.getFormattedName() + " - " + ChatColor.RED + "0 ♥"));
         Bukkit.broadcastMessage(victim.getFormattedName() + " was shot by " + killer.getFormattedName());
 
@@ -253,7 +233,7 @@ public class Quickfire extends FinaleGame {
             } else {
                 score[1]++;
                 if (score[1] == 3) endGame(secondPlace);
-                else endRound();
+                else endRound(secondPlace);
             }
         } else {
             if (playersAlive[1] != 1) {
@@ -262,7 +242,7 @@ public class Quickfire extends FinaleGame {
             } else {
                 score[0]++;
                 if (score[0] == 3) endGame(firstPlace);
-                else endRound();
+                else endRound(firstPlace);
             }
         }
     }
@@ -306,6 +286,7 @@ public class Quickfire extends FinaleGame {
     public void onDisconnect(PlayerQuitEvent e) {
         Participant p = Participant.getParticipant(e.getPlayer());
         if (p == null) return;
+        if (!(p.getTeam().equals(firstPlace) && p.getTeam().equals(secondPlace))) return;
 
         disconnect = true;
         Bukkit.broadcastMessage(p.getFormattedName() + " disconnected!");
@@ -315,7 +296,7 @@ public class Quickfire extends FinaleGame {
             } else {
                 score[1]++;
                 if (score[1] == 3) endGame(secondPlace);
-                else endRound();
+                else endRound(secondPlace);
             }
         } else {
             if (playersAlive[1] != 1) {
@@ -323,9 +304,8 @@ public class Quickfire extends FinaleGame {
             } else {
                 score[0]++;
                 if (score[0] == 3) endGame(firstPlace);
-                else endRound();
+                else endRound(firstPlace);
             }
-
         }
     }
 
@@ -373,11 +353,11 @@ public class Quickfire extends FinaleGame {
 
             world.getBlockAt(-23, y, -1).setType(m);
             world.getBlockAt(-23, y, 0).setType(m);
-            world.getBlockAt(-23, y, -1).setType(m);
+            world.getBlockAt(-23, y, 1).setType(m);
 
             world.getBlockAt(-15, y, -1).setType(m);
             world.getBlockAt(-15, y, 0).setType(m);
-            world.getBlockAt(-15, y, -1).setType(m);
+            world.getBlockAt(-15, y, 1).setType(m);
 
             world.getBlockAt(-22, y, 2).setType(m);
             world.getBlockAt(-16, y, 2).setType(m);
@@ -402,11 +382,11 @@ public class Quickfire extends FinaleGame {
 
             world.getBlockAt(23, y, -1).setType(m);
             world.getBlockAt(23, y, 0).setType(m);
-            world.getBlockAt(23, y, -1).setType(m);
+            world.getBlockAt(23, y, 1).setType(m);
 
             world.getBlockAt(15, y, -1).setType(m);
             world.getBlockAt(15, y, 0).setType(m);
-            world.getBlockAt(15, y, -1).setType(m);
+            world.getBlockAt(15, y, 1).setType(m);
 
             world.getBlockAt(22, y, 2).setType(m);
             world.getBlockAt(16, y, 2).setType(m);

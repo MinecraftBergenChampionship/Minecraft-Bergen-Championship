@@ -21,7 +21,7 @@ import java.util.List;
 public class Classic extends SkybattleMap {
     private final Location CENTER = new Location(getWorld(), 0, 100, 0);
     //public final double RADIUS_SHRINK_AMOUNT = 0.37;
-    public final double RADIUS_SHRINK_AMOUNT = 0.25;
+    public final double RADIUS_SHRINK_AMOUNT = 0.35;
     public final double HEIGHT_SHRINK_AMOUNT = 0.22;
     private float borderRadius = 80;
     private final Location[] SPAWNS = {
