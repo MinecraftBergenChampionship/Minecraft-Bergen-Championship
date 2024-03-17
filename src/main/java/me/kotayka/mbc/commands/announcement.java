@@ -23,7 +23,7 @@ public class announcement implements CommandExecutor {
         }
 
         String s = String.join(" ", args);
-        MBC.getInstance().announce(s);
+        MBC.announce(s);
 
         return true;
     }

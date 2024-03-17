@@ -29,11 +29,7 @@ public class readycheck implements CommandExecutor {
 
         MBC.getInstance().readyCheck = true;
 
-        StringBuilder readyString = new StringBuilder();
-        readyString.append(ChatColor.GREEN + "\n+=+=+=+=+=+=+=+=+=+=" + MBC.MBC_STRING_PREFIX + "+=+=+=+=+=+=+=+=+=+=\n")
-                .append("\n /ready has been enabled! When your team is fully ready, use /ready!\n")
-                .append(ChatColor.GREEN + "\n+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+\n");
-        Bukkit.broadcastMessage(readyString.toString());
+        MBC.announce("/ready has been enabled! When your team is fully ready, use /ready!");
 
         return true;
     }

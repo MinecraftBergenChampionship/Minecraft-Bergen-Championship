@@ -84,7 +84,7 @@ public class MBC implements Listener {
     //public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt","Quickfire"));
     public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire"));
     //public final List<Game> gameList = new ArrayList<Game>(6);
-    public static final String MBC_STRING_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "MBC" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: ";
+    public static final String MBC_STRING_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "MBC" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: " + ChatColor.RESET;
     private List<String> mutedMessages = new LinkedList<String>();
 
     // Define Special Blocks
@@ -93,6 +93,7 @@ public class MBC implements Listener {
     public static final Material BOOST_PAD = Material.WAXED_EXPOSED_CUT_COPPER;
     public static final Material MEGA_BOOST_PAD = Material.WAXED_WEATHERED_CUT_COPPER;
     public static final Material JUMP_PAD = Material.WAXED_WEATHERED_COPPER;
+    public static final PotionEffect SATURATION = new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false);
     public double multiplier = 1;
 
     public static NPCManager npcManager;
@@ -678,9 +679,10 @@ public class MBC implements Listener {
      * Create an announcement with string s.
      * @param s String to be broadcasted; should not end with a newline.
      */
-    public void announce(String s) {
+    public static void announce(String s) {
         StringBuilder str = new StringBuilder();
-        str.append(ChatColor.GREEN + "\n+=+=+=+=+=+=+=+=+=+=" + MBC.MBC_STRING_PREFIX + ChatColor.GREEN + "+=+=+=+=+=+=+=+=+=+\n");
+        String MBC_TITLE = ChatColor.RESET.toString() + ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "MBC" + ChatColor.WHITE + "" + ChatColor.BOLD + "]" + ChatColor.RESET;
+        str.append(ChatColor.GREEN + "\n+=+=+=+=+=+=+=+=+=+=" + MBC_TITLE + ChatColor.GREEN + "+=+=+=+=+=+=+=+=+=+\n");
         str.append("\n" + ChatColor.RESET + s);
         str.append(ChatColor.GREEN + "\n\n+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+\n");
         Bukkit.broadcastMessage(str.toString());
@@ -688,6 +690,7 @@ public class MBC implements Listener {
 
     public void ready(MBCTeam t, Player p) {
         if (ready.add(t)) {
+            Bukkit.broadcastMessage(t.teamNameFormat() + " are ready!");
             p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.GREEN + " Successfully readied up!");
         } else {
             p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + " Your team was already ready!");

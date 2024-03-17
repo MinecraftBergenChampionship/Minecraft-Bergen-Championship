@@ -112,7 +112,7 @@ public class BuildMart extends Game {
                 }
                 setGameState(GameState.STARTING);
                 timeRemaining = 30;
-            } else if (timeRemaining != 7) {
+            } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
         } else if (getState().equals(GameState.STARTING)) {

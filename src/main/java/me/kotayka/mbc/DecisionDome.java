@@ -384,25 +384,23 @@ public class DecisionDome extends Minigame {
                 }
             }
         } else {
+            List<MBCTeam> candidates = new ArrayList<>();
             for (MBCTeam t : MBC.getInstance().getValidTeams()) {
-                List<MBCTeam> candidates = new ArrayList<>(3);
-                Bukkit.broadcastMessage(candidates.size()+"");
                 if (t.getPlace() >= teams.size()-2) {
                     Bukkit.broadcastMessage(candidates.size()+"");
-                    candidates.set(teams.size()-t.getPlace(), t);
+                    candidates.add(t);
                 }
-                // randomly choose either team 6th, 5th, or 4th
-                Bukkit.broadcastMessage(candidates+"");
-                int r = (int)(Math.random()*candidates.size());
-                powerupTeams.add(candidates.get(r));
-                candidates.remove(r);
-                int r2 = (int)(Math.random()*candidates.size());
-                powerupTeams.add(candidates.get(r2));
             }
+            // randomly choose either team 6th, 5th, or 4th
+            int r = (int)(Math.random()*candidates.size());
+            powerupTeams.add(candidates.get(r));
+            candidates.remove(r);
+            int r2 = (int)(Math.random()*candidates.size());
+            powerupTeams.add(candidates.get(r2));
         }
 
         for (MBCTeam t : powerupTeams) {
-            Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.LIGHT_PURPLE + " was chosen to receive a powerup!");
+            Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.LIGHT_PURPLE + " were chosen to receive a powerup!");
             for (Participant p : t.getPlayers()) {
                 p.getPlayer().spawnParticle(Particle.VILLAGER_HAPPY, p.getPlayer().getLocation().add(0, 0.75, 0), 3);
             }

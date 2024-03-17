@@ -82,6 +82,7 @@ public class Lobby extends Minigame {
         if (getState().equals(GameState.TUTORIAL)) {
             if (timeRemaining == 0) {
                 setGameState(GameState.STARTING);
+                MBC.announce("Prepare to get warped into the decision dome!");
                 timeRemaining = 16;
             } else {
                 startingEvents(timeRemaining);
@@ -122,7 +123,7 @@ public class Lobby extends Minigame {
                     //Bukkit.broadcastMessage("[Debug] reveal == " + reveal);
                 }
                 case 95 -> {
-                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nNow for the Dodgebolt Qualifiers!\n");
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nNow for the Finale Qualifiers!\n");
                 }
                 case 90 -> {
                     String title = String.format("In %s1st", ChatColor.GOLD);
@@ -155,7 +156,7 @@ public class Lobby extends Minigame {
                     MBC.sendTitle(ChatColor.BOLD+"In " + ChatColor.GRAY+"2nd", "By " + gap + " points", 0, 140, 20);
                 }
                 case 75 -> {
-                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nPlaying in dodgebolt...\n");
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nPlaying in the finale...\n");
                 }
                 case 73 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nare...\n");
@@ -216,6 +217,7 @@ public class Lobby extends Minigame {
 
     public void toVoting() {
         HandlerList.unregisterAll(this);
+        setGameState(GameState.INACTIVE);
         if (MBC.getInstance().decisionDome == null) {
             MBC.getInstance().startGame(0);
         } else {
@@ -229,6 +231,7 @@ public class Lobby extends Minigame {
         if (!e.getPlayer().getWorld().equals(world)) return;
 
         if (getState().equals(GameState.END_ROUND) && e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) { e.setCancelled(true); }
+        if (getState().equals(GameState.TUTORIAL) && e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) { e.setCancelled(true); }
 
         if (e.getPlayer().getLocation().getY() < -45){
             e.getPlayer().teleport(LOBBY);
@@ -333,7 +336,7 @@ public class Lobby extends Minigame {
     // prevent leaving cutscenes
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent e) {
-        if (!(getState().equals(GameState.END_ROUND) || getState().equals(GameState.STARTING))) return;
+        if (!(getState().equals(GameState.END_ROUND) && getState().equals(GameState.TUTORIAL))) return;
 
         if (e.getPlayer().getSpectatorTarget() != null && e.getPlayer().getSpectatorTarget().equals(cameraman)) {
             e.setCancelled(true);
@@ -381,6 +384,8 @@ public class Lobby extends Minigame {
 
     public void loadPlayersEnd() {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            p.getPlayer().setMaxHealth(20);
+            p.getPlayer().addPotionEffect(MBC.SATURATION);
             if (p.winner) {
                 p.getPlayer().teleport(new Location(world, 49.5, 0.5, 0.5, 90, 0));
                 p.getPlayer().getInventory().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
@@ -431,13 +436,20 @@ public class Lobby extends Minigame {
     }
 
     public void startingEvents(int timeRemaining) {
-        if (timeRemaining == 63) {
+        if (timeRemaining == 20) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                MBC.announce("The Minecraft Championship is about to begin!");
+                p.setGameMode(GameMode.ADVENTURE);
+                p.teleport(LOBBY);
+            }
+            cameraman.remove();
+        } else if (timeRemaining == 63) {
             world.setTime(23225);
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1, false, false));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 1, false, false));
             }
         } else if (timeRemaining == 60) {
-            cameraman = (ArmorStand) world.spawnEntity(new Location(world, -8.5, 0, 0, -90, -11), EntityType.ARMOR_STAND);
+            cameraman = (ArmorStand) world.spawnEntity(new Location(world, -8.5, 0, 0.5, -90, -11), EntityType.ARMOR_STAND);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p, Sound.MUSIC_DISC_STRAD, SoundCategory.RECORDS, 1, 1);
                 p.removePotionEffect(PotionEffectType.BLINDNESS);
@@ -450,12 +462,6 @@ public class Lobby extends Minigame {
             }
         } else if (timeRemaining < 60 && timeRemaining > 20 && timeRemaining % 7 == 0) {
             introTeam();
-        } else if (timeRemaining == 20) {
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                p.setGameMode(GameMode.ADVENTURE);
-                p.teleport(LOBBY);
-            }
-            cameraman.remove();
         }
     }
     /*
@@ -485,7 +491,7 @@ public class Lobby extends Minigame {
     private void introTeam() {
         List<MBCTeam> teams = getValidTeams();
         if (introCounter >= teams.size()) {
-            timeRemaining = 20;
+            timeRemaining = 21;
         } else {
             MBCTeam intro = teams.get(introCounter++);
             if (lastIntro.size() != 0) {
@@ -498,6 +504,8 @@ public class Lobby extends Minigame {
             lastIntro.addAll(intro.getPlayers());
             for (Participant p : intro.getPlayers()) {
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
+                p.getPlayer().getInventory().clear();
+                MBC.spawnFirework(new Location(world, 0.5, 2, 0.5), p.getTeam().getColor());
                 p.getPlayer().teleport(new Location(world, 0, 1, 0, 90, 0));
             }
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -711,7 +719,7 @@ public class Lobby extends Minigame {
             p.setInvulnerable(false);
             p.removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-            p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 99999999, 255, false, false));
+            p.addPotionEffect(MBC.SATURATION);
         }
     }
 }
