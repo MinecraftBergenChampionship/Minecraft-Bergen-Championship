@@ -403,12 +403,14 @@ public class SurvivalGames extends Game {
      * If empty, updates list of eligible Super Chests.
      */
     public void regenChest() {
-        double totalWeight = 0;
+        double totalWeight = 116.5;
         // delete when final.
+        /*
         for (SurvivalGamesItem item : items) {
             totalWeight += item.getWeight();
         }
         Bukkit.broadcastMessage("[Debug] Total Weight == " + totalWeight);
+         */
 
 
         Random rand = new Random();

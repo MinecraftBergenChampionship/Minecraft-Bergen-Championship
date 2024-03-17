@@ -3,11 +3,9 @@ package me.kotayka.mbc;
 import me.kotayka.mbc.NPCs.NPC;
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
-import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -247,9 +245,9 @@ public class Lobby extends Minigame {
             String[] lines = ((Sign) sign.getState()).getLines();
             if (lines.length != 4) return;
 
-            if (lines[1].equals("External")) {
+            if (lines[1].equals(ChatColor.BOLD + "External")) {
                 e.getPlayer().setResourcePack("https://download.mc-packs.net/pack/befa3f484caa75efa3a540342491e43082c346ea.zip", "befa3f484caa75efa3a540342491e43082c346ea");
-            } else if (lines[1].equals("our custom")) {
+            } else if (lines[1].equals(ChatColor.BOLD + "our custom")) {
                 e.getPlayer().setResourcePack("https://download.mc-packs.net/pack/29992d6ccc406ad11e0550b17126ac1cb8f72b8a.zip", "29992d6ccc406ad11e0550b17126ac1cb8f72b8a");
             }
         } else if (e.getClickedBlock().getType().equals(Material.DAYLIGHT_DETECTOR)) {

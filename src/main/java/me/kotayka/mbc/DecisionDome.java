@@ -199,7 +199,7 @@ public class DecisionDome extends Minigame {
                     createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Deciding game...");
                     timeRemaining = 17;
                 }
-                case 44 -> startVoting();
+                case 39 -> startVoting();
             }
         } else if (getState().equals(GameState.END_ROUND)) {
             switch (timeRemaining) {
@@ -386,10 +386,13 @@ public class DecisionDome extends Minigame {
         } else {
             for (MBCTeam t : MBC.getInstance().getValidTeams()) {
                 List<MBCTeam> candidates = new ArrayList<>(3);
+                Bukkit.broadcastMessage(candidates.size()+"");
                 if (t.getPlace() >= teams.size()-2) {
+                    Bukkit.broadcastMessage(candidates.size()+"");
                     candidates.set(teams.size()-t.getPlace(), t);
                 }
                 // randomly choose either team 6th, 5th, or 4th
+                Bukkit.broadcastMessage(candidates+"");
                 int r = (int)(Math.random()*candidates.size());
                 powerupTeams.add(candidates.get(r));
                 candidates.remove(r);

@@ -358,15 +358,65 @@ public class Quickfire extends FinaleGame {
     public void Barriers(boolean b) {
         Material m = b ? Material.BARRIER : Material.AIR;
 
-        int[] blocks_x = new int[] {15, 15, 16, 17, 18, 19, 20, 21, 22, 23, 23};
-        int[] blocks_z = new int[] { 0,  1,  2,  3,  4,  4,  4,  3,  2,  1,  0};
-        for (int y = -60; y <= -59; y++) {
-            for (int i = 0; i < blocks_z.length; i++) {
-                world.getBlockAt(blocks_x[i], y, blocks_z[i]).setType(m);
-                world.getBlockAt(-blocks_x[i], y, blocks_z[i]).setType(m);
-                world.getBlockAt(blocks_x[i], y, -blocks_z[i]).setType(m);
-                world.getBlockAt(-blocks_x[i], y, -blocks_z[i]).setType(m);
-            }
+        // TODO make this not dumb as shi
+        for (int y = -60; y <=-59; y++) {
+            // first place team
+            world.getBlockAt(-18, y, -4).setType(m);
+            world.getBlockAt(-19, y, -4).setType(m);
+            world.getBlockAt(-20, y, -4).setType(m);
+
+            world.getBlockAt(-21, y, -3).setType(m);
+            world.getBlockAt(-17, y, -3).setType(m);
+
+            world.getBlockAt(-16, y, -2).setType(m);
+            world.getBlockAt(-22, y, -2).setType(m);
+
+            world.getBlockAt(-23, y, -1).setType(m);
+            world.getBlockAt(-23, y, 0).setType(m);
+            world.getBlockAt(-23, y, -1).setType(m);
+
+            world.getBlockAt(-15, y, -1).setType(m);
+            world.getBlockAt(-15, y, 0).setType(m);
+            world.getBlockAt(-15, y, -1).setType(m);
+
+            world.getBlockAt(-22, y, 2).setType(m);
+            world.getBlockAt(-16, y, 2).setType(m);
+
+            world.getBlockAt(-17, y, 3).setType(m);
+            world.getBlockAt(-21, y, 2).setType(m);
+
+            world.getBlockAt(-18, y, 4).setType(m);
+            world.getBlockAt(-19, y, 4).setType(m);
+            world.getBlockAt(-20, y, 4).setType(m);
+
+            // second place team
+            world.getBlockAt(18, y, -4).setType(m);
+            world.getBlockAt(19, y, -4).setType(m);
+            world.getBlockAt(20, y, -4).setType(m);
+
+            world.getBlockAt(21, y, -3).setType(m);
+            world.getBlockAt(17, y, -3).setType(m);
+
+            world.getBlockAt(16, y, -2).setType(m);
+            world.getBlockAt(22, y, -2).setType(m);
+
+            world.getBlockAt(23, y, -1).setType(m);
+            world.getBlockAt(23, y, 0).setType(m);
+            world.getBlockAt(23, y, -1).setType(m);
+
+            world.getBlockAt(15, y, -1).setType(m);
+            world.getBlockAt(15, y, 0).setType(m);
+            world.getBlockAt(15, y, -1).setType(m);
+
+            world.getBlockAt(22, y, 2).setType(m);
+            world.getBlockAt(16, y, 2).setType(m);
+
+            world.getBlockAt(17, y, 3).setType(m);
+            world.getBlockAt(21, y, 2).setType(m);
+
+            world.getBlockAt(18, y, 4).setType(m);
+            world.getBlockAt(19, y, 4).setType(m);
+            world.getBlockAt(20, y, 4).setType(m);
         }
     }
 }

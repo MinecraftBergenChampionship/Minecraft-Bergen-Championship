@@ -54,7 +54,7 @@ public class HotSprings extends SpleefMap {
     public void deleteMap() {
         for (int paste_to_x = -18; paste_to_x <= 17; paste_to_x++) {
             for (int paste_to_z = -17; paste_to_z <= 17; paste_to_z++) {
-                for (int y = 100; y<= 109; y++) {
+                for (int y = 98; y<= 109; y++) {
                     getWorld().getBlockAt(paste_to_x, y, paste_to_z).setType(Material.AIR);
                 }
             }
@@ -63,8 +63,8 @@ public class HotSprings extends SpleefMap {
 
     @Override
     public void Border(int timeRemaining) {
-        if (timeRemaining <= 210 && timeRemaining % 30 == 0) {
-            Bukkit.broadcastMessage(ChatColor.RED + "The decaying layer is rising!");
+        if ((timeRemaining <= 210 && timeRemaining % 30 == 0 || timeRemaining <= 120 && timeRemaining % 15 == 0) && maxErosionLayer < 12) {
+            Bukkit.broadcastMessage(ChatColor.RED + "The decay is rising!");
             maxErosionLayer++;
         }
 
