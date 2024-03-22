@@ -77,7 +77,7 @@ public class FinaleGame extends Minigame {
             case 2 -> winsTwo = "② ② ③ " + secondPlace.teamNameFormat();
             case 3 -> winsTwo = "② ② ④ " + secondPlace.teamNameFormat();
         }
-        createLine(22, ChatColor.AQUA.toString()+ChatColor.BOLD+"Final Game: " + ChatColor.RESET+"Dodgebolt", p);
+        createLine(22, ChatColor.AQUA.toString()+ChatColor.BOLD+"Final Game: " + ChatColor.RESET+gameName, p);
         createLine(1, winsOne, p);
         createLine(0, winsTwo, p);
     }

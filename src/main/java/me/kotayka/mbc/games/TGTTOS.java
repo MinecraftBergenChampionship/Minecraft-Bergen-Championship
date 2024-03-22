@@ -181,6 +181,7 @@ public class TGTTOS extends Game {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().setVelocity(new Vector(0, 0, 0));
             p.getPlayer().teleport(map.getSpawnLocation());
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             if (p.getTeam().equals(MBC.getInstance().spectator)) {
                 p.getPlayer().setGameMode(GameMode.SPECTATOR);
             }

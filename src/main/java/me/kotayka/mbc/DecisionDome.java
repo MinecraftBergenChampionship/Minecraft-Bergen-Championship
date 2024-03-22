@@ -402,7 +402,7 @@ public class DecisionDome extends Minigame {
         for (MBCTeam t : powerupTeams) {
             Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.LIGHT_PURPLE + " were chosen to receive a powerup!");
             for (Participant p : t.getPlayers()) {
-                p.getPlayer().spawnParticle(Particle.VILLAGER_HAPPY, p.getPlayer().getLocation().add(0, 0.75, 0), 3);
+                p.getPlayer().spawnParticle(Particle.VILLAGER_HAPPY, p.getPlayer().getLocation().add(0.5, 0.75, 0.5), 3);
             }
         }
     }

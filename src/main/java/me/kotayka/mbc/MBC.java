@@ -374,6 +374,17 @@ public class MBC implements Listener {
         for (Participant p : players) {
             if (e.getPlayer().getUniqueId().equals(p.getPlayer().getUniqueId())) {
                 msg = msg.replace("%", "%%");
+                //msg = msg.replace(":skull:", "💀");
+                msg = msg.replace(":blue:", "Ⓑ");
+                msg = msg.replace(":green:", "Ⓖ");
+                msg = msg.replace(":red:", "Ⓡ");
+                msg = msg.replace(":yellow:", "Ⓨ");
+                msg = msg.replace(":pink:", "Ⓟ");
+                msg = msg.replace(":purple:", "Ⓤ");
+                msg = msg.replace(":crown:", "④");
+                msg = msg.replace(":dub:", "④");
+                msg = msg.replace(":win:", "④");
+                msg = msg.replace(":w:", "④");
                 msg = p.getFormattedName() + ": " + msg;
                 e.setFormat(msg);
                 break;

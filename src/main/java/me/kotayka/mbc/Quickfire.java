@@ -15,6 +15,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.NameTagVisibility;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
@@ -81,9 +83,12 @@ public class Quickfire extends FinaleGame {
 
     @Override
     public void start() {
+        // stopTimer() and the commands to deregister lobby/dd should prob be moved to super.start()
+        stopTimer();
         if (firstPlace == null) { return; }
         MBC.getInstance().setCurrentGame(this);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
+        changeColor();
         loadPlayers();
         setGameState(GameState.TUTORIAL);
         setTimer(53);
@@ -97,12 +102,18 @@ public class Quickfire extends FinaleGame {
             p.getPlayer().setGameMode(GameMode.SPECTATOR);
             p.getPlayer().getInventory().clear();
             p.getPlayer().teleport(SPAWN);
+            p.board.getTeam(firstPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+            p.board.getTeam(secondPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
         }
     }
 
     @Override
     public void events() {
         if (getState().equals(GameState.TUTORIAL)) {
+            if (timeRemaining < 0) {
+                Bukkit.broadcastMessage("tutorial negative");
+                timeRemaining = 53;
+            }
             if (timeRemaining == 0) {
                 startRound();
                 setGameState(GameState.STARTING);
@@ -113,30 +124,31 @@ public class Quickfire extends FinaleGame {
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining == 0) {
                 Barriers(false);
-                setGameState(GameState.STARTING);
-                timeRemaining = 8000;
+                setGameState(GameState.ACTIVE);
+                timeRemaining = 3600;
             } else {
                 startingCountdown();
             }
         } else if (getState().equals(GameState.ACTIVE)) {
-            createLineAll(20, ChatColor.RED.toString() + ChatColor.BOLD + "Time: " + getFormattedTime(timeElapsed));
+            createLineAll(20, ChatColor.RED.toString() + ChatColor.BOLD + "Time: " + ChatColor.RESET + getFormattedTime(timeElapsed));
             if (timeElapsed == 60) {
                 for (Participant p : firstPlace.teamPlayers) {
-                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 100000, 2, false, false));
+                    if (!p.getPlayer().getGameMode().equals(GameMode.SPECTATOR))
+                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 100000, 2, false, false));
                 }
                 for (Participant p : secondPlace.teamPlayers) {
-                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 100000, 2, false, false));
+                    if (!p.getPlayer().getGameMode().equals(GameMode.SPECTATOR))
+                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 100000, 2, false, false));
                 }
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + ChatColor.BOLD + " All players are now glowing!");
             }
             timeElapsed++;
         } else if (getState().equals(GameState.END_ROUND)) {
             if (timeRemaining == 0) {
+                resetMap();
                 startRound();
                 setGameState(GameState.STARTING);
                 timeRemaining = 10;
-            } else if (timeRemaining == 5) {
-                resetMap();
             }
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 0) {
@@ -148,22 +160,27 @@ public class Quickfire extends FinaleGame {
     public void startRound() {
         Barriers(true);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            createLine(21, ChatColor.RESET.toString(), p);
             p.getInventory().clear();
             p.getPlayer().setInvulnerable(false);
             if (p.getTeam().equals(firstPlace)) {
                 p.getPlayer().setMaxHealth(8);
                 p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
                 p.getInventory().addItem(CROSSBOW);
+                p.getInventory().addItem(new ItemStack(Material.ARROW,64));
                 p.getInventory().setBoots(firstPlace.getColoredLeatherArmor(BOOTS));
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
                 p.getPlayer().teleport(TEAM_ONE_SPAWN);
+                p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
             } else if (p.getTeam().equals(secondPlace)) {
                 p.getPlayer().setMaxHealth(8);
                 p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
                 p.getInventory().addItem(CROSSBOW);
+                p.getInventory().addItem(new ItemStack(Material.ARROW,64));
                 p.getInventory().setBoots(secondPlace.getColoredLeatherArmor(BOOTS));
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
                 p.getPlayer().teleport(TEAM_TWO_SPAWN);
+                p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
             } else {
                 p.getPlayer().setGameMode(GameMode.SPECTATOR);
                 p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
@@ -209,13 +226,14 @@ public class Quickfire extends FinaleGame {
         if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
             Participant shot = Participant.getParticipant((Player) e.getHitEntity());
             Participant damager = Participant.getParticipant((Player) arrow.getShooter());
-            damager.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(shot.getFormattedName() + " - " + ChatColor.RED + shot.getPlayer().getHealth() + " ♥"));
-            damager.getPlayer().playSound(damager.getPlayer(), Sound.ENTITY_ARROW_HIT, 1, 1);
+            damager.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(shot.getFormattedName() + " - " + ChatColor.RED + ((int)(shot.getPlayer().getHealth()-2))/2+ " ♥"));
+            damager.getPlayer().playSound(damager.getPlayer(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
             if (shot.getPlayer().getHealth() <= 2) {
                 Death(shot, damager);
             } else {
                 shot.getPlayer().damage(2);
                 shot.getPlayer().setVelocity(new Vector(arrow.getVelocity().getX()*0.15, 0.3, arrow.getVelocity().getZ()*0.15));
+                arrow.remove();
             }
         }
     }
@@ -250,6 +268,7 @@ public class Quickfire extends FinaleGame {
     private void endGame(MBCTeam t) {
         Bukkit.broadcastMessage("\n" + t.teamNameFormat() + " win MBC!\n");
         for (Player p : Bukkit.getOnlinePlayers()) {
+            p.removePotionEffect(PotionEffectType.GLOWING);
             createScoreboard();
             p.sendTitle(t.teamNameFormat() + " win MBC!", " ", 0, 100, 20);
             p.stopSound(Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS);
@@ -269,9 +288,13 @@ public class Quickfire extends FinaleGame {
         setGameState(GameState.INACTIVE);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            p.board.getTeam(firstPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+            p.board.getTeam(secondPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+            p.getPlayer().setMaxHealth(20);
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+            p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().getInventory().clear();
             p.getPlayer().setExp(0);
@@ -374,7 +397,7 @@ public class Quickfire extends FinaleGame {
             world.getBlockAt(19, y, -4).setType(m);
             world.getBlockAt(20, y, -4).setType(m);
 
-            world.getBlockAt(21, y, -3).setType(m);
+            world.getBlockAt(21, y, 3).setType(m);
             world.getBlockAt(17, y, -3).setType(m);
 
             world.getBlockAt(16, y, -2).setType(m);
@@ -397,6 +420,33 @@ public class Quickfire extends FinaleGame {
             world.getBlockAt(18, y, 4).setType(m);
             world.getBlockAt(19, y, 4).setType(m);
             world.getBlockAt(20, y, 4).setType(m);
+        }
+    }
+
+    private void changeColor() {
+        Material first = firstPlace.getConcrete().getType();
+        Material second = secondPlace.getConcrete().getType();
+
+        // spawn area floor
+        for (int x = 16; x <= 22; x++) {
+            for (int z = -3; z <= 3; z++) {
+                if (x == 16 || x == 22 && z >= -1 && z <= 1) {
+                    world.getBlockAt(x, -61, z).setType(first);
+                    world.getBlockAt(-x, -61, z).setType(second);
+                } else if (z == -2 || z == 2 && x >= 18 && x <= 20) {
+                    world.getBlockAt(x, -61, z).setType(first);
+                    world.getBlockAt(-x, -61, z).setType(second);
+                } else {
+                    world.getBlockAt(x, -61, z).setType(first);
+                    world.getBlockAt(-x, -61, z).setType(second);
+                }
+            }
+        }
+
+        // wool blocks on bridge
+        for (int z = -6; z <= 6; z+=2) {
+            world.getBlockAt(12, -57, z).setType(first);
+            world.getBlockAt(-12, -57, z).setType(second);
         }
     }
 }

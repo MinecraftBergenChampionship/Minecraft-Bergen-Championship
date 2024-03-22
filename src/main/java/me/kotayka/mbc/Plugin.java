@@ -19,6 +19,7 @@ public class Plugin extends JavaPlugin implements Listener {
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             MBC.getInstance().players.add(new Participant(p));
+            p.setMaxHealth(20);
             p.setInvulnerable(false);
         }
         Bukkit.getLogger().info("MBC enabled");

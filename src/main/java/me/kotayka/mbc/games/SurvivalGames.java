@@ -120,6 +120,8 @@ public class SurvivalGames extends Game {
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 10, false, false));
+            p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
         }
         updatePlayersAliveScoreboard();
@@ -204,6 +206,7 @@ public class SurvivalGames extends Game {
                     timeRemaining = 45;
                 } else {
                     for (Participant p : playersAlive) {
+                        createLine(23, ChatColor.RED+"Round Over!", p);
                         MBCTeam t = p.getTeam();
                         teamPlacements.put(t, 1);
                     }
@@ -271,7 +274,7 @@ public class SurvivalGames extends Game {
                     teamPlacements.put(t, 1);
                 }
                 placementPoints();
-                //createLineAll(23, "\n");
+                createLineAll(23, ChatColor.RED+"Round Over!");
                 if (!firstRound) {
                     gameOverGraphics();
                     roundWinners(0);
@@ -403,9 +406,10 @@ public class SurvivalGames extends Game {
      * If empty, updates list of eligible Super Chests.
      */
     public void regenChest() {
-        double totalWeight = 116.5;
-        // delete when final.
+        double totalWeight = 115.5;
         /*
+        //double totalWeight = 0;
+        // delete when final.
         for (SurvivalGamesItem item : items) {
             totalWeight += item.getWeight();
         }

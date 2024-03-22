@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -88,6 +89,12 @@ public class Lobby extends Minigame {
                 startingEvents(timeRemaining);
             }
         } else if (getState().equals(GameState.STARTING)) {
+            if (timeRemaining == 5) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
+                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 110, 1, false, false));
+                }
+            }
             if (timeRemaining == 0) {
                 toVoting();
             }
@@ -207,7 +214,7 @@ public class Lobby extends Minigame {
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining < 0) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.sendTitle(ChatColor.YELLOW+"Event Over!", "Thanks for playing!", 20, 60, 20);
+                    p.sendTitle(ChatColor.YELLOW+"Event Over!", "Thanks for playing!", 20, 120, 20);
                     createLineAll(21, ChatColor.GREEN.toString()+ChatColor.BOLD+"Event Over!");
                     createLineAll(20, "Thanks for playing!");
                 }
@@ -281,6 +288,7 @@ public class Lobby extends Minigame {
         world.setTime(18000);
         loadPlayersEnd();
         updateTeamStandings();
+        MBC.getInstance().lobby.populatePodium();
         stopTimer();
         setTimer(28);
     }
@@ -386,6 +394,7 @@ public class Lobby extends Minigame {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().setMaxHealth(20);
             p.getPlayer().addPotionEffect(MBC.SATURATION);
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
             if (p.winner) {
                 p.getPlayer().teleport(new Location(world, 49.5, 0.5, 0.5, 90, 0));
                 p.getPlayer().getInventory().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
@@ -403,9 +412,11 @@ public class Lobby extends Minigame {
     }
 
     public void toFinale() {
+        Bukkit.broadcastMessage("toFinale() 1");
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
         setGameState(GameState.INACTIVE);
 
+        Bukkit.broadcastMessage("toFinale() 2");
         toQuickfire();
         // toDodgebolt();
     }
@@ -418,6 +429,9 @@ public class Lobby extends Minigame {
                 MBC.getInstance().quickfire = new Quickfire(reveal.get(reveal.size()-1), reveal.get(reveal.size()-2));
             }
         }
+
+        HandlerList.unregisterAll(MBC.getInstance().lobby);
+        HandlerList.unregisterAll(MBC.getInstance().decisionDome);
 
         //MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().dodgebolt, MBC.getInstance().plugin);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
@@ -527,22 +541,22 @@ public class Lobby extends Minigame {
     private Location placeLocation(int place) {
         switch(place) {
             case 6 -> {
-                return new Location(world, -18, -1, -24);
+                return new Location(world, -18, -0.5, -24);
             }
             case 5 -> {
-                return new Location(world, -17, 0, -28);
+                return new Location(world, -17, 0.5, -28);
             }
             case 4 -> {
-                return new Location(world, -18, 1, -32);
+                return new Location(world, -18, 1.5, -32);
             }
             case 3 -> {
-                return new Location(world, -20, 2, -29);
+                return new Location(world, -20, 2.5, -29);
             }
             case 2 -> {
-                return new Location(world, -24, 3, -27);
+                return new Location(world, -24, 3.5, -27);
             }
             case 1 -> {
-                return new Location(world, -25, 4, -31);
+                return new Location(world, -25, 4.5, -31);
             }
             default -> {
                 return null;
@@ -556,7 +570,18 @@ public class Lobby extends Minigame {
         }
 
         podiumNPCS = new ArrayList<>();
+        Location[] locs = {
+                new Location(this.world, -9.5, 3, -33.5, -0, 0),
+                new Location(this.world, -7.5, 2, -36.5, -0, 0),
+                 new Location(this.world, -4.5, 1, -38.5, -0, 0),
+                 new Location(this.world, -1.5, 0, -39.5, -0, 0),
+                new Location(this.world, 2.5, 0, -39.5, -0, 0),
+                new Location(this.world, 5.5, 0, -38.5, -0, 0),
+                new Location(this.world, 8.5, 0, -36.5, -0, 0),
+                new Location(this.world, 10.5, 0, -33.5, -0, 0),
+        };
 
+        /*
         Location[][] locs = {
                 { new Location(this.world, -62.5, 15, -7.5, -90, 0), new Location(this.world, -9.5, 3, -33.5, -0, 0)},
                 { new Location(this.world, -65.5, 14, -5.5, -90, 0), new Location(this.world, -7.5, 2, -36.5, -0, 0)},
@@ -567,6 +592,7 @@ public class Lobby extends Minigame {
                 { new Location(this.world, -62.5, 11, 8.5, -90, 0), new Location(this.world, 8.5, 0, -36.5, -0, 0)},
                 { new Location(this.world, -59.5, 11, 9.5, -90, 0), new Location(this.world, 10.5, 0, -33.5, -0, 0)},
         };
+         */
 
         List<Participant> individual = MBC.getInstance().getPlayers();
         individual.sort(new TotalIndividualComparator());
@@ -579,16 +605,16 @@ public class Lobby extends Minigame {
                 return;
             }
 
-            Location l_0 = locs[i][0];
-            Location l_1 = locs[i][1];
+            Location l_0 = locs[i];
+            //Location l_1 = locs[i][1];
 
             NPC npc1 = MBC.npcManager.createNPC(p,l_0);
-            NPC npc2 = MBC.npcManager.createNPC(p,l_1);
+            //NPC npc2 = MBC.npcManager.createNPC(p,l_1);
 
             MBC.npcManager.showAll(npc1);
-            MBC.npcManager.showAll(npc2);
+            //MBC.npcManager.showAll(npc2);
             podiumNPCS.add(npc1);
-            podiumNPCS.add(npc2);
+            //podiumNPCS.add(npc2);
         }
     }
 

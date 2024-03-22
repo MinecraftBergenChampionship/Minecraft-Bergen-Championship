@@ -53,7 +53,7 @@ public class NPC {
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
         WorldServer world = ((CraftWorld) Objects.requireNonNull((player).getWorld())).getHandle();
 
-        String[] things = getRequest(player.getName());
+        String[] things = getRequest(player.getUniqueId().toString());
 
         String texture = things[0];
         String signature = things[1];
@@ -94,12 +94,8 @@ public class NPC {
         this.viewers.remove(p);
     }
 
-    public String[] getRequest(String name)  {
+    public String[] getRequest(String uuid)  {
         try {
-            URL url_0 = new URL("https://api.mojang.com/users/profiles/minecraft/" + name);
-            InputStreamReader reader_0 = new InputStreamReader(url_0.openStream());
-            String uuid = new JsonParser().parse(reader_0).getAsJsonObject().get("id").getAsString();
-
             URL url_1 = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false");
             InputStreamReader reader_1 = new InputStreamReader(url_1.openStream());
             JsonObject textureProperty = new JsonParser().parse(reader_1).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();

@@ -31,6 +31,16 @@ public class HotSprings extends SpleefMap {
         // paste map
         int copy_from_x = -218;
         int copy_from_z = 183;
+        /*
+        for (int y = 98; y <= 109; y++) {
+            for (int paste_to_x = -18; paste_to_x <= 17; paste_to_x++) {
+                for (int paste_to_z = -17; paste_to_z <= 17; paste_to_z++) {
+
+                }
+            }
+        }
+         */
+
         for (int paste_to_x = -18; paste_to_x <= 17; paste_to_x++) {
             for (int paste_to_z = -17; paste_to_z <= 17; paste_to_z++) {
                 int y_index = 0;

@@ -48,7 +48,7 @@
 
   { "material": "EXPERIENCE_BOTTLE", "stack_max": 3, "weight": 3},
   { "material": "STICK", "stack_max": 2, "weight": 3},
-  { "material": "FEATHER", "stack_max": 3, "weight": 2.5},
-  { "material": "FLINT", "stack_max": 2, "weight": 2.5},
+  { "material": "FEATHER", "stack_max": 3, "weight": 2},
+  { "material": "FLINT", "stack_max": 2, "weight": 2},
   { "material": "STRING", "stack_max": 2, "weight": 2.5}
 ]

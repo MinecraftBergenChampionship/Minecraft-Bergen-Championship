@@ -79,7 +79,9 @@ public class Skybattle extends Game {
             p.getPlayer().setHealth(20);
 
             p.getPlayer().removePotionEffect(PotionEffectType.JUMP);
-            p.getPlayer().addPotionEffect(MBC.SATURATION);
+            p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false));
             if (roundNum == 1) {
                 skybattlePlayerMap.put(p.getPlayer().getUniqueId(), new SkybattlePlayer(p));
                 playersAlive.add(p);

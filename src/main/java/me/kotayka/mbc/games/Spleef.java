@@ -130,6 +130,8 @@ public class Spleef extends Game {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
+            p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             if (roundNum == 0) {
                 spleefPlayers.put(p.getPlayer().getUniqueId(), new SpleefPlayer(p));
                 playersAlive.add(p);
