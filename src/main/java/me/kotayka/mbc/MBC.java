@@ -218,36 +218,36 @@ public class MBC implements Listener {
     public static String getScoring(String str) {
         switch(str) {
             case "AceRace":
-                return ChatColor.BOLD + "Scoring:\n" + ChatColor.RESET +
+                return ChatColor.BOLD + "Ace Race Scoring:\n" + ChatColor.RESET +
                     "- +1 point for completing a lap\n" +
                     "- +1 point for every player beaten on a lap\n" +
                     "- +8 points for finishing the course\n" +
                     "- +4 points for every player beaten on the final lap\n" +
                     "- Top 8 Bonuses- 1st:+25, 2nd,3rd:+15, 4th,5th:+10, 6th-8th:+5";
             case "BuildMart":
-                return ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                    "- +3 points **per player** for completing a build\n" +
-                    "- +3 points **per player** for each team outplaced\n" +
+                return ChatColor.BOLD + "Build Mart Scoring: \n" + ChatColor.RESET +
+                    "- +3 points " + ChatColor.BOLD + "per player" + ChatColor.RESET + " for completing a build\n" +
+                    "- +3 points " + ChatColor.BOLD + "per player" + ChatColor.RESET + " for each team outplaced\n" +
                     "- Max +3 points **per player** for each build partially completed at game end";
             case "Skybattle":
-                return ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                return ChatColor.BOLD + "Skybattle Scoring: \n" + ChatColor.RESET +
                     "- +15 points for eliminations\n" +
                     "- +15 points for winning the round\n" +
                     "- +1 point for outliving another player";
             case "Spleef":
-                return ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                return ChatColor.BOLD + "Spleef Scoring: \n" + ChatColor.RESET +
                         "- +2 points for outliving another player\n" +
                         "- +2 points for spleefing another player\n" +
                         "- +4 points for every player on the last fully alive team\n" +
                         "- Placement Bonuses - 1st: +20, 2nd: +15, 3rd: +10, 4th,5th: +8, 6th,7th: +5, 8th,9th: +3";
             case "SurvivalGames":
-                return ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                return ChatColor.BOLD + "Survival Games Scoring: \n" + ChatColor.RESET +
                         "- +10 points for eliminations\n" +
                         "- +2 points for every player outlived\n" +
                         "- Team Bonuses (split amongst team):\n" +
                         "     - 1st: +10 points, 2nd:+8 points, 3rd: +7 points, 4th: +6 points, 5th: +5 points, 6th: +4 points";
             case "TGTTOS":
-                return ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                return ChatColor.BOLD + "TGTTOS Scoring: \n" + ChatColor.RESET +
                                 "- +1 point for completing the course\n" +
                                 "- +1 point for every player outplaced\n" +
                                 "- +4 points for each player on the first full team to finish a course\n" +

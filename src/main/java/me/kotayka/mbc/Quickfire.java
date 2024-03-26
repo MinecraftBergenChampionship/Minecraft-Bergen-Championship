@@ -57,6 +57,7 @@ public class Quickfire extends FinaleGame {
         ItemMeta bowMeta = CROSSBOW.getItemMeta();
         bowMeta.setUnbreakable(true);
         CROSSBOW.setItemMeta(bowMeta);
+        CROSSBOW.addEnchantment(Enchantment.QUICK_CHARGE, 3);
 
         playersAlive = new int[]{firstPlace.teamPlayers.size(), secondPlace.teamPlayers.size()};
     }
@@ -117,7 +118,7 @@ public class Quickfire extends FinaleGame {
             if (timeRemaining == 0) {
                 startRound();
                 setGameState(GameState.STARTING);
-                timeRemaining = 20;
+                timeRemaining = 30;
             } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
@@ -127,6 +128,11 @@ public class Quickfire extends FinaleGame {
                 setGameState(GameState.ACTIVE);
                 timeRemaining = 3600;
             } else {
+                if (timeRemaining == 16) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
+                    }
+                }
                 startingCountdown();
             }
         } else if (getState().equals(GameState.ACTIVE)) {
@@ -197,11 +203,10 @@ public class Quickfire extends FinaleGame {
         timeElapsed = 0;
         Bukkit.broadcastMessage("\n"+winner.teamNameFormat() + " have won the round!\n");
         createScoreboard();
-        for (Participant p : firstPlace.teamPlayers) {
-            p.getPlayer().setInvulnerable(true);
-        }
-        for (Participant p : secondPlace.teamPlayers) {
-            p.getPlayer().setInvulnerable(true);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.stopSound(Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS);
+            p.setInvulnerable(true);
+            p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
         }
         playersAlive[0] = firstPlace.teamPlayers.size();
         playersAlive[1] = secondPlace.teamPlayers.size();
@@ -363,7 +368,7 @@ public class Quickfire extends FinaleGame {
 
         // TODO make this not dumb as shi
         for (int y = -60; y <=-59; y++) {
-            // first place team
+            // second place team
             world.getBlockAt(-18, y, -4).setType(m);
             world.getBlockAt(-19, y, -4).setType(m);
             world.getBlockAt(-20, y, -4).setType(m);
@@ -386,13 +391,13 @@ public class Quickfire extends FinaleGame {
             world.getBlockAt(-16, y, 2).setType(m);
 
             world.getBlockAt(-17, y, 3).setType(m);
-            world.getBlockAt(-21, y, 2).setType(m);
+            //world.getBlockAt(-21, y, -2).setType(m);
 
             world.getBlockAt(-18, y, 4).setType(m);
             world.getBlockAt(-19, y, 4).setType(m);
             world.getBlockAt(-20, y, 4).setType(m);
 
-            // second place team
+            // first place team
             world.getBlockAt(18, y, -4).setType(m);
             world.getBlockAt(19, y, -4).setType(m);
             world.getBlockAt(20, y, -4).setType(m);
@@ -415,7 +420,7 @@ public class Quickfire extends FinaleGame {
             world.getBlockAt(16, y, 2).setType(m);
 
             world.getBlockAt(17, y, 3).setType(m);
-            world.getBlockAt(21, y, 2).setType(m);
+            //world.getBlockAt(21, y, -2).setType(m);
 
             world.getBlockAt(18, y, 4).setType(m);
             world.getBlockAt(19, y, 4).setType(m);
@@ -430,6 +435,7 @@ public class Quickfire extends FinaleGame {
         // spawn area floor
         for (int x = 16; x <= 22; x++) {
             for (int z = -3; z <= 3; z++) {
+                if (world.getBlockAt(x,-61, z).getType().equals(Material.MYCELIUM)) continue;
                 if (x == 16 || x == 22 && z >= -1 && z <= 1) {
                     world.getBlockAt(x, -61, z).setType(first);
                     world.getBlockAt(-x, -61, z).setType(second);

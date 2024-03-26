@@ -35,7 +35,7 @@ public class TGTTOS extends Game {
     private TGTTOSMap map = null;
     private List<TGTTOSMap> maps = new ArrayList<>(
             Arrays.asList(new Pit(), new Meatball(), new Walls(),
-                    new Cliffs(), new Elytra(), new Skydive(),
+                    new Cliffs(), new Elytra(), //new Skydive(),
                     new Boats() //, new Glide()
             ));
 

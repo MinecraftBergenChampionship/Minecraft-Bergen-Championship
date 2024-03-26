@@ -152,6 +152,8 @@ public class Skybattle extends Game {
                 for (SkybattlePlayer p : skybattlePlayerMap.values()) {
                     p.getPlayer().setInvulnerable(false);
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
+                    p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+                    p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
                 }
                 timeRemaining = 240;
             }

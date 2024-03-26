@@ -19,7 +19,7 @@ public class scoring implements CommandExecutor {
                 sender.sendMessage("[" + ChatColor.GREEN + "scoring" + ChatColor.RESET + "] Invalid game name!");
                 return true;
             }
-            String game = MBC.getInstance().getGame(MBC.gameNameList.get(MBC.gameNameList.indexOf(args[0]))).gameName;
+            String game = args[0];
             sender.sendMessage(ChatColor.GREEN + "---------------------------------------");
             sender.sendMessage("\n");
             sender.sendMessage(MBC.getScoring(game));

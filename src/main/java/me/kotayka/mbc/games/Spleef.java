@@ -373,9 +373,9 @@ public class Spleef extends Game {
             if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
                 Player p = (Player) e.getHitEntity();
                 Participant shooter = Participant.getParticipant((Player) e.getEntity().getShooter());
+                SpleefPlayer s = getSpleefPlayer(p);
 
                 snowballHit((Snowball) e.getEntity(), p);
-                SpleefPlayer s = getSpleefPlayer(p);
                 s.setLastDamager(shooter);
                 s.setResetTime(timeRemaining-RESET_DAMAGE_TIME);
             }

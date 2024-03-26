@@ -7,17 +7,21 @@ import me.kotayka.mbc.gameMaps.sgMaps.BCA;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
+import org.bukkit.block.Container;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -181,6 +185,8 @@ public class SurvivalGames extends Game {
                 map.setBarriers(false);
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
+                    p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+                    p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
                 }
                 setGameState(GameState.ACTIVE);
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Grace ends in 30 seconds!");
@@ -488,16 +494,59 @@ public class SurvivalGames extends Game {
         if (!(e.getAction().isRightClick())) return;
         Player p = e.getPlayer();
 
-        if (p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW || p.getInventory().getItemInOffHand().getType() == Material.MUSHROOM_STEW) {
-            eatMushroomStew(p);
-            return;
-        }
-
         // Custom GUI for Enchanting
         if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.ENCHANTING_TABLE)) {
             e.setCancelled(true);
             setupGUI(e.getPlayer());
             return;
+        }
+
+        if (e.getClickedBlock() != null && e.getClickedBlock() instanceof Container &&
+                (!e.getClickedBlock().getType().equals(Material.CHEST) && !e.getClickedBlock().getType().equals(Material.CRAFTING_TABLE))) {
+           e.setCancelled(true);
+           return;
+        }
+
+        if (p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW || p.getInventory().getItemInOffHand().getType() == Material.MUSHROOM_STEW) {
+            eatMushroomStew(p);
+            return;
+        }
+
+        if (p.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW)) {
+            CrossbowMeta cb1 = (CrossbowMeta) p.getInventory().getItemInMainHand().getItemMeta();
+            if (!cb1.getChargedProjectiles().isEmpty()) {
+                return;
+            }
+            // check if there exists another crossbow loaded in inventory
+            for (ItemStack i : p.getInventory()) {
+                if (i != null && i.getType().equals(Material.CROSSBOW)) {
+                    CrossbowMeta cb2 = (CrossbowMeta) i.getItemMeta();
+                    if (!cb2.getChargedProjectiles().isEmpty()) {
+                        p.sendMessage(ChatColor.RED+"You cannot load more than one crossbow!");
+                        e.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
+
+        if (p.getInventory().getItemInOffHand().getType().equals(Material.CROSSBOW)) {
+            CrossbowMeta cb1 = (CrossbowMeta) p.getInventory().getItemInOffHand().getItemMeta();
+            if (!cb1.getChargedProjectiles().isEmpty()) {
+                return;
+            }
+
+            // check if there exists another crossbow loaded in inventory
+            for (ItemStack i : p.getInventory()) {
+                if (i != null && i.getType().equals(Material.CROSSBOW)) {
+                    CrossbowMeta cb2 = (CrossbowMeta) i.getItemMeta();
+                    if (!cb2.getChargedProjectiles().isEmpty()) {
+                        p.sendMessage(ChatColor.RED+"You cannot load more than one crossbow!");
+                        e.setCancelled(true);
+                        return;
+                    }
+                }
+            }
         }
 
         // Track opened crates
@@ -576,6 +625,29 @@ public class SurvivalGames extends Game {
         }
     }
 
+    // Prevent players from picking up crossbows that are loaded
+    @EventHandler
+    public void PickupItem(EntityPickupItemEvent e) {
+        if (!(e.getEntity() instanceof Player)) return;
+        if (!(e.getItem().getItemStack().getType().equals(Material.CROSSBOW))) return;
+
+        CrossbowMeta cbm = (CrossbowMeta) e.getItem().getItemStack().getItemMeta();
+        // if loaded crossbow
+        if (!cbm.getChargedProjectiles().isEmpty()) {
+            Player p = (Player) e.getEntity();
+            for (ItemStack i : p.getInventory()) {
+                if (i != null && i.getType().equals(Material.CROSSBOW)) {
+                    CrossbowMeta cbm2 = (CrossbowMeta) i.getItemMeta();
+                    if (!cbm2.getChargedProjectiles().isEmpty()) {
+                        p.sendMessage(ChatColor.RED + "You cannot have more than one charged crossbow!");
+                        e.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * TODO: better standardization across maps
      * For now: prevent blocks from being broken if they are not glass blocks
@@ -639,6 +711,27 @@ public class SurvivalGames extends Game {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
+        if (e.getView().getType().equals(InventoryType.CHEST)) {
+            Player p = (Player) e.getWhoClicked();
+            ItemStack crossbow = e.getCursor();
+            if (crossbow == null || !crossbow.getType().equals(Material.CROSSBOW)) return;
+            CrossbowMeta cbm1 = (CrossbowMeta) crossbow.getItemMeta();
+            // check if player has another charged crossbow
+            if (!cbm1.getChargedProjectiles().isEmpty()) {
+                for (ItemStack i : p.getInventory()) {
+                    if (i != null && i.getType().equals(Material.CROSSBOW)) {
+                        CrossbowMeta cbm2 = (CrossbowMeta) i.getItemMeta();
+                        if (!cbm2.getChargedProjectiles().isEmpty()) {
+                            p.sendMessage(ChatColor.RED + "You cannot have more than one charged crossbow!");
+                            e.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+            }
+            return;
+        }
+
         if (e.getView().getTitle().equals("Enchanting")) {
             // handle custom enchants;
             handleEnchantGUI(e);

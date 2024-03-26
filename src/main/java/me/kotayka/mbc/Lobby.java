@@ -83,6 +83,7 @@ public class Lobby extends Minigame {
         if (getState().equals(GameState.TUTORIAL)) {
             if (timeRemaining == 0) {
                 setGameState(GameState.STARTING);
+                createLineAll(21, ChatColor.RED+""+ChatColor.BOLD + "To Decision Dome in: ");
                 MBC.announce("Prepare to get warped into the decision dome!");
                 timeRemaining = 16;
             } else {
@@ -91,8 +92,9 @@ public class Lobby extends Minigame {
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining == 5) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
-                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 110, 1, false, false));
+                    p.removePotionEffect(PotionEffectType.SATURATION);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_PORTAL_TRAVEL, 1, 1);
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 110, 1, false, false));
                 }
             }
             if (timeRemaining == 0) {
@@ -278,7 +280,11 @@ public class Lobby extends Minigame {
         loadPlayers();
         updateTeamStandings();
         stopTimer();
-        setTimer(120);
+        if (MBC.getInstance().gameNum == 4) {
+            setTimer(300);
+        } else {
+            setTimer(120);
+        }
     }
 
     public void end() {
@@ -459,8 +465,9 @@ public class Lobby extends Minigame {
             cameraman.remove();
         } else if (timeRemaining == 63) {
             world.setTime(23225);
+            createLineAll(21, ChatColor.RED+""+ChatColor.BOLD + "Event begins in: ");
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 1, false, false));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 110, 1, false, false));
             }
         } else if (timeRemaining == 60) {
             cameraman = (ArmorStand) world.spawnEntity(new Location(world, -8.5, 0, 0.5, -90, -11), EntityType.ARMOR_STAND);
