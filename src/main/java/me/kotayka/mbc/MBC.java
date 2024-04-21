@@ -80,6 +80,7 @@ public class MBC implements Listener {
     public Quickfire quickfire = null;
     public boolean finalGame = false;
     public boolean readyCheck = false;
+    public boolean started = false;
 
     //public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt","Quickfire"));
     public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire"));
@@ -712,8 +713,8 @@ public class MBC implements Listener {
             if (getValidTeams().size() == 0) {
                 // awwwwwww
                 announce("There are no teams! You may want to assign teams first!");
-            } else {
-                // WOOOOOOO
+            } else if (!started) {
+                started = true;
                 startEvent();
             }
         }
