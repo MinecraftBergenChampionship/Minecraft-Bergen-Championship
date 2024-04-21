@@ -107,6 +107,9 @@ public class TGTTOS extends Game {
                 setPVP(true);
                 setGameState(GameState.ACTIVE);
                 timeRemaining = 120;
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS, 1, 1);
+                }
             } else {
                 Countdown();
             }
@@ -128,12 +131,18 @@ public class TGTTOS extends Game {
                 }
             }
         } else if (getState().equals(GameState.END_ROUND)) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
+            }
             if (timeRemaining == 0) {
                 startRound();
             } else if (timeRemaining == 4) {
                 roundOverGraphics();
             }
         } else if (getState().equals(GameState.END_GAME)) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
+            }
             if (timeRemaining == 36) {
                 gameOverGraphics();
             } else if (timeRemaining == 0) {

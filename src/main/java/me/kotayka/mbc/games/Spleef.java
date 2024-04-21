@@ -63,8 +63,8 @@ public class Spleef extends Game {
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +2 points for outliving another player\n" +
                         "- +2 points for spleefing another player\n" +
-                        "- +4 points for every player on the last fully alive team\n" +
-                        "- Placement Bonuses - 1st: +20, 2nd: +15, 3rd: +10, 4th,5th: +8, 6th,7th: +5, 8th,9th: +3"
+                        "- +3 points for every player on the last fully alive team\n" +
+                        "- Placement Bonuses - 1st: +10, 2nd,3rd: +8, 4th,5th: +5, 6th,7th,8th: +3"
         });
         lobby = new Location(Bukkit.getWorld("spleef"), 0, 126, 0);
         spawnpoint = new Location(Bukkit.getWorld("spleef"), 0, 115, 0);
