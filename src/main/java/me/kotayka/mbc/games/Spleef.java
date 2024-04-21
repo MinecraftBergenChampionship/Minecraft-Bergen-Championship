@@ -48,7 +48,7 @@ public class Spleef extends Game {
     private Map<Location, SpleefBlock> brokenBlocks = new HashMap<>();
     private final long DAMAGE_COOLDOWN = 850;
     //private final int[] BONUS_POINTS = {20, 15, 15, 10, 10, 8, 8, 8, 5, 5, 3, 3}; // 24 player; these numbers are arbitrary
-    //private final int[] BONUS_POINTS = {20, 15, 10, 8, 8, 5, 5, 3, 3}; // old ones from mbc3
+    //private final int[] BONUS_POINTS = {20, 15, 10, 8, 8, 5, 5, 3, 3}; // old from mbc3
     private final int[] BONUS_POINTS = {10, 8, 8, 5, 5, 3, 3, 3};
     // NOTE: 16 player bonus is probably different
 
