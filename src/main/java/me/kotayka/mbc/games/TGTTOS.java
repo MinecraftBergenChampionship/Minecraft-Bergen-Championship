@@ -40,7 +40,7 @@ public class TGTTOS extends Game {
             ));
 
     private List<Participant> finishedParticipants;
-    private String[] deathMessages = new String[52];
+    private ArrayList<String> deathMessages = new ArrayList<>();
     private List<Location> placedBlocks = new ArrayList<Location>(20);
     private boolean firstTeamBonus = false;  // determine whether or not a full team has completed yet
     private boolean secondTeamBonus = false;
@@ -317,7 +317,7 @@ public class TGTTOS extends Game {
             int i = 0;
             String line = null;
             while ((line = br.readLine()) != null) {
-                deathMessages[i] = line;
+                deathMessages.add(line);
                 i++;
             }
             br.close();
@@ -328,8 +328,8 @@ public class TGTTOS extends Game {
     }
 
     private void printDeathMessage(Participant p) {
-        int rand = (int) (Math.random() * deathMessages.length);
-        Bukkit.broadcastMessage(ChatColor.GRAY + deathMessages[rand].replace("{player}", p.getFormattedName() + ChatColor.GRAY));
+        int rand = (int) (Math.random() * deathMessages.size());
+        Bukkit.broadcastMessage(ChatColor.GRAY + deathMessages.get(rand).replace("{player}", p.getFormattedName() + ChatColor.GRAY));
     }
 
     private void Countdown() {
