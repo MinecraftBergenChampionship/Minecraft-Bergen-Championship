@@ -1,12 +1,14 @@
 package me.kotayka.mbc;
 
-import me.kotayka.mbc.NPCs.NPC;
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.SkeletonHorse;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
@@ -19,7 +21,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Team;
+import net.citizensnpcs.api.npc.NPC;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -573,7 +575,7 @@ public class Lobby extends Minigame {
 
     public void populatePodium() {
         for (NPC npc : podiumNPCS) {
-            MBC.npcManager.removeAll(npc);
+            MBC.npcManager.remove(npc);
         }
 
         podiumNPCS = new ArrayList<>();
@@ -618,7 +620,7 @@ public class Lobby extends Minigame {
             NPC npc1 = MBC.npcManager.createNPC(p,l_0);
             //NPC npc2 = MBC.npcManager.createNPC(p,l_1);
 
-            MBC.npcManager.showAll(npc1);
+            //MBC.npcManager.showAll(npc1);
             //MBC.npcManager.showAll(npc2);
             podiumNPCS.add(npc1);
             //podiumNPCS.add(npc2);
