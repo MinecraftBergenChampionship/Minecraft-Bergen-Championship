@@ -1,11 +1,13 @@
 package me.kotayka.mbc.NPCs;
 
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.event.DespawnReason;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import java.util.Iterator;
 
 import java.util.ArrayList;
 
@@ -26,6 +28,10 @@ public class NPCManager {
 
     public boolean remove(NPC npc) {
         return npc.isSpawned() && npc.despawn();
+    }
+
+    public void removeAllNPCs() {
+        CitizensAPI.getNPCRegistry().despawnNPCs(DespawnReason.PLUGIN);
     }
 }
 

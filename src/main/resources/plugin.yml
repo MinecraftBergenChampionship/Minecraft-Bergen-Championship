@@ -4,6 +4,7 @@ main: me.kotayka.mbc.Plugin
 api-version: '1.20'
 authors: [ Kotayka, rspacerr ]
 description: Minecraft Bruh Championship
+depend: [Citizens]
 commands:
   mbchelp:
     description: list all commands
@@ -66,3 +67,6 @@ commands:
     permission: minecraft.command.op
   scoring:
     description: retrieves scoring for the specified game
+  despawnNPCS:
+    description: despawns all NPCs
+    permission: minecraft.command.op

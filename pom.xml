@@ -100,6 +100,7 @@
         </repository>
         <repository>
             <id>citizens-repo</id>
+            <name>Citizens Repository</name>
             <url>https://maven.citizensnpcs.co/repo</url>
         </repository>
     </repositories>

@@ -62,6 +62,7 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("statlogs").setTabCompleter(new statlogsTabCompleter());
 
         getCommand("spawnNPC").setExecutor(new spawnNPC());
+        getCommand("despawnNPCS").setExecutor(new despawnNPCs());
         getCommand("invincible").setExecutor(new invincible());
 
         getCommand("removeSection").setExecutor(new removeSection());
