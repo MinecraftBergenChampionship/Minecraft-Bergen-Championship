@@ -1,8 +1,10 @@
 package me.kotayka.mbc.NPCs;
 
+import me.kotayka.mbc.Participant;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.DespawnReason;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.trait.SkinTrait;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -20,9 +22,16 @@ public class NPCManager {
     }
 
     public NPC createNPC(Player player, Location loc) {
-        NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, player.getName());
+        Participant p = Participant.getParticipant(player);
+
+        NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, p.getFormattedName());
         npcs.add(npc);
         npc.spawn(loc);
+
+        SkinTrait skinTrait = npc.getTrait(SkinTrait.class);
+        System.out.println(skinTrait.getSkinName());
+        skinTrait.setSkinName(player.getName());
+
         return npc;
     }
 
@@ -31,7 +40,7 @@ public class NPCManager {
     }
 
     public void removeAllNPCs() {
-        CitizensAPI.getNPCRegistry().despawnNPCs(DespawnReason.PLUGIN);
+        CitizensAPI.getNPCRegistry().deregisterAll();
     }
 }
 
