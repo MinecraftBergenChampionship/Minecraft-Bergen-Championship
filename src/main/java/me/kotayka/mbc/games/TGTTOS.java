@@ -131,19 +131,19 @@ public class TGTTOS extends Game {
                 }
             }
         } else if (getState().equals(GameState.END_ROUND)) {
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                p.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
-            }
             if (timeRemaining == 0) {
                 startRound();
             } else if (timeRemaining == 4) {
                 roundOverGraphics();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
+                }
             }
         } else if (getState().equals(GameState.END_GAME)) {
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                p.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
-            }
             if (timeRemaining == 36) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
+                }
                 gameOverGraphics();
             } else if (timeRemaining == 0) {
                 removePlacedBlocks();

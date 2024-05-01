@@ -25,8 +25,8 @@ import java.util.*;
 public class Spleef extends Game {
     private SpleefMap map = null;
     private List<SpleefMap> maps = new ArrayList<>(
-            Arrays.asList(new Classic(), new SkySpleef(), new HotSprings())
-            //Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings())
+            //Arrays.asList(new Classic(), new SkySpleef(), new HotSprings())
+            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings())
     );
     //private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
     //public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
@@ -88,6 +88,9 @@ public class Spleef extends Game {
     @Override
     public void start() {
         super.start();
+        map.deleteMap();
+        // above is tentative change bc last tournament a map loaded on top of another. this is to prevent that
+        // i dont rlly know where a map is put into place but im j hoping it isnt here
         setGameState(GameState.TUTORIAL);
         setTimer(53);
     }
@@ -99,7 +102,7 @@ public class Spleef extends Game {
         damageMap.clear();
         brokenBlocks.clear();
         maps = new ArrayList<>(
-                Arrays.asList(new Classic(), new Space(), new SkySpleef())
+                Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings())
         );
         brokenBlocks.clear();
         map.resetMap();
@@ -202,6 +205,9 @@ public class Spleef extends Game {
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS, 1, 1);
+                }
                 setGameState(GameState.ACTIVE);
                 timeRemaining = 240;
             }
@@ -216,12 +222,18 @@ public class Spleef extends Game {
                 }
 
                 if (roundNum < 3) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.stopSound(Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS);
+                    }
                     roundOverGraphics();
                     roundWinners(0);
                     placementPoints();
                     setGameState(GameState.END_ROUND);
                     timeRemaining = 9;
                 } else {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.stopSound(Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS);
+                    }
                     gameOverGraphics();
                     roundWinners(0);
                     placementPoints();

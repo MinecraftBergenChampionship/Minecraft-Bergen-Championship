@@ -717,6 +717,9 @@ public class MBC implements Listener {
                 started = true;
                 startEvent();
             }
+            else {
+                p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + " Please only use /ready after an admin has used the /readycheck command!");
+            }
         }
     }
 
