@@ -41,7 +41,6 @@ public class Participant {
         player=p;
         p.setScoreboard(board);
 
-        //Bukkit.broadcastMessage("[Debug] assigning team");
         changeTeam(MBC.getInstance().spectator);
         MBC.getInstance().participants.add(this);
     }

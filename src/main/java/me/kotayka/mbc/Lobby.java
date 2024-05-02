@@ -95,7 +95,7 @@ public class Lobby extends Minigame {
             if (timeRemaining == 5) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.removePotionEffect(PotionEffectType.SATURATION);
-                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_PORTAL_TRAVEL, 1, 1);
+                    p.playSound(p.getPlayer(), Sound.BLOCK_PORTAL_TRAVEL, 1, 1);
                     p.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 110, 1, false, false));
                 }
             }
@@ -131,7 +131,6 @@ public class Lobby extends Minigame {
                 case 127 -> {
                     reveal = getValidTeams();
                     reveal.sort(new TeamScoreSorter());
-                    //Bukkit.broadcastMessage("[Debug] reveal == " + reveal);
                 }
                 case 95 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nNow for the Finale Qualifiers!\n");

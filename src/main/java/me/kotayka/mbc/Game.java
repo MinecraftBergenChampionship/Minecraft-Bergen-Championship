@@ -603,10 +603,6 @@ public abstract class Game extends Minigame {
             p.resetCurrentScores();
         }
 
-        if (MBC.getInstance().decisionDome == null) {
-            Bukkit.broadcastMessage("[Debug] Decision Dome has not been loaded, you may need to start another game manually or reload!");
-        }
-
         MBC.getInstance().gameNum++;
 
         if (MBC.getInstance().finalGame) {

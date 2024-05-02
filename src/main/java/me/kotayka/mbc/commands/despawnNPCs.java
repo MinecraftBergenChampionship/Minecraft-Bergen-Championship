@@ -1,6 +1,7 @@
 package me.kotayka.mbc.commands;
 
 import me.kotayka.mbc.MBC;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -12,6 +13,7 @@ public class despawnNPCs implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             MBC.npcManager.removeAllNPCs();
+            sender.sendMessage(ChatColor.GREEN + " NPCs successfully removed.");
         }
         return true;
     }

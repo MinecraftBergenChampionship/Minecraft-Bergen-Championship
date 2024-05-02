@@ -69,7 +69,7 @@ public class teamscore implements CommandExecutor {
 
         ((Lobby)MBC.getInstance().getMinigame()).colorPodiums();
 
-        Bukkit.broadcastMessage("[Debug] " + sender.getName() + " successfully added " + amount + " points to " + args[1]);
+        Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + sender.getName() + " successfully added " + amount + " points to " + args[1]);
 
         return true;
     }

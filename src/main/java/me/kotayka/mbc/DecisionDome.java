@@ -387,7 +387,6 @@ public class DecisionDome extends Minigame {
             List<MBCTeam> candidates = new ArrayList<>();
             for (MBCTeam t : MBC.getInstance().getValidTeams()) {
                 if (t.getPlace() >= teams.size()-2) {
-                    Bukkit.broadcastMessage(candidates.size()+"");
                     candidates.add(t);
                 }
             }

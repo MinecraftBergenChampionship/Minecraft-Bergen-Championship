@@ -72,7 +72,7 @@ public class playerscore implements CommandExecutor {
         ((Lobby)MBC.getInstance().getMinigame()).colorPodiums();
         ((Lobby)MBC.getInstance().getMinigame()).updatePlayerTotalScoreDisplay(p);
 
-        Bukkit.broadcastMessage("[Debug] " + sender.getName() + " successfully added " + amount + " points to " + args[1]);
+        Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + sender.getName() + " successfully added " + amount + " points to " + args[1]);
 
         return true;
     }
