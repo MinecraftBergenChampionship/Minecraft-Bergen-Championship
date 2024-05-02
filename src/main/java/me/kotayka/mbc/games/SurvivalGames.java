@@ -181,6 +181,11 @@ public class SurvivalGames extends Game {
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
                 startingCountdown();
+                if (timeRemaining == 10) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.MUSIC_DISC_FAR, SoundCategory.RECORDS, 1, 1);
+                    }
+                }
             } else {
                 map.setBarriers(false);
                 for (Participant p : MBC.getInstance().getPlayers()) {
@@ -219,11 +224,17 @@ public class SurvivalGames extends Game {
                     placementPoints();
                     //createLineAll(23, "\n");
                     if (!firstRound) {
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            p.stopSound(Sound.MUSIC_DISC_FAR, SoundCategory.RECORDS);
+                        }
                         gameOverGraphics();
                         roundWinners(0);
                         setGameState(GameState.END_GAME);
                         timeRemaining = 37;
                     } else {
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            p.stopSound(Sound.MUSIC_DISC_FAR, SoundCategory.RECORDS);
+                        }
                         roundOverGraphics();
                         roundWinners(0);
                         setGameState(GameState.END_ROUND);

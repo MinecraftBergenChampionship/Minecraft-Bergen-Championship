@@ -133,6 +133,11 @@ public class AceRace extends Game {
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
                 startingCountdown();
+                if (timeRemaining == 10) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.MUSIC_DISC_11, SoundCategory.RECORDS, 1, 1);
+                    }
+                }
             } else {
                 setGameState(GameState.ACTIVE);
                 map.setBarriers(false);
@@ -146,6 +151,9 @@ public class AceRace extends Game {
                 // TODO: play overtime music (or if there are like 2 players still racing: tbd)
             } else if (timeRemaining <= 0) {
                 gameOverGraphics();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.stopSound(Sound.MUSIC_DISC_11, SoundCategory.RECORDS);
+                }
                 for (AceRacePlayer p : aceRacePlayerMap.values()) {
                     if (!(p.getPlayer().getGameMode().equals(GameMode.SPECTATOR))) {
                         flightEffects(p.getParticipant());

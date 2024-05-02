@@ -270,7 +270,7 @@ public class DecisionDome extends Minigame {
                     }
                     // start game
                     stopTimer();
-                    MBC.getInstance().startGame(winner.game);
+                    MBC.getInstance().startGame(winner.game.substring(2));
                 }
                 case 5 -> WarpEffects();
                 case 6 -> {
