@@ -2,6 +2,12 @@ package me.kotayka.mbc;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
+import me.kotayka.mbc.gamePlayers.SpleefPlayer;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
@@ -25,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 public class Quickfire extends FinaleGame {
     public static final ItemStack CROSSBOW = new ItemStack(Material.CROSSBOW);
     public static final ItemStack BOOTS = new ItemStack(Material.LEATHER_BOOTS);
+    public Map<UUID, QuickfirePlayer> quickfirePlayers = new HashMap<>();
     public static final int MAX_DIST_FROM_CENTER = 13225;
     private World world = Bukkit.getWorld("Quickfire");
     private final Location TEAM_ONE_SPAWN = new Location(world, 19.5, -60, 0);
@@ -105,6 +112,7 @@ public class Quickfire extends FinaleGame {
             p.getPlayer().teleport(SPAWN);
             p.board.getTeam(firstPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
             p.board.getTeam(secondPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+            if (p.getTeam().equals(firstPlace) || p.getTeam().equals(secondPlace)) { quickfirePlayers.put(p.getPlayer().getUniqueId(), new QuickfirePlayer(p)); }
         }
     }
 
@@ -231,9 +239,15 @@ public class Quickfire extends FinaleGame {
         if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
             Participant shot = Participant.getParticipant((Player) e.getHitEntity());
             Participant damager = Participant.getParticipant((Player) arrow.getShooter());
+            QuickfirePlayer damagerPlayer = getQuickfirePlayer(damager.getPlayer());
+            QuickfirePlayer shotPlayer = getQuickfirePlayer(shot.getPlayer());
             damager.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(shot.getFormattedName() + " - " + ChatColor.RED + ((int)(shot.getPlayer().getHealth()-2))/2+ " ♥"));
             damager.getPlayer().playSound(damager.getPlayer(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
+            damagerPlayer.incrementDamageDealt();
+            shotPlayer.incrementDamageTaken();
             if (shot.getPlayer().getHealth() <= 2) {
+                shotPlayer.incrementDeaths();
+                damagerPlayer.incrementKills();
                 Death(shot, damager);
             } else {
                 shot.getPlayer().damage(2);
@@ -454,5 +468,9 @@ public class Quickfire extends FinaleGame {
             world.getBlockAt(12, -57, z).setType(first);
             world.getBlockAt(-12, -57, z).setType(second);
         }
+    }
+
+    public QuickfirePlayer getQuickfirePlayer(Player p) {
+        return quickfirePlayers.get(p.getUniqueId());
     }
 }
