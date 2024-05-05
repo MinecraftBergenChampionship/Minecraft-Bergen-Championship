@@ -640,7 +640,7 @@ public class DecisionDome extends Minigame {
             }
 
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
-            chicken.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10000, 1, false, false));
+            chicken.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 1, false, false));
             chickens.add(new VoteChicken(p.getTeam(), chicken));
         } else if (e.getEntity().getType().equals(EntityType.ARROW)) {
             if (!(e.getEntity().getShooter() instanceof Player) || e.getEntity().getShooter() == null) return;

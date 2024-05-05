@@ -148,11 +148,11 @@ public class Quickfire extends FinaleGame {
             if (timeElapsed == 60) {
                 for (Participant p : firstPlace.teamPlayers) {
                     if (!p.getPlayer().getGameMode().equals(GameMode.SPECTATOR))
-                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 100000, 2, false, false));
+                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, PotionEffect.INFINITE_DURATION, 2, false, false));
                 }
                 for (Participant p : secondPlace.teamPlayers) {
                     if (!p.getPlayer().getGameMode().equals(GameMode.SPECTATOR))
-                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 100000, 2, false, false));
+                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, PotionEffect.INFINITE_DURATION, 2, false, false));
                 }
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + ChatColor.BOLD + " All players are now glowing!");
             }
@@ -314,7 +314,7 @@ public class Quickfire extends FinaleGame {
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().getInventory().clear();
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);

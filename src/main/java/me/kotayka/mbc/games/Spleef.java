@@ -124,9 +124,9 @@ public class Spleef extends Game {
             p.getPlayer().setHealth(20);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
 
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             if (roundNum == 0) {
@@ -180,8 +180,8 @@ public class Spleef extends Game {
                 MBC.getInstance().sendMutedMessages();
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
                 for (Participant p : MBC.getInstance().getPlayers()) {
-                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
-                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
+                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
+                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 10, false, false));
                     p.getPlayer().setGameMode(GameMode.ADVENTURE);
                 }
                 setGameState(GameState.STARTING);

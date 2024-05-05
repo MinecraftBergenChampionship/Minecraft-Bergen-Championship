@@ -179,8 +179,8 @@ public class BuildMart extends Game {
             p.getPlayer().teleport(map.INTRO_LOC);
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().setAllowFlight(true);
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
         }
     }
 

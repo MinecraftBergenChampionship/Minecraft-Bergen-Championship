@@ -183,8 +183,8 @@ public class AceRace extends Game {
             p.getInventory().addItem(trident);
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
 
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100000, 10, false, false));
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
             //p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
 
             aceRacePlayerMap.put(p.getPlayer().getUniqueId(), new AceRacePlayer(p, this));

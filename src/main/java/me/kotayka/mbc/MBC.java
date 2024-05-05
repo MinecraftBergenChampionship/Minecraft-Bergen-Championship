@@ -94,7 +94,7 @@ public class MBC implements Listener {
     public static final Material BOOST_PAD = Material.WAXED_EXPOSED_CUT_COPPER;
     public static final Material MEGA_BOOST_PAD = Material.WAXED_WEATHERED_CUT_COPPER;
     public static final Material JUMP_PAD = Material.WAXED_WEATHERED_COPPER;
-    public static final PotionEffect SATURATION = new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false);
+    public static final PotionEffect SATURATION = new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false);
     public double multiplier = 1;
 
     public static NPCManager npcManager;

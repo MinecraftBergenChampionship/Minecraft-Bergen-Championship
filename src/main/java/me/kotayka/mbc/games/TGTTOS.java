@@ -104,7 +104,7 @@ public class TGTTOS extends Game {
                 MBC.getInstance().sendMutedMessages();
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
                 for (Participant p : MBC.getInstance().getPlayers()) {
-                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
+                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
                 }
                 setGameState(GameState.STARTING);
                 timeRemaining = 15;
@@ -199,7 +199,7 @@ public class TGTTOS extends Game {
                 p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             }
             if (map instanceof Meatball) {
-                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 10, false, false));
+                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 10, false, false));
             }
         }
     }
