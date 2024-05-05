@@ -36,12 +36,9 @@ public class Skybattle extends Game {
 
     public Skybattle() {
         super("Skybattle", new String[] {
-                "Wwwwelcome guys, to another episode of Skywars.",
-                "Skybattle is all about kills. Make your way to the center with your team, you have infinite blocks!",
-                "Make sure to TURN ON PARTICLES to see the border. There is also a height border, visible at the center, which lowers over time.",
-                "Make use of the items you find in chests-fishing rods, TNT, cobwebs, bows, to name a few-to kill other players or send them into the void!",
-                "Most points come from kills, however there are still survival points if you want to play safer.",
-                "There are three total rounds, and who you're next to is random. Kills are worth a lot, so don't fret if you have a bad round!",
+                "Make your way to the center of the map, collecting resources and eliminating other players as you go! Utility items are spread across the map, but the best items are always in the middle.",
+                "You'll have " + ChatColor.BOLD + "infinite blocks" + ChatColor.RESET + " so build as much as you need to! Just be careful of the void below...",
+                "Make sure to " + ChatColor.BOLD + "TURN ON PARTICLES" + ChatColor.RESET + " to see the border. There's also a " + ChatColor.BOLD + "height border" + ChatColor.RESET + " that lowers over time!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +15 points for eliminations\n" +
                         "- +15 points for winning the round\n" +
@@ -65,6 +62,16 @@ public class Skybattle extends Game {
         }
 
         updateInGameTeamScoreboard();
+    }
+
+    @Override
+    public void start() {
+        super.start();
+
+        setGameState(GameState.TUTORIAL);
+        //setGameState(GameState.STARTING);
+
+        setTimer(30);
     }
 
     public void loadPlayers() {
@@ -96,7 +103,13 @@ public class Skybattle extends Game {
     }
 
     /**
-     * Maps used for determining kills
+     * Used for determining kills by mapping each entity to the player that placed them.
+     * If a killed player's last damager is in either map, the kill credit goes to the placer.
+     *
+     * creeperSpawners maps Creeper Entities to the player that summoned them.
+     * TNTPlacers maps Primed TNT Entities to the player that placed the TNT.
+     * skybattlePlayerMap is the map of all skybattlePlayers.
+     *
      */
     public void resetKillMaps() {
         if (creeperSpawners != null) {
@@ -116,16 +129,6 @@ public class Skybattle extends Game {
     }
 
     @Override
-    public void start() {
-        super.start();
-
-        setGameState(GameState.TUTORIAL);
-        //setGameState(GameState.STARTING);
-
-        setTimer(53);
-    }
-
-    @Override
     public void onRestart() {
         roundNum = 1;
         resetPlayers();
@@ -138,7 +141,7 @@ public class Skybattle extends Game {
                 MBC.getInstance().sendMutedMessages();
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
                 setGameState(GameState.STARTING);
-                timeRemaining = 20;
+                timeRemaining = 15;
             } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }

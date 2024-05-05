@@ -48,18 +48,14 @@ public class Spleef extends Game {
     private Map<Location, SpleefBlock> brokenBlocks = new HashMap<>();
     private final long DAMAGE_COOLDOWN = 850;
     //private final int[] BONUS_POINTS = {20, 15, 15, 10, 10, 8, 8, 8, 5, 5, 3, 3}; // 24 player; these numbers are arbitrary
-    //private final int[] BONUS_POINTS = {20, 15, 10, 8, 8, 5, 5, 3, 3}; // old from mbc3
     private final int[] BONUS_POINTS = {10, 8, 8, 5, 5, 3, 3, 3};
     // NOTE: 16 player bonus is probably different
 
     public Spleef() {
         super("Spleef", new String[] {
-                "Spleef is a game where you try to get other players into the void and be the last player standing.",
-                "Using your hands, you can break blocks instantly. Breaking blocks gives you meatballs (don't question it), which can also break blocks instantly.",
-                "Punch knockback has been reduced, so break blocks under players using your hands and meatballs to make them fall into the abyss!",
-                "Knocking a player out of the arena will give you kill points, however the most points will come from outliving other players.",
-                "The map will slowly decay, so make sure to be careful where you step - if the block is red concrete, it’s about to disappear!",
-                "Besides surviving, winning, and spleefing, points are awarded to the last full team alive and to the top half of players as a bonus.",
+                "Break blocks below other players to eliminate them. Try to live as long as possible!",
+                "You'll get s̶n̶o̶w̶b̶a̶l̶l̶s̶ meatballs on breaking blocks to attack players from afar. Spleefing another player will get you some bonus points!",
+                "The border will decay the map around you, so watch your step! Bonus points are awarded to the highest placing players and the longest lasting full team.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +2 points for outliving another player\n" +
                         "- +2 points for spleefing another player\n" +
@@ -89,7 +85,7 @@ public class Spleef extends Game {
     public void start() {
         super.start();
         setGameState(GameState.TUTORIAL);
-        setTimer(53);
+        setTimer(30);
     }
 
     @Override
@@ -168,7 +164,7 @@ public class Spleef extends Game {
         }
 
         setGameState(GameState.STARTING);
-        setTimer(30);
+        setTimer(15);
     }
 
     private void loadMap() {

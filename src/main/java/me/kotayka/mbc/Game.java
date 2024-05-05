@@ -57,7 +57,9 @@ public abstract class Game extends Minigame {
 
 
     /**
-     * Provide game explanation
+     * Print game explanation, one line at a time.
+     *
+     * @modifies introLine
      */
     public void Introduction() {
         Bukkit.broadcastMessage(ChatColor.GREEN + "---------------------------------------");

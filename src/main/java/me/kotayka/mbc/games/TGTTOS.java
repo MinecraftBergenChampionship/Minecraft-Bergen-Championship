@@ -54,12 +54,9 @@ public class TGTTOS extends Game {
 
     public TGTTOS() {
         super("TGTTOS", new String[] {
-                "Why did the MBC Player cross the road? To get to the other side!!!",
-                "To get to the other side, or TGTTOS, is a game about, well, getting to the other side of a map.",
-                "Make sure to look up, down, left and right; the finish could basically be anywhere.",
-                "Also make sure to look at the items in your inventory, as these could be the key to finishing ahead of the competition if used right.",
-                "Once you do get to the end of the map, punch or right click a chicken to finish (I hope you're reading, Jeremy).",
-                "Points are counted for however many people you finish ahead of, and extra points are given to the first full team to finish the course.",
+                "Why did the MBC Player cross the road? To get to the other side!!!\nComplete a series of obstacle courses fast to get as many points as possible!",
+                "Make sure to " + ChatColor.BOLD + "punch the chicken" + ChatColor.RESET + " to complete the level! You'll get more points for finishing ahead of other players!",
+                "There are also bonuses for the first two teams to fully complete a level, and for being one of the first 3 players to finish a level! You can also punch people, I guess...",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +1 point for completing the course\n" +
                         "- +1 point for every player outplaced\n" +
@@ -67,6 +64,22 @@ public class TGTTOS extends Game {
                         "- +2 points for each player on the second full team to finish a course\n" +
                         "- +5 bonus points for placing Top 3 in a course\n"
         });
+    }
+
+    /**
+     * Called when the game is loaded.
+     * Starts the game.
+     */
+    public void start() {
+        super.start();
+
+        setDeathMessages();
+
+        startFirstRound();
+
+        setGameState(GameState.TUTORIAL);
+
+        setTimer(30);
     }
 
     public void createScoreboard(Participant p) {
@@ -94,7 +107,7 @@ public class TGTTOS extends Game {
                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
                 }
                 setGameState(GameState.STARTING);
-                timeRemaining = 20;
+                timeRemaining = 15;
             } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
@@ -150,18 +163,6 @@ public class TGTTOS extends Game {
             }
             gameEndEvents();
         }
-    }
-
-    public void start() {
-        super.start();
-
-        setDeathMessages();
-
-        startFirstRound();
-
-        setGameState(GameState.TUTORIAL);
-
-        setTimer(53);
     }
 
     @Override

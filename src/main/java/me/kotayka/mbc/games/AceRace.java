@@ -47,12 +47,9 @@ public class AceRace extends Game {
     public AceRace() {
         super("Ace Race",
             new String[] {
-                    "In Ace Race, your objective is to complete a race course as fast as you can.",
-                    "There are boost pads across the map: red ones launch you, orange ones launch you higher, and green ones give you a jump boost.",
-                    "You spawn in with a riptide trident, so if you’re in water, just hold right click and let go to go flying!",
-                    "If you fall into the void or into lava, don’t worry; you'll be transported to the start of the section you fell on.",
-                    "If you’ve never practiced the course before, your first lap will probably suck.",
-                    "When the game starts, you’ll get a few minutes of practice time. Make sure you use this to learn the course!",
+                    "Complete the race as fast as you can! The " + ChatColor.BOLD + "practice time" + ChatColor.RESET + " has started.",
+                    "Red jump pads will boost you, orange jump pads will launch you higher, and green pads will give you a jump boost. Orange tiles with arrows will give you a speed boost.",
+                    "Hold right click with a trident to get a boost in water. Soar with an elytra by pressing space midair! Checkpoints will be given across the map.",
                     ChatColor.BOLD + "Scoring:\n" + ChatColor.RESET +
                             "- +1 point for completing a lap\n" +
                             "- +1 point for every player beaten on a lap\n" +
@@ -79,7 +76,7 @@ public class AceRace extends Game {
             p.teleport(map.getIntroLocation());
         }
 
-        setTimer(53);
+        setTimer(210);
     }
 
     @Override
@@ -106,7 +103,6 @@ public class AceRace extends Game {
                     p.getPlayer().sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "Practice Starting!", "", 20, 60, 20);
                 }
                 finishedIntro = true;
-                setTimer(210);
             } else if (timeRemaining == 60) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "One minute left of practice!");
             } else if (timeRemaining <= 0) {

@@ -47,12 +47,9 @@ public class BuildMart extends Game {
 
     public BuildMart() {
         super("BuildMart", new String[] {
-                "Build Mart is a game where your team is trying to recreate builds as fast as possible by gathering materials on islands outside your base.",
-                "Inside your base (accessed via Nether Portal in the center), you'll find three builds with a square empty plot, where you'll recreate it.",
-                "Use the middle fan, boost pads, and your elytra to fy around to each island to gather resources! Everything will be located on these islands.",
-                "When you have everything, get back to base and recreate the build; you may need to use the chests, crafting tables, and furnaces in your base-you might have to!",
-                "Recreate builds as fast as you can! You'll earn more points for completing builds faster than other teams, although there's some partial credit if you don't finish.",
-                "Unsure on how your build is incomplete? Run the command " + ChatColor.BOLD + "/checkbuild" + ChatColor.RESET + " within your replication plot!",
+                "Replicate as many builds as possible in the time you have! The resources you'll need are below you. You will be able to fly around with an elytra!",
+                "Harder builds will be worth more points, but may take longer to complete-strategize with your team to do as many builds as fast as you can!",
+                "Some builds may require crafting or smelting, so be wary! Chests are also provided to help your team organize. Don't forget to use " + ChatColor.BOLD + "/checkbuild" + ChatColor.RESET + " if you're stumped!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +3 points **per player** for completing a build\n" +
                         "- +3 points **per player** for each team outplaced\n" +
@@ -89,7 +86,7 @@ public class BuildMart extends Game {
         map.resetBreakAreas();
 
         setGameState(GameState.TUTORIAL);
-        setTimer(53);
+        setTimer(30);
     }
 
     @Override
@@ -111,7 +108,7 @@ public class BuildMart extends Game {
                     bmp.respawn();
                 }
                 setGameState(GameState.STARTING);
-                timeRemaining = 30;
+                timeRemaining = 25;
             } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }

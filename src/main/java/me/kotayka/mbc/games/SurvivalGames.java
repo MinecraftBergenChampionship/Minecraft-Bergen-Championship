@@ -66,12 +66,9 @@ public class SurvivalGames extends Game {
 
     public SurvivalGames() {
         super("SurvivalGames", new String[] {
-                "Survival Games is all about surviving and killing to get that #1 Victory Royale.",
-                "Spawning in with nothing, gain items by searching through chests across the map. There's a short grace period!",
-                "Watch out for the fast border: you won't be able to open doors or break glass behind it!",
-                "Enchanting tables can also be used to purchase enchants. Drag and click the books to enchant items!",
-                "At the end of each round, your team will receive a point bonus that increases with placement, so live as long as you can!",
-                "Survival Games is two rounds, so make sure to remember who killed you...",
+                ChatColor.BOLD + "In a world..." + ChatColor.RESET + "spawn in with nothing, collect items through chests, emerge the last team standing! There will be a short grace period.",
+                "Purchase items at the enchant table, drag and click books to enchant! Additionally, watch out for the border, " + ChatColor.BOLD + " you will not be able to break glass or open doors behind the border.",
+                "Your team will get a placement bonus, so live as long as you can! But there are two rounds, so remember who killed you...",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "- +10 points for eliminations\n" +
                         "- +2 points for every player outlived\n" +
@@ -143,7 +140,7 @@ public class SurvivalGames extends Game {
          setGameState(GameState.TUTORIAL);
         //setGameState(GameState.STARTING);
 
-        setTimer(53);
+        setTimer(30);
     }
 
     @Override
@@ -174,7 +171,7 @@ public class SurvivalGames extends Game {
                 MBC.getInstance().sendMutedMessages();
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
                 setGameState(GameState.STARTING);
-                timeRemaining = 20;
+                timeRemaining = 15;
             } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
