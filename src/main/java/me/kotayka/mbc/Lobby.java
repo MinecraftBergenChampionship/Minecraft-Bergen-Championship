@@ -419,11 +419,9 @@ public class Lobby extends Minigame {
     }
 
     public void toFinale() {
-        Bukkit.broadcastMessage("toFinale() 1");
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
         setGameState(GameState.INACTIVE);
 
-        Bukkit.broadcastMessage("toFinale() 2");
         toQuickfire();
         // toDodgebolt();
     }
@@ -457,7 +455,7 @@ public class Lobby extends Minigame {
     }
 
     public void startingEvents(int timeRemaining) {
-        if (timeRemaining == 20) {
+        if (timeRemaining == 14) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 MBC.announce("The Minecraft Championship is about to begin!");
                 p.setGameMode(GameMode.ADVENTURE);
@@ -482,7 +480,7 @@ public class Lobby extends Minigame {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.sendTitle(ChatColor.GOLD.toString() + ChatColor.BOLD + "Introducing:", " ", 20, 60, 20);
             }
-        } else if (timeRemaining < 60 && timeRemaining > 20 && timeRemaining % 7 == 0) {
+        } else if (timeRemaining < 60 && timeRemaining > 14 && timeRemaining % 7 == 0) {
             introTeam();
         }
     }
