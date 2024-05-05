@@ -88,9 +88,6 @@ public class Spleef extends Game {
     @Override
     public void start() {
         super.start();
-        map.deleteMap();
-        // above is tentative change bc last tournament a map loaded on top of another. this is to prevent that
-        // i dont rlly know where a map is put into place but im j hoping it isnt here
         setGameState(GameState.TUTORIAL);
         setTimer(53);
     }

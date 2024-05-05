@@ -147,6 +147,9 @@ public class Skybattle extends Game {
                 startingCountdown();
             } else {
                 setGameState(GameState.ACTIVE);
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS, 1, 1);
+                }
                 map.removeBarriers();
                 setPVP(true);
                 for (SkybattlePlayer p : skybattlePlayerMap.values()) {
@@ -167,11 +170,17 @@ public class Skybattle extends Game {
                 } else {
                     if (roundNum < 3) {
                         roundOverGraphics();
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
+                        }
                         roundWinners(WIN_POINTS);
                         timeRemaining = 10;
                         setGameState(GameState.END_ROUND);
                     } else {
                         gameOverGraphics();
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
+                        }
                         roundWinners(WIN_POINTS);
                         timeRemaining = 38;
                         setGameState(GameState.END_GAME);
@@ -200,11 +209,17 @@ public class Skybattle extends Game {
             map.Overtime();
             if (timeRemaining == 0 && roundNum < 3) {
                 roundOverGraphics();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
+                }
                 roundWinners(WIN_POINTS);
                 timeRemaining = 10;
                 setGameState(GameState.END_ROUND);
             } else if (timeRemaining == 0) {
                 gameOverGraphics();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
+                }
                 roundWinners(WIN_POINTS);
                 timeRemaining = 38;
                 setGameState(GameState.END_GAME);

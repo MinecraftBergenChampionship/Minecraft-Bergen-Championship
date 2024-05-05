@@ -123,12 +123,19 @@ public class BuildMart extends Game {
                 }
                 setGameState(GameState.ACTIVE);
                 timeRemaining = 720;
+            } else if (timeRemaining == 25) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS, 1, 1);
+                }
             } else {
                 startingCountdown();
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             if (timeRemaining == 0) {
                 gameOverGraphics();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.stopSound(Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS);
+                }
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     flightEffects(p); // sets gamemode adventure
                 }
