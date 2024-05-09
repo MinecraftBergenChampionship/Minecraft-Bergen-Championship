@@ -1,10 +1,12 @@
 package me.kotayka.mbc;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import me.kotayka.mbc.NPCs.NPCManager;
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
 import me.kotayka.mbc.games.*;
 import me.kotayka.mbc.teams.*;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
@@ -365,11 +367,40 @@ public class MBC implements Listener {
         return newTeams;
     }
 
+    @EventHandler
+    public void onPlayerChat(AsyncPlayerChatEvent e) {
+        String msg = e.getMessage();
+        Player player = e.getPlayer();
+
+        for (Participant p : players) {
+            if (player.getUniqueId().equals(p.getPlayer().getUniqueId())) {
+                msg = msg.replace("%", "%%")
+                        .replace(":blue:", "Ⓑ")
+                        .replace(":green:", "Ⓖ")
+                        .replace(":red:", "Ⓡ")
+                        .replace(":yellow:", "Ⓨ")
+                        .replace(":pink:", "Ⓟ")
+                        .replace(":purple:", "Ⓤ")
+                        .replace(":crown:", "④")
+                        .replace(":dub:", "④")
+                        .replace(":win:", "④")
+                        .replace(":w:", "④");
+                msg = p.getFormattedName() + ": " + msg;
+                e.setFormat(p.getTeam().getIcon() + " " + p.getTeam().getChatColor() + "%s" + ChatColor.RESET+ ": %s");
+            }
+        }
+
+        if (currentGame != null && ((currentGame != lobby && currentGame.getState().equals(GameState.TUTORIAL)) ||
+                (currentGame == lobby && lobby.getState().equals(GameState.END_ROUND) && lobby.timeRemaining <= 80 && lobby.timeRemaining > 69))) {
+            mutedMessages.add(msg);
+            player.sendMessage(ChatColor.RED + "Chat is currently muted, your message will send after!");
+            e.setCancelled(true);
+        }
+    }
+
+
     /**
      * Handles formatting player messages
-     * @param e PlayerChatEvent
-     */
-    @EventHandler
     public void onPlayerChat(PlayerChatEvent e) {
         String msg = e.getMessage();
         for (Participant p : players) {
@@ -387,8 +418,6 @@ public class MBC implements Listener {
                 msg = msg.replace(":win:", "④");
                 msg = msg.replace(":w:", "④");
                 msg = p.getFormattedName() + ": " + msg;
-                e.setFormat(msg);
-                break;
             }
         }
         if (currentGame != null && (currentGame != lobby && currentGame.getState().equals(GameState.TUTORIAL)) ||
@@ -398,6 +427,7 @@ public class MBC implements Listener {
             e.setCancelled(true);
         }
     }
+     */
 
     public void sendMutedMessages() {
         for (String s : mutedMessages) {
