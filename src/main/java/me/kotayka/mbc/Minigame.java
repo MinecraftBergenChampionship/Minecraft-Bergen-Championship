@@ -8,27 +8,34 @@ import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 
-import java.util.*;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Collections;
+import java.util.HashMap;
 
 /**
- * This class is for lobby-related minigames that do not necessitate the full package of a point-scoring game.
+ * Template class representing a Minecraft minigame.
+ * The class <b>Game</b> extends this class.
+ *
+ * As a standalone, this class is suitable for lobby-related games that do not have scoring mechanics.
  * Examples:
  *      Lobby
  *      Decision Dome / Voting gimmick
  *      Any hub minigame put in place, i.e. trick-or-treat/presents/milk the cow
  */
 public abstract class Minigame implements Scoreboard, Listener {
-    public String gameName;
+    private final String NAME;
     private GameState gameState = GameState.INACTIVE;
     public int timeRemaining = -1;
-    public static int taskID = -1;
+    private int taskID = -1;
 
     // GLOBAL STRING STORAGE FOR STORING STRINGS TO PRINT WHILE PERFORMING TASKS (ie sorting through game scores)
     protected String TO_PRINT = "";
     private List<String> mutedMessages = new LinkedList<String>();
 
     public Minigame(String name) {
-        gameName = name;
+        NAME = name;
     }
 
     /**
@@ -146,8 +153,8 @@ public abstract class Minigame implements Scoreboard, Listener {
     }
 
     public void createLine(int score, String line, Participant p) {
-        if (p.objective == null || !Objects.equals(p.gameObjective, gameName)) {
-            p.gameObjective = gameName;
+        if (p.objective == null || !Objects.equals(p.gameObjective, NAME)) {
+            p.gameObjective = NAME;
             MBC.getInstance().getMinigame().newObjective(p);
             MBC.getInstance().getMinigame().createScoreboard(p);
         }
@@ -238,6 +245,12 @@ public abstract class Minigame implements Scoreboard, Listener {
         }
     }
 
+    /**
+     * Removes a line from the scoreboard.
+     *
+     * @param p The Participant whose scoreboard should be changed
+     * @param line Index of the line on the scoreboard to be reset.
+     */
     public void resetLine(Participant p, int line) {
         if (p.lines.containsKey(line)) {
             p.objective.getScoreboard().resetScores(p.lines.get(line));
@@ -283,7 +296,7 @@ public abstract class Minigame implements Scoreboard, Listener {
             p.objective.unregister();
         }
 
-        p.gameObjective = gameName;
+        p.gameObjective = NAME;
         Objective obj;
 
         if (p.board.getObjective("Objective") == null) {
@@ -299,5 +312,13 @@ public abstract class Minigame implements Scoreboard, Listener {
 
         p.objective = obj;
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
+
+    /**
+     * Returns the name of the game represented by the instance of this class
+     * @return NAME
+     */
+    public String name() {
+        return NAME;
     }
 }

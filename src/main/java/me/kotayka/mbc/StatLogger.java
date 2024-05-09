@@ -72,7 +72,7 @@ public class StatLogger {
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.isOp()) {
-                p.sendMessage(ChatColor.GREEN+"Successfully logged stats for " + GAME.gameName+ ".");
+                p.sendMessage(ChatColor.GREEN+"Successfully logged stats for " + GAME.name() + ".");
             }
         }
     }
@@ -86,7 +86,7 @@ public class StatLogger {
     private File createFile() {
         if (!MBC.getInstance().logStats()) return null;
         try {
-            File file = new File(directory, GAME.gameName+".txt");
+            File file = new File(directory, GAME.name() +".txt");
             file.getParentFile().mkdirs();
             if (file.createNewFile()) {
                 return file;

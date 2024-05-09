@@ -103,7 +103,7 @@ public class Space extends SpleefMap {
 
     private void erodeMap() {
         if (erosion == -1) {
-            erosion = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
+            erosion = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().getPlugin(), () -> {
                 for (Block b : decaying) {
                     switch (b.getType()) {
                         case YELLOW_CONCRETE -> b.setType(Material.ORANGE_CONCRETE);

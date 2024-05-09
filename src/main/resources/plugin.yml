@@ -70,3 +70,6 @@ commands:
   despawnNPCS:
     description: despawns all NPCs
     permission: minecraft.command.op
+  partygame:
+    description: start a party game
+    permission: minecraft.command.op

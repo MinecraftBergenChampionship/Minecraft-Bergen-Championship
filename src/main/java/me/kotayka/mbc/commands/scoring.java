@@ -31,7 +31,7 @@ public class scoring implements CommandExecutor {
                 sender.sendMessage("[" + ChatColor.GREEN + "scoring" + ChatColor.RESET + "] Usage: /scoring <game> or use during a game.");
                 return true;
             }
-            String curr = MBC.getInstance().getGame().gameName;
+            String curr = MBC.getInstance().getGame().name();
             sender.sendMessage(ChatColor.GREEN + "---------------------------------------");
             sender.sendMessage("\n");
             sender.sendMessage(MBC.getScoring(curr));

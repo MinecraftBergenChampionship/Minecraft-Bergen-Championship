@@ -62,6 +62,8 @@ public abstract class Game extends Minigame {
      * @modifies introLine
      */
     public void Introduction() {
+        if (INTRODUCTION == null || introLine > INTRODUCTION.length) return;
+
         Bukkit.broadcastMessage(ChatColor.GREEN + "---------------------------------------");
         Bukkit.broadcastMessage("\n");
         Bukkit.broadcastMessage(INTRODUCTION[introLine++]);
@@ -386,13 +388,13 @@ public abstract class Game extends Minigame {
 
            // for intro
            p.getPlayer().addPotionEffect(MBC.SATURATION);
-           p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 300, 255, true, false));
+           p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 180, 255, true, false));
        }
 
 
        loadPlayers();
        createScoreboard();
-       createLineAll(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, gameName));
+       createLineAll(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, name()));
        createLineAll(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET));
    }
 

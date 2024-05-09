@@ -305,9 +305,9 @@ public class MBC implements Listener {
             Participant newPlayer = new Participant(event.getPlayer());
             players.add(newPlayer);
 
-            if (newPlayer.objective == null || !Objects.equals(newPlayer.gameObjective, currentGame.gameName)) {
+            if (newPlayer.objective == null || !Objects.equals(newPlayer.gameObjective, currentGame.name())) {
                 currentGame.createScoreboard(newPlayer);
-                newPlayer.gameObjective = currentGame.gameName;
+                newPlayer.gameObjective = currentGame.name();
             }
         } else { // relog
             Participant p = Participant.getParticipant(event.getPlayer());
@@ -317,11 +317,11 @@ public class MBC implements Listener {
             p.getPlayer().setScoreboard(newBoard);
             p.changeTeam(p.getTeam());
             p.setupScoreboardTeams();
-            p.gameObjective = currentGame.gameName;
+            p.gameObjective = currentGame.name();
             currentGame.newObjective(p);
             currentGame.createScoreboard(p);
             if (currentGame instanceof Game) {
-                currentGame.createLineAll(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, currentGame.gameName));
+                currentGame.createLineAll(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, currentGame.name()));
                 currentGame.createLineAll(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET));
             }
         }
@@ -506,11 +506,11 @@ public class MBC implements Listener {
 
     public void startGame(Minigame game) {
         if (currentGame instanceof Game) {
-            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: " + currentGame.gameName + " is in progress!");
+            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: " + currentGame.name()+ " is in progress!");
             return;
         }
 
-        Bukkit.broadcastMessage(ChatColor.GOLD + game.gameName + ChatColor.WHITE + " has started");
+        Bukkit.broadcastMessage(ChatColor.GOLD + game.name()+ ChatColor.WHITE + " has started");
         currentGame = game;
         currentGame.start();
     }
@@ -518,7 +518,7 @@ public class MBC implements Listener {
     public void startGame(int game) {
         // prevent another game from starting if a non-lobby game is active
         if (currentGame instanceof Game) {
-            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: " + currentGame.gameName + " is in progress!");
+            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: " + currentGame.name()+ " is in progress!");
             return;
         }
 
@@ -722,6 +722,13 @@ public class MBC implements Listener {
             }
         }
     }
+
+    /**
+     * Get Plugin instance.
+     *
+     * @return plugin
+     */
+    public Plugin getPlugin() { return plugin; }
 
     private void startEvent() {
         lobby.setGameState(GameState.TUTORIAL);
