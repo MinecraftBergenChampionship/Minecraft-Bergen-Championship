@@ -16,8 +16,12 @@ import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.PartyGame;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -29,8 +33,11 @@ import java.util.*;
 
 public class DiscoFever extends PartyGame {
     private int discoID = -1; // ID for event that applies randomized block pattern to all the air blocks in the Disco Region
+    private int bossBarID = -1; // ID for event that constantly updates the boss bar time display.
     private long delay = 100; // Delay for disco event. Decreases every 5 rounds.
     private int rounds = 0;
+    private int counter = -1;
+    private BossBar bossBar;
 
     private List<Participant> playersAlive = new LinkedList<>();
 
@@ -110,15 +117,19 @@ public class DiscoFever extends PartyGame {
                 if (timeRemaining == 0) {
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         p.getPlayer().teleport(SPAWN);
+                        p.getInventory().clear();
                     }
+                    Barriers(true);
                     endDisco();
                     setGameState(GameState.END_ROUND);
                     rounds = 0;
+                    counter = 0;
                     setTimer(7);
                 } else if (timeRemaining == 36) {
-                    //randomPattern = generatePattern();
                     Disco();
-                    // TODO: start playing music
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.getPlayer().sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "Practice Starting!", "", 20, 60, 20);
+                    }
                     Barriers(false);
                     MBC.getInstance().hideAllPlayers();
                 } else if (timeRemaining % 7 == 0) {
@@ -128,7 +139,6 @@ public class DiscoFever extends PartyGame {
             case END_ROUND:
                 if (timeRemaining == 0) {
                     for (Participant p : MBC.getInstance().getPlayers()) {
-                        p.getPlayer().teleport(SPAWN);
                         MBC.getInstance().showPlayers(p);
                     }
                     initializeRegions();
@@ -143,9 +153,9 @@ public class DiscoFever extends PartyGame {
             case STARTING:
                 startingCountdown();
                 if (timeRemaining == 0) {
-                    // temp?
+                    MBC.getInstance().hideAllPlayers();
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS,1,1);
+                        p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS,1,1); // temp?
                     }
                     Barriers(false);
                     setGameState(GameState.ACTIVE);
@@ -188,20 +198,53 @@ public class DiscoFever extends PartyGame {
      * - Can only be canceled with the "endDisco()" method within this class
      */
     private void Disco() {
-        // Cancel event whenever delay decreases
-        if (discoID != -1) {
-            MBC.getInstance().cancelEvent(discoID);
-            // Decrease delay between applying floor pattern and removing the blocks
-            if (rounds % 6 == 0 && delay > 0.5) {
-                if (delay > 1) {
-                    delay -= 0.5;
-                } else {
-                    delay -= 0.2;
-                }
-            }
+        // TODO: move boss bar portion elsewhere
+        if (bossBar != null) {
+            bossBar.setVisible(false);
+            bossBar.removeAll();
         }
-
+        bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "TIME", BarColor.RED, BarStyle.SOLID);
+        bossBar.setVisible(true);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            bossBar.addPlayer(p);
+        }
         discoID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().getPlugin(), () -> {
+            // Decrease delay between applying floor pattern and removing the blocks
+            if (counter == 5 && rounds % 5 == 0 && delay > 10) {
+                MBC.getInstance().cancelEvent(discoID);
+                if (bossBar != null) {
+                    bossBar.removeAll();
+                    bossBar.setVisible(false);
+                }
+                if (delay == 100) {
+                    delay -= 20;
+                } else if (delay > 1) {
+                    delay -= 10;
+                } else {
+                    delay -= 4;
+                }
+                Bukkit.broadcastMessage(ChatColor.YELLOW+"Things are speeding up!");
+                counter = 0;
+                // Cancel task then call Disco() again to reinitialize it
+                Disco();
+                return;
+            }
+
+            // update BossBar
+            // TODO this is probably inefficient
+            new BukkitRunnable() {
+                double tmp = delay;
+                @Override
+                public void run() {
+                    if (tmp < 0) {
+                        cancel();
+                    }
+                    bossBar.setProgress(tmp / delay);
+                    tmp--;
+                }
+            }.runTaskTimer(MBC.getInstance().getPlugin(), 0, 1);
+
+
             // Apply randomized palette to the region
             editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(world()));
             try {
@@ -238,14 +281,95 @@ public class DiscoFever extends PartyGame {
                             b.setType(Material.AIR);
                         }
                     }
+
+                    if (counter != 5) {
+                        counter++;
+                    }
                     rounds++;
                     incrementRegions();
-
-
+                    MBC.getInstance().cancelEvent(bossBarID);
                 }
             };
             removeFloor.runTaskLater(MBC.getInstance().getPlugin(), delay);
         }, 0, delay+40);
+    }
+
+
+    /**
+     * Update BossBar Time Display continually (each tick)
+     */
+    private void updateBossBar() {
+        if (bossBar == null) {
+            bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "TIME", BarColor.RED, BarStyle.SOLID);
+            bossBar.setVisible(true);
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                bossBar.addPlayer(p);
+            }
+        }
+        bossBarID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().getPlugin(), () -> {
+            // Decrease delay between applying floor pattern and removing the blocks
+            if (counter == 5 && rounds % 5 == 0 && delay > 0.5) {
+                MBC.getInstance().cancelEvent(discoID);
+                if (delay == 100) {
+                    delay -= 20;
+                } else if (delay > 1) {
+                    delay -= 10;
+                } else {
+                    delay -= 4;
+                }
+                Bukkit.broadcastMessage(ChatColor.YELLOW+"Things are speeding up!");
+                counter = 0;
+                // Cancel task then call Disco() again to reinitialize it
+                Disco();
+                return;
+            }
+            // Apply randomized palette to the region
+            editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(world()));
+            try {
+                editSession.setBlocks(disco, randomPattern);
+                if (backPrimary.getZ() > 402) {
+                    editSession.setBlocks(back, BlockTypes.LIGHT_GRAY_CONCRETE.getDefaultState());
+                }
+                editSession.close();
+            } catch (MaxChangedBlocksException e) {
+                e.printStackTrace();
+            }
+
+            // Choose safe block
+            ColorType[] colors = palette.keySet().stream()
+                    .filter(color -> !color.equals(lastColor))
+                    .toArray(ColorType[]::new);
+            int rand = (int) (Math.random() * colors.length);
+            lastColor = colors[rand];
+            safe = palette.get(colors[rand]);
+            showSafeBlock(safe);
+            BukkitRunnable removeFloor = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    for (BlockVector3 block : disco) {
+                        Block b = world().getBlockAt(block.x(), block.y(), block.z());
+                        Material mat = b.getType();
+                        if (mat != safe) {
+                            b.setType(Material.AIR);
+                        }
+                    }
+                    if (backPrimary.getZ() > 402) {
+                        for (BlockVector3 block : back) {
+                            Block b = world().getBlockAt(block.x(), block.y(), block.z());
+                            b.setType(Material.AIR);
+                        }
+                    }
+
+                    if (counter != 5) {
+                        counter++;
+                    }
+                    rounds++;
+                    incrementRegions();
+                }
+            };
+            removeFloor.runTaskLater(MBC.getInstance().getPlugin(), delay);
+        }, 0, 1);
+
     }
 
 
@@ -291,7 +415,9 @@ public class DiscoFever extends PartyGame {
     private void endDisco() {
         if (discoID != -1) {
             MBC.getInstance().cancelEvent(discoID);
+            MBC.getInstance().cancelEvent(bossBarID);
             discoID = -1;
+            bossBarID = -1;
         }
         for (BlockVector3 block : disco) {
             Block b = world().getBlockAt(block.x(), block.y(), block.z());
@@ -312,10 +438,10 @@ public class DiscoFever extends PartyGame {
     private void initializePalette() {
         // TODO: Randomization
         palette.put(ColorType.RED, Material.ACACIA_PLANKS);
-        palette.put(ColorType.BLUE, Material.LAPIS_BLOCK);
-        palette.put(ColorType.GREEN, Material.EMERALD_BLOCK);
-        palette.put(ColorType.PINK, Material.PURPLE_WOOL);
         palette.put(ColorType.YELLOW, Material.YELLOW_CONCRETE);
+        palette.put(ColorType.GREEN, Material.EMERALD_BLOCK);
+        palette.put(ColorType.BLUE, Material.LAPIS_BLOCK);
+        palette.put(ColorType.PINK, Material.PURPLE_WOOL);
     }
 
     /**
@@ -357,6 +483,14 @@ public class DiscoFever extends PartyGame {
             p.sendTitle(" ", "You died!", 0, 60, 20);
             // other things later
         }
+    }
+
+    /**
+     * Prevent players from throwing items.
+     */
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        e.setCancelled(true);
     }
 
 

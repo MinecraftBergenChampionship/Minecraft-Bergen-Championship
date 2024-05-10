@@ -62,7 +62,7 @@ public abstract class PartyGame extends Minigame {
      * @modifies introLine
      */
     public void Introduction() {
-        if (INTRODUCTION == null || introLine > INTRODUCTION.length) return;
+        if (INTRODUCTION == null || introLine >= INTRODUCTION.length) return;
 
         Bukkit.broadcastMessage(ChatColor.GREEN + "---------------------------------------");
         Bukkit.broadcastMessage("\n");
