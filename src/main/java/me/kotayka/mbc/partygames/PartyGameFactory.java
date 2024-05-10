@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PartyGameFactory {
-    private static List<String> gameNames = Arrays.asList("Disco Fever", "Beep Test", "Knockout");
+    private static List<String> gameNames = Arrays.asList("DiscoFever", "BeepTest", "Knockout");
     private static Map<String, PartyGame> games = new HashMap<>();
 
     private PartyGameFactory() {}
@@ -22,13 +22,13 @@ public class PartyGameFactory {
             return games.get(name);
         } else {
             switch (name) {
-                case "Disco Fever":
-                    games.put("Disco Fever", DiscoFever.getInstance());
+                case "DiscoFever":
+                    games.put(name, DiscoFever.getInstance());
                     break;
                 default:
                     return null;
             }
         }
-        return null;
+        return games.get(name);
     }
 }

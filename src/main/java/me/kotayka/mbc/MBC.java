@@ -541,7 +541,7 @@ public class MBC implements Listener {
         }
 
         Bukkit.broadcastMessage(ChatColor.GOLD + game.name()+ ChatColor.WHITE + " has started");
-        currentGame = game;
+        setCurrentGame(game);
         currentGame.start();
     }
 
@@ -750,6 +750,53 @@ public class MBC implements Listener {
             else {
                 p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + " Please only use /ready after an admin has used the /readycheck command!");
             }
+        }
+    }
+
+    /**
+     * Hides all players from each other.
+     */
+    public void hideAllPlayers() {
+        for (Participant p : getPlayers()) {
+            for (Participant p2 : getPlayers()) {
+                if (p.getPlayer().getUniqueId().equals(p2.getPlayer().getUniqueId())) continue;
+                p.getPlayer().hidePlayer(plugin, p2.getPlayer());
+            }
+        }
+    }
+
+
+    /**
+     * Ensures all players see each other.
+     */
+    public void showAllPlayers() {
+        for (Participant p : getPlayers()) {
+            for (Participant p2 : getPlayers()) {
+                if (p.getPlayer().getUniqueId().equals(p2.getPlayer().getUniqueId())) continue;
+                p.getPlayer().showPlayer(plugin, p2.getPlayer());
+            }
+        }
+    }
+
+    /**
+     * Hides all players from this player.
+     * @param p The player to hide all players from.
+     */
+    public void hidePlayers(Participant p) {
+        for (Participant p2 : getPlayers()) {
+            if (p.getPlayer().getUniqueId().equals(p2.getPlayer().getUniqueId())) continue;
+            p.getPlayer().hidePlayer(plugin, p2.getPlayer());
+        }
+    }
+
+    /**
+     * Shows all players to this player.
+     * @param p The player to show all players to.
+     */
+    public void showPlayers(Participant p) {
+        for (Participant p2 : getPlayers()) {
+            if (p.getPlayer().getUniqueId().equals(p2.getPlayer().getUniqueId())) continue;
+            p.getPlayer().showPlayer(plugin, p2.getPlayer());
         }
     }
 

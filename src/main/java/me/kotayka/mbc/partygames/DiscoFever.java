@@ -14,14 +14,15 @@ import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.PartyGame;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
@@ -31,16 +32,19 @@ public class DiscoFever extends PartyGame {
     private long delay = 100; // Delay for disco event. Decreases every 5 rounds.
     private int rounds = 0;
 
+    private List<Participant> playersAlive = new LinkedList<>();
+
     // Region boundaries for disco fever. Incrementally moved after each round.
     private Location discoPrimary = new Location(world(), 409, 0, 418);
-    private Location discoSecondary = new Location(world(), 390, 0, 407);
-    private Location backPrimary = new Location(world(), 409, 0, 406);
-    private Location backSecondary = new Location(world(), 409, 0, 403);
+    private Location discoSecondary = new Location(world(), 390, 0, 402);
+    private Location backPrimary = new Location(world(), 409, 0, 401);
+    private Location backSecondary = new Location(world(), 390, 0, 398);
 
     private Map<ColorType, Material> palette = new HashMap<>();
     private final Material EMTPY_BLOCK = Material.LIGHT_GRAY_STAINED_GLASS;
     private Material safe = null;
     private ColorType lastColor = null;
+    private int DEATH_Y = -10; // y-level at which the game considers the player as eliminated
 
     // WorldEdit
     private Region disco = null;
@@ -48,17 +52,22 @@ public class DiscoFever extends PartyGame {
     private Pattern randomPattern = null;
     private EditSession editSession = null;
 
+    // game instance
+    private static DiscoFever instance = null;
+
     /**
      * Get the instance for this disco fever.
      */
     public static PartyGame getInstance() {
-        if (PartyGameFactory.getPartyGame("Disco Fever") != null) {
-            return PartyGameFactory.getPartyGame("Disco Fever");
+        if (instance == null) {
+            instance = new DiscoFever();
+            return new DiscoFever();
+        } else {
+            return instance;
         }
-        return new DiscoFever();
     }
     private DiscoFever() {
-        super("Disco Fever", new Location(Bukkit.getWorld("Party"), 400, 1, 400,0,0), new String[] {
+        super("DiscoFever", new Location(Bukkit.getWorld("Party"), 400, 1.5, 400,0,0), new String[] {
                 "text 1",
                 "text 2",
                 "text 3",
@@ -72,40 +81,79 @@ public class DiscoFever extends PartyGame {
 
         initializePalette();
         initializeRegions();
+        Barriers(true);
 
         setGameState(GameState.TUTORIAL);
+        randomPattern = generatePattern();
 
-        setTimer(37);
+        setTimer(38);
     }
 
     @Override
     public void loadPlayers() {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.setInvulnerable(false);
-            p.setFlying(false);
-            p.removePotionEffect(PotionEffectType.NIGHT_VISION);
-            p.addPotionEffect(MBC.SATURATION);
-            p.teleport(SPAWN);
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().setInvulnerable(false);
+            p.getPlayer().setFlying(false);
+            p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+            p.getPlayer().addPotionEffect(MBC.SATURATION);
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            playersAlive.add(p);
+            p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+            p.getPlayer().teleport(SPAWN);
         }
     }
 
     @Override
     public void events() {
-        switch(getState()) {
+        switch (getState()) {
             case TUTORIAL:
                 if (timeRemaining == 0) {
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         p.getPlayer().teleport(SPAWN);
                     }
-                    setGameState(GameState.STARTING);
-                    setTimer(20);
+                    endDisco();
+                    setGameState(GameState.END_ROUND);
+                    rounds = 0;
+                    setTimer(7);
                 } else if (timeRemaining == 36) {
-                    randomPattern = generatePattern();
+                    //randomPattern = generatePattern();
+                    Disco();
                     // TODO: start playing music
                     Barriers(false);
+                    MBC.getInstance().hideAllPlayers();
                 } else if (timeRemaining % 7 == 0) {
                     Introduction();
                 }
+                break;
+            case END_ROUND:
+                if (timeRemaining == 0) {
+                    for (Participant p : MBC.getInstance().getPlayers()) {
+                        p.getPlayer().teleport(SPAWN);
+                        MBC.getInstance().showPlayers(p);
+                    }
+                    initializeRegions();
+                    setGameState(GameState.STARTING);
+                    setTimer(20);
+                } else if (timeRemaining == 6) {
+                    Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.GOLD + "Practice Over!");
+                } else if (timeRemaining == 5) {
+                    Bukkit.broadcastMessage(ChatColor.YELLOW + "The game will begin shortly...");
+                }
+                break;
+            case STARTING:
+                startingCountdown();
+                if (timeRemaining == 0) {
+                    // temp?
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS,1,1);
+                    }
+                    Barriers(false);
+                    setGameState(GameState.ACTIVE);
+                    Disco();
+                    setTimer(237);
+                }
+                break;
+            case ACTIVE:
         }
     }
 
@@ -155,8 +203,15 @@ public class DiscoFever extends PartyGame {
 
         discoID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().getPlugin(), () -> {
             // Apply randomized palette to the region
-            for (BlockVector3 block : disco) {
-                randomPattern.applyBlock(block);
+            editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(world()));
+            try {
+                editSession.setBlocks(disco, randomPattern);
+                if (backPrimary.getZ() > 402) {
+                    editSession.setBlocks(back, BlockTypes.LIGHT_GRAY_CONCRETE.getDefaultState());
+                }
+                editSession.close();
+            } catch (MaxChangedBlocksException e) {
+                e.printStackTrace();
             }
 
             // Choose safe block
@@ -166,7 +221,7 @@ public class DiscoFever extends PartyGame {
             int rand = (int) (Math.random() * colors.length);
             lastColor = colors[rand];
             safe = palette.get(colors[rand]);
-
+            showSafeBlock(safe);
             BukkitRunnable removeFloor = new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -177,11 +232,57 @@ public class DiscoFever extends PartyGame {
                             b.setType(Material.AIR);
                         }
                     }
+                    if (backPrimary.getZ() > 402) {
+                        for (BlockVector3 block : back) {
+                            Block b = world().getBlockAt(block.x(), block.y(), block.z());
+                            b.setType(Material.AIR);
+                        }
+                    }
+                    rounds++;
+                    incrementRegions();
+
+
                 }
             };
             removeFloor.runTaskLater(MBC.getInstance().getPlugin(), delay);
         }, 0, delay+40);
     }
+
+
+    /**
+     * Fills the hotbar of each player with the safe block.
+     *
+     * @param m The material which will not be destroyed on the dance floor.
+     */
+    private void showSafeBlock(Material m) {
+        ItemStack item = new ItemStack(m);
+        for (Participant p : playersAlive) {
+            p.getPlayer().getInventory().setItem(0, item);
+            p.getPlayer().getInventory().setItem(1, item);
+            p.getPlayer().getInventory().setItem(2, item);
+            p.getPlayer().getInventory().setItem(3, item);
+            p.getPlayer().getInventory().setItem(4, item);
+            p.getPlayer().getInventory().setItem(5, item);
+            p.getPlayer().getInventory().setItem(6, item);
+            p.getPlayer().getInventory().setItem(7, item);
+            p.getPlayer().getInventory().setItem(8, item);
+            p.getPlayer().getInventory().setItem(9, item);
+            p.getPlayer().getInventory().setItem(40, item);
+        }
+    }
+
+    /**
+     * Increments each region by 4
+     */
+    private void incrementRegions() {
+        discoPrimary.setZ(discoPrimary.getZ()+4);
+        discoSecondary.setZ(discoSecondary.getZ()+4);
+        backPrimary.setZ(backPrimary.getZ()+4);
+        backSecondary.setZ(backSecondary.getZ()+4);
+        disco = new CuboidRegion(BukkitAdapter.asBlockVector(discoPrimary), BukkitAdapter.asBlockVector(discoSecondary));
+        back = new CuboidRegion(BukkitAdapter.asBlockVector(backPrimary), BukkitAdapter.asBlockVector(backSecondary));
+    }
+
 
     /**
      * Cancels the task represented by discoID,
@@ -190,7 +291,17 @@ public class DiscoFever extends PartyGame {
     private void endDisco() {
         if (discoID != -1) {
             MBC.getInstance().cancelEvent(discoID);
+            discoID = -1;
         }
+        for (BlockVector3 block : disco) {
+            Block b = world().getBlockAt(block.x(), block.y(), block.z());
+            b.setType(Material.AIR);
+        }
+        for (BlockVector3 block : back) {
+            Block b = world().getBlockAt(block.x(), block.y(), block.z());
+            b.setType(Material.AIR);
+        }
+
     }
 
     /**
@@ -213,14 +324,38 @@ public class DiscoFever extends PartyGame {
      * starter blocks.
      */
     private void initializeRegions() {
+        discoPrimary = new Location(world(), 409, 0, 418);
+        discoSecondary = new Location(world(), 390, 0, 402);
+        backPrimary = new Location(world(), 409, 0, 401);
+        backSecondary = new Location(world(), 390, 0, 398);
         disco = new CuboidRegion(BukkitAdapter.asBlockVector(discoPrimary), BukkitAdapter.asBlockVector(discoSecondary));
-        //back = new CuboidRegion(BukkitAdapter.asBlockVector(backPrimary), BukkitAdapter.asBlockVector(backSecondary));
+        back = new CuboidRegion(BukkitAdapter.asBlockVector(backPrimary), BukkitAdapter.asBlockVector(backSecondary));
         editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(world()));
         try {
             editSession.setBlocks(disco, BlockTypes.LIGHT_GRAY_STAINED_GLASS.getDefaultState());
             //editSession.setBlocks(back, BlockTypes.LIGHT_GRAY_CONCRETE.getDefaultState());
+            editSession.close();
         } catch (MaxChangedBlocksException e) {
            e.printStackTrace();
+        }
+    }
+
+    @EventHandler
+    public void onPlayerFall(PlayerMoveEvent e) {
+        if (e.getPlayer().getGameMode() != GameMode.ADVENTURE) return;
+        if (e.getTo().getY() > DEATH_Y) return;
+
+        Player p = e.getPlayer();
+        if (getState().equals(GameState.TUTORIAL) || getState().equals(GameState.END_ROUND)) {
+            p.teleport(SPAWN);
+            p.sendMessage(ChatColor.RED+"You fell!");
+            return;
+        }
+
+        if (getState().equals(GameState.ACTIVE)) {
+            p.setGameMode(GameMode.ADVENTURE);
+            p.sendTitle(" ", "You died!", 0, 60, 20);
+            // other things later
         }
     }
 

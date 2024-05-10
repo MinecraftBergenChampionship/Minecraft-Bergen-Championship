@@ -2,6 +2,7 @@ package me.kotayka.mbc;
 
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -21,9 +22,16 @@ public abstract class PartyGame extends Minigame {
         INTRODUCTION = intro;
     }
 
+    /**
+     * Starts the minigame.
+     * Unregisters events for other games and resets timer.
+     * Several scoreboard lines are created TODO move them to another function for clarity
+     */
     @Override
     public void start() {
         // start registering events for this game
+        HandlerList.unregisterAll(MBC.getInstance().lobby);
+        HandlerList.unregisterAll(MBC.getInstance().decisionDome);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
 
         // if timer hasn't reached 1, stop it
@@ -42,6 +50,10 @@ public abstract class PartyGame extends Minigame {
             p.getPlayer().addPotionEffect(MBC.SATURATION);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 300, 255, true, false));
         }
+        loadPlayers();
+        createScoreboard();
+        createLineAll(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party! (" + name()) + ")");
+        createLineAll(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET));
     }
 
     /**
