@@ -34,7 +34,7 @@ import java.util.*;
 public class DiscoFever extends PartyGame {
     private int discoID = -1; // ID for event that applies randomized block pattern to all the air blocks in the Disco Region
     private int bossBarID = -1; // ID for event that constantly updates the boss bar time display.
-    private long delay = 100; // Delay for disco event. Decreases every 5 rounds.
+    private long delay = 80; // Delay for disco event. Decreases every 5 rounds.
     private int rounds = 0;
     private int counter = -1;
     private BossBar bossBar;
@@ -138,6 +138,7 @@ public class DiscoFever extends PartyGame {
                 break;
             case END_ROUND:
                 if (timeRemaining == 0) {
+                    delay = 80;
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         MBC.getInstance().showPlayers(p);
                     }
@@ -164,6 +165,11 @@ public class DiscoFever extends PartyGame {
                 }
                 break;
             case ACTIVE:
+                if (timeRemaining == 0 || discoPrimary.getZ() > 674) {
+                    endDisco();
+                    setGameState(GameState.END_GAME);
+                    setTimer(7);
+                }
         }
     }
 
@@ -199,6 +205,11 @@ public class DiscoFever extends PartyGame {
      */
     private void Disco() {
         // TODO: move boss bar portion elsewhere
+        if (discoPrimary.getZ() > 674) {
+            endDisco();
+            timeRemaining = 0;
+            return;
+        }
         if (bossBar != null) {
             bossBar.setVisible(false);
             bossBar.removeAll();
@@ -216,9 +227,7 @@ public class DiscoFever extends PartyGame {
                     bossBar.removeAll();
                     bossBar.setVisible(false);
                 }
-                if (delay == 100) {
-                    delay -= 20;
-                } else if (delay > 1) {
+                if (delay > 20) {
                     delay -= 10;
                 } else {
                     delay -= 4;
@@ -282,96 +291,19 @@ public class DiscoFever extends PartyGame {
                         }
                     }
 
-                    if (counter != 5) {
-                        counter++;
+                    if (getState().equals(GameState.ACTIVE)) {
+                        if (counter != 5) {
+                            counter++;
+                        }
+                        rounds++;
+                        incrementRegions();
                     }
-                    rounds++;
-                    incrementRegions();
                     MBC.getInstance().cancelEvent(bossBarID);
                 }
             };
             removeFloor.runTaskLater(MBC.getInstance().getPlugin(), delay);
         }, 0, delay+40);
     }
-
-
-    /**
-     * Update BossBar Time Display continually (each tick)
-     */
-    private void updateBossBar() {
-        if (bossBar == null) {
-            bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "TIME", BarColor.RED, BarStyle.SOLID);
-            bossBar.setVisible(true);
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                bossBar.addPlayer(p);
-            }
-        }
-        bossBarID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().getPlugin(), () -> {
-            // Decrease delay between applying floor pattern and removing the blocks
-            if (counter == 5 && rounds % 5 == 0 && delay > 0.5) {
-                MBC.getInstance().cancelEvent(discoID);
-                if (delay == 100) {
-                    delay -= 20;
-                } else if (delay > 1) {
-                    delay -= 10;
-                } else {
-                    delay -= 4;
-                }
-                Bukkit.broadcastMessage(ChatColor.YELLOW+"Things are speeding up!");
-                counter = 0;
-                // Cancel task then call Disco() again to reinitialize it
-                Disco();
-                return;
-            }
-            // Apply randomized palette to the region
-            editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(world()));
-            try {
-                editSession.setBlocks(disco, randomPattern);
-                if (backPrimary.getZ() > 402) {
-                    editSession.setBlocks(back, BlockTypes.LIGHT_GRAY_CONCRETE.getDefaultState());
-                }
-                editSession.close();
-            } catch (MaxChangedBlocksException e) {
-                e.printStackTrace();
-            }
-
-            // Choose safe block
-            ColorType[] colors = palette.keySet().stream()
-                    .filter(color -> !color.equals(lastColor))
-                    .toArray(ColorType[]::new);
-            int rand = (int) (Math.random() * colors.length);
-            lastColor = colors[rand];
-            safe = palette.get(colors[rand]);
-            showSafeBlock(safe);
-            BukkitRunnable removeFloor = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    for (BlockVector3 block : disco) {
-                        Block b = world().getBlockAt(block.x(), block.y(), block.z());
-                        Material mat = b.getType();
-                        if (mat != safe) {
-                            b.setType(Material.AIR);
-                        }
-                    }
-                    if (backPrimary.getZ() > 402) {
-                        for (BlockVector3 block : back) {
-                            Block b = world().getBlockAt(block.x(), block.y(), block.z());
-                            b.setType(Material.AIR);
-                        }
-                    }
-
-                    if (counter != 5) {
-                        counter++;
-                    }
-                    rounds++;
-                    incrementRegions();
-                }
-            };
-            removeFloor.runTaskLater(MBC.getInstance().getPlugin(), delay);
-        }, 0, 1);
-
-    }
-
 
     /**
      * Fills the hotbar of each player with the safe block.
@@ -419,13 +351,20 @@ public class DiscoFever extends PartyGame {
             discoID = -1;
             bossBarID = -1;
         }
+        if (bossBar != null) {
+            bossBar.setVisible(false);
+            bossBar.removeAll();
+        }
+
         for (BlockVector3 block : disco) {
             Block b = world().getBlockAt(block.x(), block.y(), block.z());
             b.setType(Material.AIR);
         }
-        for (BlockVector3 block : back) {
-            Block b = world().getBlockAt(block.x(), block.y(), block.z());
-            b.setType(Material.AIR);
+        if (backPrimary.getZ() > 402) {
+            for (BlockVector3 block : back) {
+                Block b = world().getBlockAt(block.x(), block.y(), block.z());
+                b.setType(Material.AIR);
+            }
         }
 
     }
@@ -479,8 +418,8 @@ public class DiscoFever extends PartyGame {
         }
 
         if (getState().equals(GameState.ACTIVE)) {
-            p.setGameMode(GameMode.ADVENTURE);
-            p.sendTitle(" ", "You died!", 0, 60, 20);
+            p.setGameMode(GameMode.SPECTATOR);
+            p.sendTitle(" ", ChatColor.RED + "You died!", 0, 60, 20);
             // other things later
         }
     }
