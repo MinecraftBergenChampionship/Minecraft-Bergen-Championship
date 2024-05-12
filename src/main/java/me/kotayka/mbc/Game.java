@@ -38,6 +38,9 @@ public abstract class Game extends Minigame {
     protected final String[] INTRODUCTION;
     protected int introLine = 0;
 
+    // NOTE: although it may be better for each Game class to have an icon,
+    // I'm not doing this currently to avoid future issues of postponing game development
+    // due to a lack of icons, or similar issues.
     public Game(String gameName, String[] INTRO) {
         super(gameName);
         this.INTRODUCTION= INTRO;

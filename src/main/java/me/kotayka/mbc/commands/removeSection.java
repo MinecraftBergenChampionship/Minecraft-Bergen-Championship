@@ -2,7 +2,6 @@ package me.kotayka.mbc.commands;
 
 import me.kotayka.mbc.DecisionDome;
 import me.kotayka.mbc.MBC;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -34,7 +33,7 @@ public class removeSection implements CommandExecutor {
         DecisionDome dd = MBC.getInstance().decisionDome;
         ArrayList<String> names = new ArrayList<>();
         for (int i = 0; i < dd.gameNames.size(); i++) {
-            String s = dd.gameNames.get(i);
+            String s = dd.gameNames.get(i).substring(0, 2);
             names.add(s.replace(" ", "_").toLowerCase());
         }
 

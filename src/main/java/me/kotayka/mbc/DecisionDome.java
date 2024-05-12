@@ -17,12 +17,19 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 /**
- * Current voting gimmick ; support for 8 games at the moment
+ * DecisionDome is the representation of the Voting Phase of the tournament.
+ * Chickens randomly walk into different quadrants, and the quadrant with the most chickens wins.
+ *
+ * Currently supports <= 8 games, a refactor will be needed for > 8 games.
+ * Quadrants are mapped by the blocks that are hidden beneath them on the map.
+ * DecisionDome also handles distributing powerups.
+ *
  * Most quadrant/section code provided by @Jack-Crowley
  */
 public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
     private boolean revealedGames;
+    // Icon display code is kinda missy can probably be improved; a refactoring of game class may need to be made for cleanest icon support but not doing it yet @see Game
     public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑭ Ace Race", "⑬ Survival Games", "⑫ Skybattle", "⑯ Spleef", "⑮ Build Mart"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
@@ -243,7 +250,7 @@ public class DecisionDome extends Minigame {
                 }
                 case 0 -> {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.sendTitle(winner.game, "", 0, 15, 15);
+                        p.sendTitle(winner.game.substring(0,2) + ChatColor.BOLD + winner.game.substring(2), "", 0, 15, 15);
                         p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
                     }
                     Bukkit.broadcastMessage(ChatColor.BOLD + winner.game + "!");
@@ -258,7 +265,7 @@ public class DecisionDome extends Minigame {
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining > 5 && timeRemaining % 2 != 0) {
                 for (Player p : Bukkit.getOnlinePlayers())
-                    p.sendTitle(winner.game,"", 15, 15, 15);
+                    p.sendTitle(winner.game.substring(0,2) + ChatColor.BOLD + winner.game.substring(2),"", 15, 15, 15);
             }
             switch (timeRemaining) {
                 case 0 -> {
@@ -418,6 +425,7 @@ public class DecisionDome extends Minigame {
         }
 
         String randomGame = gameNames.get((int)(Math.random()*gameNames.size()));
+        randomGame = randomGame.substring(0,2) + ChatColor.BOLD + randomGame.substring(2);
         loadSection(section, randomGame);
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.sendTitle(randomGame, "", 20, 60, 20);
@@ -657,6 +665,9 @@ public class DecisionDome extends Minigame {
             if (e.getHitBlock().getLocation().getY() >= -23) return;
             String type = e.getHitBlock().getType().toString();
             Participant shooter = Participant.getParticipant((Player) e.getEntity().getShooter());
+            if (dunker == null || !(shooter.getPlayer().getUniqueId().equals(dunker.getUniqueId()))) {
+                return;
+            }
             if (type.contains("RED_")) {
                 Dunk(MBCTeam.getTeam("red"), shooter);
                 dunked_team = ChatColor.RED;
@@ -721,6 +732,7 @@ public class DecisionDome extends Minigame {
 
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().sendTitle(" ", team.teamNameFormat() + ChatColor.RESET + " were dunked!", 0, 60, 30);
+            p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 1, 1);
             if (p.getTeam().equals(team)) {
                 p.getPlayer().teleport(getTeleportLocation(p.getTeam().getChatColor()));
                 p.getPlayer().setVelocity(new Vector(0, 0, 0));
@@ -806,8 +818,8 @@ public class DecisionDome extends Minigame {
             }
             chickens.remove(rm);
         } else if (e instanceof Player) {
-            // Dunk powerup
-            if (dunker != null && !(damager.getUniqueId().equals(dunker.getUniqueId()))) {
+            // Check if the player that shot had the powerup
+            if (dunker == null || !(damager.getUniqueId().equals(dunker.getUniqueId()))) {
                 return;
             }
 
@@ -939,7 +951,7 @@ class Section {
             gameDisplay.setGravity(false);
             gameDisplay.setInvulnerable(true);
             gameDisplay.setInvisible(true);
-            gameDisplay.setCustomName(ChatColor.BOLD+game);
+            gameDisplay.setCustomName(game.substring(0, 2) + ChatColor.BOLD + game.substring(2));
             gameDisplay.setCustomNameVisible(true);
         }
     }
