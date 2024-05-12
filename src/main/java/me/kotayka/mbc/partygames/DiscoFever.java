@@ -153,11 +153,15 @@ public class DiscoFever extends PartyGame {
                 break;
             case STARTING:
                 startingCountdown();
-                if (timeRemaining == 0) {
-                    MBC.getInstance().hideAllPlayers();
+                if (timeRemaining == 10) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS,1,1); // temp?
                     }
+                }
+
+                if (timeRemaining == 0) {
+                    MBC.getInstance().hideAllPlayers();
+                    
                     Barriers(false);
                     setGameState(GameState.ACTIVE);
                     Disco();
@@ -167,6 +171,9 @@ public class DiscoFever extends PartyGame {
             case ACTIVE:
                 if (timeRemaining == 0 || discoPrimary.getZ() > 674) {
                     endDisco();
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.stopSound(Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS);
+                    }
                     setGameState(GameState.END_GAME);
                     setTimer(7);
                 }
