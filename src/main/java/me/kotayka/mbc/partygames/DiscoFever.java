@@ -75,10 +75,13 @@ public class DiscoFever extends PartyGame {
     }
     private DiscoFever() {
         super("DiscoFever", new Location(Bukkit.getWorld("Party"), 400, 1.5, 400,0,0), new String[] {
-                "text 1",
-                "text 2",
-                "text 3",
-                "scoring"
+                "Go as fast as you can towards the block in your hand before the timer runs out, and the rest of the blocks disappear!",
+                "The platform moves as time goes on, so make sure to keep moving forwards.",
+                "You'll get points for each player you outlive, along with points for every few rounds you survive and for reaching the end of the course.",
+                ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                        "- +2 points for each set of 6 stages completed\n" +
+                        "- +1 point for each player outlived\n" +
+                        "- +10 points for reaching the end of the course\n"
         });
     }
 
@@ -157,7 +160,7 @@ public class DiscoFever extends PartyGame {
                 startingCountdown();
                 if (timeRemaining == 10) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS,1,1); // temp?
+                        p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS,1,1);
                     }
                 }
 
@@ -251,6 +254,8 @@ public class DiscoFever extends PartyGame {
 
             // update BossBar
             // TODO can possibly be improved
+            // note but would the bossbar be able to refill in the 2 seconds where each player is standing on the blocks
+            // yeah ill work on that when everything else is done
             new BukkitRunnable() {
                 double tmp = delay;
                 @Override
