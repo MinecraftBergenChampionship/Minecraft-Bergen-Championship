@@ -86,6 +86,8 @@ public class DiscoFever extends PartyGame {
     public void start() {
         super.start();
 
+        world().setTime(18000);
+
         initializePalette();
         initializeRegions();
         Barriers(true);
@@ -161,7 +163,7 @@ public class DiscoFever extends PartyGame {
 
                 if (timeRemaining == 0) {
                     MBC.getInstance().hideAllPlayers();
-                    
+
                     Barriers(false);
                     setGameState(GameState.ACTIVE);
                     Disco();
@@ -177,6 +179,7 @@ public class DiscoFever extends PartyGame {
                     setGameState(GameState.END_GAME);
                     setTimer(7);
                 }
+                break;
         }
     }
 
@@ -247,13 +250,14 @@ public class DiscoFever extends PartyGame {
             }
 
             // update BossBar
-            // TODO this is probably inefficient
+            // TODO can possibly be improved
             new BukkitRunnable() {
                 double tmp = delay;
                 @Override
                 public void run() {
                     if (tmp < 0) {
                         cancel();
+                        return;
                     }
                     bossBar.setProgress(tmp / delay);
                     tmp--;
@@ -408,7 +412,7 @@ public class DiscoFever extends PartyGame {
             //editSession.setBlocks(back, BlockTypes.LIGHT_GRAY_CONCRETE.getDefaultState());
             editSession.close();
         } catch (MaxChangedBlocksException e) {
-           e.printStackTrace();
+            e.printStackTrace();
         }
     }
 

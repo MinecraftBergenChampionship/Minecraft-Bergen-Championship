@@ -25,6 +25,9 @@ public class PartyGameFactory {
                 case "DiscoFever":
                     games.put(name, DiscoFever.getInstance());
                     break;
+                case "BeepTest":
+                    games.put(name, BeepTest.getInstance());
+                    break;
                 default:
                     return null;
             }

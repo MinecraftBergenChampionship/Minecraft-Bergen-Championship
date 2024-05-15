@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class partygame implements CommandExecutor, TabCompleter {
-    List<String> partyGames = Arrays.asList("DiscoFever");
+    List<String> partyGames = Arrays.asList("DiscoFever", "BeepTest");
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
@@ -37,6 +37,7 @@ public class partygame implements CommandExecutor, TabCompleter {
             }
             if (!partyGames.contains(args[0])) {
                 sender.sendMessage("Please provide a valid game");
+                return false;
             }
 
             MBC.getInstance().startGame(PartyGameFactory.getPartyGame(args[0]));

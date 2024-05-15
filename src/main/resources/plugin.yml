@@ -4,7 +4,7 @@ main: me.kotayka.mbc.Plugin
 api-version: '1.20'
 authors: [ Kotayka, rspacerr ]
 description: Minecraft Bruh Championship
-depend: [Citizens]
+depend: [Citizens, WorldEdit]
 commands:
   mbchelp:
     description: list all commands
