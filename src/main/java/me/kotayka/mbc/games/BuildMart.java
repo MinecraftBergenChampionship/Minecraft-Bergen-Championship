@@ -47,13 +47,20 @@ public class BuildMart extends Game {
 
     public BuildMart() {
         super("BuildMart", new String[] {
-                "Replicate as many builds as possible in the time you have! The resources you'll need are below you. You will be able to fly around with an elytra!",
-                "Harder builds will be worth more points, but may take longer to complete-strategize with your team to do as many builds as fast as you can!",
-                "Some builds may require crafting or smelting, so be wary! Chests are also provided to help your team organize. Don't forget to use " + ChatColor.BOLD + "/checkbuild" + ChatColor.RESET + " if you're stumped!",
+                "⑮ Replicate as many builds as possible in the time you have!\n\n" + 
+                "⑮ The resources you'll need are below you. You will be able to fly around with an elytra!",
+                "⑮ Harder builds will be worth more points, but may take longer to complete.\n\n" +
+                "⑮ Strategize with your team to do as many builds as fast as you can!",
+                "⑮ Some builds may require crafting or smelting, so be wary!\n" +
+                "⑮ Chests are also provided to help your team organize.\n" +
+                "⑮ Don't forget to use " + ChatColor.BOLD + "/checkbuild" + ChatColor.RESET + " if you're stumped!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "- +3 points **per player** for completing a build\n" +
-                        "- +3 points **per player** for each team outplaced\n" +
-                        "- Max +3 points **per player** for each build partially completed at game end"
+                        "⑮ +4 points **per player** for completing an easy build\n" +
+                        "⑮ +8 points **per player** for completing a medium build\n" +
+                        "⑮ +10 points **per player** for completing a hard build\n" +
+                        "⑮ +1 points **per player** for each team beat when completing an easy or medium build\n" +
+                        "⑮ +2 points **per player** for each team beat when completing a hard build\n" +
+                        "⑮ Max +3 points **per player** for each build partially completed at game end"
         });
     }
 
