@@ -53,14 +53,17 @@ public class Spleef extends Game {
 
     public Spleef() {
         super("Spleef", new String[] {
-                "Break blocks below other players to eliminate them. Try to live as long as possible!",
-                "You'll get s̶n̶o̶w̶b̶a̶l̶l̶s̶ meatballs on breaking blocks to attack players from afar. Spleefing another player will get you some bonus points!",
-                "The border will decay the map around you, so watch your step! Bonus points are awarded to the highest placing players and the longest lasting full team.",
+                "⑯ Break blocks below other players to eliminate them.\n\n" + 
+                "⑯ Try to live as long as possible!",
+                "⑯ You'll get meatballs when breaking blocks to attack players from afar.\n\n" + 
+                "⑯ Spleefing another player will get you some bonus points!",
+                "⑯ The border will decay the map around you, so watch your step!\n\n" + 
+                "⑯ Bonus points are awarded to the highest placing players and the longest lasting full team.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "- +2 points for outliving another player\n" +
-                        "- +2 points for spleefing another player\n" +
-                        "- +3 points for every player on the last fully alive team\n" +
-                        "- Placement Bonuses - 1st: +10, 2nd,3rd: +8, 4th,5th: +5, 6th,7th,8th: +3"
+                        "⑯ +2 points for outliving another player\n" +
+                        "⑯ +2 points for spleefing another player\n" +
+                        "⑯ +3 points for every player on the last fully alive team\n" +
+                        "⑯ Placement Bonuses - 1st: +10, 2nd,3rd: +8, 4th,5th: +5, 6th,7th,8th: +3"
         });
         lobby = new Location(Bukkit.getWorld("spleef"), 0, 126, 0);
         spawnpoint = new Location(Bukkit.getWorld("spleef"), 0, 115, 0);

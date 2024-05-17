@@ -57,10 +57,17 @@ public class BeepTest extends PartyGame {
 
     private BeepTest() {
         super("BeepTest", new Location(Bukkit.getWorld("Party"), -522, -55, -458), new String[] {
-                "text 1",
-                "text 2",
-                "text 3",
-                "scoring"
+                "⑰ The fitness gram " + ChatColor.BOLD + "Beep Test" + ChatColor.RESET + " is a multistage parkour capacity test that progressively gets more difficult as it continues.",
+                "⑰ Jump from one side of the map to the other to complete the courses as fast as you can.\n\n" +  
+                "⑰ The parkour difficulty starts easy, but gets more difficult each time the arena changes color.",
+                "⑰ The third time you fail the parkour course, or do not complete it in time, you are eliminated.\n\n" + 
+                "⑰ You earn points for each stage and each difficulty you complete.",
+                ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                        "⑰ +1 point for each easy level completed\n" +
+                        "⑰ +2 points for each medium level completed\n" +
+                        "⑰ +3 points for each hard level completed\n" +
+                        "⑰ +4 points for each extreme level completed\n" +
+                        "⑰ +4 points for completing a color of difficulty\n"
         });
 
         loadCourses();

@@ -66,14 +66,18 @@ public class SurvivalGames extends Game {
 
     public SurvivalGames() {
         super("SurvivalGames", new String[] {
-                ChatColor.BOLD + "In a world..." + ChatColor.RESET + "spawn in with nothing, collect items through chests, emerge the last team standing! There will be a short grace period.",
-                "Purchase items at the enchant table, drag and click books to enchant! Additionally, watch out for the border, " + ChatColor.BOLD + " you will not be able to break glass or open doors behind the border.",
-                "Your team will get a placement bonus, so live as long as you can! But there are two rounds, so remember who killed you...",
+                "⑬ " + ChatColor.BOLD + "In a world..." + ChatColor.RESET + "spawn in with nothing, collect items through chests, emerge the last team standing!\n\n" + 
+                "⑬ There will be a short grace period.",
+                "⑬ Purchase items at the enchant table, drag and click books to enchant!\n\n" + 
+                "⑬ Additionally, watch out for the border, " + ChatColor.BOLD + " you will not be able to break glass or open doors behind the border.",
+                "⑬ Your team will get a placement bonus, so live as long as you can!\n\n" +
+                "But there are two rounds, so remember who killed you...",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "- +10 points for eliminations\n" +
-                        "- +2 points for every player outlived\n" +
-                        "- Team Bonuses (split amongst team):\n" +
-                        "     - 1st: +10 points, 2nd:+8 points, 3rd: +7 points, 4th: +6 points, 5th: +5 points, 6th: +4 points"
+                        "⑬ +10 points for eliminations\n" +
+                        "⑬ +2 points for every player outlived\n" +
+                        "⑬ Team Bonuses (split amongst team):\n" +
+                        "     ⑬ 1st: +10 points, 2nd: +8 points, 3rd: +7 points\n" +
+                        "     ⑬ 4th: +6 points, 5th: +5 points, 6th: +4 points"
         });
 
         for (MBCTeam t : getValidTeams()) {

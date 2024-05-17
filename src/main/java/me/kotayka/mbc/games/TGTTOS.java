@@ -4,7 +4,6 @@ import me.kotayka.mbc.Game;
 import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
-import me.kotayka.mbc.gameMaps.tgttosMap.TGTTOSMap;
 import me.kotayka.mbc.gameMaps.tgttosMap.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -54,15 +53,18 @@ public class TGTTOS extends Game {
 
     public TGTTOS() {
         super("TGTTOS", new String[] {
-                "Why did the MBC Player cross the road? To get to the other side!!!\nComplete a series of obstacle courses fast to get as many points as possible!",
-                "Make sure to " + ChatColor.BOLD + "punch the chicken" + ChatColor.RESET + " to complete the level! You'll get more points for finishing ahead of other players!",
-                "There are also bonuses for the first two teams to fully complete a level, and for being one of the first 3 players to finish a level! You can also punch people, I guess...",
+                "⑪ Why did the MBC Player cross the road? To get to the other side!!!\n\n" +
+                "⑪ Complete a series of obstacle courses fast to get as many points as possible!",
+                "⑪ Make sure to " + ChatColor.BOLD + "punch the chicken" + ChatColor.RESET + " to complete the level!\n\n" +
+                "⑪ You'll get more points for finishing ahead of other players!",
+                "⑪ There are also bonuses for the first two teams to fully complete a level, and for being one of the first 3 players to finish a level!\n\n" + 
+                "⑪ You can also punch people, I guess...",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "- +1 point for completing the course\n" +
-                        "- +1 point for every player outplaced\n" +
-                        "- +4 points for each player on the first full team to finish a course\n" +
-                        "- +2 points for each player on the second full team to finish a course\n" +
-                        "- +5 bonus points for placing Top 3 in a course\n"
+                        "⑪ +1 point for completing the course\n" +
+                        "⑪ +1 point for every player outplaced\n" +
+                        "⑪ +4 points for each player on the first full team to finish a course\n" +
+                        "⑪ +2 points for each player on the second full team to finish a course\n" +
+                        "⑪ +5 bonus points for placing Top 3 in a course\n"
         });
     }
 

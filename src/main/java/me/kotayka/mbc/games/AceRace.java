@@ -47,15 +47,19 @@ public class AceRace extends Game {
     public AceRace() {
         super("Ace Race",
             new String[] {
-                    "Complete the race as fast as you can! The " + ChatColor.BOLD + "practice time" + ChatColor.RESET + " has started.",
-                    "Red jump pads will boost you, orange jump pads will launch you higher, and green pads will give you a jump boost. Orange tiles with arrows will give you a speed boost.",
-                    "Hold right click with a trident to get a boost in water. Soar with an elytra by pressing space midair! Checkpoints will be given across the map.",
+                    "⑭ Complete the race as fast as you can!\n\n" + 
+                    "⑭ The " + ChatColor.BOLD + "practice time" + ChatColor.RESET + " has started.",
+                    "⑭ Red jump pads will boost you, orange jump pads will launch you higher, and green pads will give you a jump boost.\n\n" + 
+                    "⑭ Orange tiles with arrows will give you a speed boost.",
+                    "⑭ Hold right click with a trident to get a boost in water.\n" + 
+                    "⑭ Soar with an elytra by pressing space midair!\n" + 
+                    "⑭ Checkpoints will be given across the map.",
                     ChatColor.BOLD + "Scoring:\n" + ChatColor.RESET +
-                            "- +1 point for completing a lap\n" +
-                            "- +1 point for every player beaten on a lap\n" +
-                            "- +8 points for finishing the course\n" +
-                            "- +4 points for every player beaten on the final lap\n" +
-                            "- Top 8 Bonuses- 1st:+25, 2nd,3rd:+15, 4th,5th:+10, 6th-8th:+5"
+                            "⑭ +1 point for completing a lap\n" +
+                            "⑭ +1 point for every player beaten on a lap\n" +
+                            "⑭ +8 points for finishing the course\n" +
+                            "⑭ +4 points for every player beaten on the final lap\n" +
+                            "⑭ Top 8 Bonuses- 1st:+25, 2nd,3rd:+15, 4th,5th:+10, 6th-8th:+5"
             });
     }
 

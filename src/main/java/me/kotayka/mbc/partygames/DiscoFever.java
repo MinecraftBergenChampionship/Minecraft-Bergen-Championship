@@ -75,13 +75,15 @@ public class DiscoFever extends PartyGame {
     }
     private DiscoFever() {
         super("DiscoFever", new Location(Bukkit.getWorld("Party"), 400, 1.5, 400,0,0), new String[] {
-                "Go as fast as you can towards the block in your hand before the timer runs out, and the rest of the blocks disappear!",
-                "The platform moves as time goes on, so make sure to keep moving forwards.",
-                "You'll get points for each player you outlive, along with points for every few rounds you survive and for reaching the end of the course.",
+                "⑰ Go as fast as you can towards the block in your hand before the timer runs out, and the rest of the blocks disappear!",
+                "⑰ The platform moves as time goes on, so make sure to keep moving forwards.\n\n" +
+                "⑰ The timer will get faster as the game goes on!",
+                "⑰ You'll get points for each player you outlive, along with points for every few rounds you survive.\n\n" +
+                "⑰ Players recieve a bonus for reaching the end of the course (and getting to the monkey!!).",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "- +2 points for each set of 6 stages completed\n" +
-                        "- +1 point for each player outlived\n" +
-                        "- +10 points for reaching the end of the course\n"
+                        "⑰ +2 points for each set of 6 stages completed\n" +
+                        "⑰ +1 point for each player outlived\n" +
+                        "⑰ +10 points for reaching the end of the course\n"
         });
     }
 

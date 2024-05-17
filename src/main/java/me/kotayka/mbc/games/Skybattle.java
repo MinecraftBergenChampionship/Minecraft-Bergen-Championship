@@ -36,13 +36,16 @@ public class Skybattle extends Game {
 
     public Skybattle() {
         super("Skybattle", new String[] {
-                "Make your way to the center of the map, collecting resources and eliminating other players as you go! Utility items are spread across the map, but the best items are always in the middle.",
-                "You'll have " + ChatColor.BOLD + "infinite blocks" + ChatColor.RESET + " so build as much as you need to! Just be careful of the void below...",
-                "Make sure to " + ChatColor.BOLD + "TURN ON PARTICLES" + ChatColor.RESET + " to see the border. There's also a " + ChatColor.BOLD + "height border" + ChatColor.RESET + " that lowers over time!",
+                "⑫ Make your way to the center of the map, collecting resources and eliminating other players as you go!\n\n" + 
+                "⑫ Utility items are spread across the map, but the best items are always in the middle.",
+                "⑫ You'll have " + ChatColor.BOLD + "infinite blocks" + ChatColor.RESET + " so build as much as you need to!\n\n" + 
+                "⑫ Just be careful of the void below...",
+                "⑫ Make sure to " + ChatColor.BOLD + "TURN ON PARTICLES" + ChatColor.RESET + " to see the border.\n\n" +
+                "⑫ There's also a " + ChatColor.BOLD + "height border" + ChatColor.RESET + " that lowers over time!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "- +15 points for eliminations\n" +
-                        "- +15 points for winning the round\n" +
-                        "- +1 point for outliving another player"
+                        "⑫ +15 points for eliminations\n" +
+                        "⑫ +15 points for winning the round\n" +
+                        "⑫ +1 point for outliving another player"
         });
     }
     private int roundNum = 1;
