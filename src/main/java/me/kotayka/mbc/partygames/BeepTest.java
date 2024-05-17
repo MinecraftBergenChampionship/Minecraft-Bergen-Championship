@@ -4,10 +4,12 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.function.mask.BlockStateMask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
+import com.sk89q.worldedit.math.transform.CombinedTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import me.kotayka.mbc.GameState;
@@ -72,7 +74,7 @@ public class BeepTest extends PartyGame {
         world().setTime(18000);
 
         loadInitialArena();
-        barriersFirstSide(true);
+        Barriers(true);
 
         setGameState(GameState.TUTORIAL);
 
@@ -107,7 +109,7 @@ public class BeepTest extends PartyGame {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS,1,1); // temp?
                     }
-                    barriersFirstSide(false);
+                    Barriers(false);
                     nextRound();
                     rounds++;
                     setGameState(GameState.ACTIVE);
@@ -155,8 +157,7 @@ public class BeepTest extends PartyGame {
         if (oppositeSide) {
             oppositeSide = false;
             EditSession editSession = WorldEdit.getInstance().newEditSession(WorldEditWorld);
-            ForwardExtentCopy copy = new ForwardExtentCopy(WorldEditWorld, lvl.getRegion(), BukkitAdapter.asBlockVector(lvl.getPasteFrom()), editSession, BukkitAdapter.asBlockVector(courseToSecondary));
-            copy.setTransform(new AffineTransform().rotateY(180));
+            ForwardExtentCopy copy = new ForwardExtentCopy(WorldEditWorld, lvl.getReversedRegion(), BukkitAdapter.asBlockVector(lvl.getPasteReversed()), editSession, BukkitAdapter.asBlockVector(courseToPrimary));
             try {
                 Operations.complete(copy);
                 editSession.close();
@@ -206,7 +207,7 @@ public class BeepTest extends PartyGame {
      *
      * @param b Boolean for state of barriers: true = Barriers, false = Air
      */
-    private void barriersFirstSide(boolean b) {
+    private void Barriers(boolean b) {
         Material m = b ? Material.BARRIER : Material.AIR;
 
         for (int y = -55; y <= -52; y++) {
