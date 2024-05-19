@@ -48,6 +48,8 @@ public class DecisionDome extends Minigame {
     private int currentSection = (int)(Math.random()*gameNames.size());
     private Section winner;
     private boolean tie = false;
+    private int doubleTime = (int)(Math.random()*20) + 10;
+    private boolean doubled = true;
 
     public DecisionDome(boolean revealedGames) {
         super("DecisionDome");
@@ -193,6 +195,10 @@ public class DecisionDome extends Minigame {
                 }
             }
         } else if (getState().equals(GameState.ACTIVE)) {
+            if (timeRemaining == doubleTime) {
+                doubled = false;
+                Bukkit.broadcastMessage(ChatColor.GREEN+"Double Chicken Time has ended!");
+            }
             switch (timeRemaining) {
                 case 0 -> {
                     for (Participant p : MBC.getInstance().getPlayers()) {
@@ -650,6 +656,12 @@ public class DecisionDome extends Minigame {
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
             chicken.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 1, false, false));
             chickens.add(new VoteChicken(p.getTeam(), chicken));
+            if(doubled) {
+                Chicken chickenTwo = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
+                chickenTwo.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 1, false, false));
+                chickens.add(new VoteChicken(p.getTeam(), chickenTwo));
+            }
+            
         } else if (e.getEntity().getType().equals(EntityType.ARROW)) {
             if (!(e.getEntity().getShooter() instanceof Player) || e.getEntity().getShooter() == null) return;
             if (e.getHitEntity() != null) {
