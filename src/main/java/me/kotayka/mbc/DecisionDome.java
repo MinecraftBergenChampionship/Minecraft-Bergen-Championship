@@ -431,7 +431,6 @@ public class DecisionDome extends Minigame {
         }
 
         String randomGame = gameNames.get((int)(Math.random()*gameNames.size()));
-        randomGame = randomGame.substring(0,2) + ChatColor.BOLD + randomGame.substring(2);
         loadSection(section, randomGame);
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.sendTitle(randomGame, "", 20, 60, 20);
