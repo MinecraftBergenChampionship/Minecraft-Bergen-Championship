@@ -29,15 +29,19 @@ import java.util.*;
 public class BuildMart extends Game {
     public AbstractBuildMartMap map = new BuildMartMap(this);
     public List<BuildMartPlayer> buildMartPlayers = new ArrayList<BuildMartPlayer>();
+    // TODO this goes for a lot of things but these are preferably private
     public BuildMartTeam red = new BuildMartTeam(MBC.getInstance().red, new Location(map.getWorld(), -107, 1, 150, -90, 0));
     public BuildMartTeam yellow = new BuildMartTeam(MBC.getInstance().yellow, new Location(map.getWorld(), -68, 1, 150, -90, 0));
     public BuildMartTeam green = new BuildMartTeam(MBC.getInstance().green, new Location(map.getWorld(), -28, 1, 150, -90, 0));
     public BuildMartTeam blue = new BuildMartTeam(MBC.getInstance().blue, new Location(map.getWorld(), 11, 1, 150, -90, 0));
     public BuildMartTeam purple = new BuildMartTeam(MBC.getInstance().purple, new Location(map.getWorld(), 50, 1, 150, -90, 0));
     public BuildMartTeam pink = new BuildMartTeam(MBC.getInstance().pink, new Location(map.getWorld(), 89, 1, 150, -90, 0));
-    public BuildMartTeam[] teams = {red, yellow, green, blue, purple, pink};
-    private final List<Build> GAME_ORDER = new ArrayList<>(); // Randomly ordered builds
-    private final Location FIRST_BUILD_MIDDLE = new Location(Bukkit.getWorld("bsabmMaps"), -6, 185, 2);
+    private BuildMartTeam[] teams = {red, yellow, green, blue, purple, pink};
+
+    //private final List<Build> GAME_ORDER = new ArrayList<>(); // Randomly ordered builds
+    private final List<Build> EASY_BUILDS = new ArrayList<>();
+    private final List<Build> MEDIUM_BUILDS = new ArrayList<>();
+    private final List<Build> HARD_BUILDS = new ArrayList<>();
     public final World BUILD_WORLD = Bukkit.getWorld("bsabmMaps");
     public static final int NUM_PLOTS_PER_TEAM = 3;
     public static final int BUILD_COMPLETION_POINTS = 3; // points are per player
@@ -213,6 +217,7 @@ public class BuildMart extends Game {
 
         Block b = e.getBlock();
 
+        // Search all plots to check if block broken was in a build plot.
         BuildMartTeam t = getTeam(Participant.getParticipant(e.getPlayer()));
         for (int i = 0; i < NUM_PLOTS_PER_TEAM; i++) {
             BuildPlot plot = t.getPlots()[i][1];
@@ -225,9 +230,17 @@ public class BuildMart extends Game {
         }
 
         if (m.toString().endsWith("FAN") || m.toString().endsWith("CORAL")) {
+            // TODO: This is a map dependent, temporary fix.
+            // Since there are no break areas corresponding to FAN and CORAL (due to me trying to shortcut),
+            // I cannot place this lower, as it will exit. Since MBC4 is approaching, I am leaving this temporary solution.
+            if (e.getBlock().getY() < 20) return;
+
             map.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(m));
             e.setCancelled(true);
         } else if (m.toString().contains("POTTED")){
+            // see above
+            if (e.getBlock().getY() < 20) return;
+
             for (ItemStack i : e.getBlock().getDrops()) {
                 map.getWorld().dropItemNaturally(b.getLocation(), i);
             }
@@ -298,7 +311,6 @@ public class BuildMart extends Game {
 
         Location fwLoc = new Location(map.getWorld(), plot.getMIDPOINT().getX(), plot.getMIDPOINT().getY()+3, plot.getMIDPOINT().getZ());
         MBC.spawnFirework(fwLoc, team.getTeam().getColor());
-        team.incrementBuildsCompleted();
         for (Participant p : team.getTeam().teamPlayers) {
             MBC.spawnFirework(p);
             p.addCurrentScoreNoDisplay(BUILD_COMPLETION_POINTS);
@@ -315,9 +327,14 @@ public class BuildMart extends Game {
         }
         Bukkit.broadcastMessage(s);
 
-        // Next Build
+        // Generate next build based on which build was just completed
         int id = plot.getID();
-        Build nextBuild = GAME_ORDER.get((NUM_PLOTS_PER_TEAM+team.getBuildsCompleted()) % GAME_ORDER.size());
+        team.incrementBuildsCompleted(id);
+        Build nextBuild = switch (id) {
+            case 0 -> EASY_BUILDS.get(team.getEasyBuildsCompleted());
+            case 1 -> MEDIUM_BUILDS.get(team.getMediumBuildsCompleted());
+            default -> HARD_BUILDS.get(team.getHardBuildsCompleted());
+        };
         BuildPlot example = team.getPlots()[id][0];
         team.getPlots()[id][1].setAir();
         plot.setBuild(nextBuild);
@@ -326,22 +343,39 @@ public class BuildMart extends Game {
     }
 
     /**
-     * Load all possible builds
+     * Loads all builds from bsabmMaps world into their respective ArrayLists.
+     * Each list is then shuffled.
      */
     public void loadBuilds() {
-        Block b = BUILD_WORLD.getBlockAt(FIRST_BUILD_MIDDLE);
+        Location FIRST_EASY_BUILD = new Location(BUILD_WORLD, 11, 185, 2);
+        Location FIRST_MEDIUM_BUILD = new Location(BUILD_WORLD, 11, 185, -28);
+        Location FIRST_HARD_BUILD = new Location(BUILD_WORLD, 11, 185, -58);
+        EASY_BUILDS.add(new Build(FIRST_EASY_BUILD));
+        MEDIUM_BUILDS.add(new Build(FIRST_MEDIUM_BUILD));
+        HARD_BUILDS.add(new Build(FIRST_HARD_BUILD));
 
-        Build build = new Build(new Location(BUILD_WORLD, 11, 185, 2));
-        GAME_ORDER.add(build);
+        Block easyBlock = BUILD_WORLD.getBlockAt(new Location(BUILD_WORLD, -6, 185, 2));
+        Block mediumBlock = BUILD_WORLD.getBlockAt(new Location(BUILD_WORLD, -6, 185, -28));
+        Block hardBlock = BUILD_WORLD.getBlockAt(new Location(BUILD_WORLD, -6, 185, -58));
 
-        while (b.getType() == Material.DIAMOND_BLOCK) {
-            GAME_ORDER.add(new Build(b.getLocation()));
-
-            b = BUILD_WORLD.getBlockAt(b.getX() - 9, b.getY(), b.getZ());
+        // load easy builds
+        while (easyBlock.getType() == Material.DIAMOND_BLOCK) {
+            EASY_BUILDS.add(new Build(easyBlock.getLocation()));
+            easyBlock = BUILD_WORLD.getBlockAt(easyBlock.getX() - 9, easyBlock.getY(), easyBlock.getZ());
         }
-        Collections.shuffle(GAME_ORDER);
 
-        //Bukkit.broadcastMessage("[Debug] GAME_ORDER.size() == " + GAME_ORDER.size());
+        // load medium builds
+        while (mediumBlock.getType() == Material.DIAMOND_BLOCK) {
+            MEDIUM_BUILDS.add(new Build(mediumBlock.getLocation()));
+            mediumBlock = BUILD_WORLD.getBlockAt(mediumBlock.getX() - 9, mediumBlock.getY(), mediumBlock.getZ());
+        }
+
+        // load hard builds
+        while (hardBlock.getType() == Material.DIAMOND_BLOCK) {
+            EASY_BUILDS.add(new Build(hardBlock.getLocation()));
+            hardBlock = BUILD_WORLD.getBlockAt(hardBlock.getX() - 9, hardBlock.getY(), hardBlock.getZ());
+        }
+
     }
 
     public StringBuilder createActionBarString (String material) {
@@ -471,8 +505,14 @@ public class BuildMart extends Game {
         p.setPlayer(e.getPlayer());
     }
 
-    public List<Build> getOrder() {
-        return GAME_ORDER;
+    public List<Build> getOrder(int id) {
+        if (id < 0 || id > 2) return null;
+
+        return switch (id) {
+            case 0 -> EASY_BUILDS;
+            case 1 -> MEDIUM_BUILDS;
+            default -> HARD_BUILDS;
+        };
     }
 
 }

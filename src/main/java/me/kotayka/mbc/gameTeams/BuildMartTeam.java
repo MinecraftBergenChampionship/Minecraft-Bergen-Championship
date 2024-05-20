@@ -13,7 +13,11 @@ public class BuildMartTeam extends gameTeam {
     private final BuildPlot[][] plots = new BuildPlot[BuildMart.NUM_PLOTS_PER_TEAM][2];
     private final Location SPAWN;
     private final Map<Build, Integer> completions = new HashMap<>();
-    private int buildsCompleted = 0;
+    private int buildsCompleted = 0; // this probably doesn't need to exist anymore but i'm keeping it for now just for convenience
+    private int easyBuildsCompleted = 0;
+    private int mediumBuildsCompleted = 0;
+    private int hardBuildsCompleted = 0;
+
 
     public BuildMartTeam(MBCTeam team, Location spawnLoc) {
         super(team);
@@ -42,6 +46,18 @@ public class BuildMartTeam extends gameTeam {
         return SPAWN;
     }
     public int getBuildsCompleted() { return buildsCompleted; }
-    public void incrementBuildsCompleted() { buildsCompleted++; }
+    public int getEasyBuildsCompleted() { return easyBuildsCompleted; }
+    public int getMediumBuildsCompleted() { return mediumBuildsCompleted; }
+    public int getHardBuildsCompleted() { return hardBuildsCompleted; }
+    public void incrementBuildsCompleted(int id) {
+        if (id != 0 && id != 1 && id != 2) return;
+        buildsCompleted++;
+
+        switch (id) {
+            case 0 -> easyBuildsCompleted++;
+            case 1 -> mediumBuildsCompleted++;
+            default -> hardBuildsCompleted++;
+        }
+    }
     public Map<Build, Integer> getCompletions() { return completions; }
 }

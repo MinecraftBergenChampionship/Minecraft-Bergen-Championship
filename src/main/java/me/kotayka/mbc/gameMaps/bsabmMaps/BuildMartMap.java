@@ -25,6 +25,8 @@ public class BuildMartMap extends AbstractBuildMartMap {
         super.replicationLocations.put(BreakAreaType.SPRUCE_LOGS, new Location(w, -31, -16, 159));
         super.replicationLocations.put(BreakAreaType.BIRCH_LOGS, new Location(w, -40, -16, 159));
         super.replicationLocations.put(BreakAreaType.OAK_LOGS, new Location(w, -49, -16, 159));
+        super.replicationLocations.put(BreakAreaType.DARK_OAK_LOGS, new Location(w, -4, -16, 159));
+        super.replicationLocations.put(BreakAreaType.CHERRY_LOGS, new Location(w, 5, -16, 159));
         super.replicationLocations.put(BreakAreaType.SAND, new Location(w, -60, -16, 159));
         super.replicationLocations.put(BreakAreaType.ORES, new Location(w, -78, -16, 159));
         this.BUILD_MART = buildMart;
@@ -100,8 +102,8 @@ public class BuildMartMap extends AbstractBuildMartMap {
         addBreakArea(new BreakArea(Material.BIRCH_LOG, new Location(w, -91, 73, 24), new Location(w, -83, 79, 32), BreakAreaType.BIRCH_LOGS, new Location(w, -81, 72, 21, 0, 0)));
         addBreakArea(new BreakArea(Material.BIRCH_LOG, new Location(w, -91, 82, 24), new Location(w, -83, 88, 32), BreakAreaType.BIRCH_LOGS, new Location(w, -81, 81, 22, 0, 0)));
         addBreakArea(new BreakArea(Material.JUNGLE_LOG, new Location(w, -79, 73, -4), new Location(w, -71, 79, 4), BreakAreaType.JUNGLE_LOGS, new Location(w, -81, 72, 7, -180, 0)));
-        addBreakArea(new BreakArea(Material.JUNGLE_LOG, new Location(w, -79, 82, -4), new Location(w, -71, 88, 4), BreakAreaType.JUNGLE_LOGS, new Location(w, -81, 81, 6, -180, 0)));
-        addBreakArea(new BreakArea(Material.ACACIA_LOG, new Location(w, -91, 73, -4), new Location(w, -83, 79, 4), BreakAreaType.ACACIA_LOGS, new Location(w, -81, 72, 7, -180, 0)));
+        addBreakArea(new BreakArea(Material.JUNGLE_LOG, new Location(w, -79, 82, -4), new Location(w, -71, 88, 4), BreakAreaType.CHERRY_LOGS, new Location(w, -81, 81, 6, -180, 0)));
+        addBreakArea(new BreakArea(Material.ACACIA_LOG, new Location(w, -91, 73, -4), new Location(w, -83, 79, 4), BreakAreaType.DARK_OAK_LOGS, new Location(w, -81, 72, 7, -180, 0)));
         addBreakArea(new BreakArea(Material.ACACIA_LOG, new Location(w, -91, 82, -4), new Location(w, -83, 88, 4), BreakAreaType.ACACIA_LOGS, new Location(w, -81, 81, 6, -180, 0)));
         addBreakArea(new BreakArea(Material.SPRUCE_LOG, new Location(w, -105, 73, 10), new Location(w, -97, 79, 18), BreakAreaType.SPRUCE_LOGS, new Location(w, -94, 72, 14, 90, 0)));
         addBreakArea(new BreakArea(Material.SPRUCE_LOG, new Location(w, -105, 82, 10), new Location(w, -97, 88, 18), BreakAreaType.SPRUCE_LOGS, new Location(w, -96, 81, 14, 90, 0)));
@@ -201,13 +203,13 @@ public class BuildMartMap extends AbstractBuildMartMap {
         World world = Bukkit.getWorld("BSABM");
         int x = -85;
         int z = 142;
-        int i = 0, n = 0; // i tracks teams, k tracks plot num
+        int i = 0, n = 0; // i tracks teams, n tracks plot num
         for (; x <= 110; x += 39) {
             for (; z <= 164; z += 11) {
                 BuildPlot example = new BuildPlot(new Location(world, x, 1, z), true, n);
                 BuildPlot replica = new BuildPlot(new Location(world, x-11, 1, z), false, n);
-                replica.setBuild(BUILD_MART.getOrder().get(n));
-                example.setBuild(BUILD_MART.getOrder().get(n));
+                replica.setBuild(BUILD_MART.getOrder(n).get(0));
+                example.setBuild(BUILD_MART.getOrder(n).get(0));
                 teams[i].addBuildPlot(replica, n);
                 teams[i].addExamplePlot(example, n);
                 replica.setAir();
