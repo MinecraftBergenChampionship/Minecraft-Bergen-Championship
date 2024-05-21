@@ -12,6 +12,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -84,6 +85,8 @@ public class BuildMart extends Game {
 
     public void start() {
         super.start();
+
+        deleteOldNames();
 
         // make all item frames fixed
         for (ItemFrame i : map.getWorld().getEntitiesByClass(ItemFrame.class)) {
@@ -535,6 +538,12 @@ public class BuildMart extends Game {
         BuildMartPlayer p = getBuildMartPlayer(e.getPlayer());
         if (p == null) return; // new login; doesn't matter
         p.setPlayer(e.getPlayer());
+    }
+
+    public void deleteOldNames() {
+        for (ArmorStand a : map.getWorld().getEntitiesByClass(ArmorStand.class)) {
+            a.remove();
+        }
     }
 
     public List<Build> getOrder(int id) {
