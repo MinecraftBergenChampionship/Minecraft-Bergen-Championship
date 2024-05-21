@@ -87,7 +87,8 @@ public class BuildMartMap extends AbstractBuildMartMap {
         addBreakArea(new BreakArea(Material.DIAMOND_BLOCK, new Location(w, 78, 74, 48), new Location(w, 84, 80, 54), BreakAreaType.ORES, new Location(w, 75, 74, 51, -90, 0)));
         addBreakArea(new BreakArea(Material.IRON_BLOCK, new Location(w,51,74,59), new Location(w,57,80,65), BreakAreaType.ORES, new Location(w, 54, 74, 56, 0, 0)));
         addBreakArea(new BreakArea(Material.REDSTONE_BLOCK, new Location(w, 59, 74, 59), new Location(w, 65, 80, 65), BreakAreaType.ORES, new Location(w, 62, 74, 56, 0, 0)));
-        addBreakArea(new BreakArea(Material.COAL_BLOCK, new Location(w, 67, 75, 59), new Location(w, 73, 80, 65), BreakAreaType.ORES, new Location(w, 70, 80, 56, 0, 0)));
+        addBreakArea(new BreakArea(Material.COAL_BLOCK, new Location(w, 67, 74, 59), new Location(w, 73, 80, 65), BreakAreaType.ORES, new Location(w, 70, 80, 56, 0, 0)));
+        addBreakArea(new BreakArea(Material.AMETHYST_BLOCK, new Location(w, 78, 74, 59), new Location(w, 84, 80,65), BreakAreaType.ORES, new Location(w, 70, 80, 56, 0, 0)));
 
         // Sand
         addBreakArea(new BreakArea(Material.SANDSTONE, new Location(w, -74, 74, -56), new Location(w, -64, 84, -46), BreakAreaType.SAND, new Location(w, -69, 74, -43, -180, 0)));
@@ -102,8 +103,8 @@ public class BuildMartMap extends AbstractBuildMartMap {
         addBreakArea(new BreakArea(Material.BIRCH_LOG, new Location(w, -91, 73, 24), new Location(w, -83, 79, 32), BreakAreaType.BIRCH_LOGS, new Location(w, -81, 72, 21, 0, 0)));
         addBreakArea(new BreakArea(Material.BIRCH_LOG, new Location(w, -91, 82, 24), new Location(w, -83, 88, 32), BreakAreaType.BIRCH_LOGS, new Location(w, -81, 81, 22, 0, 0)));
         addBreakArea(new BreakArea(Material.JUNGLE_LOG, new Location(w, -79, 73, -4), new Location(w, -71, 79, 4), BreakAreaType.JUNGLE_LOGS, new Location(w, -81, 72, 7, -180, 0)));
-        addBreakArea(new BreakArea(Material.JUNGLE_LOG, new Location(w, -79, 82, -4), new Location(w, -71, 88, 4), BreakAreaType.CHERRY_LOGS, new Location(w, -81, 81, 6, -180, 0)));
-        addBreakArea(new BreakArea(Material.ACACIA_LOG, new Location(w, -91, 73, -4), new Location(w, -83, 79, 4), BreakAreaType.DARK_OAK_LOGS, new Location(w, -81, 72, 7, -180, 0)));
+        addBreakArea(new BreakArea(Material.CHERRY_LOG, new Location(w, -79, 82, -4), new Location(w, -71, 88, 4), BreakAreaType.CHERRY_LOGS, new Location(w, -81, 81, 6, -180, 0)));
+        addBreakArea(new BreakArea(Material.DARK_OAK_LOG, new Location(w, -91, 73, -4), new Location(w, -83, 79, 4), BreakAreaType.DARK_OAK_LOGS, new Location(w, -81, 72, 7, -180, 0)));
         addBreakArea(new BreakArea(Material.ACACIA_LOG, new Location(w, -91, 82, -4), new Location(w, -83, 88, 4), BreakAreaType.ACACIA_LOGS, new Location(w, -81, 81, 6, -180, 0)));
         addBreakArea(new BreakArea(Material.SPRUCE_LOG, new Location(w, -105, 73, 10), new Location(w, -97, 79, 18), BreakAreaType.SPRUCE_LOGS, new Location(w, -94, 72, 14, 90, 0)));
         addBreakArea(new BreakArea(Material.SPRUCE_LOG, new Location(w, -105, 82, 10), new Location(w, -97, 88, 18), BreakAreaType.SPRUCE_LOGS, new Location(w, -96, 81, 14, 90, 0)));

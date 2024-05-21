@@ -44,8 +44,12 @@ public class BuildMart extends Game {
     private final List<Build> HARD_BUILDS = new ArrayList<>();
     public final World BUILD_WORLD = Bukkit.getWorld("bsabmMaps");
     public static final int NUM_PLOTS_PER_TEAM = 3;
-    public static final int BUILD_COMPLETION_POINTS = 3; // points are per player
-    public static final int BUILD_PLACEMENT_POINTS = 3; // points are per player
+    // Scoring; points are per player
+    public static final int COMPLETION_POINTS_EASY = 4;
+    public static final int COMPLETION_POINTS_MEDIUM = 8;
+    public static final int COMPLETION_POINTS_HARD = 10;
+    public static final int PLACEMENT_POINTS = 1;
+    public static final int PLACEMENT_POINTS_HARD = 2;
 
     private Map<Participant, Material> hotbarSelector = new HashMap<Participant, Material>();
 
@@ -159,6 +163,13 @@ public class BuildMart extends Game {
                         BuildPlot plot = t.getPlots()[i][1];
                         Build build = plot.getBuild();
                         double percent = plot.getPercentCompletion();
+
+                        int BUILD_COMPLETION_POINTS;
+                        switch (plot.getID()) {
+                            case 0 -> BUILD_COMPLETION_POINTS = COMPLETION_POINTS_EASY;
+                            case 1 -> BUILD_COMPLETION_POINTS = COMPLETION_POINTS_MEDIUM;
+                            default -> BUILD_COMPLETION_POINTS = COMPLETION_POINTS_HARD;
+                        }
                         int points = (int) (BUILD_COMPLETION_POINTS * t.getTeam().teamPlayers.size() * percent);
 
                         getLogger().log(String.format("%.2f%% of %s%s%s", percent, ChatColor.BOLD, build.getName(), ChatColor.RESET));
@@ -309,6 +320,17 @@ public class BuildMart extends Game {
         }
         team.getCompletions().put(plot.getBuild(), placement);
 
+        int BUILD_COMPLETION_POINTS;
+        int BUILD_PLACEMENT_POINTS = PLACEMENT_POINTS;
+        switch (plot.getID()) {
+            case 0 -> BUILD_COMPLETION_POINTS = COMPLETION_POINTS_EASY;
+            case 1 -> BUILD_COMPLETION_POINTS = COMPLETION_POINTS_MEDIUM;
+            default -> {
+                BUILD_COMPLETION_POINTS = COMPLETION_POINTS_HARD;
+                BUILD_PLACEMENT_POINTS = PLACEMENT_POINTS_HARD;
+            }
+        }
+
         Location fwLoc = new Location(map.getWorld(), plot.getMIDPOINT().getX(), plot.getMIDPOINT().getY()+3, plot.getMIDPOINT().getZ());
         MBC.spawnFirework(fwLoc, team.getTeam().getColor());
         for (Participant p : team.getTeam().teamPlayers) {
@@ -318,8 +340,13 @@ public class BuildMart extends Game {
             createLine(3, ChatColor.GREEN.toString()+ChatColor.BOLD+"Builds Completed: " + ChatColor.RESET+team.getBuildsCompleted(), p);
         }
 
+        ChatColor color = switch (plot.getID()) {
+            case 0 -> ChatColor.GREEN;
+            case 1 -> ChatColor.YELLOW;
+            default -> ChatColor.RED;
+        };
         String s =
-                String.format("%s completed [%s%s%s] in %s%s%s place!", team.getTeam().teamNameFormat(), ChatColor.BOLD, plot.getBuild().getName(),
+                String.format("%s completed [%s%s%s%s] in %s%s%s place!", team.getTeam().teamNameFormat(), color, ChatColor.BOLD, plot.getBuild().getName(),
                         ChatColor.RESET, getColorStringFromPlacement(placement), getPlace(placement), ChatColor.RESET);
 
         if (MBC.getInstance().logStats()) {
@@ -372,9 +399,13 @@ public class BuildMart extends Game {
 
         // load hard builds
         while (hardBlock.getType() == Material.DIAMOND_BLOCK) {
-            EASY_BUILDS.add(new Build(hardBlock.getLocation()));
+            HARD_BUILDS.add(new Build(hardBlock.getLocation()));
             hardBlock = BUILD_WORLD.getBlockAt(hardBlock.getX() - 9, hardBlock.getY(), hardBlock.getZ());
         }
+
+        Collections.shuffle(EASY_BUILDS);
+        Collections.shuffle(MEDIUM_BUILDS);
+        Collections.shuffle(HARD_BUILDS);
 
     }
 
@@ -415,7 +446,8 @@ public class BuildMart extends Game {
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (e.getClickedBlock() == null) return;
-        if ((e.getClickedBlock().getType().toString().endsWith("LOG") && e.getPlayer().getInventory().getItemInMainHand().getType().toString().endsWith("AXE"))) {
+        if ((e.getClickedBlock().getType().toString().endsWith("LOG") && e.getPlayer().getInventory().getItemInMainHand().getType().toString().endsWith("AXE"))
+            || e.getClickedBlock().getType().toString().startsWith("POTTED")) {
             Block b = e.getClickedBlock();
             BuildMartTeam t = getTeam(Participant.getParticipant(e.getPlayer()));
             for (int i = 0; i < NUM_PLOTS_PER_TEAM; i++) {

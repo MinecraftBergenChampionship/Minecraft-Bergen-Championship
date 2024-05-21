@@ -45,7 +45,13 @@ public class BuildPlot {
             authorNameDisplay.setGravity(false);
         }
 
-        buildNameDisplay.setCustomName(ChatColor.BOLD+this.build.getName());
+        ChatColor color = switch (ID) {
+            case 0 -> ChatColor.GREEN;
+            case 1 -> ChatColor.YELLOW;
+            default -> ChatColor.RED;
+        };
+
+        buildNameDisplay.setCustomName(color + "" + ChatColor.BOLD+this.build.getName());
         buildNameDisplay.setCustomNameVisible(true);
 
         String creator = this.build.getAuthor();
