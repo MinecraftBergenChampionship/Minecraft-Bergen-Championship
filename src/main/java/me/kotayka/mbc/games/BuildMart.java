@@ -123,7 +123,7 @@ public class BuildMart extends Game {
                     bmp.respawn();
                 }
                 setGameState(GameState.STARTING);
-                timeRemaining = 25;
+                timeRemaining = 30;
             } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
