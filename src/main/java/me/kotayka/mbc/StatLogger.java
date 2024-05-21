@@ -19,7 +19,7 @@ public class StatLogger {
 
     public StatLogger(Minigame game) {
         this.GAME = game;
-        directory = MBC.statDirectory();
+        directory = MBC.getInstance().statDirectory();
         file = createFile();
     }
 

@@ -27,21 +27,25 @@ public class statlogs implements CommandExecutor {
         if (args.length == 0) {
             sender.sendMessage(ChatColor.RED+"Usage: /statlogs set [true/false]");
             sender.sendMessage(ChatColor.RED+"Usage: /statlogs get [game] [team/individual]");
+            sender.sendMessage(ChatColor.RED+"Usage: /statlogs directory [directory]");
             sender.sendMessage("Stat logging is currently set to: " + MBC.getInstance().logStats());
             return false;
         }
 
-        if (!(args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("get"))) {
+        if (!(args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("get") || args[0].equalsIgnoreCase("directory"))) {
             sender.sendMessage(ChatColor.RED+"Invalid arguments;");
             sender.sendMessage(ChatColor.RED+"Usage: /statlogs set [true/false]");
             sender.sendMessage(ChatColor.RED+"Usage: /statlogs get [game] [team/individual]");
+            sender.sendMessage(ChatColor.RED+"Usage: /statlogs directory [directory name (no spaces)]");
             return false;
         }
 
-        if ((args.length != 2 && args[0].equalsIgnoreCase("set")) || (args.length != 3 && args[0].equalsIgnoreCase("get"))) {
+        if ((args.length != 2 && args[0].equalsIgnoreCase("set")) || (args.length != 3 && args[0].equalsIgnoreCase("get"))
+            || args.length != 2 && args[0].equalsIgnoreCase("directory")) {
             sender.sendMessage(ChatColor.RED+"Invalid arguments;");
             sender.sendMessage(ChatColor.RED+"Usage: /statlogs set [true/false]");
             sender.sendMessage(ChatColor.RED+"Usage: /statlogs get [game] [team/individual]");
+            sender.sendMessage(ChatColor.RED+"Usage: /statlogs directory [directory name (no spaces)]");
             return false;
         }
 
@@ -74,23 +78,27 @@ public class statlogs implements CommandExecutor {
 
             // NOTE: this may not put in order rn, not the biggest deal
             if (args[2].equalsIgnoreCase("team")) {
-                sender.sendMessage(ChatColor.BOLD+"Team Scores:\n"+ChatColor.RESET);
+                sender.sendMessage(ChatColor.BOLD + "Team Scores:\n" + ChatColor.RESET);
                 for (MBCTeam t : game.scoreMap.keySet()) {
                     sender.sendMessage(String.format("%s: %.1f", t.teamNameFormat(), game.scoreMap.get(t)));
                 }
                 return true;
             } else if (args[2].equalsIgnoreCase("individual")) {
-                sender.sendMessage(ChatColor.BOLD+"Individual Scores:"+ChatColor.RESET);
+                sender.sendMessage(ChatColor.BOLD + "Individual Scores:" + ChatColor.RESET);
                 for (Participant p : game.gameIndividual) {
                     sender.sendMessage(String.format("%s: %d", p.getFormattedName(), game.individual.get(p)));
                 }
                 return true;
             } else {
-                sender.sendMessage(ChatColor.RED+"Invalid arguments;");
-                sender.sendMessage(ChatColor.RED+"Usage: /statlogs set [true/false]");
-                sender.sendMessage(ChatColor.RED+"Usage: /statlogs get [game] [team/individual]");
+                sender.sendMessage(ChatColor.RED + "Invalid arguments;");
+                sender.sendMessage(ChatColor.RED + "Usage: /statlogs set [true/false]");
+                sender.sendMessage(ChatColor.RED + "Usage: /statlogs get [game] [team/individual]");
                 return false;
             }
+        } else if (args[0].equalsIgnoreCase("directory")) {
+            MBC.getInstance().setStatDirectory(args[1]);
+            sender.sendMessage(ChatColor.GREEN + "Directory has been updated to: " + MBC.getInstance().statDirectory());
+            return true;
         } else {
             sender.sendMessage(ChatColor.RED+"Invalid arguments;");
             sender.sendMessage(ChatColor.RED+"Usage: /statlogs set [true/false]");

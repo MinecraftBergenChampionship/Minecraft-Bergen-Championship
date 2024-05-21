@@ -15,7 +15,7 @@ public class statlogsTabCompleter implements TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("set", "get");
+            return Arrays.asList("set", "get", "directory");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("set")) {
             return Arrays.asList("true", "false");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("get")) {

@@ -83,6 +83,8 @@ public class MBC implements Listener {
     public boolean finalGame = false;
     public boolean readyCheck = false;
     public boolean started = false;
+    private boolean no_stats = false;
+    private String STAT_DIRECTORY = "MBC_EVENT";
 
     //public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt","Quickfire"));
     public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire"));
@@ -741,10 +743,19 @@ public class MBC implements Listener {
 
         if (ready.size() == getValidTeams().size()) {
             if (getValidTeams().size() == 0) {
-                // awwwwwww
                 announce("There are no teams! You may want to assign teams first!");
+            } else if (!started && !enable_stat_logging && !no_stats) {
+                announce("Waiting for admin...");
+                for (Player pl : Bukkit.getOnlinePlayers()) {
+                    if (pl.isOp()) {
+                        pl.sendMessage("Stat logging is not enabled. Run /ready again if you are sure you do not want to log stats.");
+                        pl.sendMessage("Stat logs can be enabled with: /statlogs set true");
+                        pl.sendMessage("Directory of stat logs is currently: " + statDirectory());
+                        pl.sendMessage("Directory can be updated with: /statlogs directory <directory name (no spaces)>");
+                    }
+                    no_stats = true;
+                }
             } else if (!started) {
-                started = true;
                 startEvent();
             }
             else {
@@ -808,6 +819,7 @@ public class MBC implements Listener {
     public Plugin getPlugin() { return plugin; }
 
     private void startEvent() {
+        started = true;
         lobby.setGameState(GameState.TUTORIAL);
         announce(ChatColor.BOLD + "The event is starting!" + ChatColor.RESET + "\nYou may want to turn JUKEBOX sounds down.");
         lobby.setTimer(65);
@@ -816,7 +828,8 @@ public class MBC implements Listener {
     public void setLogStats(boolean b) { enable_stat_logging = b; }
     public boolean logStats() { return enable_stat_logging; }
     public void setMultiplier(double multiplier) { this.multiplier = multiplier; }
-    public static String statDirectory() { return "stat_archive"+File.separator+"MBC2";}
+    public void setStatDirectory(String s) { this.STAT_DIRECTORY = s; }
+    public String statDirectory() { return "stat_archive"+File.separator+STAT_DIRECTORY;}
     /**
      * ArrayList of all Participants including Spectators.
      * @return Copy of list of current players with spectators.
