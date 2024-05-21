@@ -506,22 +506,22 @@ public class SurvivalGames extends Game {
         if (!(e.getAction().isRightClick())) return;
         Player p = e.getPlayer();
 
+        if (p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW || p.getInventory().getItemInOffHand().getType() == Material.MUSHROOM_STEW) {
+            eatMushroomStew(p);
+            return;
+        }
+
         // Custom GUI for Enchanting
         if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.ENCHANTING_TABLE)) {
             e.setCancelled(true);
             setupGUI(e.getPlayer());
-            return;
         }
 
+        /*
         if (e.getClickedBlock() != null && e.getClickedBlock() instanceof Container &&
                 (!e.getClickedBlock().getType().equals(Material.CHEST) && !e.getClickedBlock().getType().equals(Material.CRAFTING_TABLE))) {
            e.setCancelled(true);
            return;
-        }
-
-        if (p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW || p.getInventory().getItemInOffHand().getType() == Material.MUSHROOM_STEW) {
-            eatMushroomStew(p);
-            return;
         }
 
         if (p.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW)) {
@@ -637,6 +637,7 @@ public class SurvivalGames extends Game {
         }
     }
 
+    /*
     // Prevent players from picking up crossbows that are loaded
     @EventHandler
     public void PickupItem(EntityPickupItemEvent e) {
@@ -659,6 +660,7 @@ public class SurvivalGames extends Game {
             }
         }
     }
+     */
 
     /**
      * TODO: better standardization across maps
@@ -723,6 +725,7 @@ public class SurvivalGames extends Game {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
+        /*
         if (e.getView().getType().equals(InventoryType.CHEST)) {
             Player p = (Player) e.getWhoClicked();
             ItemStack crossbow = e.getCursor();
@@ -743,6 +746,7 @@ public class SurvivalGames extends Game {
             }
             return;
         }
+         */
 
         if (e.getView().getTitle().equals("Enchanting")) {
             // handle custom enchants;
