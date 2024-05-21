@@ -98,6 +98,8 @@ public class statlogs implements CommandExecutor {
         } else if (args[0].equalsIgnoreCase("directory")) {
             MBC.getInstance().setStatDirectory(args[1]);
             sender.sendMessage(ChatColor.GREEN + "Directory has been updated to: " + MBC.getInstance().statDirectory());
+            ChatColor color = MBC.getInstance().logStats() ? ChatColor.GREEN : ChatColor.RED;
+            sender.sendMessage(color + "Stat logging is currently set to " + MBC.getInstance().logStats() + ".");
             return true;
         } else {
             sender.sendMessage(ChatColor.RED+"Invalid arguments;");

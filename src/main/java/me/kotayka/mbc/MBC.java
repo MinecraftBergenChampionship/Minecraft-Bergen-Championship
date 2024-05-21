@@ -83,13 +83,13 @@ public class MBC implements Listener {
     public boolean finalGame = false;
     public boolean readyCheck = false;
     public boolean started = false;
-    private boolean no_stats = false;
     private String STAT_DIRECTORY = "MBC_EVENT";
 
     //public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt","Quickfire"));
     public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire"));
     //public final List<Game> gameList = new ArrayList<Game>(6);
     public static final String MBC_STRING_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "MBC" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: " + ChatColor.RESET;
+    public static final String ADMIN_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "ADMIN" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: " + ChatColor.RESET;
     private List<String> mutedMessages = new LinkedList<String>();
 
     // Define Special Blocks
@@ -744,23 +744,30 @@ public class MBC implements Listener {
         if (ready.size() == getValidTeams().size()) {
             if (getValidTeams().size() == 0) {
                 announce("There are no teams! You may want to assign teams first!");
-            } else if (!started && !enable_stat_logging && !no_stats) {
+            } else if (!started && !enable_stat_logging) {
                 announce("Waiting for admin...");
                 for (Player pl : Bukkit.getOnlinePlayers()) {
                     if (pl.isOp()) {
-                        pl.sendMessage("Stat logging is not enabled. Run /ready again if you are sure you do not want to log stats.");
-                        pl.sendMessage("Stat logs can be enabled with: /statlogs set true");
-                        pl.sendMessage("Directory of stat logs is currently: " + statDirectory());
-                        pl.sendMessage("Directory can be updated with: /statlogs directory <directory name (no spaces)>");
+                        pl.sendMessage(ADMIN_PREFIX + ChatColor.BOLD + "\nWhen ready, run /startevent! (rspacerr should take care of this!)\n");
+                        if (!enable_stat_logging) {
+                            pl.sendMessage("Stat logging is not enabled. Only run /startevent if this is intentional.");
+                            pl.sendMessage("Stat logs can be enabled with: /statlogs set true");
+                            pl.sendMessage("Directory of stat logs is currently: " + statDirectory());
+                            pl.sendMessage("Directory can be updated with: /statlogs directory <directory name (no spaces)>");
+                        }
                     }
-                    no_stats = true;
                 }
-            } else if (!started) {
-                startEvent();
-            }
-            else {
+            } else {
                 p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + " Please only use /ready after an admin has used the /readycheck command!");
             }
+        }
+    }
+
+    public void unready(MBCTeam t, Player p) {
+        if (ready.remove(t)) {
+            Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.RED + " are not ready.");
+        } else {
+            p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + " Your team is currently not ready!");
         }
     }
 
@@ -818,7 +825,7 @@ public class MBC implements Listener {
      */
     public Plugin getPlugin() { return plugin; }
 
-    private void startEvent() {
+    public void startEvent() {
         started = true;
         lobby.setGameState(GameState.TUTORIAL);
         announce(ChatColor.BOLD + "The event is starting!" + ChatColor.RESET + "\nYou may want to turn JUKEBOX sounds down.");

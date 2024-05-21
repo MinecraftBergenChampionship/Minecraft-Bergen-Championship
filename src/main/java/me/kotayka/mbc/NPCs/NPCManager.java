@@ -4,6 +4,7 @@ import me.kotayka.mbc.Participant;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.trait.SkinTrait;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -24,12 +25,11 @@ public class NPCManager {
 
         NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, p.getFormattedName());
         npcs.add(npc);
-        npc.spawn(loc);
 
         SkinTrait skinTrait = npc.getTrait(SkinTrait.class);
-        System.out.println(skinTrait.getSkinName());
         skinTrait.setSkinName(player.getName());
 
+        npc.spawn(loc);
         return npc;
     }
 

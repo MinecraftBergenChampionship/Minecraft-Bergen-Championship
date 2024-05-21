@@ -198,6 +198,7 @@ public class Lobby extends Minigame {
                 }
                 case 60 -> {
                     teamBarriers(false);
+                    populatePodium();
                     boolean flag = false;
                     if (reveal.size() > 1) {
                         flag = true;
@@ -207,7 +208,6 @@ public class Lobby extends Minigame {
                         p.setGameMode(GameMode.ADVENTURE);
                         p.teleport(LOBBY);
                         if (flag) {
-                            populatePodium();
                             p.sendTitle("Final Duel!", reveal.get(reveal.size()-1).teamNameFormat() + " vs. " + reveal.get(reveal.size()-2).teamNameFormat(), 20, 60, 20);
                         }
                     }

@@ -30,6 +30,10 @@ commands:
     permission: minecraft.command.op
   ready:
     description: indicate a team is ready.
+  unready:
+    description: indicate a team is not ready, if they were previously.
+  startevent:
+    description: begin event once all teams are ready.
   placement:
     description: gets player's individual placement information
     aliases: [place, score, standing]

@@ -27,6 +27,7 @@ public class readycheck implements CommandExecutor {
             return false;
         }
 
+        MBC.getInstance().ready.clear();
         MBC.getInstance().readyCheck = true;
 
         p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "Ensure statlogging is on if this is an actual event!");
