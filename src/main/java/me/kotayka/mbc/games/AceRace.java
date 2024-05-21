@@ -76,8 +76,13 @@ public class AceRace extends Game {
         super.start();
         setGameState(GameState.TUTORIAL);
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.teleport(map.getIntroLocation());
+        //for (Player p : Bukkit.getOnlinePlayers()) {
+            //p.teleport(map.getIntroLocation());
+        //}
+
+        for (AceRacePlayer p : aceRacePlayerMap.values()) {
+            p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
+            p.reset();
         }
 
         setTimer(210);
@@ -96,12 +101,7 @@ public class AceRace extends Game {
                 Introduction();
             } else if (!finishedIntro && timeRemaining == 0){
                 MBC.getInstance().sendMutedMessages();
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
-
-                for (AceRacePlayer p : aceRacePlayerMap.values()) {
-                    p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
-                    p.reset();
-                }
+                //Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
 
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.getPlayer().sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "Practice Starting!", "", 20, 60, 20);
@@ -117,6 +117,7 @@ public class AceRace extends Game {
                     p.getPlayer().sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "Practice Over!", "", 0, 60, 20);
                     createLine(6, ChatColor.GREEN.toString()+ChatColor.BOLD+"Lap: " + ChatColor.RESET+"1/3", p.getParticipant());
                 }
+                // something breaks like right here. idk why
                 setGameState(GameState.END_ROUND);
                 timeRemaining = 5;
             }
