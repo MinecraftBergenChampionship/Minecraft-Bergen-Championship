@@ -211,12 +211,13 @@ public class BeepTest extends PartyGame {
             for (int groundY = y; groundY <= y + 7; groundY++) {
                 for (int groundZ = z; groundZ <= z + 36; groundZ++) {
                     int mapX = groundX - x + (-505);
-                    int mapY = groundY - y + (-60);
+                    int mapY = groundY - y + (-63);
                     int mapZ = groundZ - z + (-492);
 
                     Block groundBlock = world.getBlockAt(groundX, groundY, groundZ);
                     Block mapBlock = world.getBlockAt(mapX, mapY, mapZ);
-                    if (!(mapBlock.getType().name() == "AIR") && !(groundBlock.getType().name().equals(mapBlock.getType().name()))) {
+                    if ((mapY < -60 || mapX > -508 || mapX < -536) && mapBlock.getType().name().equals("AIR")) {}
+                    else if (mapBlock.getType().name().equals("AIR") && !(groundBlock.getType().name().equals(mapBlock.getType().name()))) {
                         mapBlock.setType(groundBlock.getType());
                         mapBlock.setBlockData(groundBlock.getBlockData());
                     }
@@ -233,12 +234,12 @@ public class BeepTest extends PartyGame {
             for (int groundY = y; groundY <= y + 7; groundY++) {
                 for (int groundZ = z; groundZ <= z + 36; groundZ++) {
                     int mapX = groundX - x + (-505);
-                    int mapY = groundY - y + (-60);
+                    int mapY = groundY - y + (-63);
                     int mapZ = groundZ - z + (-492);
 
                     Block groundBlock = world.getBlockAt(groundX, groundY, groundZ);
                     Block mapBlock = world.getBlockAt(mapX, mapY, mapZ);
-                    if (!(mapBlock.getType().name() == "AIR") && !(groundBlock.getType().name().equals(mapBlock.getType().name()))) {
+                    if (!(groundBlock.getType().name().equals(mapBlock.getType().name()))) {
                         mapBlock.setType(groundBlock.getType());
                         mapBlock.setBlockData(groundBlock.getBlockData());
                     }
