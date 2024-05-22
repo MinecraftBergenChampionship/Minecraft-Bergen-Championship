@@ -17,6 +17,7 @@ import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.PartyGame;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -42,6 +43,8 @@ public class BeepTest extends PartyGame {
     private final BlockVector3 arenaFrom = new BlockVector3(-65, -63, 60);
     private final BlockVector3 arenaTo = new BlockVector3(-500, -63, -500);
     private final World WorldEditWorld = BukkitAdapter.adapt(Bukkit.getWorld("Party"));
+    
+    private final org.bukkit.World world = Bukkit.getWorld("Party");
 
     // game instance
     private static BeepTest instance = null;
@@ -118,6 +121,7 @@ public class BeepTest extends PartyGame {
                     }
                     Barriers(false);
                     nextRound();
+                    newGround();
                     rounds++;
                     setGameState(GameState.ACTIVE);
                     setTimer(16);
@@ -181,6 +185,30 @@ public class BeepTest extends PartyGame {
                 editSession.close();
             } catch (WorldEditException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void newGround() {
+        int y = -60;
+        int x;
+        int z;
+        if (rounds < 4) {x = -560;} else if (rounds < 8) {x = -596;} else if (rounds < 12) {x = -632;} else {x = -668;}
+        if (oppositeSide) {z = -387;} else {z = -425;}
+        for (int groundX = x; groundX <= x - 34; groundX--) {
+            for (int groundY = y; groundY <= y + 4; groundY++) {
+                for (int groundZ = z; groundZ <= z + 36; groundZ++) {
+                    int mapX = x - groundX + (-505);
+                    int mapY = y - groundY + (-60);
+                    int mapZ = z - groundZ + (-492);
+
+                    Block groundBlock = world.getBlockAt(groundX, groundY, groundZ);
+                    Block mapBlock = world.getBlockAt(mapX, mapY, mapZ);
+                    if (!(groundBlock.getType().name().equals(mapBlock.getType().name()))) {
+                        mapBlock.setType(groundBlock.getType());
+                        mapBlock.setBlockData(groundBlock.getBlockData());
+                    }
+                }
             }
         }
     }
