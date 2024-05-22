@@ -15,6 +15,7 @@ public abstract class PartyGame extends Minigame {
     protected final Location SPAWN;
     protected final String[] INTRODUCTION;
     private int introLine = 0;
+    private boolean isGameOver = false;
 
     public PartyGame(String name, Location spawn, String[] intro) {
         super(name);
@@ -72,6 +73,14 @@ public abstract class PartyGame extends Minigame {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.playSound(p, Sound.ENTITY_CHICKEN_EGG, 1, 1);
         }
+    }
+
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    public void gameOver() {
+        isGameOver = true;
     }
 
     public World world() {
