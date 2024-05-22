@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.*;
 
 public class PartyGameFactory {
-    private static List<String> gameNames = Arrays.asList("DiscoFever", "BeepTest", "DiscoFever");
+    private static List<String> gameNames = Arrays.asList("DiscoFever", "BeepTest");
     private static Map<String, PartyGame> games = new HashMap<>();
 
     public PartyGameFactory() {}
@@ -36,8 +36,4 @@ public class PartyGameFactory {
         return games.get(name);
     }
 
-    public String getRandomGame() {
-        return gameNames.get((int)(Math.random()*gameNames.size()));
-    }
-    
 }

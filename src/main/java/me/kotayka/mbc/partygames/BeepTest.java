@@ -128,6 +128,7 @@ public class BeepTest extends PartyGame {
                     if (rounds == 15) {
                         // there are no more rounds. game is over
                         Bukkit.broadcastMessage("The game is over!");
+                        gameOver();
                     } else {
                         // clear level, move onto next level
                         nextRound();

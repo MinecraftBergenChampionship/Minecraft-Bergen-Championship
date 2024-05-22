@@ -385,6 +385,7 @@ public class DiscoFever extends PartyGame {
             }
         }
 
+        gameOver();
     }
 
     /**
