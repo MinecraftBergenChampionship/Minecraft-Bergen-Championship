@@ -6,12 +6,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.*;
 
 public class PartyGameFactory {
-    private static List<String> gameNames = Arrays.asList("DiscoFever", "BeepTest", "Knockout");
+    private static List<String> gameNames = Arrays.asList("DiscoFever", "BeepTest", "DiscoFever");
     private static Map<String, PartyGame> games = new HashMap<>();
 
-    private PartyGameFactory() {}
+    public PartyGameFactory() {}
 
     public static PartyGame getPartyGame(String name) {
         if (!(gameNames.contains(name))) {
@@ -34,4 +35,9 @@ public class PartyGameFactory {
         }
         return games.get(name);
     }
+
+    public String getRandomGame() {
+        return gameNames.get((int)(Math.random()*gameNames.size()));
+    }
+    
 }
