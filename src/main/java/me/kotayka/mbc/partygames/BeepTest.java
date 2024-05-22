@@ -4,12 +4,9 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.function.mask.BlockStateMask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.transform.AffineTransform;
-import com.sk89q.worldedit.math.transform.CombinedTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import me.kotayka.mbc.GameState;
@@ -19,10 +16,16 @@ import me.kotayka.mbc.PartyGame;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class BeepTest extends PartyGame {
     // Maps of levels by name
@@ -32,7 +35,9 @@ public class BeepTest extends PartyGame {
     private List<BeepTestLevel> hardLevels = null;
     private int rounds = 0;
     private boolean oppositeSide = false;
+    private Set<Player> fallenPlayers = new HashSet<>();
 
+    private final Location OPPOSITE_SPAWN = new Location(Bukkit.getWorld("Party"), -522, -55, -490);
     // arena regions
     private final Location copyArenaPrimary = new Location(Bukkit.getWorld("Party"), -65, -63, 60);
     private final Location copyArenaSecondary = new Location(Bukkit.getWorld("Party"), -109, -37, 112);
@@ -59,7 +64,7 @@ public class BeepTest extends PartyGame {
     }
 
     private BeepTest() {
-        super("BeepTest", new Location(Bukkit.getWorld("Party"), -522, -55, -458), new String[] {
+        super("BeepTest", new Location(Bukkit.getWorld("Party"), -522, -55, -458, 180, 0), new String[] {
                 "⑰ The fitness gram " + ChatColor.BOLD + "Beep Test" + ChatColor.RESET + " is a multistage parkour capacity test that progressively gets more difficult as it continues.",
                 "⑰ Jump from one side of the map to the other to complete the courses as fast as you can.\n\n" +  
                 "⑰ The parkour difficulty starts easy, but gets more difficult each time the arena changes color.",
@@ -95,11 +100,18 @@ public class BeepTest extends PartyGame {
     @Override
     public void loadPlayers() {
         //MBC.getInstance().hideAllPlayers();
+        ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(SPAWN);
             p.addPotionEffect(MBC.SATURATION);
             p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 255, false, false));
+            Participant par = Participant.getParticipant(p);
+            if (par != null) {
+                p.getInventory().setBoots(par.getTeam().getColoredLeatherArmor(leatherBoots));
+                par.board.getTeam(par.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+            }
         }
+
     }
 
     @Override
@@ -123,8 +135,26 @@ public class BeepTest extends PartyGame {
                     Barriers(false);
                     newGround();
                     nextRound();
-                    rounds++;
+                    roundDisplay();
                     setGameState(GameState.ACTIVE);
+                    setTimer(13);
+                }
+                break;
+            case ACTIVE:
+                if (timeRemaining == 0) {
+                    Bukkit.broadcastMessage("rounds == " + rounds);
+                    if (rounds > 14) {
+                        // there are no more rounds. game is over
+                        Bukkit.broadcastMessage("The game is over!");
+                        gameOver();
+                    } else {
+                        // clear level, move onto next level
+                        rounds++;
+                        newGround();
+                        respawn();
+                        nextRound();
+                        roundDisplay();
+                    }
                     int timeForLevel;
                     if (rounds < 4) {
                         timeForLevel = 10;
@@ -138,21 +168,6 @@ public class BeepTest extends PartyGame {
                     setTimer(timeForLevel+1);
                 }
                 break;
-            case ACTIVE:
-                if (timeRemaining == 0) {
-                    if (rounds == 16) {
-                        // there are no more rounds. game is over
-                        Bukkit.broadcastMessage("The game is over!");
-                        gameOver();
-                    } else {
-                        // clear level, move onto next level
-                        newGround();
-                        nextRound();
-                        rounds++;
-                    }
-                    setTimer(16);
-                }
-                break;
             case END_GAME:
         }
 
@@ -164,6 +179,50 @@ public class BeepTest extends PartyGame {
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
 
         updateInGameTeamScoreboard();
+    }
+
+    /*
+     * Display the amount of rounds on the scoreboard.
+     */
+    private void roundDisplay() {
+        ChatColor color = null;
+        if (rounds < 4) {
+            color = ChatColor.AQUA;
+        } else if (rounds < 8) {
+            color = ChatColor.GREEN;
+        } else if (rounds < 12) {
+            color = ChatColor.YELLOW;
+        } else {
+            color = ChatColor.RED;
+        }
+
+        String round = ((rounds / 4) + 1) + "-" + ((rounds % 4)+1);
+        createLineAll(21, ChatColor.BOLD + "Current Round: " + ChatColor.RESET + "" + color + round);
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        Player p = e.getPlayer();
+        if (p.getGameMode() != GameMode.ADVENTURE) return;
+
+        if (p.getLocation().getY() < -59 && fallenPlayers.add(p)) {
+            p.sendMessage(ChatColor.RED + "You fell!");
+        }
+    }
+
+    /*
+     * Respawn all players that fell in the previous round to the appropriate location.
+     */
+    private void respawn() {
+        if (fallenPlayers.size() == 0) return;
+        for (Player p : fallenPlayers) {
+            if (oppositeSide) {
+                p.teleport(SPAWN);
+            } else {
+                p.teleport(OPPOSITE_SPAWN);
+            }
+        }
+        fallenPlayers.clear();
     }
 
     private void loadCourses() {
@@ -216,10 +275,15 @@ public class BeepTest extends PartyGame {
 
                     Block groundBlock = world.getBlockAt(groundX, groundY, groundZ);
                     Block mapBlock = world.getBlockAt(mapX, mapY, mapZ);
-                    if ((mapY < -60 || mapX > -508 || mapX < -536) && mapBlock.getType().name().equals("AIR")) {}
-                    else if (mapBlock.getType().name().equals("AIR") && !(groundBlock.getType().name().equals(mapBlock.getType().name()))) {
-                        mapBlock.setType(groundBlock.getType());
-                        mapBlock.setBlockData(groundBlock.getBlockData());
+
+                    if (groundBlock.getType() != mapBlock.getType()) {
+                        if ((mapY < -60 || mapX > -507 || mapX < -537)) {
+                            mapBlock.setType(groundBlock.getType());
+                            mapBlock.setBlockData(groundBlock.getBlockData());
+                        } else if (mapBlock.getType() != Material.AIR) {
+                            mapBlock.setType(groundBlock.getType());
+                            mapBlock.setBlockData(groundBlock.getBlockData());
+                        }
                     }
                 }
             }

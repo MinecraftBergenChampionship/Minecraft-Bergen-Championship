@@ -105,12 +105,14 @@ public class DiscoFever extends PartyGame {
 
     @Override
     public void loadPlayers() {
+        ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().setInvulnerable(false);
             p.getPlayer().setFlying(false);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().addPotionEffect(MBC.SATURATION);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
             playersAlive.add(p);
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             p.getPlayer().teleport(SPAWN);

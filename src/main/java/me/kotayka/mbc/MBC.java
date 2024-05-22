@@ -77,6 +77,7 @@ public class MBC implements Listener {
     public Skybattle skybattle = null;
     public SurvivalGames sg = null;
     public Spleef spleef = null;
+    public Party party = null;
     //public Dodgebolt dodgebolt = null;
     public Quickfire quickfire = null;
     public boolean finalGame = false;
@@ -160,6 +161,11 @@ public class MBC implements Listener {
                     spleef = new Spleef();
                 }
                 return spleef;
+            case "Party":
+                if (party == null) {
+                    party = new Party();
+                }
+                return party;
                 /*
             case "Dodgebolt":
                 if (dodgebolt == null) {
@@ -214,6 +220,8 @@ public class MBC implements Listener {
                 return bsabm;
             case "Spleef":
                 return spleef;
+            case "Party":
+                return party;
             default:
                 return null;
         }

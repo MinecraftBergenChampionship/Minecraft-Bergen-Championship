@@ -1,10 +1,6 @@
 package me.kotayka.mbc.games;
 
-import me.kotayka.mbc.Game;
-import me.kotayka.mbc.GameState;
-import me.kotayka.mbc.MBC;
-import me.kotayka.mbc.Participant;
-import me.kotayka.mbc.PartyGame;
+import me.kotayka.mbc.*;
 import me.kotayka.mbc.partygames.DiscoFever;
 import me.kotayka.mbc.partygames.BeepTest;
 import me.kotayka.mbc.partygames.PartyGameFactory;
@@ -19,9 +15,8 @@ import java.util.*;
 
 public class Party extends Game {
     private final World world = Bukkit.getWorld("Party");
-    protected final Location LOBBY = new Location(world, 0, 0, -1000);
-    private PartyGameFactory factory = new PartyGameFactory();
-    private List<String> gameNames = Arrays.asList("DiscoFever", "BeepTest", "DiscoFever");
+    protected final Location LOBBY = new Location(world, 0.5, -17.5, -999.5);
+    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "BeepTest", "DiscoFever"));
     private int gameNum;
     private PartyGame partyGame = null;
 
@@ -34,7 +29,7 @@ public class Party extends Game {
             "⑰ Our three games for this event are " + ChatColor.BOLD + "Disco Fever, Disco Fever, and Beep Test." + ChatColor.RESET,
             ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                     "⑮ You'll find out! "
-    });
+        });
     }
 
     @Override
@@ -42,28 +37,29 @@ public class Party extends Game {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(LOBBY);
         }
+        preFirstRound();
     }
 
     public void start() {
         super.start();
 
-        setGameState(GameState.TUTORIAL);
+        setGameState(GameState.STARTING);
 
-        setTimer(30);
+        setTimer(15);
     }
 
     /**
      * Generates random party game from gameNames.
      * Removes chosen game from gameNames.
+     *
      * Returns associated PartyGame.
      */
     public PartyGame getRandomPartyGame() {
         if (gameNames.size() > 0) {
             String randomGame = gameNames.get((int)(Math.random()*gameNames.size()));
             gameNames.remove(randomGame);
-            return factory.getPartyGame(randomGame);
-        }
-        else {
+            return PartyGameFactory.getPartyGame(randomGame);
+        } else {
             Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "Oops, this shouldn't have been sent :(\n");
             return null;
         }
@@ -77,7 +73,7 @@ public class Party extends Game {
      */
     public void preFirstRound() {
         gameNum = 0;
-        createLineAll(21, ChatColor.GREEN + "Game: " + ChatColor.RESET + gameNum + "/3");
+        ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().getInventory().clear();
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -85,7 +81,6 @@ public class Party extends Game {
             if (p.getPlayer().getAllowFlight()) {
                 removeWinEffect(p);
             }
-            ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
         }
     }
@@ -152,7 +147,10 @@ public class Party extends Game {
 
     @Override
     public void createScoreboard(Participant p) {
-
+        createLineAll(22, ChatColor.GREEN + "Party Round: " + ChatColor.RESET + gameNum + "/3");
+        createLine(19, ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET + ChatColor.RESET.toString(), p);
+        updateInGameTeamScoreboard();
     }
 
     @Override

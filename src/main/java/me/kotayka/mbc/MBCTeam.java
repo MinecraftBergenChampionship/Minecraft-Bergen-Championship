@@ -331,7 +331,6 @@ class TeamUnMultipliedScoreSorter implements Comparator<MBCTeam> {
         return a.getRawTotalScore() - b.getRawTotalScore();
     }
 }
-
 class TeamRoundSorter implements Comparator<MBCTeam> {
     public TeamRoundSorter() {}
 
@@ -343,3 +342,4 @@ class TeamRoundSorter implements Comparator<MBCTeam> {
         return (int) (b.getMultipliedCurrentScore() - a.getMultipliedCurrentScore()); // reverse so bigger numbers are at the top when sorted
     }
 }
+
