@@ -12,6 +12,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
+import me.kotayka.mbc.MBCTeam;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.PartyGame;
 import org.bukkit.*;
@@ -39,8 +40,6 @@ public class DiscoFever extends PartyGame {
     private int counter = -1;
     private BossBar bossBar;
 
-    private List<Participant> playersAlive = new LinkedList<>();
-
     // Region boundaries for disco fever. Incrementally moved after each round.
     private Location discoPrimary = new Location(world(), 409, 0, 418);
     private Location discoSecondary = new Location(world(), 390, 0, 402);
@@ -58,6 +57,10 @@ public class DiscoFever extends PartyGame {
     private Region back = null;
     private Pattern randomPattern = null;
     private EditSession editSession = null;
+
+    public final int STAGE_POINTS = 2;
+    public final int SURVIVAL_POINTS = 1;
+    public final int WIN_POINTS = 10;
 
     // game instance
     private static DiscoFever instance = null;
@@ -105,6 +108,11 @@ public class DiscoFever extends PartyGame {
 
     @Override
     public void loadPlayers() {
+        if (!teamsAlive.isEmpty()) {
+            teamsAlive.clear();
+        }
+        teamsAlive.addAll(getValidTeams());
+
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().setInvulnerable(false);
             p.getPlayer().setFlying(false);
@@ -115,6 +123,8 @@ public class DiscoFever extends PartyGame {
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             p.getPlayer().teleport(SPAWN);
         }
+
+        updatePlayersAliveScoreboard();
     }
 
     @Override
@@ -248,6 +258,9 @@ public class DiscoFever extends PartyGame {
                     delay -= 4;
                 }
                 Bukkit.broadcastMessage(ChatColor.YELLOW+"Things are speeding up!");
+                for (Participant i : playersAlive) {
+                    i.addCurrentScore(STAGE_POINTS);
+                }
                 counter = 0;
                 // Cancel task then call Disco() again to reinitialize it
                 Disco();
@@ -384,6 +397,7 @@ public class DiscoFever extends PartyGame {
                 b.setType(Material.AIR);
             }
         }
+        roundWinners(WIN_POINTS);
 
         gameOver();
     }
@@ -439,6 +453,13 @@ public class DiscoFever extends PartyGame {
         if (getState().equals(GameState.ACTIVE)) {
             p.setGameMode(GameMode.SPECTATOR);
             p.sendTitle(" ", ChatColor.RED + "You died!", 0, 60, 20);
+            Participant part = Participant.getParticipant(p);
+            if (part == null) return;
+            updatePlayersAlive(part);
+            for (Participant i : playersAlive) {
+                i.addCurrentScore(SURVIVAL_POINTS);
+            }
+            updatePlayersAliveScoreboard();
             // other things later
         }
     }
