@@ -208,9 +208,9 @@ public class BeepTest extends PartyGame {
         for (int groundX = x; groundX >= x - 34; groundX--) {
             for (int groundY = y; groundY <= y + 4; groundY++) {
                 for (int groundZ = z; groundZ <= z + 36; groundZ++) {
-                    int mapX = x - groundX + (-505);
-                    int mapY = y - groundY + (-60);
-                    int mapZ = z - groundZ + (-492);
+                    int mapX = groundX - x + (-505);
+                    int mapY = groundY - y + (-60);
+                    int mapZ = groundZ - z + (-492);
 
                     Block groundBlock = world.getBlockAt(groundX, groundY, groundZ);
                     Block mapBlock = world.getBlockAt(mapX, mapY, mapZ);
