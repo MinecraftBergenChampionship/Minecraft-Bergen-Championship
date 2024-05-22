@@ -124,12 +124,22 @@ public class BeepTest extends PartyGame {
                     newGround();
                     rounds++;
                     setGameState(GameState.ACTIVE);
-                    setTimer(16);
+                    int timeForLevel;
+                    if (rounds < 4) {
+                        timeForLevel = 10;
+                    } else if (rounds < 8) {
+                        timeForLevel = 15;
+                    } else if (rounds < 12) {
+                        timeForLevel = 20;
+                    } else {
+                        timeForLevel = 25;
+                    }
+                    setTimer(timeForLevel+1);
                 }
                 break;
             case ACTIVE:
                 if (timeRemaining == 0) {
-                    if (rounds == 15) {
+                    if (rounds == 16) {
                         // there are no more rounds. game is over
                         Bukkit.broadcastMessage("The game is over!");
                         gameOver();
@@ -195,7 +205,7 @@ public class BeepTest extends PartyGame {
         int z;
         if (rounds < 4) {x = -560;} else if (rounds < 8) {x = -596;} else if (rounds < 12) {x = -632;} else {x = -668;}
         if (oppositeSide) {z = -387;} else {z = -425;}
-        for (int groundX = x; groundX <= x - 34; groundX--) {
+        for (int groundX = x; groundX >= x - 34; groundX--) {
             for (int groundY = y; groundY <= y + 4; groundY++) {
                 for (int groundZ = z; groundZ <= z + 36; groundZ++) {
                     int mapX = x - groundX + (-505);
