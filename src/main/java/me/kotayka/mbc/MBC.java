@@ -1,12 +1,11 @@
 package me.kotayka.mbc;
 
-import io.papermc.paper.event.player.AsyncChatEvent;
 import me.kotayka.mbc.NPCs.NPCManager;
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
 import me.kotayka.mbc.games.*;
 import me.kotayka.mbc.teams.*;
-import net.kyori.adventure.text.Component;
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
@@ -439,29 +438,46 @@ public class MBC implements Listener {
     }
 
     @EventHandler
+    public void onJump(PlayerJumpEvent e) {
+        if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    Player p = e.getPlayer();
+                    Location l = p.getLocation();
+                    l.setPitch(-30);
+                    p.setVelocity(p.getVelocity().add(l.getDirection().multiply(4.0).setY(1.25)));
+                }
+            }, 1);
+            return;
+        }
+
+        if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    Player p = e.getPlayer();
+                    Location l = p.getLocation();
+                    l.setPitch(-30);
+                    p.setVelocity(p.getVelocity().add(l.getDirection().multiply(2.0)));
+                }
+            }, 1);
+            return;
+        }
+
+        if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    Player p = e.getPlayer();
+                    p.setVelocity(p.getVelocity().add(new Vector(p.getVelocity().getX(), p.getVelocity().getY()*1.75, p.getVelocity().getZ())));
+                }
+            }, 1);
+        }
+    }
+
+    @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
-            Player p = e.getPlayer();
-            Location l = p.getLocation();
-            l.setPitch(-30);
-            Vector d = l.getDirection();
-            p.setVelocity(d.multiply(4));
-            p.setVelocity(new Vector(p.getVelocity().getX(), 1.65, p.getVelocity().getZ()));
-            return;
-        }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
-            Player p = e.getPlayer();
-            Location l = p.getLocation();
-            l.setPitch(-30);
-            Vector d = l.getDirection();
-            p.setVelocity(d.multiply(2.5));
-            p.setVelocity(new Vector(p.getVelocity().getX(), 1.25, p.getVelocity().getZ()));
-            return;
-        }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
-            e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
-            return;
-        }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
         }
