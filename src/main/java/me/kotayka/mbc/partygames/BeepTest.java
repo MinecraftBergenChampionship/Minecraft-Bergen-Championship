@@ -85,6 +85,7 @@ public class BeepTest extends PartyGame {
 
         loadInitialArena();
         Barriers(true);
+        resetGround();
 
         setGameState(GameState.TUTORIAL);
 
@@ -120,8 +121,8 @@ public class BeepTest extends PartyGame {
                         p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS,1,1); // temp?
                     }
                     Barriers(false);
-                    nextRound();
                     newGround();
+                    nextRound();
                     rounds++;
                     setGameState(GameState.ACTIVE);
                     int timeForLevel;
@@ -145,6 +146,7 @@ public class BeepTest extends PartyGame {
                         gameOver();
                     } else {
                         // clear level, move onto next level
+                        newGround();
                         nextRound();
                         rounds++;
                     }
@@ -200,13 +202,13 @@ public class BeepTest extends PartyGame {
     }
 
     private void newGround() {
-        int y = -60;
+        int y = -63;
         int x;
         int z;
         if (rounds < 4) {x = -560;} else if (rounds < 8) {x = -596;} else if (rounds < 12) {x = -632;} else {x = -668;}
         if (oppositeSide) {z = -387;} else {z = -425;}
         for (int groundX = x; groundX >= x - 34; groundX--) {
-            for (int groundY = y; groundY <= y + 4; groundY++) {
+            for (int groundY = y; groundY <= y + 7; groundY++) {
                 for (int groundZ = z; groundZ <= z + 36; groundZ++) {
                     int mapX = groundX - x + (-505);
                     int mapY = groundY - y + (-60);
@@ -214,7 +216,29 @@ public class BeepTest extends PartyGame {
 
                     Block groundBlock = world.getBlockAt(groundX, groundY, groundZ);
                     Block mapBlock = world.getBlockAt(mapX, mapY, mapZ);
-                    if (!(groundBlock.getType().name().equals(mapBlock.getType().name()))) {
+                    if (!(mapBlock.getType().name() == "AIR") && !(groundBlock.getType().name().equals(mapBlock.getType().name()))) {
+                        mapBlock.setType(groundBlock.getType());
+                        mapBlock.setBlockData(groundBlock.getBlockData());
+                    }
+                }
+            }
+        }
+    }
+
+    private void resetGround() {
+        int y = -63;
+        int x = -524;
+        int z = -425;
+        for (int groundX = x; groundX >= x - 34; groundX--) {
+            for (int groundY = y; groundY <= y + 7; groundY++) {
+                for (int groundZ = z; groundZ <= z + 36; groundZ++) {
+                    int mapX = groundX - x + (-505);
+                    int mapY = groundY - y + (-60);
+                    int mapZ = groundZ - z + (-492);
+
+                    Block groundBlock = world.getBlockAt(groundX, groundY, groundZ);
+                    Block mapBlock = world.getBlockAt(mapX, mapY, mapZ);
+                    if (!(mapBlock.getType().name() == "AIR") && !(groundBlock.getType().name().equals(mapBlock.getType().name()))) {
                         mapBlock.setType(groundBlock.getType());
                         mapBlock.setBlockData(groundBlock.getBlockData());
                     }
