@@ -274,8 +274,9 @@ public class DiscoFever extends PartyGame {
         bossBar.setVisible(true);
         for (Player p : Bukkit.getOnlinePlayers()) {
             bossBar.addPlayer(p);
-            double displayDelay = delay/20;
+            double displayDelay = ((double)delay)/20.0;
             createLine(18, "" + ChatColor.BOLD + ChatColor.AQUA + "Current Delay: " + ChatColor.RESET + displayDelay, Participant.getParticipant(p));
+            createLine(17, ChatColor.RESET.toString(), Participant.getParticipant(p));
         }
         discoID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().getPlugin(), () -> {
             // Decrease delay between applying floor pattern and removing the blocks
