@@ -13,7 +13,6 @@ import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.PartyGame;
-import me.kotayka.mbc.games.Party;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -58,8 +57,8 @@ public class BeepTest extends PartyGame {
     private final org.bukkit.World world = Bukkit.getWorld("Party");
     private final Location SPAWN = new Location(Bukkit.getWorld("Party"), -522, -55, -458, 180, 0);
 
-    private List<Player> completedPlayers = new ArrayList<>(); 
-    private List<Player> alivePlayers = new ArrayList<>(); 
+    private List<Participant> completedPlayers = new ArrayList<>();
+    private List<Participant> alivePlayers = new ArrayList<>();
     public long roundTime;
 
     public final int STAGE_POINTS = 4;
@@ -129,7 +128,6 @@ public class BeepTest extends PartyGame {
             p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
         }
         if (MBC.getInstance().party == null) {
-            Bukkit.broadcastMessage("party is null!");
             MBC.getInstance().updatePlacings();
             for (Participant p : MBC.getInstance().getPlayers()) {
                 p.addCurrentScoreToTotal();
@@ -157,7 +155,7 @@ public class BeepTest extends PartyGame {
             p.getPlayer().teleport(SPAWN);
             p.getPlayer().addPotionEffect(MBC.SATURATION);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 255, false, false));
-            alivePlayers.add(p.getPlayer());
+            alivePlayers.add(p);
             p.getPlayer().setMaxHealth(6);
             p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
@@ -304,74 +302,76 @@ public class BeepTest extends PartyGame {
     }
 
     public void endRound() {
-        List<Player> toEliminate = new ArrayList<>();
-        for (Player p : alivePlayers) {
+        List<Participant> toEliminate = new ArrayList<>();
+        for (Participant p : alivePlayers) {
             if (completedPlayers.contains(p)) continue;
-            if (p.getHealth() <= 2) {
+            Player pl = p.getPlayer();
+            if (pl.getHealth() <= 2) {
                 toEliminate.add(p);
             } else {
-                p.setHealth(p.getHealth()-2);
+                pl.setHealth(pl.getHealth()-2);
                 if (!oppositeSide) {
-                    p.teleport(OPPOSITE_SPAWN);
+                    pl.teleport(OPPOSITE_SPAWN);
                 }
                 else {
-                    p.teleport(SPAWN);
+                    pl.teleport(SPAWN);
                 }
             }
         }
 
-        for (Player p : toEliminate) {
+        for (Participant p : toEliminate) {
             eliminatePlayer(p);
         }
     }
 
     public void stagePoints() {
+        Bukkit.broadcastMessage("stagePoints()");
         if (rounds+1 % 4 == 0) {
-            for (Player p : alivePlayers) {
-                Participant.getParticipant(p).addCurrentScore(STAGE_POINTS);
-                p.sendMessage(ChatColor.GREEN + "You completed stage #" + ((rounds + 1) / 4) + "!");
+            for (Participant p : alivePlayers) {
+                p.addCurrentScore(STAGE_POINTS);
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You completed stage #" + ((rounds + 1) / 4) + "!");
             }
         }
     }
 
-    public void eliminatePlayer(Player p) {
+    public void eliminatePlayer(Participant p) {
         if (getState().equals(GameState.ACTIVE)) {
-            p.setGameMode(GameMode.SPECTATOR);
+            p.getPlayer().setGameMode(GameMode.SPECTATOR);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 1, false, false));
             alivePlayers.remove(p);
-            p.sendTitle(" ", ChatColor.RED + "You died!", 0, 60, 20);
-            Participant part = Participant.getParticipant(p);
-            if (part == null) return;
-            updatePlayersAlive(part);
-            MBC.getInstance().showPlayers(part);
+            p.getPlayer().sendTitle(" ", ChatColor.RED + "You died!", 0, 60, 20);
+            updatePlayersAlive(p);
+            MBC.getInstance().showPlayers(p);
             updatePlayersAliveScoreboard();
         }
     }
 
     public void completedCourse(PlayerMoveEvent e) {
-        Player p = e.getPlayer();
+        Player pl = e.getPlayer();
+        Participant p = Participant.getParticipant(pl);
         if (oppositeSide) {
             if (e.getTo().getZ() < REGULAR_Z) {
                 completedPlayers.add(p);
                 long currentTime = System.currentTimeMillis() - roundTime;
-                // to do: fix round 1 stuff
+                // TODO: fix round 1 off
                 String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
-                p.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
+                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
                 if (completedPlayers.size() == 1) {
-                    Bukkit.broadcastMessage(Participant.getParticipant(p).getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
+                    Bukkit.broadcastMessage(p.getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
                 }
-                Participant.getParticipant(p).addCurrentScore(CURRENT_POINTS);
+                p.addCurrentScore(CURRENT_POINTS);
                 
             }
         } else {
             if (e.getTo().getZ() > OPPOSITE_Z) {
                 long currentTime = System.currentTimeMillis() - roundTime;
                 String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
-                p.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
+                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
                 if (completedPlayers.size() == 0) {
-                    Bukkit.broadcastMessage(Participant.getParticipant(p).getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
+                    Bukkit.broadcastMessage(p.getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
                 }
                 completedPlayers.add(p);
-                Participant.getParticipant(p).addCurrentScore(CURRENT_POINTS);
+                p.addCurrentScore(CURRENT_POINTS);
             }
         }
     }

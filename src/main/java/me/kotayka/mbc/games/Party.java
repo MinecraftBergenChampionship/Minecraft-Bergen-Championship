@@ -53,9 +53,9 @@ public class Party extends Game {
     public void start() {
         super.start();
 
-        setGameState(GameState.STARTING);
+        setGameState(GameState.TUTORIAL);
 
-        setTimer(15);
+        setTimer(32);
     }
 
     /**
@@ -161,13 +161,18 @@ public class Party extends Game {
     }
 
     public void next() {
-        MBC.getInstance().setCurrentGame(this);
+        //MBC.getInstance().setCurrentGame(this);
         if (GAMES_PLAYED == gameNum) {
             setGameState(GameState.END_GAME);
             setTimer(37);
         } else {
             setGameState(GameState.STARTING);
             setTimer(12);
+        }
+    }
+
+    public void addIndividual() {
+        for (Participant p : MBC.getInstance().getPlayers()) {
         }
     }
 
