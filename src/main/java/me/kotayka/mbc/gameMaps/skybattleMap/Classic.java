@@ -20,9 +20,8 @@ import java.util.List;
 
 public class Classic extends SkybattleMap {
     private final Location CENTER = new Location(getWorld(), 0, 100, 0);
-    //public final double RADIUS_SHRINK_AMOUNT = 0.37;
-    public final double RADIUS_SHRINK_AMOUNT = 0.35;
-    public final double HEIGHT_SHRINK_AMOUNT = 0.22;
+    public final double RADIUS_SHRINK_AMOUNT = 0.35; // previously 0.37
+    public final double HEIGHT_SHRINK_AMOUNT = 0.2; // previously 0.22
     private float borderRadius = 80;
     private final Location[] SPAWNS = {
         new Location(getWorld(), 33, 71, 54),
@@ -49,7 +48,7 @@ public class Classic extends SkybattleMap {
      * there is also probably a better way to do this but nah
      */
     public void resetMap() {
-        SKYBATTLE.resetKillMaps();
+        SKYBATTLE.resetMaps();
         setBorderHeight(120);
         setBorderRadius(80);
 

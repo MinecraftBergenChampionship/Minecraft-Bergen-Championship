@@ -30,9 +30,13 @@ public class Skybattle extends Game {
     public Map<Entity, Player> TNTPlacers = new HashMap<Entity, Player>(5);
     // Creeper Entity, Player (that spawned them); used for determining kills by creeper explosion
     public Map<Entity, Player> creeperSpawners = new HashMap<Entity, Player>(5);
-    private final int KILL_POINTS = 15;
+    private final int KILL_POINTS = 10;
+    private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
+    private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
     private final int SURVIVAL_POINTS = 1;
-    private final int WIN_POINTS = 15;
+    private final int WIN_POINTS = 10;
+    // Team bonuses split among team
+    private final int[] TEAM_BONUSES_3 = {18, 15, 12, 9, 6, 3};
 
     public Skybattle() {
         super("Skybattle", new String[] {
@@ -114,7 +118,7 @@ public class Skybattle extends Game {
      * skybattlePlayerMap is the map of all skybattlePlayers.
      *
      */
-    public void resetKillMaps() {
+    public void resetMaps() {
         if (creeperSpawners != null) {
             creeperSpawners.clear();
         }
@@ -122,6 +126,11 @@ public class Skybattle extends Game {
         if (TNTPlacers != null) {
             TNTPlacers.clear();
         }
+
+        if (teamPlacements != null) {
+            teamPlacements.clear();
+        }
+        deadTeams = 0;
 
         // not sure if necessary
         if (skybattlePlayerMap != null) {
@@ -179,6 +188,11 @@ public class Skybattle extends Game {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
                         }
+                        for (Participant p : playersAlive) {
+                            MBCTeam t = p.getTeam();
+                            teamPlacements.put(t, 1);
+                        }
+                        placementPoints();
                         roundWinners(WIN_POINTS);
                         timeRemaining = 10;
                         setGameState(GameState.END_ROUND);
@@ -219,6 +233,11 @@ public class Skybattle extends Game {
                     p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
                 }
                 roundWinners(WIN_POINTS);
+                for (Participant p : playersAlive) {
+                    MBCTeam t = p.getTeam();
+                    teamPlacements.put(t, 1);
+                }
+                placementPoints();
                 timeRemaining = 10;
                 setGameState(GameState.END_ROUND);
             } else if (timeRemaining == 0) {
@@ -312,6 +331,19 @@ public class Skybattle extends Game {
             // Add each creeper spawned to a map, use to check kill credit
             Location spawn = getLocationToSpawnEntity(p.getTargetBlock(null, 5), e.getBlockFace());
             creeperSpawners.put(p.getWorld().spawn(spawn, Creeper.class), p);
+        }
+    }
+
+    /**
+     *
+     */
+    public void placementPoints() {
+        for (MBCTeam t : getValidTeams()) {
+            for (Participant p : t.getPlayers()) {
+                int placement = teamPlacements.get(t);
+                p.addCurrentScore(TEAM_BONUSES_3[placement-1] / t.getPlayers().size());
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_3[placement-1] * MBC.getInstance().multiplier) + " points!");
+            }
         }
     }
 
@@ -479,6 +511,19 @@ public class Skybattle extends Game {
         } else {
             skybattleDeathGraphics(e, damageEvent.getCause());
         }
+
+        int count = 0;
+        for (Participant p : player.getParticipant().getTeam().teamPlayers) {
+            if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
+                count++;
+            }
+        }
+
+        if (count == player.getParticipant().getTeam().teamPlayers.size()) {
+            teamPlacements.put(player.getParticipant().getTeam(), getValidTeams().size() - deadTeams);
+            deadTeams++;
+        }
+
         e.setCancelled(true);
 
         Bukkit.broadcastMessage(e.getDeathMessage());

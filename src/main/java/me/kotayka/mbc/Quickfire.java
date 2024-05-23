@@ -247,6 +247,7 @@ public class Quickfire extends FinaleGame {
                 shotPlayer.incrementDeaths();
                 damagerPlayer.incrementKills();
                 Death(shot, damager);
+                arrow.remove();
             } else {
                 shot.getPlayer().damage(2);
                 shot.getPlayer().setVelocity(new Vector(arrow.getVelocity().getX()*0.15, 0.3, arrow.getVelocity().getZ()*0.15));
