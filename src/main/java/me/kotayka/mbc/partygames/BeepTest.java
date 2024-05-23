@@ -69,7 +69,8 @@ public class BeepTest extends PartyGame {
     public int CURRENT_POINTS = EASY_POINTS;
 
     public final int REGULAR_Z = -486;
-    public final int OPPOSITE_Z = -462;
+    public final int OPPOSITE_Z = -461;
+    //to test: might not work, but i found a glitch beforehand
 
     // game instance
     private static BeepTest instance = null;
@@ -85,7 +86,8 @@ public class BeepTest extends PartyGame {
 
     private BeepTest() {
         super("BeepTest", new String[] {
-                "⑰ The fitness gram " + ChatColor.BOLD + "Beep Test" + ChatColor.RESET + " is a multistage parkour capacity test that progressively gets more difficult as it continues.",
+                "⑰ The fitness gram " + ChatColor.BOLD + "Beep Test" + ChatColor.RESET + " is a multistage parkour capacity\n\n" + 
+                "  test that progressively gets more difficult as it continues.",
                 "⑰ Jump from one side of the map to the other to complete the courses as fast as you can.\n\n" +  
                 "⑰ The parkour difficulty starts easy, but gets more difficult each time the arena changes color.",
                 "⑰ The third time you fail the parkour course, or do not complete it in time, you are eliminated.\n\n" + 
@@ -187,6 +189,7 @@ public class BeepTest extends PartyGame {
                         newGround();
                         nextRound();
                         endRound();
+                        stagePoints();
                         roundDisplay();
                         fallenPlayers.clear();
                         completedPlayers.clear();
@@ -310,6 +313,15 @@ public class BeepTest extends PartyGame {
         }
     }
 
+    public void stagePoints() {
+        if (rounds+1 % 4 == 0) {
+            for (Player p : alivePlayers) {
+                Participant.getParticipant(p).addCurrentScore(STAGE_POINTS);
+                p.sendMessage(ChatColor.GREEN + "You completed stage #" + ((rounds + 1) / 4) + "!");
+            }
+        }
+    }
+
     public void eliminatePlayer(Player p) {
         if (getState().equals(GameState.ACTIVE)) {
             p.setGameMode(GameMode.SPECTATOR);
@@ -329,15 +341,14 @@ public class BeepTest extends PartyGame {
             if (e.getTo().getZ() < REGULAR_Z) {
                 completedPlayers.add(p);
                 long currentTime = System.currentTimeMillis() - roundTime;
+                // to do: fix round 1 stuff
                 String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
                 p.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName() + " in " + formattedTime + "!");
                 if (completedPlayers.size() == 1) {
-                    Bukkit.broadcastMessage(ChatColor.BOLD + "" + p.getName() + ChatColor.RESET + " completed " + currentLevel.getName() + " first, in " + formattedTime + "!");
+                    Bukkit.broadcastMessage(Participant.getParticipant(p).getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + "" + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
                 }
                 Participant.getParticipant(p).addCurrentScore(CURRENT_POINTS);
-                if (rounds % 4 == 0) {
-                    Participant.getParticipant(p).addCurrentScore(STAGE_POINTS);
-                }
+                
             }
         } else {
             if (e.getTo().getZ() > OPPOSITE_Z) {
@@ -345,13 +356,10 @@ public class BeepTest extends PartyGame {
                 String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
                 p.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName() + " in " + formattedTime + "!");
                 if (completedPlayers.size() == 0) {
-                    Bukkit.broadcastMessage(ChatColor.BOLD + "" + p.getName() + ChatColor.RESET + " completed " + currentLevel.getName() + " first, in " + formattedTime + "!");
+                    Bukkit.broadcastMessage(Participant.getParticipant(p).getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + "" + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
                 }
                 completedPlayers.add(p);
                 Participant.getParticipant(p).addCurrentScore(CURRENT_POINTS);
-                if (rounds % 4 == 0) {
-                    Participant.getParticipant(p).addCurrentScore(STAGE_POINTS);
-                }
             }
         }
     }
