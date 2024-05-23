@@ -39,8 +39,6 @@ public class DiscoFever extends PartyGame {
     private int counter = -1;
     private BossBar bossBar;
 
-    private List<Participant> playersAlive = new LinkedList<>();
-
     // Region boundaries for disco fever. Incrementally moved after each round.
     private Location discoPrimary = new Location(world(), 409, 0, 418);
     private Location discoSecondary = new Location(world(), 390, 0, 402);
@@ -59,6 +57,11 @@ public class DiscoFever extends PartyGame {
     private Pattern randomPattern = null;
     private EditSession editSession = null;
 
+    public final int STAGE_POINTS = 2;
+    public final int SURVIVAL_POINTS = 1;
+    public final int WIN_POINTS = 10;
+    public final Location SPAWN = new Location(Bukkit.getWorld("Party"), 400, 1.5, 400, 0, 0);
+
     // game instance
     private static DiscoFever instance = null;
 
@@ -74,7 +77,7 @@ public class DiscoFever extends PartyGame {
         }
     }
     private DiscoFever() {
-        super("DiscoFever", new Location(Bukkit.getWorld("Party"), 400, 1.5, 400,0,0), new String[] {
+        super("DiscoFever", new String[] {
                 "⑰ Go as fast as you can towards the block in your hand before the timer runs out, and the rest of the blocks disappear!",
                 "⑰ The platform moves as time goes on, so make sure to keep moving forwards.\n\n" +
                 "⑰ The timer will get faster as the game goes on!",
@@ -104,8 +107,18 @@ public class DiscoFever extends PartyGame {
     }
 
     @Override
+    public void onRestart() {
+
+    }
+
+    @Override
     public void loadPlayers() {
         ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
+        if (!teamsAlive.isEmpty()) {
+            teamsAlive.clear();
+        }
+        teamsAlive.addAll(getValidTeams());
+
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().setInvulnerable(false);
             p.getPlayer().setFlying(false);
@@ -117,6 +130,7 @@ public class DiscoFever extends PartyGame {
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             p.getPlayer().teleport(SPAWN);
         }
+        updatePlayersAliveScoreboard();
     }
 
     @Override
@@ -250,6 +264,9 @@ public class DiscoFever extends PartyGame {
                     delay -= 4;
                 }
                 Bukkit.broadcastMessage(ChatColor.YELLOW+"Things are speeding up!");
+                for (Participant i : playersAlive) {
+                    i.addCurrentScore(STAGE_POINTS);
+                }
                 counter = 0;
                 // Cancel task then call Disco() again to reinitialize it
                 Disco();
@@ -387,7 +404,11 @@ public class DiscoFever extends PartyGame {
             }
         }
 
-        gameOver();
+        if (getState() != GameState.TUTORIAL) {
+            roundWinners(WIN_POINTS);
+
+            gameOver();
+        }
     }
 
     /**
@@ -441,6 +462,13 @@ public class DiscoFever extends PartyGame {
         if (getState().equals(GameState.ACTIVE)) {
             p.setGameMode(GameMode.SPECTATOR);
             p.sendTitle(" ", ChatColor.RED + "You died!", 0, 60, 20);
+            Participant part = Participant.getParticipant(p);
+            if (part == null) return;
+            updatePlayersAlive(part);
+            for (Participant i : playersAlive) {
+                i.addCurrentScore(SURVIVAL_POINTS);
+            }
+            updatePlayersAliveScoreboard();
             // other things later
         }
     }

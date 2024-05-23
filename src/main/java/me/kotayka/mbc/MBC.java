@@ -305,7 +305,7 @@ public class MBC implements Listener {
     }
 
     public void setCurrentGame(Minigame game) {
-       currentGame = game;
+        currentGame = game;
     }
 
     private MBC() {}

@@ -288,7 +288,7 @@ public abstract class MBCTeam {
         // small delay to sync messages correctly
         String s = "\n" + teamNameFormat() + " have been eliminated!\n";
 
-        MBC.getInstance().getGame().getLogger().log(s);
+        MBC.getInstance().getMinigame().getLogger().log(s);
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().plugin, new Runnable() {
             @Override

@@ -32,7 +32,6 @@ public abstract class Game extends Minigame {
     public Map<MBCTeam, Double> scoreMap = new HashMap<>();
     public List<Participant> playersAlive = new ArrayList<>();
     public List<MBCTeam> teamsAlive = new ArrayList<>();
-    private StatLogger logger;
     // Used to signal whether or not there has been a disconnect when moving from any state -> starting; if so, pause
     public boolean disconnect = false;
     protected final String[] INTRODUCTION;
@@ -53,11 +52,6 @@ public abstract class Game extends Minigame {
             createScoreboard(p);
         }
     }
-
-    private void initLogger() {
-        logger = new StatLogger(this);
-    }
-
 
     /**
      * Print game explanation, one line at a time.
@@ -258,6 +252,16 @@ public abstract class Game extends Minigame {
     }
 
     /**
+     * Updates the player's current coin count in-game on the scoreboard
+     * Your Coins: {COIN_AMOUNT}
+     * @param p Participant whose scoreboard to update
+     */
+    public void updatePlayerCurrentScoreDisplay(Participant p) {
+        if (MBC.getInstance().finalGame) { finalGamePlayerCurrentScoreDisplay(p); return; }
+        createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
+    }
+
+    /**
      * Updates each player's scoreboards to match that of playersAlive and teamsAlive.
      * Does not do any computation and assumes playersAlive and teamsAlive has been properly
      * computed by the function call.
@@ -276,15 +280,6 @@ public abstract class Game extends Minigame {
          */
     }
 
-    /**
-     * Updates the player's current coin count in-game on the scoreboard
-     * Your Coins: {COIN_AMOUNT}
-     * @param p Participant whose scoreboard to update
-     */
-    public void updatePlayerCurrentScoreDisplay(Participant p) {
-        if (MBC.getInstance().finalGame) { finalGamePlayerCurrentScoreDisplay(p); return; }
-        createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+p.getMultipliedCurrentScore(), p);
-    }
 
     public void finalGamePlayerCurrentScoreDisplay(Participant p) {
         createLine(0, ChatColor.YELLOW+"Your Coins: "+ChatColor.WHITE+"???", p);
@@ -375,6 +370,7 @@ public abstract class Game extends Minigame {
        HandlerList.unregisterAll(MBC.getInstance().lobby);
        HandlerList.unregisterAll(MBC.getInstance().decisionDome);
        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
+       super.initLogger();
 
        // if timer hasn't reached 1, stop it
        stopTimer();

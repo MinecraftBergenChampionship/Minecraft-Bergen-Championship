@@ -50,6 +50,7 @@ public class BeepTest extends PartyGame {
     private final World WorldEditWorld = BukkitAdapter.adapt(Bukkit.getWorld("Party"));
     
     private final org.bukkit.World world = Bukkit.getWorld("Party");
+    private final Location SPAWN = new Location(Bukkit.getWorld("Party"), -522, -55, -458, 180, 0);
 
     // game instance
     private static BeepTest instance = null;
@@ -64,7 +65,7 @@ public class BeepTest extends PartyGame {
     }
 
     private BeepTest() {
-        super("BeepTest", new Location(Bukkit.getWorld("Party"), -522, -55, -458, 180, 0), new String[] {
+        super("BeepTest", new String[] {
                 "⑰ The fitness gram " + ChatColor.BOLD + "Beep Test" + ChatColor.RESET + " is a multistage parkour capacity test that progressively gets more difficult as it continues.",
                 "⑰ Jump from one side of the map to the other to complete the courses as fast as you can.\n\n" +  
                 "⑰ The parkour difficulty starts easy, but gets more difficult each time the arena changes color.",
@@ -95,6 +96,11 @@ public class BeepTest extends PartyGame {
         setGameState(GameState.TUTORIAL);
 
         setTimer(30);
+    }
+
+    @Override
+    public void onRestart() {
+
     }
 
     @Override

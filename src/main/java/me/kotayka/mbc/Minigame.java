@@ -29,6 +29,7 @@ public abstract class Minigame implements Scoreboard, Listener {
     private GameState gameState = GameState.INACTIVE;
     public int timeRemaining = -1;
     private int taskID = -1;
+    public StatLogger logger;
 
     // GLOBAL STRING STORAGE FOR STORING STRINGS TO PRINT WHILE PERFORMING TASKS (ie sorting through game scores)
     protected String TO_PRINT = "";
@@ -85,6 +86,14 @@ public abstract class Minigame implements Scoreboard, Listener {
             }
             MBC.getInstance().getMinigame().events();
         }, 20, 20);
+    }
+
+    public void initLogger() {
+        logger = new StatLogger(this);
+    }
+
+    public StatLogger getLogger() {
+        return logger;
     }
 
     public void Pause() {
