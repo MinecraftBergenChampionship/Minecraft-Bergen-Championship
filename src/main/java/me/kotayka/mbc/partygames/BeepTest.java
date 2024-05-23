@@ -326,7 +326,7 @@ public class BeepTest extends PartyGame {
     }
 
     public void stagePoints() {
-        if (rounds+1 % 4 == 0) {
+        if ((rounds+1)% 4 == 0) {
             for (Player p : alivePlayers) {
                 Participant.getParticipant(p).addCurrentScore(STAGE_POINTS);
                 p.sendMessage(ChatColor.GREEN + "You completed stage #" + ((rounds + 1) / 4) + "!");
