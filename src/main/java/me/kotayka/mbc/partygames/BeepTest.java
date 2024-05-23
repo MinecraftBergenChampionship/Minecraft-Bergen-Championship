@@ -171,6 +171,10 @@ public class BeepTest extends PartyGame {
                 if (timeRemaining == 0) {
                     if (rounds > 14 || alivePlayers.size() == 0) {
                         roundWinners(STAGE_POINTS);
+                        for (Participant p : MBC.getInstance().getPlayers()) {
+                            p.getPlayer().setMaxHealth(6);
+                            p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
+                        }
                         if (MBC.getInstance().party == null) {
                             Bukkit.broadcastMessage("party is null!");
                             MBC.getInstance().updatePlacings();
