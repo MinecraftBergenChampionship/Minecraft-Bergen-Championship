@@ -97,6 +97,8 @@ public class Party extends Game {
 
     @Override
     public void events() {
+        Bukkit.broadcastMessage("party events");
+        Bukkit.broadcastMessage(getState() + "");
         if (getState().equals(GameState.TUTORIAL)) {
             if (timeRemaining == 0) {
                 MBC.getInstance().sendMutedMessages();
@@ -119,16 +121,6 @@ public class Party extends Game {
                 partyGame = getRandomPartyGame();
             }
             else if (timeRemaining == 5) {
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.sendTitle(" ", partyGame.name() + "!", 0, 80, 20);
-                    p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
-                }
-            }
-        } else if (getState().equals(GameState.END_ROUND)) {
-            if (timeRemaining == 10) {
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + "The next party game is...");
-                partyGame = getRandomPartyGame();
-            } else if (timeRemaining == 5) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.sendTitle(" ", partyGame.name() + "!", 0, 80, 20);
                     p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
@@ -168,6 +160,16 @@ public class Party extends Game {
             p.getPlayer().setInvulnerable(true);
         }
         partyGame.start();
+    }
+
+    public void next() {
+        if (GAMES_PLAYED == gameNum) {
+            setGameState(GameState.END_GAME);
+            setTimer(37);
+        } else {
+            setGameState(GameState.STARTING);
+            setTimer(12);
+        }
     }
 
     public int getGameNum() {

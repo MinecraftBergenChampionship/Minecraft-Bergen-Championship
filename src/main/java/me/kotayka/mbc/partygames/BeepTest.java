@@ -13,6 +13,7 @@ import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.PartyGame;
+import me.kotayka.mbc.games.Party;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -120,6 +121,26 @@ public class BeepTest extends PartyGame {
     }
 
     @Override
+    public void endEvents() {
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().setMaxHealth(20);
+            p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
+        }
+        if (MBC.getInstance().party == null) {
+            Bukkit.broadcastMessage("party is null!");
+            MBC.getInstance().updatePlacings();
+            for (Participant p : MBC.getInstance().getPlayers()) {
+                p.addCurrentScoreToTotal();
+            }
+            logger.logStats();
+            returnToLobby();
+        } else {
+            // start next game
+            MBC.getInstance().party.next();
+        }
+    }
+
+    @Override
     public void onRestart() {
 
     }
@@ -169,10 +190,10 @@ public class BeepTest extends PartyGame {
                 break;
             case ACTIVE:
                 if (timeRemaining == 0) {
-                    if (rounds > 14 || alivePlayers.size() == 0) {
+                    if (rounds > 14) {
                         roundWinners(STAGE_POINTS);
                         for (Participant p : MBC.getInstance().getPlayers()) {
-                            p.getPlayer().setMaxHealth(6);
+                            p.getPlayer().setMaxHealth(20);
                             p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
                         }
                         if (MBC.getInstance().party == null) {
@@ -185,7 +206,7 @@ public class BeepTest extends PartyGame {
                             returnToLobby();
                         } else {
                             // start next game
-                            warpToNext();
+                            setupNext();
                         }
                     } else {
                         // clear level, move onto next level

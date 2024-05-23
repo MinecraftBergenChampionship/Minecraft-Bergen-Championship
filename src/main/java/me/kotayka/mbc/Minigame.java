@@ -191,20 +191,6 @@ public abstract class Minigame implements Scoreboard, Listener {
         }
     }
 
-    /**
-     * Sorts teams by their current round score to place onto scoreboard.
-     */
-    public void updateInGameTeamScoreboard() {
-        if (MBC.getInstance().finalGame) { finalGameScoreboard(); return; }
-
-        List<MBCTeam> teamRoundsScores = getValidTeams();
-        teamRoundsScores.sort(new TeamRoundSorter());
-
-        for (int i = 14; i > 14-teamRoundsScores.size(); i--) {
-            MBCTeam t = teamRoundsScores.get(14-i);
-            createLineAll(i,String.format("%s: %.1f", t.teamNameFormat(), t.getMultipliedCurrentScore()));
-        }
-    }
 
     public void finalGameScoreboard() {
         List<MBCTeam> teams = getValidTeams();

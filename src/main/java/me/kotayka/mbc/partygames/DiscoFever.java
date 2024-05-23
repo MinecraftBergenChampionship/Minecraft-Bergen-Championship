@@ -223,7 +223,7 @@ public class DiscoFever extends PartyGame {
                         returnToLobby();
                     } else {
                         // start next game
-                        warpToNext();
+                        MBC.getInstance().party.next();
                     }
                 }
         }
@@ -245,6 +245,11 @@ public class DiscoFever extends PartyGame {
         }
         pattern.add(BukkitAdapter.adapt(EMTPY_BLOCK.createBlockData()), 50);
         return pattern;
+    }
+
+    @Override
+    public void endEvents() {
+        timeRemaining = 1;
     }
 
 

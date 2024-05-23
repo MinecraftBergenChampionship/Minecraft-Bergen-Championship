@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
 
 /**
  * <b>PartyGame</b> represents a separate, individual game, which may be selected
@@ -143,7 +144,7 @@ public abstract class PartyGame extends Game {
         updatePlayersAliveScoreboard();
 
         if (playersAlive.size() == 0) {
-            timeRemaining = 1;
+            endEvents();
         }
     }
 
@@ -153,6 +154,8 @@ public abstract class PartyGame extends Game {
             t.announceTeamDeath();
         }
     }
+
+    public abstract void endEvents();
 
     public void updatePlayersAliveScoreboard() {
         createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players: " + ChatColor.RESET+playersAlive.size() + "/"+MBC.getInstance().getPlayers().size() + " | " +
@@ -166,19 +169,25 @@ public abstract class PartyGame extends Game {
     /*
      *
      */
-    public void warpToNext() {
+    public void setupNext() {
         Party party = MBC.getInstance().party;
         if (party == null) return;
-
-        MBC.getInstance().setCurrentGame(party);
-        if (party.getGameNum() == Party.GAMES_PLAYED) {
-            setGameState(GameState.END_GAME);
-            setTimer(37);
-        } else {
-            setGameState(GameState.END_ROUND);
-            setTimer(12);
+        HandlerList.unregisterAll(this);
+        setGameState(GameState.INACTIVE);
+        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(party, MBC.getInstance().plugin);
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            p.getPlayer().setMaxHealth(20);
+            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+            p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+            p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
+            p.getPlayer().setExp(0);
+            p.getPlayer().setLevel(0);
         }
 
+        MBC.getInstance().setCurrentGame(party);
+        party.next();
     }
 
     public boolean isGameOver() {
