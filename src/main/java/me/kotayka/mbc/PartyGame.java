@@ -38,6 +38,7 @@ public abstract class PartyGame extends Game {
         HandlerList.unregisterAll(MBC.getInstance().lobby);
         HandlerList.unregisterAll(MBC.getInstance().decisionDome);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
+        playersAlive.addAll(MBC.getInstance().getPlayers());
 
         // if timer hasn't reached 1, stop it
         stopTimer();
@@ -138,6 +139,7 @@ public abstract class PartyGame extends Game {
     }
 
     public void updatePlayersAlive(Participant p) {
+        Bukkit.broadcastMessage("playersAlive: " + playersAlive.toString());
         Bukkit.broadcastMessage(p.getFormattedName() + " partied too hard!");
         playersAlive.remove(p);
         checkLastTeam(p.getTeam());

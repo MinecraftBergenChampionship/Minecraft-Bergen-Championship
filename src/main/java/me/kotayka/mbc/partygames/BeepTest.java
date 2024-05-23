@@ -40,7 +40,7 @@ public class BeepTest extends PartyGame {
     private List<BeepTestLevel> hardLevels = null;
     private int rounds = 0;
     private boolean oppositeSide = false;
-    private Set<Player> fallenPlayers = new HashSet<>();
+    private Set<Participant> fallenPlayers = new HashSet<>();
 
     private final Location OPPOSITE_SPAWN = new Location(Bukkit.getWorld("Party"), -522, -55, -490);
     // arena regions
@@ -128,10 +128,10 @@ public class BeepTest extends PartyGame {
             p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
         }
         if (MBC.getInstance().party == null) {
-            MBC.getInstance().updatePlacings();
             for (Participant p : MBC.getInstance().getPlayers()) {
                 p.addCurrentScoreToTotal();
             }
+            MBC.getInstance().updatePlacings();
             logger.logStats();
             returnToLobby();
         } else {
@@ -161,6 +161,7 @@ public class BeepTest extends PartyGame {
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
         }
+        Bukkit.broadcastMessage(playersAlive.toString());
     }
 
     @Override
@@ -260,18 +261,19 @@ public class BeepTest extends PartyGame {
     public void onMove(PlayerMoveEvent e) {
         if (!getState().equals(GameState.ACTIVE)) return;
         Player p = e.getPlayer();
+        Participant par = Participant.getParticipant(p);
         if (p.getGameMode() != GameMode.ADVENTURE) return;
 
-        if (!completedPlayers.contains(p)) {
+        if (!completedPlayers.contains(par)) {
             completedCourse(e);
         }
 
-        if (p.getLocation().getY() < -59 && fallenPlayers.add(p)) {
-            if (completedPlayers.contains(p) && !oppositeSide && p.getZ() <= REGULAR_Z) {
+        if (p.getLocation().getY() < -59 && fallenPlayers.add(par)) {
+            if (completedPlayers.contains(par) && !oppositeSide && p.getZ() <= REGULAR_Z) {
                 p.setVelocity(new Vector(0, 0, 0));
                 p.teleport(OPPOSITE_SPAWN);
             }
-            if (completedPlayers.contains(p) && oppositeSide && p.getZ() >= OPPOSITE_Z) {
+            if (completedPlayers.contains(par) && oppositeSide && p.getZ() >= OPPOSITE_Z) {
                 p.setVelocity(new Vector(0, 0, 0));
                 p.teleport(SPAWN);
             }
@@ -284,11 +286,11 @@ public class BeepTest extends PartyGame {
      */
     private void respawn() {
         if (fallenPlayers.size() == 0) return;
-        for (Player p : fallenPlayers) {
+        for (Participant p : fallenPlayers) {
             if (oppositeSide) {
-                p.teleport(SPAWN);
+                p.getPlayer().teleport(SPAWN);
             } else {
-                p.teleport(OPPOSITE_SPAWN);
+                p.getPlayer().teleport(OPPOSITE_SPAWN);
             }
         }
         fallenPlayers.clear();
@@ -319,17 +321,17 @@ public class BeepTest extends PartyGame {
             }
         }
 
+        Bukkit.broadcastMessage("Eliminate: " + toEliminate.toString());
         for (Participant p : toEliminate) {
             eliminatePlayer(p);
         }
     }
 
     public void stagePoints() {
-        Bukkit.broadcastMessage("stagePoints()");
-        if (rounds+1 % 4 == 0) {
+        if (rounds % 4 == 0) {
             for (Participant p : alivePlayers) {
                 p.addCurrentScore(STAGE_POINTS);
-                p.getPlayer().sendMessage(ChatColor.GREEN + "You completed stage #" + ((rounds + 1) / 4) + "!");
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You completed stage #" + (rounds / 4) + "!");
             }
         }
     }

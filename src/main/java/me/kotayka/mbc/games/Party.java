@@ -27,7 +27,7 @@ public class Party extends Game {
             "⑰ The three minigames will be chosen from in a random order.\n\n" +
             "⑰ Our three games for this event are " + ChatColor.BOLD + "Disco Fever, Disco Fever, and Beep Test." + ChatColor.RESET,
             ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                    "⑮ You'll find out! "
+                    "⑰ You'll find out! "
         });
     }
 
@@ -120,7 +120,7 @@ public class Party extends Game {
             }
             else if (timeRemaining == 5) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.sendTitle(" ", partyGame.name() + "!", 0, 80, 20);
+                    p.sendTitle(ChatColor.BOLD + "" + partyGame.name() + "!", "", 0, 80, 20);
                     p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
                 }
             }

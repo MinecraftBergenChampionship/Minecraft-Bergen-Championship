@@ -208,6 +208,7 @@ public class DiscoFever extends PartyGame {
                     if (gameOne) {
                         gameOne = false;
                         deletedSpawn = false;
+                        delay = 80;
                         setSpawnArea(true);
                         Barriers(true);
                         loadPlayers();
@@ -215,10 +216,10 @@ public class DiscoFever extends PartyGame {
                         setGameState(GameState.STARTING);
                         setTimer(16);
                     } else if (MBC.getInstance().party == null) {
-                        MBC.getInstance().updatePlacings();
                         for (Participant p : MBC.getInstance().getPlayers()) {
                             p.addCurrentScoreToTotal();
                         }
+                        MBC.getInstance().updatePlacings();
                         logger.logStats();
                         returnToLobby();
                     } else {
