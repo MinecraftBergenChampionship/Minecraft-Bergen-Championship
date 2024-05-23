@@ -218,29 +218,29 @@ public class AceRace extends Game {
         }
 
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
-            Location l = p.getLocation();
-            l.setPitch(-30);
-            Vector d = l.getDirection();
-            p.setVelocity(d.multiply(4));
-            p.setVelocity(new Vector(p.getVelocity().getX(), 1.65, p.getVelocity().getZ()));
+            //Location l = p.getLocation();
+            //l.setPitch(-30);
+            //Vector d = l.getDirection();
+            //p.setVelocity(d.multiply(4));
+            //p.setVelocity(new Vector(p.getVelocity().getX(), 1.65, p.getVelocity().getZ()));
             player.setCheckpoint();
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
-            Location l = p.getLocation();
-            l.setPitch(-30);
-            Vector d = l.getDirection();
-            p.setVelocity(d.multiply(2.5));
-            p.setVelocity(new Vector(p.getVelocity().getX(), 1.25, p.getVelocity().getZ()));
+            //Location l = p.getLocation();
+            //l.setPitch(-30);
+            //Vector d = l.getDirection();
+            //p.setVelocity(d.multiply(2.5));
+            //p.setVelocity(new Vector(p.getVelocity().getX(), 1.25, p.getVelocity().getZ()));
             player.setCheckpoint();
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
-            p.setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
+            //p.setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
-            p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
+            //p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
             return;
         }
         if (e.getTo().getBlock().getType().toString().toLowerCase().contains("carpet")) {
