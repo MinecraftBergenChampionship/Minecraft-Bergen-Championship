@@ -3,7 +3,6 @@ package me.kotayka.mbc;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
-import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 
 import java.util.HashMap;
 import java.util.Map;

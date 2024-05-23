@@ -223,8 +223,7 @@ public class DiscoFever extends PartyGame {
                         returnToLobby();
                     } else {
                         // start next game
-                        PartyGame game = MBC.getInstance().party.getRandomPartyGame();
-                        game.start();
+                        warpToNext();
                     }
                 }
         }

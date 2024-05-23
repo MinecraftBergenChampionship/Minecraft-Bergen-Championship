@@ -1,22 +1,21 @@
 package me.kotayka.mbc.games;
 
 import me.kotayka.mbc.*;
-import me.kotayka.mbc.partygames.DiscoFever;
-import me.kotayka.mbc.partygames.BeepTest;
 import me.kotayka.mbc.partygames.PartyGameFactory;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.*;
+
 import java.util.*;
 
 public class Party extends Game {
     private final World world = Bukkit.getWorld("Party");
     protected final Location LOBBY = new Location(world, 0.5, -17.5, -999.5);
-    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "BeepTest", "DiscoFever"));
+    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "BeepTest"));
+    public static final int GAMES_PLAYED = 2;
     private int gameNum;
     private PartyGame partyGame = null;
 
@@ -34,9 +33,20 @@ public class Party extends Game {
 
     @Override
     public void loadPlayers() {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.teleport(LOBBY);
-        }
+        // standards
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().removePotionEffect(PotionEffectType.LEVITATION);
+            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            p.getPlayer().setLevel(0);
+            p.getPlayer().setExp(0);
+
+            // for intro
+            p.getPlayer().addPotionEffect(MBC.SATURATION);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 300, 255, true, false));
+            p.getPlayer().teleport(LOBBY);
+    }
         preFirstRound();
     }
 
@@ -100,48 +110,35 @@ public class Party extends Game {
                 Introduction();
             }
         } else if (getState().equals(GameState.STARTING)) {
-            if (timeRemaining == 10) {
+            if (timeRemaining == 0) {
+                gameNum++;
+                startPartyGame();
+            }
+            else if (timeRemaining == 10) {
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The next Party Game is...\n");
                 partyGame = getRandomPartyGame();
             }
-            if (timeRemaining == 5) {
+            else if (timeRemaining == 5) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.sendTitle("\n" + MBC.MBC_STRING_PREFIX + ChatColor.BOLD + partyGame.name() + "!" + ChatColor.RESET, "", 0, 15, 15);
+                    p.sendTitle(" ", partyGame.name() + "!", 0, 80, 20);
                     p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
                 }
             }
-            if (timeRemaining == 0) {
-                setGameState(GameState.ACTIVE);
-                gameNum++;
-                partyGame.start();
-            }
-        } else if (getState().equals(GameState.ACTIVE)) {
-            if (partyGame.isGameOver()) {
-                if (gameNum == 3) {
-                    timeRemaining = 37;
-                    setGameState(GameState.END_GAME);
-                }
-                else {
-                    timeRemaining = 5;
-                    setGameState(GameState.END_ROUND);
-                }
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.getPlayer().teleport(LOBBY);
-                }
-
-            }
         } else if (getState().equals(GameState.END_ROUND)) {
-            Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The next Party Game will be picked shortly...");
-            if (timeRemaining == 0) {
-                setGameState(GameState.STARTING);
-                timeRemaining = 15;
+            if (timeRemaining == 10) {
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + "The next party game is...");
+                partyGame = getRandomPartyGame();
+            } else if (timeRemaining == 5) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.sendTitle(" ", partyGame.name() + "!", 0, 80, 20);
+                    p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
+                }
             }
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 36) {
                 gameOverGraphics();
             }
             gameEndEvents();
-
         }
     }
 
@@ -151,6 +148,30 @@ public class Party extends Game {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET + ChatColor.RESET.toString(), p);
         updateInGameTeamScoreboard();
+    }
+
+    public void startPartyGame() {
+        setGameState(GameState.INACTIVE);
+        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(partyGame, MBC.getInstance().plugin);
+        MBC.getInstance().setCurrentGame(partyGame);
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            p.getPlayer().setMaxHealth(20);
+            p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
+            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+            p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+            p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
+            p.getPlayer().getInventory().clear();
+            p.getPlayer().setExp(0);
+            p.getPlayer().setLevel(0);
+            p.getPlayer().setInvulnerable(true);
+        }
+        partyGame.start();
+    }
+
+    public int getGameNum() {
+        return gameNum;
     }
 
     @Override

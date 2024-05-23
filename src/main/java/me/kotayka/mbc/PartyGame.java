@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import me.kotayka.mbc.games.Party;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -160,6 +161,24 @@ public abstract class PartyGame extends Game {
         createLineAll(3, ChatColor.GREEN+""+ChatColor.BOLD+"Players Remaining: " + ChatColor.RESET+playersAlive.size()+"/"+MBC.getInstance().getPlayers().size());
         createLineAll(2, ChatColor.GREEN+""+ChatColor.BOLD+"Teams Remaining: " + ChatColor.RESET+teamsAlive.size()+"/"+MBC.MAX_TEAMS);
          */
+    }
+
+    /*
+     *
+     */
+    public void warpToNext() {
+        Party party = MBC.getInstance().party;
+        if (party == null) return;
+
+        MBC.getInstance().setCurrentGame(party);
+        if (party.getGameNum() == Party.GAMES_PLAYED) {
+            setGameState(GameState.END_GAME);
+            setTimer(37);
+        } else {
+            setGameState(GameState.END_ROUND);
+            setTimer(12);
+        }
+
     }
 
     public boolean isGameOver() {
