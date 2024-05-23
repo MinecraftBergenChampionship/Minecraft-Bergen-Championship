@@ -138,7 +138,7 @@ public abstract class PartyGame extends Game {
     }
 
     public void updatePlayersAlive(Participant p) {
-        Bukkit.broadcastMessage(p.getFormattedName() + " partied too hard");
+        Bukkit.broadcastMessage(p.getFormattedName() + " partied too hard!");
         playersAlive.remove(p);
         checkLastTeam(p.getTeam());
         updatePlayersAliveScoreboard();
@@ -185,9 +185,6 @@ public abstract class PartyGame extends Game {
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
         }
-
-        MBC.getInstance().setCurrentGame(party);
-        party.next();
     }
 
     public boolean isGameOver() {

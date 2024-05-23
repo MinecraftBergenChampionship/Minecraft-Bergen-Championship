@@ -122,7 +122,9 @@ public class BeepTest extends PartyGame {
 
     @Override
     public void endEvents() {
+        roundWinners(STAGE_POINTS);
         for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().stopSound(Sound.MUSIC_DISC_13);
             p.getPlayer().setMaxHealth(20);
             p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
         }
@@ -136,6 +138,7 @@ public class BeepTest extends PartyGame {
             returnToLobby();
         } else {
             // start next game
+            setupNext();
             MBC.getInstance().party.next();
         }
     }
@@ -191,23 +194,7 @@ public class BeepTest extends PartyGame {
             case ACTIVE:
                 if (timeRemaining == 0) {
                     if (rounds > 14) {
-                        roundWinners(STAGE_POINTS);
-                        for (Participant p : MBC.getInstance().getPlayers()) {
-                            p.getPlayer().setMaxHealth(20);
-                            p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
-                        }
-                        if (MBC.getInstance().party == null) {
-                            Bukkit.broadcastMessage("party is null!");
-                            MBC.getInstance().updatePlacings();
-                            for (Participant p : MBC.getInstance().getPlayers()) {
-                                p.addCurrentScoreToTotal();
-                            }
-                            logger.logStats();
-                            returnToLobby();
-                        } else {
-                            // start next game
-                            setupNext();
-                        }
+                        endEvents();
                     } else {
                         // clear level, move onto next level
                         rounds++;

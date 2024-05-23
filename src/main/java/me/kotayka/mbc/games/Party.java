@@ -97,8 +97,6 @@ public class Party extends Game {
 
     @Override
     public void events() {
-        Bukkit.broadcastMessage("party events");
-        Bukkit.broadcastMessage(getState() + "");
         if (getState().equals(GameState.TUTORIAL)) {
             if (timeRemaining == 0) {
                 MBC.getInstance().sendMutedMessages();
@@ -163,6 +161,7 @@ public class Party extends Game {
     }
 
     public void next() {
+        MBC.getInstance().setCurrentGame(this);
         if (GAMES_PLAYED == gameNum) {
             setGameState(GameState.END_GAME);
             setTimer(37);
