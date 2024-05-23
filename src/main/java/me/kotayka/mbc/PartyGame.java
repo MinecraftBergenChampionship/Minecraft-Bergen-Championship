@@ -136,19 +136,20 @@ public abstract class PartyGame extends Game {
     }
 
     public void updatePlayersAlive(Participant p) {
+        Bukkit.broadcastMessage(p.getFormattedName() + " partied too hard");
         playersAlive.remove(p);
         checkLastTeam(p.getTeam());
         updatePlayersAliveScoreboard();
+
+        if (playersAlive.size() == 0) {
+            timeRemaining = 1;
+        }
     }
 
     public void checkLastTeam(MBCTeam t) {
         if (checkTeamEliminated(t)) {
             teamsAlive.remove(t);
             t.announceTeamDeath();
-
-            if (teamsAlive.size() <= 1) {
-                timeRemaining = 1;
-            }
         }
     }
 

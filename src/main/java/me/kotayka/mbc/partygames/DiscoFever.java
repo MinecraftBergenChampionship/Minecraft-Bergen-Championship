@@ -50,7 +50,7 @@ public class DiscoFever extends PartyGame {
     private Material safe = null;
     private ColorType lastColor = null;
     private int DEATH_Y = -10; // y-level at which the game considers the player as eliminated
-
+    private boolean deletedSpawn = false;
     // WorldEdit
     private Region disco = null;
     private Region back = null;
@@ -99,6 +99,7 @@ public class DiscoFever extends PartyGame {
         initializePalette();
         initializeRegions();
         Barriers(true);
+        setSpawnArea(true);
 
         setGameState(GameState.TUTORIAL);
         randomPattern = generatePattern();
@@ -108,7 +109,7 @@ public class DiscoFever extends PartyGame {
 
     @Override
     public void onRestart() {
-
+        setSpawnArea(true);
     }
 
     @Override
@@ -299,6 +300,10 @@ public class DiscoFever extends PartyGame {
                 editSession.setBlocks(disco, randomPattern);
                 if (backPrimary.getZ() > 402) {
                     editSession.setBlocks(back, BlockTypes.LIGHT_GRAY_CONCRETE.getDefaultState());
+                    if (!deletedSpawn) {
+                        setSpawnArea(false);
+                        deletedSpawn = true;
+                    }
                 }
                 editSession.close();
             } catch (MaxChangedBlocksException e) {
@@ -496,6 +501,31 @@ public class DiscoFever extends PartyGame {
         for (int y = 1; y <= 3; y++) {
             for (int x = 390; x <= 409; x++) {
                 world().getBlockAt(x, y, 402).setType(m);
+            }
+        }
+    }
+
+    /**
+     * Place or remove spawn area;
+     * b = True -> Place Spawn
+     * b = False -> Remove spawn
+     */
+    public void setSpawnArea(boolean b) {
+        if (!b) {
+            for (int y = 0; y < 4; y++) {
+                for (int x = 409; x >= 390; x--) {
+                    for (int z = 398; z <= 401; z++) {
+                        world().getBlockAt(x, y, z).setType(Material.AIR);
+                    }
+                }
+            }
+        } else {
+            for (int y = 0; y < 4; y++) {
+                for (int x = 409; x >= 390; x--) {
+                    for (int z = 398; z <= 401; z++) {
+                        world().getBlockAt(x, y, z).setType(world().getBlockAt(x, y, z-398).getType());
+                    }
+                }
             }
         }
     }
