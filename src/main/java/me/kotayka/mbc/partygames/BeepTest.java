@@ -22,7 +22,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.util.Vector;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,9 +52,26 @@ public class BeepTest extends PartyGame {
     private final BlockVector3 arenaFrom = new BlockVector3(-65, -63, 60);
     private final BlockVector3 arenaTo = new BlockVector3(-500, -63, -500);
     private final World WorldEditWorld = BukkitAdapter.adapt(Bukkit.getWorld("Party"));
+
+    private final Location respawnNormal = new Location(Bukkit.getWorld("Party"), -522, -55, -490);
+    private final Location respawnOpposite = new Location(Bukkit.getWorld("Party"), -522, -55, -459);
     
     private final org.bukkit.World world = Bukkit.getWorld("Party");
     private final Location SPAWN = new Location(Bukkit.getWorld("Party"), -522, -55, -458, 180, 0);
+
+    private List<Player> completedPlayers = new ArrayList<>(); 
+    private List<Player> alivePlayers = new ArrayList<>(); 
+    public long roundTime;
+
+    public final int STAGE_POINTS = 4;
+    public final int EASY_POINTS = 1;
+    public final int MEDIUM_POINTS = 2;
+    public final int HARD_POINTS = 3;
+    public final int EXTREME_POINTS = 4;
+    public int CURRENT_POINTS = EASY_POINTS;
+
+    public final int REGULAR_Z = -486;
+    public final int OPPOSITE_Z = -462;
 
     // game instance
     private static BeepTest instance = null;
@@ -107,11 +128,15 @@ public class BeepTest extends PartyGame {
     public void loadPlayers() {
         //MBC.getInstance().hideAllPlayers();
         ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
+        alivePlayers.clear();
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(SPAWN);
             p.addPotionEffect(MBC.SATURATION);
             p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 255, false, false));
+            alivePlayers.add(p);
             Participant par = Participant.getParticipant(p);
+            p.getPlayer().setMaxHealth(6);
+            p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
             if (par != null) {
                 p.getInventory().setBoots(par.getTeam().getColoredLeatherArmor(leatherBoots));
                 par.board.getTeam(par.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
@@ -140,6 +165,7 @@ public class BeepTest extends PartyGame {
                     }
                     Barriers(false);
                     newGround();
+                    endRound();
                     nextRound();
                     roundDisplay();
                     setGameState(GameState.ACTIVE);
@@ -160,16 +186,21 @@ public class BeepTest extends PartyGame {
                         respawn();
                         nextRound();
                         roundDisplay();
+                        roundTime = System.currentTimeMillis();
                     }
                     int timeForLevel;
                     if (rounds < 4) {
                         timeForLevel = 10;
+                        CURRENT_POINTS = EASY_POINTS;
                     } else if (rounds < 8) {
                         timeForLevel = 15;
+                        CURRENT_POINTS = MEDIUM_POINTS;
                     } else if (rounds < 12) {
                         timeForLevel = 20;
+                        CURRENT_POINTS = HARD_POINTS;
                     } else {
                         timeForLevel = 25;
+                        CURRENT_POINTS = EXTREME_POINTS;
                     }
                     setTimer(timeForLevel+1);
                 }
@@ -236,6 +267,86 @@ public class BeepTest extends PartyGame {
         regularLevels = BeepTestLevelLoader.loadRegularLevels();
         mediumLevels = BeepTestLevelLoader.loadMediumLevels();
         hardLevels = BeepTestLevelLoader.loadHardLevels();
+    }
+
+    public void endRound() {
+        for (Player p : alivePlayers) {
+            if (!completedPlayers.contains(p)) {
+                if (p.getHealth() <= 2) {
+                    eliminatePlayer(p);
+                }
+            } else {
+                p.damage(2);
+                if (!oppositeSide) {
+                    p.teleport(respawnNormal);
+                }
+                else {
+                    p.teleport(respawnOpposite);
+                }
+            }
+        }
+    }
+
+    public void eliminatePlayer(Player p) {
+        if (getState().equals(GameState.ACTIVE)) {
+            p.setGameMode(GameMode.SPECTATOR);
+            alivePlayers.remove(p);
+            p.sendTitle(" ", ChatColor.RED + "You died!", 0, 60, 20);
+            Participant part = Participant.getParticipant(p);
+            Bukkit.broadcastMessage(ChatColor.BOLD + "" + p.name() + ChatColor.RESET + " has been eliminated!");
+            if (part == null) return;
+            updatePlayersAlive(part);
+            MBC.getInstance().showPlayers(part);
+            updatePlayersAliveScoreboard();
+            // other things later
+        }
+    }
+
+    public void playerNoKillThemselves(PlayerMoveEvent e) {
+        Player p = e.getPlayer();
+        if (completedPlayers.contains(p) && !oppositeSide && p.getZ() <= REGULAR_Z) {
+            p.teleport(respawnOpposite);
+        }
+        if (completedPlayers.contains(p) && oppositeSide && p.getZ() >= OPPOSITE_Z) {
+            p.teleport(respawnOpposite);
+        }
+    }
+
+    public void completedCourse(PlayerMoveEvent e) {
+        if (!oppositeSide) {
+            if (e.getTo().getZ() > REGULAR_Z) return;
+            else {
+                Player p = e.getPlayer();
+                completedPlayers.add(p);
+                long currentTime = System.currentTimeMillis() - roundTime;
+                String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
+                p.sendMessage(ChatColor.BOLD + "You completed this stage in " + formattedTime + "!");
+                if (completedPlayers.size() == 1) {
+                    Bukkit.broadcastMessage(ChatColor.BOLD + "" + p.name() + ChatColor.RESET + " completed this stage first, in " + formattedTime + "!");
+                }
+                Participant.getParticipant(p).addCurrentScore(CURRENT_POINTS);
+                if (rounds%4 == 0) {
+                    Participant.getParticipant(p).addCurrentScore(STAGE_POINTS);
+                }
+            }
+        }
+        else {
+            if (e.getTo().getZ() < OPPOSITE_Z) return;
+            else {
+                Player p = e.getPlayer();
+                completedPlayers.add(p);
+                long currentTime = System.currentTimeMillis() - roundTime;
+                String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
+                p.sendMessage(ChatColor.BOLD + "You completed this stage in " + formattedTime + "!");
+                if (completedPlayers.size() == 1) {
+                    Bukkit.broadcastMessage(ChatColor.BOLD + "" + p.name() + ChatColor.RESET + " completed this stage first, in " + formattedTime + "!");
+                }
+                Participant.getParticipant(p).addCurrentScore(CURRENT_POINTS);
+                if (rounds%4 == 0) {
+                    Participant.getParticipant(p).addCurrentScore(STAGE_POINTS);
+                }
+            }
+        }
     }
 
     /**
