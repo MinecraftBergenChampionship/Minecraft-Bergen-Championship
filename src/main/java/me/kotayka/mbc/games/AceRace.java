@@ -6,6 +6,7 @@ import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
 import me.kotayka.mbc.gameMaps.aceRaceMap.Biomes;
+import me.kotayka.mbc.gameMaps.aceRaceMap.semoiB;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
@@ -26,7 +27,8 @@ import java.util.*;
 
 public class AceRace extends Game {
     // Change this to determine played map
-    public AceRaceMap map = new Biomes();
+    //public AceRaceMap map = new Biomes();
+    public AceRaceMap map = new semoiB();
     public static World world = Bukkit.getWorld("AceRace");;
     public Map<UUID, AceRacePlayer> aceRacePlayerMap = new HashMap<UUID, AceRacePlayer>();
     public short[] finishedPlayersByLap = {0, 0, 0};
@@ -81,7 +83,7 @@ public class AceRace extends Game {
         //}
 
         for (AceRacePlayer p : aceRacePlayerMap.values()) {
-            p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
+            p.getPlayer().teleport(new Location(map.getWorld(), -2158, 13, -2303, 90, 0));
             p.reset();
         }
 
@@ -185,11 +187,12 @@ public class AceRace extends Game {
 
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getInventory().clear();
-            p.getInventory().addItem(trident);
+            //p.getInventory().addItem(trident);
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, PotionEffect.INFINITE_DURATION, 1, false, false));
             //p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
 
             aceRacePlayerMap.put(p.getPlayer().getUniqueId(), new AceRacePlayer(p, this));
@@ -229,6 +232,7 @@ public class AceRace extends Game {
             Vector d = l.getDirection();
             p.setVelocity(d.multiply(2.5));
             p.setVelocity(new Vector(p.getVelocity().getX(), 1.25, p.getVelocity().getZ()));
+            player.setCheckpoint();
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
