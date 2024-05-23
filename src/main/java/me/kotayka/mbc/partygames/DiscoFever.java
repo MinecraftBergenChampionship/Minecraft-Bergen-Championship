@@ -61,6 +61,7 @@ public class DiscoFever extends PartyGame {
     public final int SURVIVAL_POINTS = 1;
     public final int WIN_POINTS = 10;
     public final Location SPAWN = new Location(Bukkit.getWorld("Party"), 400, 1.5, 400, 0, 0);
+    private boolean gameOne = true;
 
     // game instance
     private static DiscoFever instance = null;
@@ -141,7 +142,7 @@ public class DiscoFever extends PartyGame {
                 if (timeRemaining == 0) {
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         p.getPlayer().teleport(SPAWN);
-                        p.getInventory().clear();
+                        playerClear(p.getPlayer());
                     }
                     Barriers(true);
                     endDisco();
@@ -202,6 +203,30 @@ public class DiscoFever extends PartyGame {
                     setTimer(7);
                 }
                 break;
+            case END_GAME:
+                if (timeRemaining == 0) {
+                    if (gameOne) {
+                        gameOne = false;
+                        deletedSpawn = false;
+                        setSpawnArea(true);
+                        Barriers(true);
+                        loadPlayers();
+                        initializeRegions();
+                        setGameState(GameState.STARTING);
+                        setTimer(16);
+                    } else if (MBC.getInstance().party == null) {
+                        MBC.getInstance().updatePlacings();
+                        for (Participant p : MBC.getInstance().getPlayers()) {
+                            p.addCurrentScoreToTotal();
+                        }
+                        logger.logStats();
+                        returnToLobby();
+                    } else {
+                        // start next game
+                        PartyGame game = MBC.getInstance().party.getRandomPartyGame();
+                        game.start();
+                    }
+                }
         }
     }
 
@@ -369,6 +394,20 @@ public class DiscoFever extends PartyGame {
             p.getPlayer().getInventory().setItem(9, item);
             p.getPlayer().getInventory().setItem(40, item);
         }
+    }
+
+    private void playerClear(Player p) {
+        p.getInventory().setItem(0, null);
+        p.getInventory().setItem(1, null);
+        p.getInventory().setItem(2, null);
+        p.getInventory().setItem(3, null);
+        p.getInventory().setItem(4, null);
+        p.getInventory().setItem(5, null);
+        p.getInventory().setItem(6, null);
+        p.getInventory().setItem(7, null);
+        p.getInventory().setItem(8, null);
+        p.getInventory().setItem(9, null);
+        p.getInventory().setItem(40, null);
     }
 
     /**

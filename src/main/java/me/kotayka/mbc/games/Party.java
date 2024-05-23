@@ -102,9 +102,9 @@ public class Party extends Game {
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining == 10) {
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The next Party Game is...\n");
+                partyGame = getRandomPartyGame();
             }
             if (timeRemaining == 5) {
-                partyGame = getRandomPartyGame();
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.sendTitle("\n" + MBC.MBC_STRING_PREFIX + ChatColor.BOLD + partyGame.name() + "!" + ChatColor.RESET, "", 0, 15, 15);
                     p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
