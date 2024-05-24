@@ -196,7 +196,7 @@ public class Spleef extends Game {
             if (timeRemaining > 0) {
                 startingCountdown();
             } else {
-                setPVP(true);
+                //setPVP(true);
                 openFloor(true);
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
@@ -383,6 +383,8 @@ public class Spleef extends Game {
                 Player p = (Player) e.getHitEntity();
                 Participant shooter = Participant.getParticipant((Player) e.getEntity().getShooter());
                 SpleefPlayer s = getSpleefPlayer(p);
+
+                if (s.getParticipant().getTeam().equals(shooter.getTeam())) return;
 
                 snowballHit((Snowball) e.getEntity(), p);
                 s.setLastDamager(shooter);

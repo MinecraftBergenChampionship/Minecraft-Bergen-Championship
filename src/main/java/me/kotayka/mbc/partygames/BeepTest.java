@@ -78,10 +78,8 @@ public class BeepTest extends PartyGame {
     public static PartyGame getInstance() {
         if (instance == null) {
             instance = new BeepTest();
-            return new BeepTest();
-        } else {
-            return instance;
         }
+        return instance;
     }
 
     private BeepTest() {
@@ -138,7 +136,6 @@ public class BeepTest extends PartyGame {
         } else {
             // start next game
             setupNext();
-            MBC.getInstance().party.next();
         }
     }
 
@@ -157,11 +154,13 @@ public class BeepTest extends PartyGame {
             p.getPlayer().addPotionEffect(MBC.SATURATION);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 255, false, false));
             alivePlayers.add(p);
+            playersAlive.add(p);
             p.getPlayer().setMaxHealth(6);
             p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
         }
+        Bukkit.broadcastMessage("[debug] playersAlive.toString() == " + playersAlive.toString());
     }
 
     @Override
@@ -186,6 +185,7 @@ public class BeepTest extends PartyGame {
                     newGround();
                     nextRound();
                     roundDisplay();
+                    roundTime = System.currentTimeMillis();
                     setGameState(GameState.ACTIVE);
                     setTimer(13);
                 }
@@ -223,7 +223,6 @@ public class BeepTest extends PartyGame {
                     setTimer(timeForLevel+1);
                 }
                 break;
-            case END_GAME:
         }
 
     }
@@ -268,7 +267,8 @@ public class BeepTest extends PartyGame {
             completedCourse(e);
         }
 
-        if (p.getLocation().getY() < -59 && (fallenPlayers.add(par) && !completedPlayers.contains(par))) {
+        if (p.getLocation().getY() < -59 && (!fallenPlayers.contains(par) && !completedPlayers.contains(par))) {
+            fallenPlayers.add(par);
             if (completedPlayers.contains(par) && !oppositeSide && p.getZ() <= REGULAR_Z) {
                 p.setVelocity(new Vector(0, 0, 0));
                 p.teleport(OPPOSITE_SPAWN);

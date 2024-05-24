@@ -72,10 +72,8 @@ public class DiscoFever extends PartyGame {
     public static PartyGame getInstance() {
         if (instance == null) {
             instance = new DiscoFever();
-            return new DiscoFever();
-        } else {
-            return instance;
         }
+        return instance;
     }
     private DiscoFever() {
         super("DiscoFever", new String[] {
@@ -89,6 +87,7 @@ public class DiscoFever extends PartyGame {
                         "⑰ +1 point for each player outlived\n" +
                         "⑰ +10 points for reaching the end of the course\n"
         });
+        Bukkit.broadcastMessage("[debug] making new disco");
     }
 
     @Override
@@ -128,10 +127,8 @@ public class DiscoFever extends PartyGame {
             p.getPlayer().addPotionEffect(MBC.SATURATION);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
-            if (playersAlive != null && playersAlive.size() != 0) {
-                playersAlive.add(p);
-            }
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+            playersAlive.add(p);
             p.getPlayer().teleport(SPAWN);
         }
         updatePlayersAliveScoreboard();
@@ -209,6 +206,9 @@ public class DiscoFever extends PartyGame {
                 if (timeRemaining == 0) {
                     if (gameOne) {
                         gameOne = false;
+                        if (MBC.getInstance().party != null) {
+                            MBC.getInstance().party.incrementGameNum();
+                        }
                         deletedSpawn = false;
                         delay = 80;
                         setSpawnArea(true);
@@ -227,9 +227,9 @@ public class DiscoFever extends PartyGame {
                     } else {
                         // start next game
                         setupNext();
-                        MBC.getInstance().party.next();
                     }
                 }
+                break;
         }
     }
 

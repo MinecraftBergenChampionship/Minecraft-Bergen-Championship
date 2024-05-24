@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -468,6 +469,12 @@ public class Quickfire extends FinaleGame {
             world.getBlockAt(-12, -57, z).setType(second);
         }
     }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        e.setCancelled(true);
+    }
+
 
     public QuickfirePlayer getQuickfirePlayer(Player p) {
         return quickfirePlayers.get(p.getUniqueId());

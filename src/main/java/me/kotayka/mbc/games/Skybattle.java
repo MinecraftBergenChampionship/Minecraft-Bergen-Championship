@@ -443,17 +443,16 @@ public class Skybattle extends Game {
         */
 
         SkybattlePlayer player = skybattlePlayerMap.get(e.getHitEntity().getUniqueId());
-        if (player == null) return;
+        Participant damager = Participant.getParticipant((Player) e.getEntity().getShooter());
+        if (player == null || damager == null) return;
+
+        if (player.getParticipant().getTeam().equals(damager.getTeam())) return;
 
         if (e.getEntity() instanceof Snowball) {
             snowballHit((Snowball) e.getEntity(), player.getPlayer());
-            player.lastDamager = (Player) e.getEntity().getShooter();
+            player.lastDamager = damager.getPlayer();
+            return;
         }
-
-
-        Participant damager = Participant.getParticipant((Player) e.getEntity().getShooter());
-        if (damager.getTeam().equals(player.getParticipant().getTeam())) return;
-
         player.lastDamager = (Player) e.getEntity().getShooter();
     }
 

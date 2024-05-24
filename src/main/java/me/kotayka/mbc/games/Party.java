@@ -15,7 +15,7 @@ public class Party extends Game {
     private final World world = Bukkit.getWorld("Party");
     protected final Location LOBBY = new Location(world, 0.5, -17.5, -999.5);
     private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "BeepTest"));
-    public static final int GAMES_PLAYED = 2;
+    public static final int GAMES_PLAYED = 3;
     private int gameNum;
     private PartyGame partyGame = null;
 
@@ -46,7 +46,7 @@ public class Party extends Game {
             p.getPlayer().addPotionEffect(MBC.SATURATION);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 300, 255, true, false));
             p.getPlayer().teleport(LOBBY);
-    }
+        }
         preFirstRound();
     }
 
@@ -65,6 +65,7 @@ public class Party extends Game {
      * Returns associated PartyGame.
      */
     public PartyGame getRandomPartyGame() {
+        Bukkit.broadcastMessage("[debug] Choosing random party game!");
         if (gameNames.size() > 0) {
             String randomGame = gameNames.get((int)(Math.random()*gameNames.size()));
             gameNames.remove(randomGame);
@@ -141,6 +142,7 @@ public class Party extends Game {
     }
 
     public void startPartyGame() {
+        Bukkit.broadcastMessage("[debug] starting new party game");
         setGameState(GameState.INACTIVE);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(partyGame, MBC.getInstance().plugin);
         MBC.getInstance().setCurrentGame(partyGame);
@@ -161,7 +163,8 @@ public class Party extends Game {
     }
 
     public void next() {
-        //MBC.getInstance().setCurrentGame(this);
+        MBC.getInstance().setCurrentGame(this);
+        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
         if (GAMES_PLAYED == gameNum) {
             setGameState(GameState.END_GAME);
             setTimer(37);
@@ -178,6 +181,9 @@ public class Party extends Game {
 
     public int getGameNum() {
         return gameNum;
+    }
+    public void incrementGameNum() {
+        gameNum++;
     }
 
     @Override

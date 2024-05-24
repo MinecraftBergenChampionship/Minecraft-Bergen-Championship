@@ -34,11 +34,11 @@ public abstract class PartyGame extends Game {
      */
     @Override
     public void start() {
+        Bukkit.broadcastMessage("starting!");
         // start registering events for this game
         HandlerList.unregisterAll(MBC.getInstance().lobby);
         HandlerList.unregisterAll(MBC.getInstance().decisionDome);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
-        playersAlive.addAll(MBC.getInstance().getPlayers());
 
         // if timer hasn't reached 1, stop it
         stopTimer();
@@ -56,6 +56,7 @@ public abstract class PartyGame extends Game {
             p.getPlayer().addPotionEffect(MBC.SATURATION);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 300, 255, true, false));
         }
+        Bukkit.broadcastMessage("[debug] " + playersAlive.toString());
         loadPlayers();
         createScoreboard();
         createLineAll(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party! (" + name()) + ")");
@@ -175,7 +176,6 @@ public abstract class PartyGame extends Game {
         if (party == null) return;
         HandlerList.unregisterAll(this);
         setGameState(GameState.INACTIVE);
-        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(party, MBC.getInstance().plugin);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().setMaxHealth(20);
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
@@ -186,6 +186,7 @@ public abstract class PartyGame extends Game {
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
         }
+        MBC.getInstance().party.next();
     }
 
     public boolean isGameOver() {

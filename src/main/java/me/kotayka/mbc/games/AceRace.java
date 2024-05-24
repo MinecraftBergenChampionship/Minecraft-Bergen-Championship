@@ -42,7 +42,7 @@ public class AceRace extends Game {
     public static final int LAP_COMPLETION_POINTS = 1;
     public static final int PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
     public static final int[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
-    public static final int TUTORIAL_TIME = 45;
+    public static final int TUTORIAL_TIME = 210;
 
     private boolean finishedIntro = false;
 

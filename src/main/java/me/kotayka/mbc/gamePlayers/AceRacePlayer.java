@@ -166,10 +166,10 @@ public class AceRacePlayer extends GamePlayer {
             ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
             Lap();
         } else { // not last checkpoint
-            checkpoint++;
             if (checkpoint != 0) {
                 this.getParticipant().getPlayer().sendTitle(ChatColor.YELLOW + "Checkpoint!", ChatColor.YELLOW + "" + checkpoint + "/" + ACE_RACE.map.mapLength, 0, 60, 20);
             }
+            checkpoint++;
             ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
         }
     }

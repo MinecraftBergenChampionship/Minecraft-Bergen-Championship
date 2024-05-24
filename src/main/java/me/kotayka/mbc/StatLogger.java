@@ -88,13 +88,14 @@ public class StatLogger {
         if (!MBC.getInstance().logStats()) return null;
         try {
             File file = new File(directory, GAME.name() +".txt");
+            Bukkit.broadcastMessage(file.getAbsolutePath());
             file.getParentFile().mkdirs();
             if (file.createNewFile()) {
                 return file;
             } else {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (p.isOp()) {
-                        p.sendMessage(ChatColor.RED + "ERROR: File already exists!");
+                        p.sendMessage(MBC.ADMIN_PREFIX + ChatColor.RED + "ERROR: File already exists!");
                         stupid = true;
                     }
                 }

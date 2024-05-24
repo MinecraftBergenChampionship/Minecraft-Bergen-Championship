@@ -43,6 +43,8 @@ public abstract class Game extends Minigame {
     public Game(String gameName, String[] INTRO) {
         super(gameName);
         this.INTRODUCTION= INTRO;
+        Bukkit.broadcastMessage("Making new game!");
+        Bukkit.broadcastMessage("The game in question: " + gameName);
         initLogger();
     }
 
@@ -385,7 +387,6 @@ public abstract class Game extends Minigame {
        HandlerList.unregisterAll(MBC.getInstance().lobby);
        HandlerList.unregisterAll(MBC.getInstance().decisionDome);
        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
-       super.initLogger();
 
        // if timer hasn't reached 1, stop it
        stopTimer();
