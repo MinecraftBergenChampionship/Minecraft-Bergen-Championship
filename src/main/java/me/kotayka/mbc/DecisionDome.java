@@ -327,7 +327,7 @@ public class DecisionDome extends Minigame {
         }
 
         List<VotePowerup> powerups = new ArrayList<>();
-        powerups.add(VotePowerup.CROSSBOWS);
+        //powerups.add(VotePowerup.CROSSBOWS);
         powerups.add(VotePowerup.MEGA_COW);
         powerups.add(VotePowerup.DUNK);
         powerups.add(VotePowerup.EGGSTRA_VOTES);
