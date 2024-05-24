@@ -84,8 +84,8 @@ public class BeepTest extends PartyGame {
 
     private BeepTest() {
         super("BeepTest", new String[] {
-                "⑰ The fitness gram " + ChatColor.BOLD + "Beep Test" + ChatColor.RESET + " is a multistage parkour capacity\n\n" + 
-                "  test that progressively gets more difficult as it continues.",
+                "⑰ The fitness gram " + ChatColor.BOLD + "Beep Test" + ChatColor.RESET + " is a multistage parkour\n" + 
+                " capacity test that progressively gets more difficult as it continues.",
                 "⑰ Jump from one side of the map to the other to complete the courses as fast as you can.\n\n" +  
                 "⑰ The parkour difficulty starts easy, but gets more difficult each time the arena changes color.",
                 "⑰ The third time you fail the parkour course, or do not complete it in time, you are eliminated.\n\n" + 
