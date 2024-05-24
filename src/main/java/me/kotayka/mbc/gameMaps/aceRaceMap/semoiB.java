@@ -42,7 +42,7 @@ public class semoiB extends AceRaceMap {
         for (int y = 14; y <= 16; y++) {
             for (int z = -2309; z <= -2299; z++) {
                 getWorld().getBlockAt(-2160, y, z).setType(block); //main
-                getWorld().getBlockAt(-2160, y, z).setType(block); //back
+                getWorld().getBlockAt(-2152, y, z).setType(block); //back
             }
         }
 
