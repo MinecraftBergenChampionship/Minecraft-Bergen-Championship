@@ -254,6 +254,7 @@ public class DiscoFever extends PartyGame {
 
     @Override
     public void endEvents() {
+        logger.logStats();
         timeRemaining = 1;
     }
 
@@ -302,6 +303,7 @@ public class DiscoFever extends PartyGame {
                     delay -= 4;
                 }
                 Bukkit.broadcastMessage(ChatColor.YELLOW+"Things are speeding up!");
+                logger.log("Things are speeding up! Delay = " + (delay/20.0));
                 for (Participant i : playersAlive) {
                     i.addCurrentScore(STAGE_POINTS);
                 }

@@ -154,6 +154,7 @@ public abstract class PartyGame extends Game {
 
     public void updatePlayersAlive(Participant p) {
         Bukkit.broadcastMessage(p.getFormattedName() + " partied too hard!");
+        logger.log(p.getFormattedName() + " partied too hard!");
         playersAlive.remove(p);
         checkLastTeam(p.getTeam());
         updatePlayersAliveScoreboard();

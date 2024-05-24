@@ -121,10 +121,12 @@ public class BeepTest extends PartyGame {
     @Override
     public void endEvents() {
         // Debug
+        /*
         StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
         StackTraceElement e = stacktrace[2];//maybe this number needs to be corrected
         String methodName = e.getMethodName();
         Bukkit.broadcastMessage("In " + name() + ".endEvents(), called by " + methodName);
+         */
 
         if (ended) {
             return;
@@ -151,6 +153,7 @@ public class BeepTest extends PartyGame {
             }
             setupNext();
         }
+        logger.logStats();
     }
 
     @Override
@@ -394,6 +397,7 @@ public class BeepTest extends PartyGame {
                 long currentTime = System.currentTimeMillis() - roundTime;
                 String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
                 pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
+                logger.log(p.getFormattedName() + " completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
                 if (completedPlayers.size() == 0) {
                     Bukkit.broadcastMessage(p.getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
                 }
