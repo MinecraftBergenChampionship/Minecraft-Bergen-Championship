@@ -136,7 +136,7 @@ public class AceRacePlayer extends GamePlayer {
     private void updateScore(Participant p) {
         int beatPlayers = ACE_RACE.aceRacePlayerMap.size() - ACE_RACE.finishedPlayersByLap[lap-1];
         if (lap < 3) {
-            p.addCurrentScore(beatPlayers * AceRace.PLACEMENT_LAP_POINTS);
+            p.addCurrentScore(beatPlayers * AceRace.PLACEMENT_LAP_POINTS + AceRace.LAP_COMPLETION_POINTS);
         } else {
             // final points are worth more
             p.addCurrentScore(beatPlayers * AceRace.PLACEMENT_FINAL_LAP_POINTS + AceRace.LAP_COMPLETION_POINTS);

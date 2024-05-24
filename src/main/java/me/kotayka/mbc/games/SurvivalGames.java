@@ -592,7 +592,8 @@ public class SurvivalGames extends Game {
                 createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your Kills: "+ChatColor.RESET+"1", killer);
             } else {
                 int kills = playerKills.get(victim.getKiller());
-                playerKills.put(e.getPlayer().getKiller(), kills++);
+                kills++;
+                playerKills.put(e.getPlayer().getKiller(), kills);
                 createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
             }
             deathEffectsWithHealth(e);
