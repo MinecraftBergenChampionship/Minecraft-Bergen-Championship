@@ -13,6 +13,7 @@ public class StatLogger {
     private final Minigame GAME;
     private final String directory;
     private File file;
+    private boolean stupid = false;
     private List<String> transcript = new ArrayList<>();
     private List<String> individual = new ArrayList<>();
     private List<String> teamScores = new ArrayList<>();
@@ -36,7 +37,7 @@ public class StatLogger {
     }
 
     public void logStats() {
-        if (!MBC.getInstance().logStats()) {
+        if (!MBC.getInstance().logStats() || stupid) {
             return;
         }
 
@@ -92,8 +93,10 @@ public class StatLogger {
                 return file;
             } else {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (p.isOp())
-                        p.sendMessage(ChatColor.RED+"ERROR: File already exists!");
+                    if (p.isOp()) {
+                        p.sendMessage(ChatColor.RED + "ERROR: File already exists!");
+                        stupid = true;
+                    }
                 }
                 return null;
             }

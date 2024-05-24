@@ -128,7 +128,9 @@ public class DiscoFever extends PartyGame {
             p.getPlayer().addPotionEffect(MBC.SATURATION);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
-            playersAlive.add(p);
+            if (playersAlive != null && playersAlive.size() != 0) {
+                playersAlive.add(p);
+            }
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             p.getPlayer().teleport(SPAWN);
         }

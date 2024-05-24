@@ -122,6 +122,7 @@ public class BeepTest extends PartyGame {
     @Override
     public void endEvents() {
         roundWinners(STAGE_POINTS);
+        MBC.getInstance().showAllPlayers();
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().stopSound(Sound.MUSIC_DISC_13);
             p.getPlayer().setMaxHealth(20);
@@ -148,7 +149,7 @@ public class BeepTest extends PartyGame {
 
     @Override
     public void loadPlayers() {
-        //MBC.getInstance().hideAllPlayers();
+        MBC.getInstance().hideAllPlayers();
         ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
         alivePlayers.clear();
         for (Participant p : MBC.getInstance().getPlayers()) {
@@ -161,7 +162,6 @@ public class BeepTest extends PartyGame {
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
         }
-        Bukkit.broadcastMessage(playersAlive.toString());
     }
 
     @Override
@@ -268,7 +268,7 @@ public class BeepTest extends PartyGame {
             completedCourse(e);
         }
 
-        if (p.getLocation().getY() < -59 && fallenPlayers.add(par)) {
+        if (p.getLocation().getY() < -59 && (fallenPlayers.add(par) && !completedPlayers.contains(par))) {
             if (completedPlayers.contains(par) && !oppositeSide && p.getZ() <= REGULAR_Z) {
                 p.setVelocity(new Vector(0, 0, 0));
                 p.teleport(OPPOSITE_SPAWN);
@@ -321,7 +321,6 @@ public class BeepTest extends PartyGame {
             }
         }
 
-        Bukkit.broadcastMessage("Eliminate: " + toEliminate.toString());
         for (Participant p : toEliminate) {
             eliminatePlayer(p);
         }

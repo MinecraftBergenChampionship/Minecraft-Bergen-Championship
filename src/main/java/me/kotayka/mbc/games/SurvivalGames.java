@@ -572,6 +572,9 @@ public class SurvivalGames extends Game {
          */
 
         // prevent stripping trees :p
+        if (e.getClickedBlock().getType().toString().endsWith("SIGN")) {
+            return;
+        }
         if (e.getClickedBlock() == null) return;
         if (e.getClickedBlock().getType().toString().endsWith("LOG") && p.getInventory().getItemInMainHand().getType().toString().endsWith("AXE")) {
             e.setCancelled(true);

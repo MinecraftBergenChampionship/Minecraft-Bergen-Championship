@@ -5,7 +5,6 @@ import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
-import me.kotayka.mbc.gameMaps.aceRaceMap.Biomes;
 import me.kotayka.mbc.gameMaps.aceRaceMap.semoiB;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
 import org.bukkit.*;
@@ -43,6 +42,7 @@ public class AceRace extends Game {
     public static final int LAP_COMPLETION_POINTS = 1;
     public static final int PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
     public static final int[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
+    public static final int TUTORIAL_TIME = 45;
 
     private boolean finishedIntro = false;
 
@@ -87,7 +87,7 @@ public class AceRace extends Game {
             p.reset();
         }
 
-        setTimer(210);
+        setTimer(TUTORIAL_TIME);
     }
 
     @Override
@@ -99,19 +99,7 @@ public class AceRace extends Game {
 
     public void events() {
         if (getState().equals(GameState.TUTORIAL)) {
-            if (!finishedIntro && timeRemaining > 0 && timeRemaining % 7 == 0) {
-                Introduction();
-            } else if (!finishedIntro && timeRemaining == 0){
-                MBC.getInstance().sendMutedMessages();
-                //Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
-
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.getPlayer().sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "Practice Starting!", "", 20, 60, 20);
-                }
-                finishedIntro = true;
-            } else if (timeRemaining == 60) {
-                Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "One minute left of practice!");
-            } else if (timeRemaining <= 0) {
+            if (timeRemaining == 0) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.YELLOW + "Practice Over!");
                 for (AceRacePlayer p : aceRacePlayerMap.values()) {
                     p.getPlayer().setVelocity(new Vector(0,0,0));
@@ -122,12 +110,21 @@ public class AceRace extends Game {
                 // something breaks like right here. idk why
                 setGameState(GameState.END_ROUND);
                 timeRemaining = 5;
+            } else if (!finishedIntro && timeRemaining > 0 && timeRemaining % 7 == 0) {
+                Introduction();
+            } else if (!finishedIntro && timeRemaining == TUTORIAL_TIME-30){
+                MBC.getInstance().sendMutedMessages();
+                //Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
+                finishedIntro = true;
+            } else if (timeRemaining == 60) {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "One minute left of practice!");
             }
         } else if (getState().equals(GameState.END_ROUND)) {
             if (timeRemaining <= 0) {
                 map.setBarriers(true);
                 for (AceRacePlayer p : aceRacePlayerMap.values()) {
-                    p.getPlayer().teleport(new Location(map.getWorld(), 2, 26, 150, 90, 0));
+                    p.getPlayer().teleport(new Location(map.getWorld(), -2158, 13, -2303, 90, 0));
+                    //p.getPlayer().teleport(new Location(map.getWorld(), 2, 26, 150, 90, 0));
                     p.checkpoint = 0;
                 }
                 setGameState(GameState.STARTING);
@@ -208,14 +205,15 @@ public class AceRace extends Game {
 
         Player p = e.getPlayer();
         AceRacePlayer player = getGamePlayer(p);
+        if (player == null) return;
 
         if (map.checkDeath(p.getLocation())) {
             int checkpoint = player.checkpoint;
             p.teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength-1 : checkpoint-1));
             p.removePotionEffect(PotionEffectType.SPEED);
             p.setFireTicks(0);
-
         }
+
 
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
             //Location l = p.getLocation();
