@@ -43,8 +43,6 @@ public abstract class Game extends Minigame {
     public Game(String gameName, String[] INTRO) {
         super(gameName);
         this.INTRODUCTION= INTRO;
-        Bukkit.broadcastMessage("Making new game!");
-        Bukkit.broadcastMessage("The game in question: " + gameName);
         initLogger();
     }
 
@@ -605,6 +603,7 @@ public abstract class Game extends Minigame {
 
     public void returnToLobby() {
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
+        MBC.getInstance().showAllPlayers();
         setGameState(GameState.INACTIVE);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
         for (Participant p : MBC.getInstance().getPlayers()) {

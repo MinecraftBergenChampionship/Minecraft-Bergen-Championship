@@ -1,16 +1,15 @@
 package me.kotayka.mbc;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import me.kotayka.mbc.games.Party;
+import me.kotayka.mbc.partygames.BeepTest;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Team;
 
 /**
  * <b>PartyGame</b> represents a separate, individual game, which may be selected
@@ -34,11 +33,26 @@ public abstract class PartyGame extends Game {
      */
     @Override
     public void start() {
-        Bukkit.broadcastMessage("starting!");
+        /*
+        //Debug
+        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+        StackTraceElement e = stacktrace[2];//maybe this number needs to be corrected
+        String methodName = e.getMethodName();
+        Bukkit.broadcastMessage("In " + this.name() + ".start(), called by " + methodName);
+         */
+
+        // probably unnecessary
+        if (MBC.getInstance().getMinigame().equals(this)) {
+            return;
+        }
         // start registering events for this game
         HandlerList.unregisterAll(MBC.getInstance().lobby);
         HandlerList.unregisterAll(MBC.getInstance().decisionDome);
+        if (MBC.getInstance().party != null) {
+            HandlerList.unregisterAll(MBC.getInstance().party);
+        }
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
+        MBC.getInstance().setCurrentGame(this);
 
         // if timer hasn't reached 1, stop it
         stopTimer();
@@ -56,7 +70,6 @@ public abstract class PartyGame extends Game {
             p.getPlayer().addPotionEffect(MBC.SATURATION);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 300, 255, true, false));
         }
-        Bukkit.broadcastMessage("[debug] " + playersAlive.toString());
         loadPlayers();
         createScoreboard();
         createLineAll(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party! (" + name()) + ")");
@@ -172,6 +185,14 @@ public abstract class PartyGame extends Game {
      *
      */
     public void setupNext() {
+        /*
+        //Debug
+        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+        StackTraceElement e = stacktrace[2];//maybe this number needs to be corrected
+        String methodName = e.getMethodName();
+        Bukkit.broadcastMessage("In " + this.name() + ".setupNext(), called by " + methodName);
+         */
+
         Party party = MBC.getInstance().party;
         if (party == null) return;
         HandlerList.unregisterAll(this);

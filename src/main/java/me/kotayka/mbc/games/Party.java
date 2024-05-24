@@ -4,6 +4,7 @@ import me.kotayka.mbc.*;
 import me.kotayka.mbc.partygames.PartyGameFactory;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -65,7 +66,6 @@ public class Party extends Game {
      * Returns associated PartyGame.
      */
     public PartyGame getRandomPartyGame() {
-        Bukkit.broadcastMessage("[debug] Choosing random party game!");
         if (gameNames.size() > 0) {
             String randomGame = gameNames.get((int)(Math.random()*gameNames.size()));
             gameNames.remove(randomGame);
@@ -116,10 +116,14 @@ public class Party extends Game {
                 startPartyGame();
             }
             else if (timeRemaining == 10) {
+                if (gameNames.size() == 0) {
+                    return;
+                }
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The next Party Game is...\n");
                 partyGame = getRandomPartyGame();
             }
             else if (timeRemaining == 5) {
+                Bukkit.broadcastMessage(ChatColor.BOLD + partyGame.name()+"!");
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.sendTitle(ChatColor.BOLD + "" + partyGame.name() + "!", "", 0, 80, 20);
                     p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
@@ -144,10 +148,16 @@ public class Party extends Game {
     }
 
     public void startPartyGame() {
-        Bukkit.broadcastMessage("[debug] starting new party game");
+        /*
+        //Debug
+        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+        StackTraceElement e = stacktrace[2];//maybe this number needs to be corrected
+        String methodName = e.getMethodName();
+        Bukkit.broadcastMessage("In " + this.name() + ".startPartyGame(), called by " + methodName);
+         */
+
         setGameState(GameState.INACTIVE);
-        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(partyGame, MBC.getInstance().plugin);
-        MBC.getInstance().setCurrentGame(partyGame);
+        HandlerList.unregisterAll(this);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().setMaxHealth(20);
             p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
@@ -165,6 +175,15 @@ public class Party extends Game {
     }
 
     public void next() {
+        /*
+        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+        StackTraceElement e = stacktrace[2];//maybe this number needs to be corrected
+        String methodName = e.getMethodName();
+        Bukkit.broadcastMessage("In " + name() + ".next(), called by " + methodName);
+         */
+
+        stopTimer();
+        setGameState(GameState.INACTIVE);
         MBC.getInstance().setCurrentGame(this);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
         if (GAMES_PLAYED == gameNum) {

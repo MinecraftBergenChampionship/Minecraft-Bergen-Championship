@@ -95,7 +95,7 @@ public class Lobby extends Minigame {
             if (timeRemaining == 5) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.removePotionEffect(PotionEffectType.SATURATION);
-                    p.playSound(p.getPlayer(), Sound.BLOCK_PORTAL_TRAVEL, 1, 1);
+                    p.playSound(p, Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.RECORDS, 1, 1);
                     p.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 110, 1, false, false));
                 }
             }

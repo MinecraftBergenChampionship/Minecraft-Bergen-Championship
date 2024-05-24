@@ -852,7 +852,7 @@ public class DecisionDome extends Minigame {
 
     public void WarpEffects() {
         for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_PORTAL_TRAVEL, 1, 1);
+            p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.RECORDS, 1, 1);
             if (p.getTeam().getChatColor().equals(dunked_team)) continue;
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 110, 1, false, false));
         }

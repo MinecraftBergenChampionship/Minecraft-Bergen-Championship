@@ -87,7 +87,6 @@ public class DiscoFever extends PartyGame {
                         "⑰ +1 point for each player outlived\n" +
                         "⑰ +10 points for reaching the end of the course\n"
         });
-        Bukkit.broadcastMessage("[debug] making new disco");
     }
 
     @Override
@@ -518,6 +517,7 @@ public class DiscoFever extends PartyGame {
 
         if (getState().equals(GameState.ACTIVE)) {
             p.setGameMode(GameMode.SPECTATOR);
+            playerClear(p);
             p.sendTitle(" ", ChatColor.RED + "You died!", 0, 60, 20);
             Participant part = Participant.getParticipant(p);
             if (part == null) return;
