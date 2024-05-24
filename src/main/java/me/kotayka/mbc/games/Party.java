@@ -134,7 +134,7 @@ public class Party extends Game {
 
     @Override
     public void createScoreboard(Participant p) {
-        createLineAll(22, ChatColor.GREEN + "Party Round: " + ChatColor.RESET + gameNum + "/3");
+        //createLineAll(22, ChatColor.GREEN + "Party Round: " + ChatColor.RESET + gameNum + "/3");
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET + ChatColor.RESET.toString(), p);
         updateInGameTeamScoreboard();
