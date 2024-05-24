@@ -48,9 +48,9 @@ public class BuildMart extends Game {
     // Scoring; points are per player
     public static final int COMPLETION_POINTS_EASY = 4;
     public static final int COMPLETION_POINTS_MEDIUM = 8;
-    public static final int COMPLETION_POINTS_HARD = 10;
+    public static final int COMPLETION_POINTS_HARD = 12;
     public static final int PLACEMENT_POINTS = 1;
-    public static final int PLACEMENT_POINTS_HARD = 2;
+    public static final int PLACEMENT_POINTS_HARD = 1;
 
     private Map<Participant, Material> hotbarSelector = new HashMap<Participant, Material>();
 
