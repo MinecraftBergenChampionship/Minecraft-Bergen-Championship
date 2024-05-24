@@ -49,8 +49,8 @@ public class semoiB extends AceRaceMap {
         // sides
         for (int x = -2152; x >= -2160; x--) {
             for (int y = 14; y <= 16; y++) {
-                getWorld().getBlockAt(x, y, -2297).setType(block);
-                getWorld().getBlockAt(x, y, -2311).setType(block);
+                getWorld().getBlockAt(x, y, -2298).setType(block);
+                getWorld().getBlockAt(x, y, -2310).setType(block);
             }
         }
     }
