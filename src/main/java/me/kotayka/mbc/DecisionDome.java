@@ -69,6 +69,7 @@ public class DecisionDome extends Minigame {
         }
         chickens.clear();
         tie = false;
+        doubled = true;
         winner = null;
         if (dunked_team != null) {
             dunked_team = null;
