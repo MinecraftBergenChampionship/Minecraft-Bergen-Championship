@@ -423,6 +423,8 @@ public class Spleef extends Game {
 
     @EventHandler
     public void onPunch(EntityDamageByEntityEvent e) {
+        e.setCancelled(true);
+        /*
         if (!(e.getDamager() instanceof Player) || !(e.getEntity() instanceof Player)) return;
         if (!getState().equals(GameState.ACTIVE)) return;
 
@@ -450,6 +452,7 @@ public class Spleef extends Game {
         hit.setLastDamager(Participant.getParticipant((Player) e.getDamager()));
         hit.setResetTime(timeRemaining - RESET_DAMAGE_TIME);
         e.setCancelled(true);
+         */
     }
 
     @EventHandler

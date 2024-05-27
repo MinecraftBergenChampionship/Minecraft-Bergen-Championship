@@ -42,7 +42,7 @@ public class AceRace extends Game {
     public static final int LAP_COMPLETION_POINTS = 1;
     public static final int PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
     public static final int[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
-    public static final int TUTORIAL_TIME = 210;
+    public static final int TUTORIAL_TIME = 240;
 
     private boolean finishedIntro = false;
 
@@ -110,7 +110,7 @@ public class AceRace extends Game {
                 // something breaks like right here. idk why
                 setGameState(GameState.END_ROUND);
                 timeRemaining = 5;
-            } else if (!finishedIntro && timeRemaining > 0 && timeRemaining % 7 == 0) {
+            } else if (!finishedIntro && timeRemaining > 0 && timeRemaining % 7 == 0 && timeRemaining != TUTORIAL_TIME-30) {
                 Introduction();
             } else if (!finishedIntro && timeRemaining == TUTORIAL_TIME-30){
                 MBC.getInstance().sendMutedMessages();

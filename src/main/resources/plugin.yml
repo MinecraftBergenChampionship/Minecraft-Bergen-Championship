@@ -77,3 +77,6 @@ commands:
   partygame:
     description: start a party game
     permission: minecraft.command.op
+  nick:
+    description: nick
+    permisison: minecraft.command.op

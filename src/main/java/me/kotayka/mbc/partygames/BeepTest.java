@@ -223,6 +223,7 @@ public class BeepTest extends PartyGame {
                         return;
                     } else {
                         // clear level, move onto next level
+                        MBC.getInstance().hideAllPlayers();
                         rounds++;
                         newGround();
                         nextRound();
@@ -307,6 +308,9 @@ public class BeepTest extends PartyGame {
                 p.teleport(SPAWN);
             }
             p.sendMessage(ChatColor.RED + "You fell!");
+            for (Player other : Bukkit.getOnlinePlayers()) {
+                other.showPlayer(p);
+            }
 
             logger.log(par.getFormattedName() + " fell on " + currentLevel.getName());
         }
