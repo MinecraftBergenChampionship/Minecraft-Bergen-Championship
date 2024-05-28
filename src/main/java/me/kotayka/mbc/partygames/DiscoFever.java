@@ -57,6 +57,15 @@ public class DiscoFever extends PartyGame {
     private Pattern randomPattern = null;
     private EditSession editSession = null;
 
+    public List<Material> woodList = new ArrayList<>(Arrays.asList(Material.MANGROVE_PLANKS, Material.BAMBOO_PLANKS, Material.LIME_TERRACOTTA, Material.WARPED_PLANKS, Material.CRIMSON_PLANKS));
+    public List<Material> concreteList = new ArrayList<>(Arrays.asList(Material.RED_CONCRETE, Material.YELLOW_CONCRETE, Material.LIME_CONCRETE, Material.BLUE_CONCRETE, Material.PURPLE_CONCRETE));
+    public List<Material> oreList = new ArrayList<>(Arrays.asList(Material.REDSTONE_BLOCK, Material.GOLD_BLOCK, Material.EMERALD_BLOCK, Material.LAPIS_BLOCK, Material.AMETHYST_BLOCK));
+    public List<Material> woolList = new ArrayList<>(Arrays.asList(Material.RED_WOOL, Material.YELLOW_WOOL, Material.LIME_WOOL, Material.BLUE_WOOL, Material.PURPLE_WOOL));
+    public List<Material> miscListOne = new ArrayList<>(Arrays.asList(Material.RED_MUSHROOM_BLOCK, Material.HONEYCOMB_BLOCK, Material.MELON, Material.WARPED_WART_BLOCK, Material.PURPUR_BLOCK));
+    public List<Material> miscListTwo = new ArrayList<>(Arrays.asList(Material.BRICKS, Material.SPONGE, Material.MOSS_BLOCK, Material.PRISMARINE_BRICKS, Material.STRIPPED_CHERRY_WOOD));
+
+    public List<Material> randomizedBlocks = new ArrayList<>();
+
     public final int STAGE_POINTS = 2;
     public final int SURVIVAL_POINTS = 1;
     public final int WIN_POINTS = 10;
@@ -475,12 +484,69 @@ public class DiscoFever extends PartyGame {
      * - No two blocks have the same TextureType
      */
     private void initializePalette() {
-        // TODO: Randomization
-        palette.put(ColorType.RED, Material.ACACIA_PLANKS);
-        palette.put(ColorType.YELLOW, Material.YELLOW_CONCRETE);
-        palette.put(ColorType.GREEN, Material.EMERALD_BLOCK);
-        palette.put(ColorType.BLUE, Material.LAPIS_BLOCK);
-        palette.put(ColorType.PINK, Material.PURPLE_WOOL);
+
+        List<Integer> colorList = new ArrayList<>();
+        colorList.add(1); // red
+        colorList.add(2); // yellow
+        colorList.add(3); // green
+        colorList.add(4); // blue
+        colorList.add(5); // purple
+
+        Collections.shuffle(colorList);
+        // place 1 is wood, place 2 is concrete, place 3 is ores, place 4 is wool, place 5 is one of the two 
+        Material m;
+        ColorType c;
+
+        for (Integer i : colorList) {
+            int index = colorList.indexOf(i);
+            switch (index) {
+                case 1 -> {
+                    m = woodList.get(i);
+                }
+                case 2 -> {
+                    m = concreteList.get(i);
+                }
+                case 3 -> {
+                    m = oreList.get(i);
+                }
+                case 4 -> {
+                    m = woolList.get(i);
+                }
+                case 5 -> {
+                    if (Math.random()*2 == 1) {
+                        m = miscListOne.get(i);
+                    }
+                    else {
+                        m = miscListTwo.get(i);
+                    }
+                }
+                default -> {
+                    m = concreteList.get(i);
+                }
+            }
+            switch (i) {
+                case 1 -> {
+                    c = ColorType.RED;
+                }
+                case 2 -> {
+                    c = ColorType.YELLOW;
+                }
+                case 3 -> {
+                    c = ColorType.GREEN;
+                }
+                case 4 -> {
+                    c = ColorType.BLUE;
+                }
+                case 5 -> {
+                    c = ColorType.PINK;
+                }
+                default -> {
+                    c = ColorType.RED;
+                }
+            }
+            palette.put(c, m);
+            // TODO: this randomization sucks someone should make it better
+        }
     }
 
     /**
