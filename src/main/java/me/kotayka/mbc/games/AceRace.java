@@ -40,8 +40,8 @@ public class AceRace extends Game {
     public static final int FINISH_RACE_POINTS = 8;           // points for finishing the race
     public static final int PLACEMENT_LAP_POINTS = 1;         // points for placement for first laps
     public static final int LAP_COMPLETION_POINTS = 1;
-    public static final int PLACEMENT_FINAL_LAP_POINTS = 4;   // points for placement for last lap
-    public static final int[] PLACEMENT_BONUSES = {25, 15, 15, 10, 10, 5, 5, 5}; // points for Top 8 finishers
+    public static final int PLACEMENT_FINAL_LAP_POINTS = 3;   // points for placement for last lap
+    public static final int[] PLACEMENT_BONUSES = {30, 20, 20, 15, 15, 10, 10, 10, 5, 5}; // points for Top 8 finishers
     public static final int TUTORIAL_TIME = 240;
 
     private boolean finishedIntro = false;
@@ -60,8 +60,8 @@ public class AceRace extends Game {
                             "⑭ +1 point for completing a lap\n" +
                             "⑭ +1 point for every player beaten on a lap\n" +
                             "⑭ +8 points for finishing the course\n" +
-                            "⑭ +4 points for every player beaten on the final lap\n" +
-                            "⑭ Top 8 Bonuses- 1st:+25, 2nd,3rd:+15, 4th,5th:+10, 6th-8th:+5"
+                            "⑭ +3 points for every player beaten on the final lap\n" +
+                            "⑭ Top 8 Bonuses- 1st:+30, 2nd,3rd:+20, 4th,5th:+15, 6th-8th:+10, 9th-10th:+5"
             });
     }
 
