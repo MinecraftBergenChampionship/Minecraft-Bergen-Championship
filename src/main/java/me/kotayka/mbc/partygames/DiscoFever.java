@@ -486,11 +486,11 @@ public class DiscoFever extends PartyGame {
     private void initializePalette() {
 
         List<Integer> colorList = new ArrayList<>();
-        colorList.add(1); // red
-        colorList.add(2); // yellow
-        colorList.add(3); // green
-        colorList.add(4); // blue
-        colorList.add(5); // purple
+        colorList.add(0); // red
+        colorList.add(1); // yellow
+        colorList.add(2); // green
+        colorList.add(3); // blue
+        colorList.add(4); // purple
 
         Collections.shuffle(colorList);
         // place 1 is wood, place 2 is concrete, place 3 is ores, place 4 is wool, place 5 is one of the two 
@@ -525,19 +525,19 @@ public class DiscoFever extends PartyGame {
                 }
             }
             switch (i) {
-                case 1 -> {
+                case 0 -> {
                     c = ColorType.RED;
                 }
-                case 2 -> {
+                case 1 -> {
                     c = ColorType.YELLOW;
                 }
-                case 3 -> {
+                case 2 -> {
                     c = ColorType.GREEN;
                 }
-                case 4 -> {
+                case 3 -> {
                     c = ColorType.BLUE;
                 }
-                case 5 -> {
+                case 4 -> {
                     c = ColorType.PINK;
                 }
                 default -> {
