@@ -500,19 +500,19 @@ public class DiscoFever extends PartyGame {
         for (Integer i : colorList) {
             int index = colorList.indexOf(i);
             switch (index) {
-                case 1 -> {
+                case 0 -> {
                     m = woodList.get(i);
                 }
-                case 2 -> {
+                case 1 -> {
                     m = concreteList.get(i);
                 }
-                case 3 -> {
+                case 2 -> {
                     m = oreList.get(i);
                 }
-                case 4 -> {
+                case 3 -> {
                     m = woolList.get(i);
                 }
-                case 5 -> {
+                case 4 -> {
                     if (Math.random()*2 == 1) {
                         m = miscListOne.get(i);
                     }
