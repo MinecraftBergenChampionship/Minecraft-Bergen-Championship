@@ -60,7 +60,7 @@ public class DiscoFever extends PartyGame {
     private EditSession editSession = null;
 
     public Map<ColorType, Material> woodMap = Map.of(ColorType.RED, Material.MANGROVE_PLANKS, ColorType.YELLOW, 
-                                                        Material.BAMBOO_PLANKS, ColorType.GREEN, Material.LIME_TERRACOTTA, 
+                                                        Material.BIRCH_PLANKS, ColorType.GREEN, Material.LIME_TERRACOTTA, 
                                                         ColorType.BLUE, Material.WARPED_PLANKS, ColorType.PINK, Material.CRIMSON_PLANKS);
     public Map<ColorType, Material> concreteMap = Map.of(ColorType.RED, Material.RED_CONCRETE, ColorType.YELLOW, 
                                                         Material.YELLOW_CONCRETE, ColorType.GREEN, Material.LIME_CONCRETE, 

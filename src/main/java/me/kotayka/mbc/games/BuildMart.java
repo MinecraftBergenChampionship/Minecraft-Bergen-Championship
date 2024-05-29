@@ -345,8 +345,8 @@ public class BuildMart extends Game {
             default -> ChatColor.RED;
         };
         String s =
-                String.format("%s completed [%s%s%s%s] in %s%s%s place!", team.getTeam().teamNameFormat(), color, ChatColor.BOLD, plot.getBuild().getName(),
-                        ChatColor.RESET, getColorStringFromPlacement(placement), getPlace(placement), ChatColor.RESET);
+                String.format("%s completed [%s%s%s%s] in %s%s%s place!", team.getTeam().teamNameFormat(), color, ChatColor.BOLD, 
+                        plot.getBuild().getName().trim(), ChatColor.RESET, getColorStringFromPlacement(placement), getPlace(placement), ChatColor.RESET);
 
         if (MBC.getInstance().logStats()) {
             getLogger().log(s);
