@@ -322,7 +322,10 @@ public class DiscoFever extends PartyGame {
                 }
                 if (delay > 20) {
                     delay -= 10;
-                } else {
+                } else if (delay == 12) {
+                    delay -= 2;
+                }
+                else {
                     delay -= 4;
                 }
                 Bukkit.broadcastMessage(ChatColor.YELLOW+"Things are speeding up!");

@@ -332,6 +332,8 @@ public class BuildMart extends Game {
 
         Location fwLoc = new Location(map.getWorld(), plot.getMIDPOINT().getX(), plot.getMIDPOINT().getY()+3, plot.getMIDPOINT().getZ());
         MBC.spawnFirework(fwLoc, team.getTeam().getColor());
+        int id = plot.getID();
+        team.incrementBuildsCompleted(id);
         for (Participant p : team.getTeam().teamPlayers) {
             MBC.spawnFirework(p);
             p.addCurrentScoreNoDisplay(BUILD_COMPLETION_POINTS);
@@ -354,8 +356,6 @@ public class BuildMart extends Game {
         Bukkit.broadcastMessage(s);
 
         // Generate next build based on which build was just completed
-        int id = plot.getID();
-        team.incrementBuildsCompleted(id);
         Build nextBuild = switch (id) {
             case 0 -> EASY_BUILDS.get(team.getEasyBuildsCompleted());
             case 1 -> MEDIUM_BUILDS.get(team.getMediumBuildsCompleted());
