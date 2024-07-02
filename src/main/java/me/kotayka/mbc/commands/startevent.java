@@ -25,6 +25,7 @@ public class startevent implements CommandExecutor {
         // check if ready check has even begun
         if (!MBC.getInstance().readyCheck) {
             p.sendMessage("Use /readycheck first, once all teams are online!");
+            p.sendMessage("You must run readycheck again if a team responded notready.");
             return false;
         }
 

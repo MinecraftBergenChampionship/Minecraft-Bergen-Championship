@@ -199,10 +199,7 @@ public class Lobby extends Minigame {
                 case 60 -> {
                     teamBarriers(false);
                     populatePodium();
-                    boolean flag = false;
-                    if (reveal.size() > 1) {
-                        flag = true;
-                    }
+                    boolean flag = reveal.size() > 1;
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.MUSIC_DISC_WAIT, SoundCategory.RECORDS, 1, 1);
                         p.setGameMode(GameMode.ADVENTURE);
@@ -456,8 +453,8 @@ public class Lobby extends Minigame {
 
     public void startingEvents(int timeRemaining) {
         if (timeRemaining == 14) {
+            MBC.announce("The Minecraft Championship is about to begin!");
             for (Player p : Bukkit.getOnlinePlayers()) {
-                MBC.announce("The Minecraft Championship is about to begin!");
                 p.setGameMode(GameMode.ADVENTURE);
                 p.teleport(LOBBY);
             }
