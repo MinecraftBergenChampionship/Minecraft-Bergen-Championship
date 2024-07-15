@@ -226,7 +226,6 @@ public class Lobby extends Minigame {
         if (MBC.getInstance().decisionDome == null) {
             MBC.getInstance().startGame(0);
         } else {
-            MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().decisionDome, MBC.getInstance().plugin);
             MBC.getInstance().decisionDome.start();
         }
     }
