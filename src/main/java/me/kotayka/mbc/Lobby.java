@@ -376,7 +376,8 @@ public class Lobby extends Minigame {
         cameraman = (ArmorStand) world.spawnEntity(new Location(world, -14.5, -1, -21.5, 140, 0), EntityType.ARMOR_STAND);
         cameraman.setInvisible(true);
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.teleport(LOBBY);
+            // probably better to have a global but doesn't matter for rn
+            p.teleport(new Location(world, -14.5, -1, -21.5, 140, 0));
             p.setGameMode(GameMode.SPECTATOR);
             p.setSpectatorTarget(cameraman);
         }
@@ -384,6 +385,7 @@ public class Lobby extends Minigame {
 
     public void prepareScoreReveal() {
         MBC.getInstance().setCurrentGame(this);
+        MBC.npcManager.removeAllNPCs();
         setGameState(GameState.END_ROUND);
         world.setTime(13000);
         colorPodiumsWhite();
