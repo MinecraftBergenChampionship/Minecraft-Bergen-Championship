@@ -381,7 +381,7 @@ public class MBC implements Listener {
         String msg = e.getMessage();
         Player player = e.getPlayer();
 
-        for (Participant p : players) {
+        for (Participant p : getPlayersAndSpectators()) {
             if (player.getUniqueId().equals(p.getPlayer().getUniqueId())) {
                 msg = msg.replace("%", "%%")
                         .replace(":blue:", "Ⓑ")
@@ -396,6 +396,7 @@ public class MBC implements Listener {
                         .replace(":w:", "④");
                 msg = p.getFormattedName() + ": " + msg;
                 e.setFormat(p.getTeam().getIcon() + " " + p.getTeam().getChatColor() + "%s" + ChatColor.RESET+ ": %s");
+                break;
             }
         }
 

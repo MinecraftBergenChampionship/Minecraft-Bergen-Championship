@@ -28,6 +28,8 @@ public class Plugin extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(MBC.getInstance(), this);
         getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, this);
+        MBC.getInstance().lobby.createScoreboard();
+
 
         getCommand("mbchelp").setExecutor(new mbchelp());
 
