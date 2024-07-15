@@ -27,6 +27,8 @@ public class notready implements CommandExecutor {
         MBC.getInstance().readyCheck = false;
         Participant par = Participant.getParticipant(p);
         MBC.getInstance().unready(par.getTeam(), p);
+
+        MBC.announce("A team is NOT READY! The ready check has been disabled.");
         return true;
     }
 }

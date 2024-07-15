@@ -31,12 +31,9 @@ public class readycheck implements CommandExecutor {
         }
 
         MBC.getInstance().ready.clear();
-        MBC.getInstance().ready.put(MBC.getInstance().red, Boolean.FALSE);
-        MBC.getInstance().ready.put(MBC.getInstance().green, Boolean.FALSE);
-        MBC.getInstance().ready.put(MBC.getInstance().blue, Boolean.FALSE);
-        MBC.getInstance().ready.put(MBC.getInstance().purple, Boolean.FALSE);
-        MBC.getInstance().ready.put(MBC.getInstance().pink, Boolean.FALSE);
-        MBC.getInstance().ready.put(MBC.getInstance().yellow, Boolean.FALSE);
+        for (MBCTeam t : MBC.getInstance().getValidTeams()) {
+            MBC.getInstance().ready.put(t, Boolean.FALSE);
+        }
         MBC.getInstance().readyCheck = true;
 
 

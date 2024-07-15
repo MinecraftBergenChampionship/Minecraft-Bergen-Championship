@@ -30,7 +30,7 @@ commands:
     permission: minecraft.command.op
   ready:
     description: indicate a team is ready.
-  unready:
+  notready:
     description: indicate a team is not ready, if they were previously.
   startevent:
     description: begin event once all teams are ready.

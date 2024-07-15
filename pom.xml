@@ -76,6 +76,13 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--https://stackoverflow.com/questions/75682819/failed-with-malformedinputexception-input-length-1-when-building-java-applica -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+
         </plugins>
         <resources>
             <resource>
