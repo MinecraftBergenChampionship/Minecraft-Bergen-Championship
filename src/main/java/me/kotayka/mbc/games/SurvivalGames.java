@@ -7,12 +7,17 @@ import me.kotayka.mbc.gameMaps.sgMaps.BCA;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
@@ -22,6 +27,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
@@ -48,16 +54,21 @@ public class SurvivalGames extends Game {
     //private int crateNum = 0;
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
     private boolean firstRound = true;
+    private Map<Player, Double> playerDamage = new HashMap<>();
 
     // Enchantment
     private final GUIItem[] guiItems = setupGUIItems();
 
+    private BossBar bossBar;
+
     // SCORING
-    public final int KILL_POINTS = 10;
+    public final int KILL_POINTS_INITIAL = 10;
+    public int killPoints = KILL_POINTS_INITIAL;
     public final int SURVIVAL_POINTS = 2;
     // Shared amongst each team: 10, 8, 7, 6, 5, 4 points for each player
     public final int[] TEAM_BONUSES_4 = {40, 32, 28, 24, 20, 16};
     public final int[] TEAM_BONUSES_3 = {30, 24, 21, 18, 15, 12};
+    private double totalDamage = 0;
     // public final int WIN_POINTS = 36; // shared amongst all remaining players
 
     public SurvivalGames() {
@@ -102,6 +113,7 @@ public class SurvivalGames extends Game {
     public void loadPlayers() {
         setPVP(false);
         deadTeams = 0;
+        killPoints = KILL_POINTS_INITIAL;
         // possibly redundant
         if (!teamsAlive.isEmpty()) {
             teamsAlive.clear();
@@ -149,6 +161,10 @@ public class SurvivalGames extends Game {
         playerKills.clear();
         //crateNum = 0;
         deadTeams = 0;
+        killPoints = KILL_POINTS_INITIAL;
+        if (bossBar != null) {
+            bossBar.setVisible(false);
+        }
 
         map.resetMap();
     }
@@ -185,7 +201,10 @@ public class SurvivalGames extends Game {
                 }
             } else {
                 map.setBarriers(false);
+                bossBar = Bukkit.createBossBar(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "GRACE PERIOD", BarColor.PURPLE, BarStyle.SOLID);
+                bossBar.setVisible(true);
                 for (Participant p : MBC.getInstance().getPlayers()) {
+                    bossBar.addPlayer(p.getPlayer());
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                     p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
                     p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
@@ -195,31 +214,32 @@ public class SurvivalGames extends Game {
                 timeRemaining = 450;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
+            decrementBossBar();
             /*
              * Event timeline:
              *  7:30: Game Starts
-             *  7:00: Grace Ends, border starts to move
+             *  7:00: Grace Ends, border starts to move; kills worth 10
              *  6:00: 1 minute to chest refill, 1st supply crate announced
-             *  5:00: Chest Refill, 1st supply crate drops, 2nd supply crate announced
+             *  5:00: Chest Refill, 1st supply crate drops, 2nd supply crate announced; kills worth 8
              *  4:00: 2nd supply crate drops, 3rd supply crate announced
-             *  3:00: Last supply crate lands
+             *  3:00: Last supply crate lands; kills worth 5
              */
             //if (crates.size() > 0) { crateParticles(); }
 
             if (timeRemaining == 0) {
+                damagePoints();
                 if (teamsAlive.size() > 1) {
                     Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Border shrinking!");
                     map.Overtime();
                     setGameState(GameState.OVERTIME);
                     timeRemaining = 45;
                 } else {
+                    createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD+"Round Over!");
                     for (Participant p : playersAlive) {
-                        createLine(23, ChatColor.RED+"Round Over!", p);
                         MBCTeam t = p.getTeam();
                         teamPlacements.put(t, 1);
                     }
                     placementPoints();
-                    //createLineAll(23, "\n");
                     if (!firstRound) {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             p.stopSound(Sound.MUSIC_DISC_FAR, SoundCategory.RECORDS);
@@ -244,7 +264,11 @@ public class SurvivalGames extends Game {
             if (timeRemaining == 420) {
                 //event = SurvivalGamesEvent.SUPPLY_CRATE;
                 event = SurvivalGamesEvent.CHEST_REFILL;
-                for (Participant p : MBC.getInstance().getPlayers()) {
+                bossBar.removeAll();
+                bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "MAX KILL POINTS / CHEST REFILL", BarColor.RED, BarStyle.SOLID);
+                bossBar.setVisible(true);
+                for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+                    bossBar.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
                     p.getPlayer().setInvulnerable(false);
                 }
@@ -259,9 +283,15 @@ public class SurvivalGames extends Game {
                 //crateLocation();
             } else if (timeRemaining == 300) {
                 //spawnSupplyCrate();
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    player.sendTitle("", MBC.MBC_STRING_PREFIX + ChatColor.RED+"Chests refilled!", 20, 60, 20);
-                    player.playSound(player, Sound.BLOCK_CHEST_OPEN, 1, 1);
+                killPoints -= 2;
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.RED + "Kill points are decreasing! (10 -> 8)");
+                bossBar.removeAll();
+                bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "TIME BEFORE MINIMUM KILL POINTS", BarColor.RED, BarStyle.SOLID);
+                bossBar.setVisible(true);
+                for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+                    bossBar.addPlayer(p.getPlayer());
+                    p.getPlayer().sendTitle("", MBC.MBC_STRING_PREFIX + ChatColor.RED+"Chests refilled!", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_CHEST_OPEN, 1, 1);
                 }
                 regenChest();
                 getLogger().log(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
@@ -279,16 +309,22 @@ public class SurvivalGames extends Game {
 
                 //event = SurvivalGamesEvent.DEATHMATCH;
                  */
+            } else if (timeRemaining == 180) {
+                killPoints -= 2;
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.RED + "Kill points are decreasing! (8 -> 5)");
+                bossBar.removeAll();
+                bossBar.setVisible(false);
             }
             UpdateEvent();
         } else if (getState().equals(GameState.OVERTIME)) {
+            damagePoints();
             if (timeRemaining == 0) {
                 for (Participant p : playersAlive) {
                     MBCTeam t = p.getTeam();
                     teamPlacements.put(t, 1);
                 }
                 placementPoints();
-                createLineAll(23, ChatColor.RED+"Round Over!");
+                createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD+"Round Over!");
                 if (!firstRound) {
                     gameOverGraphics();
                     roundWinners(0);
@@ -485,12 +521,19 @@ public class SurvivalGames extends Game {
         boolean mainHand = p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW;
         p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 60, 1, false, true));
         p.playSound(p.getLocation(), Sound.BLOCK_GRASS_BREAK, 1, 1);
-        map.getWorld().spawnParticle(Particle.BLOCK_CRACK, p.getLocation(), 3, Material.DIRT.createBlockData());
+        map.getWorld().spawnParticle(Particle.BLOCK_CRACK, p.getEyeLocation(), 3, Material.DIRT.createBlockData());
 
         if (mainHand) {
             p.getInventory().setItemInMainHand(null);
         } else {
             p.getInventory().setItemInOffHand(null);
+        }
+    }
+
+    private void damagePoints() {
+        for (Player player : playerDamage.keySet()) {
+            Participant p = Participant.getParticipant(player);
+            p.addCurrentScore(Math.min((int) (playerDamage.get(player) / 150) * 100, 10));
         }
     }
 
@@ -501,6 +544,11 @@ public class SurvivalGames extends Game {
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (!(e.getAction().isRightClick())) return;
         Player p = e.getPlayer();
+
+        if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.ANVIL)) {
+            e.setCancelled(true);
+            return;
+        }
 
         if (p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW || p.getInventory().getItemInOffHand().getType() == Material.MUSHROOM_STEW) {
             eatMushroomStew(p);
@@ -572,12 +620,27 @@ public class SurvivalGames extends Game {
          */
 
         // prevent stripping trees :p
-        if (e.getClickedBlock().getType().toString().endsWith("SIGN")) {
+        if (e.getClickedBlock() != null && e.getClickedBlock().getType().toString().endsWith("SIGN")) {
             return;
         }
         if (e.getClickedBlock() == null) return;
         if (e.getClickedBlock().getType().toString().endsWith("LOG") && p.getInventory().getItemInMainHand().getType().toString().endsWith("AXE")) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageByEntityEvent e) {
+        if (!(e.getEntity() instanceof Player)) return;
+        if (e.getDamager() instanceof Player) {
+            playerDamage.put((Player) e.getDamager(), e.getDamage());
+            return;
+        }
+
+        if (e.getDamager() instanceof Projectile) {
+            ProjectileSource shooter = ((Projectile) e.getDamager()).getShooter();
+            if (!(shooter instanceof Player)) return;
+            playerDamage.put((Player) shooter, e.getDamage());
         }
     }
 
@@ -589,7 +652,7 @@ public class SurvivalGames extends Game {
         Player victim = e.getPlayer();
         Participant killer = Participant.getParticipant(victim.getKiller());
         if (killer != null) {
-            killer.addCurrentScore(KILL_POINTS);
+            killer.addCurrentScore(killPoints);
             if (playerKills.get(victim.getKiller()) == null) {
                 playerKills.put(victim.getKiller(), 1);
                 createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your Kills: "+ChatColor.RESET+"1", killer);
@@ -661,6 +724,22 @@ public class SurvivalGames extends Game {
         }
     }
      */
+
+    private void decrementBossBar() {
+        if (timeRemaining <= 180) return;
+
+        if (timeRemaining > 420) {
+            bossBar.setProgress((timeRemaining - 420) / 30.0); // grace period time
+            return;
+        }
+
+        if (timeRemaining > 300) {
+            bossBar.setProgress((timeRemaining - 300) / 120.0); // kills worth 10 points time
+            return;
+        }
+
+        bossBar.setProgress((timeRemaining - 180) / 120.0);  // kills worth 8 points time
+    }
 
     /**
      * TODO: better standardization across maps
@@ -819,6 +898,7 @@ public class SurvivalGames extends Game {
             p.sendMessage(ChatColor.RED + "Cannot apply this enchantment to this item!");
             e.setCancelled(true);
         }
+        e.setCancelled(true);
     }
 
     private void setupGUI(Player p) {
