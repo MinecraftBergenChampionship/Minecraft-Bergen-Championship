@@ -51,6 +51,7 @@ public class Lobby extends Minigame {
         if (MBC.getInstance().gameNum > 1) {
             createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Event resumes in: ", p);
             createLine(16, ChatColor.RESET+ChatColor.RESET.toString()+ChatColor.RESET, p);
+            createLine(15, String.format("%sTeam Leaderboard: (%d/6 Games)", ChatColor.GREEN, MBC.getInstance().gameNum), p);
             createLine(15, ChatColor.GREEN+"Team Leaderboard: ", p);
         } else {
             createLine(21, ChatColor.RED+""+ChatColor.BOLD + "Waiting for players...", p);

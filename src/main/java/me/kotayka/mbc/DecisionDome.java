@@ -296,6 +296,10 @@ public class DecisionDome extends Minigame {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(18, ChatColor.GREEN + "" + ChatColor.BOLD + "Your Team:", p);
         createLine(17, p.getTeam().getChatColor() + p.getTeam().teamNameFormat(), p);
+        createLine(16, ChatColor.RESET.toString(), p);
+        createLine(15, ChatColor.AQUA + "" + ChatColor.RED + "Games Played: " + MBC.getInstance().gameNum + "/6", p);
+        createLine(14, String.format("%s%sPoint Multiplier: %.1f", ChatColor.RED, ChatColor.BOLD, MBC.getInstance().multiplier), p);
+
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         updatePlayerTotalScoreDisplay(p);
 
