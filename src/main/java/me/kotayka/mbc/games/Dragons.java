@@ -72,6 +72,8 @@ public class Dragons extends Game {
 
         setTimer(3);
 
+        teamsAlive.addAll(getValidTeams());
+
         Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
             if (playersAlive.size() == 0) {
                 return;
@@ -167,15 +169,15 @@ public class Dragons extends Game {
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             canJump.put(p.getPlayer().getUniqueId(), true);
 
-            ItemStack helmet = new ItemStack(Material.CHAINMAIL_HELMET);
-            ItemStack chestplate = new ItemStack(Material.CHAINMAIL_CHESTPLATE);
-            ItemStack leggings = new ItemStack(Material.CHAINMAIL_LEGGINGS);
-            ItemStack boots = new ItemStack(Material.CHAINMAIL_BOOTS);
+            ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
+            ItemStack chestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
+            ItemStack leggings = new ItemStack(Material.LEATHER_LEGGINGS);
+            ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
 
-            p.getInventory().setHelmet(helmet);
-            p.getInventory().setChestplate(chestplate);
-            p.getInventory().setLeggings(leggings);
-            p.getInventory().setBoots(boots);
+            p.getInventory().setHelmet(p.getTeam().getColoredLeatherArmor(helmet));
+            p.getInventory().setChestplate(p.getTeam().getColoredLeatherArmor(chestplate));
+            p.getInventory().setLeggings(p.getTeam().getColoredLeatherArmor(leggings));
+            p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(boots));
         }
     }
 
@@ -190,7 +192,7 @@ public class Dragons extends Game {
             deathMessage = p.getFormattedName()+" fell from too high";
         }
 
-        getLogger().log(deathMessage);
+        //getLogger().log(deathMessage);
         Bukkit.broadcastMessage(deathMessage);
 
         updatePlayersAlive(p);
@@ -224,7 +226,6 @@ public class Dragons extends Game {
             case STARTING:
                 startingCountdown();
                 if (timeRemaining == 0) {
-                    MBC.getInstance().hideAllPlayers();
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS,1,1); // temp?
                     }
@@ -244,7 +245,7 @@ public class Dragons extends Game {
 
                     EnderDragon enderDragon = (EnderDragon) map.getWorld().spawnEntity(map.DRAGON_SPAWN, EntityType.ENDER_DRAGON);
 
-                    Bukkit.broadcastMessage(ChatColor.GOLD+"End Dragon Spawning!!!");
+                    Bukkit.broadcastMessage(ChatColor.GOLD+"Ender Dragon Spawning!!!");
 
                     enderDragon.setPhase(EnderDragon.Phase.CIRCLING);
 
@@ -310,14 +311,14 @@ public class Dragons extends Game {
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        // Check if the damager is an Ender Dragon
-        if (event.getDamager() instanceof EnderDragon) {
-            // Check if the entity being damaged is a player or another entity (you can specify this if needed)
-            if (event.getEntity() instanceof org.bukkit.entity.Player) {
-                // Reduce the damage
-                double reducedDamage = event.getDamage() * 0.5; // Reduce damage by 50%, adjust as needed
-                event.setDamage(reducedDamage);
-            }
+        if (event.getDamager() instanceof EnderDragon && event.getEntity() instanceof Player) {
+            event.setDamage(0);
+
+            double knockbackFactor = 1;
+            Player player = (Player) event.getEntity();
+            Vector knockbackDirection = player.getLocation().clone().toVector().subtract(event.getDamager().getLocation().toVector()).normalize();
+            knockbackDirection.setY(Math.abs(knockbackDirection.getY()));
+            player.setVelocity(knockbackDirection.multiply(knockbackFactor));
         }
     }
 
@@ -343,6 +344,17 @@ public class Dragons extends Game {
             p.teleport(map.SPAWN);
         } else {
             handleDeath(p, false);
+        }
+
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onFallDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+                event.setDamage(event.getDamage() * 0.5);
+            }
         }
     }
 }
