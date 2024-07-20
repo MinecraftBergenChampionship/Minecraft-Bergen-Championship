@@ -249,8 +249,13 @@ public class Dragons extends Game {
                 gameEndEvents();
                 break;
             case ACTIVE:
-                if ((timeRemaining < 297 && enderDragons.size() == 0) || (timeRemaining < 240 && enderDragons.size() == 1) || (timeRemaining < 180 && enderDragons.size() == 2)
-                    || (timeRemaining < 120 && enderDragons.size() == 3) || (timeRemaining < 60 && enderDragons.size() == 4)) {
+                if ((timeRemaining < 297 && enderDragons.size() == 0)
+                    || (timeRemaining < 255 && enderDragons.size() == 1)
+                    || (timeRemaining < 210 && enderDragons.size() == 2)
+                    || (timeRemaining < 165 && enderDragons.size() == 3)
+                    || (timeRemaining < 120 && enderDragons.size() == 4)
+                    || (timeRemaining < 075 && enderDragons.size() == 5)
+                    || (timeRemaining < 030 && enderDragons.size() == 6)) {
 
                     EnderDragon enderDragon = (EnderDragon) map.getWorld().spawnEntity(map.DRAGON_SPAWN, EntityType.ENDER_DRAGON);
 
@@ -352,7 +357,7 @@ public class Dragons extends Game {
         if (p.getGameMode() != GameMode.ADVENTURE) {
             p.teleport(map.SPAWN);
         } else {
-            handleDeath(p, false);
+            handleDeath(p, true);
         }
 
         event.setCancelled(true);
@@ -362,7 +367,7 @@ public class Dragons extends Game {
     public void onFallDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-                event.setDamage(event.getDamage() * 0.5);
+                event.setDamage(event.getDamage() * 0.75);
             }
         }
     }
