@@ -1,7 +1,7 @@
 package me.kotayka.mbc.games;
 
 import me.kotayka.mbc.*;
-import me.kotayka.mbc.gameMaps.dragonsMap.Classic;
+import me.kotayka.mbc.gameMaps.dragonsMap.ConchStreet;
 import me.kotayka.mbc.gameMaps.dragonsMap.DragonsMap;
 import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 import net.md_5.bungee.api.ChatMessageType;
@@ -58,9 +58,18 @@ public class Dragons extends Game {
     private final int SURVIVAL_POINTS = 2;
 
     public Dragons() {
-        super("Dragons", new String[]{});
+        super("Dragons", new String[]{
+                "⑰ Dragons is a survival game where you attempt to survive a barage of dragons.",
+                "⑰ Dragons will gradually spawn and destroy the map (and you).\n\n" +
+                "⑰ Your goal is to survive the void, the dragons, and fall damage!",
+                "⑰ You'll get points for each player you outlive, along with points every time a dragon spawns." +
+                "⑰ Players recieve a bonus for surviving the round.",
+                ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                        "⑰ +2 points for each player outlived\n" +
+                        "⑰ +1 points for being alive when a new dragon spawns" +
+                        "⑰ +5 points for surviving until the end of the round"});
 
-        map = new Classic(this);
+        map = new ConchStreet(this);
         map.resetMap();
     }
 
@@ -68,9 +77,9 @@ public class Dragons extends Game {
     public void start() {
         super.start();
 
-        setGameState(GameState.STARTING);
+        setGameState(GameState.TUTORIAL);
 
-        setTimer(3);
+        setTimer(30);
 
         teamsAlive.addAll(getValidTeams());
 
@@ -227,7 +236,7 @@ public class Dragons extends Game {
                 startingCountdown();
                 if (timeRemaining == 0) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS,1,1); // temp?
+                        p.playSound(p, Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS,1,1); // temp?
                     }
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         p.getInventory().addItem(new ItemStack(Material.IRON_AXE));
@@ -245,7 +254,7 @@ public class Dragons extends Game {
 
                     EnderDragon enderDragon = (EnderDragon) map.getWorld().spawnEntity(map.DRAGON_SPAWN, EntityType.ENDER_DRAGON);
 
-                    Bukkit.broadcastMessage(ChatColor.GOLD+"Ender Dragon Spawning!!!");
+                    Bukkit.broadcastMessage(ChatColor.GOLD+"" + ChatColor.BOLD + "Ender Dragon Spawning!");
 
                     enderDragon.setPhase(EnderDragon.Phase.CIRCLING);
 
