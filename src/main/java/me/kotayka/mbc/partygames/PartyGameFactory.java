@@ -1,6 +1,7 @@
 package me.kotayka.mbc.partygames;
 
 import me.kotayka.mbc.PartyGame;
+import me.kotayka.mbc.games.Dragons;
 
 import java.util.Arrays;
 import java.util.HashMap;

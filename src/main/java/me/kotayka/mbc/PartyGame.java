@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffectType;
  * to be played as a part of the game represented in Party.java.
  */
 public abstract class PartyGame extends Game {
-    private final World world = Bukkit.getWorld("Party");
+    public World world = Bukkit.getWorld("Party");
     private int introLine = 0;
     private boolean isGameOver = false;
     public List<Participant> playersAlive = new ArrayList<>();
