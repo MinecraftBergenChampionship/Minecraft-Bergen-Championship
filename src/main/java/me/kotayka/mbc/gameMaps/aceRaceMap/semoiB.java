@@ -15,7 +15,7 @@ public class semoiB extends AceRaceMap {
             new Location(getWorld(), -2038, 12, -2083, -135, 0),
             new Location(getWorld(), -2013, 13, -2131, -150, 0),
             new Location(getWorld(), -2048, 18, -2256, 135, 0),
-            new Location(getWorld(), -2131, 13, -2032, 90, 0)
+            new Location(getWorld(), -2131, 13, -2302, 90, 0)
     };
 
     Location[] checkpoints = {

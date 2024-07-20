@@ -58,7 +58,7 @@ public class MBC implements Listener {
     public Spectator spectator = new Spectator();
 
     public List<MBCTeam> teams = new ArrayList<>(Arrays.asList(red, yellow, green, blue, purple, pink, spectator));
-    public Set<MBCTeam> ready = new HashSet<>();
+    public Map<MBCTeam,Boolean> ready = new HashMap<>();
     //public List<MBCTeam> validTeams = new ArrayList<>();
     //public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets", "Spectator"));
     public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets", "Spectator"));
@@ -375,7 +375,7 @@ public class MBC implements Listener {
     public List<MBCTeam> getValidTeams() {
         List<MBCTeam> newTeams = new ArrayList<>();
         for (MBCTeam t : teams) {
-            if (!(t instanceof Spectator) && t.teamPlayers.size() > 0) {
+            if (!(t instanceof Spectator) && !t.teamPlayers.isEmpty()) {
                 newTeams.add(t);
             }
         }
@@ -387,7 +387,7 @@ public class MBC implements Listener {
         String msg = e.getMessage();
         Player player = e.getPlayer();
 
-        for (Participant p : players) {
+        for (Participant p : getPlayersAndSpectators()) {
             if (player.getUniqueId().equals(p.getPlayer().getUniqueId())) {
                 msg = msg.replace("%", "%%")
                         .replace(":blue:", "Ⓑ")
@@ -402,6 +402,7 @@ public class MBC implements Listener {
                         .replace(":w:", "④");
                 msg = p.getFormattedName() + ": " + msg;
                 e.setFormat(p.getTeam().getIcon() + " " + p.getTeam().getChatColor() + "%s" + ChatColor.RESET+ ": %s");
+                break;
             }
         }
 
@@ -763,7 +764,7 @@ public class MBC implements Listener {
     }
 
     public void ready(MBCTeam t, Player p) {
-        if (ready.add(t)) {
+        if (ready.get(t).equals(Boolean.FALSE)) {
             Bukkit.broadcastMessage(t.teamNameFormat() + " are ready!");
             p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.GREEN + " Successfully readied up!");
         } else {
@@ -772,9 +773,9 @@ public class MBC implements Listener {
 
 
         if (ready.size() == getValidTeams().size()) {
-            if (getValidTeams().size() == 0) {
+            if (getValidTeams().isEmpty()) {
                 announce("There are no teams! You may want to assign teams first!");
-            } else if (!started && !enable_stat_logging) {
+            } else if (!started) {
                 announce("Waiting for admin...");
                 for (Player pl : Bukkit.getOnlinePlayers()) {
                     if (pl.isOp()) {
@@ -797,7 +798,7 @@ public class MBC implements Listener {
         if (ready.remove(t)) {
             Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.RED + " are not ready.");
         } else {
-            p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + " Your team is currently not ready!");
+            p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "Your team is currently not ready!");
         }
     }
 
@@ -858,6 +859,7 @@ public class MBC implements Listener {
 
     public void startEvent() {
         started = true;
+        readyCheck = false;
         lobby.setGameState(GameState.TUTORIAL);
         announce(ChatColor.BOLD + "The event is starting!" + ChatColor.RESET + "\nYou may want to turn JUKEBOX sounds down.");
         lobby.setTimer(65);

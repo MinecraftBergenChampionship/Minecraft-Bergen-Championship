@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class unready implements CommandExecutor {
+public class notready implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player)) {
@@ -22,8 +22,13 @@ public class unready implements CommandExecutor {
             return true;
         }
 
+
+
+        MBC.getInstance().readyCheck = false;
         Participant par = Participant.getParticipant(p);
         MBC.getInstance().unready(par.getTeam(), p);
+
+        MBC.announce("A team is NOT READY! The ready check has been disabled.");
         return true;
     }
 }

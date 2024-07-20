@@ -28,6 +28,8 @@ public class Plugin extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(MBC.getInstance(), this);
         getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, this);
+        MBC.getInstance().lobby.createScoreboard();
+
 
         getCommand("mbchelp").setExecutor(new mbchelp());
 
@@ -35,7 +37,7 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("changeTeam").setTabCompleter(new changeTeamTabCompletion());
 
         getCommand("ready").setExecutor(new ready());
-        getCommand("unready").setExecutor(new unready());
+        getCommand("notready").setExecutor(new notready());
         getCommand("readycheck").setExecutor(new readycheck());
         getCommand("startevent").setExecutor(new startevent());
         getCommand("announcement").setExecutor(new announcement());

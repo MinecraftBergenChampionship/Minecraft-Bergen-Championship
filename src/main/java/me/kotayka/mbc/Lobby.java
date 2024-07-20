@@ -47,19 +47,18 @@ public class Lobby extends Minigame {
 
     public void createScoreboard(Participant p) {
         newObjective(p);
+        createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team: " + p.getTeam().teamNameFormat(), p);
         if (MBC.getInstance().gameNum > 1) {
             createLine(21, ChatColor.RED+""+ChatColor.BOLD+"Event resumes in: ", p);
-            createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team: " + p.getTeam().teamNameFormat(), p);
+            createLine(16, ChatColor.RESET+ChatColor.RESET.toString()+ChatColor.RESET, p);
+            createLine(15, String.format("%sTeam Leaderboard: (%d/6 Games)", ChatColor.GREEN, MBC.getInstance().gameNum), p);
+            createLine(15, ChatColor.GREEN+"Team Leaderboard: ", p);
         } else {
             createLine(21, ChatColor.RED+""+ChatColor.BOLD + "Waiting for players...", p);
-            createLine(18, ChatColor.GREEN + "Teams Ready: ", p);
+            // createLine(18, ChatColor.GREEN + "Teams Ready: ", p);
         }
-        createLine(19, ChatColor.RESET.toString(), p);
-        //createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team: " + p.getTeam().teamNameFormat(), p);
-        //createLine(17, p.getTeam().getChatColor()+p.getTeam().getTeamFullName(), p);
-        createLine(16, ChatColor.RESET+ChatColor.RESET.toString()+ChatColor.RESET, p);
-        createLine(15, ChatColor.GREEN+"Team Leaderboard: ", p);
         createLine(4, ChatColor.RESET.toString()+ChatColor.RESET, p);
+        createLine(19, ChatColor.RESET.toString(), p);
         updatePlayerTotalScoreDisplay(p);
 
         displayTeamTotalScore(p.getTeam());
@@ -78,7 +77,7 @@ public class Lobby extends Minigame {
     }
 
     public void changeTeam(Participant p) {
-        //createLine(17, p.getTeam().getChatColor()+p.getTeam().getTeamFullName(), p);
+        createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team: " + p.getTeam().teamNameFormat(), p);
     }
 
     public void events() {
@@ -199,10 +198,7 @@ public class Lobby extends Minigame {
                 case 60 -> {
                     teamBarriers(false);
                     populatePodium();
-                    boolean flag = false;
-                    if (reveal.size() > 1) {
-                        flag = true;
-                    }
+                    boolean flag = reveal.size() > 1;
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.MUSIC_DISC_WAIT, SoundCategory.RECORDS, 1, 1);
                         p.setGameMode(GameMode.ADVENTURE);
@@ -231,7 +227,6 @@ public class Lobby extends Minigame {
         if (MBC.getInstance().decisionDome == null) {
             MBC.getInstance().startGame(0);
         } else {
-            MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().decisionDome, MBC.getInstance().plugin);
             MBC.getInstance().decisionDome.start();
         }
     }
@@ -276,11 +271,11 @@ public class Lobby extends Minigame {
     @Override
     public void start() {
         MBC.getInstance().setCurrentGame(this);
+        stopTimer();
         setGameState(GameState.ACTIVE);
         createScoreboard();
         loadPlayers();
         updateTeamStandings();
-        stopTimer();
         if (MBC.getInstance().gameNum == 4) {
             setTimer(300);
         } else {
@@ -294,7 +289,6 @@ public class Lobby extends Minigame {
         createScoreboardEnd();
         world.setTime(18000);
         loadPlayersEnd();
-        updateTeamStandings();
         MBC.getInstance().lobby.populatePodium();
         stopTimer();
         setTimer(28);
@@ -379,7 +373,8 @@ public class Lobby extends Minigame {
         cameraman = (ArmorStand) world.spawnEntity(new Location(world, -14.5, -1, -21.5, 140, 0), EntityType.ARMOR_STAND);
         cameraman.setInvisible(true);
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.teleport(LOBBY);
+            // probably better to have a global but doesn't matter for rn
+            p.teleport(new Location(world, -14.5, -1, -21.5, 140, 0));
             p.setGameMode(GameMode.SPECTATOR);
             p.setSpectatorTarget(cameraman);
         }
@@ -387,6 +382,7 @@ public class Lobby extends Minigame {
 
     public void prepareScoreReveal() {
         MBC.getInstance().setCurrentGame(this);
+        MBC.npcManager.removeAllNPCs();
         setGameState(GameState.END_ROUND);
         world.setTime(13000);
         colorPodiumsWhite();
@@ -456,8 +452,8 @@ public class Lobby extends Minigame {
 
     public void startingEvents(int timeRemaining) {
         if (timeRemaining == 14) {
+            MBC.announce("The Minecraft Championship is about to begin!");
             for (Player p : Bukkit.getOnlinePlayers()) {
-                MBC.announce("The Minecraft Championship is about to begin!");
                 p.setGameMode(GameMode.ADVENTURE);
                 p.teleport(LOBBY);
             }
@@ -511,10 +507,10 @@ public class Lobby extends Minigame {
     private void introTeam() {
         List<MBCTeam> teams = getValidTeams();
         if (introCounter >= teams.size()) {
-            timeRemaining = 21;
+            timeRemaining = 15;
         } else {
             MBCTeam intro = teams.get(introCounter++);
-            if (lastIntro.size() != 0) {
+            if (!lastIntro.isEmpty()) {
                 for (Participant p : lastIntro) {
                     p.getPlayer().setGameMode(GameMode.SPECTATOR);
                     p.getPlayer().setSpectatorTarget(cameraman);

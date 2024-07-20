@@ -603,6 +603,7 @@ public abstract class Game extends Minigame {
 
     public void returnToLobby() {
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
+        stopTimer();
         MBC.getInstance().showAllPlayers();
         setGameState(GameState.INACTIVE);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
@@ -613,6 +614,8 @@ public abstract class Game extends Minigame {
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+            p.getPlayer().removePotionEffect(PotionEffectType.DOLPHINS_GRACE);
+            p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
             p.getPlayer().addPotionEffect(MBC.SATURATION);
             p.getPlayer().getInventory().clear();
             p.getPlayer().setExp(0);

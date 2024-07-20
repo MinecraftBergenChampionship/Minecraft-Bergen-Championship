@@ -38,7 +38,6 @@ public class DecisionDome extends Minigame {
     private Player dunker = null;
     private ChatColor dunked_team = null;
     private Location[] dunked_corners = new Location[2];
-    public Set<Egg> eggs = new HashSet<>();
     private final int[][] coordsForBorder = {
             {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}, {0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7},
             {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}, {-1, 0}, {-2, 0}, {-3, 0}, {-4, 0}, {-5, 0}, {-6, 0}, {-7, 0},
@@ -74,8 +73,6 @@ public class DecisionDome extends Minigame {
         if (dunked_team != null) {
             dunked_team = null;
         }
-        dunked_corners[0] = null;
-        dunked_corners[1] = null;
 
         // Powerups
         if (!powerupTeams.isEmpty()) powerupTeams.clear();
@@ -109,9 +106,6 @@ public class DecisionDome extends Minigame {
 
     @Override
     public void loadPlayers() {
-        if (!eggs.isEmpty()) {
-            eggs.clear();
-        }
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {
             Location l = getTeleportLocation(t.getChatColor());
             for (Participant p : t.getPlayers()) {
@@ -276,7 +270,7 @@ public class DecisionDome extends Minigame {
             }
             switch (timeRemaining) {
                 case 0 -> {
-                    if (dunked_corners[0] != null) {
+                    if (dunked_team != null) {
                         replaceTube(dunked_corners[0], dunked_corners[1]);
                     }
                     for (Player p : Bukkit.getOnlinePlayers()) {
@@ -301,7 +295,11 @@ public class DecisionDome extends Minigame {
         createLine(21, ChatColor.RED + "" + ChatColor.BOLD + "Voting begins in:", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(18, ChatColor.GREEN + "" + ChatColor.BOLD + "Your Team:", p);
-        createLine(17, p.getTeam().getChatColor() + p.getTeam().getTeamFullName(), p);
+        createLine(17, p.getTeam().getChatColor() + p.getTeam().teamNameFormat(), p);
+        createLine(16, ChatColor.RESET.toString(), p);
+        createLine(15, ChatColor.AQUA + "" + ChatColor.RED + "Games Played: " + MBC.getInstance().gameNum + "/6", p);
+        createLine(14, String.format("%s%sPoint Multiplier: %.1f", ChatColor.RED, ChatColor.BOLD, MBC.getInstance().multiplier), p);
+
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         updatePlayerTotalScoreDisplay(p);
 
@@ -636,16 +634,13 @@ public class DecisionDome extends Minigame {
 
         if (e.getEntity().getType().equals(EntityType.EGG)) {
             Egg egg = (Egg) e.getEntity();
-            if (!(eggs.add(egg))) {
-                egg.remove();
-                return;
-            }
             egg.remove();
             Participant p = Participant.getParticipant(((Player) e.getEntity().getShooter()));
             if (p == null) return;
 
             if (mega_cow_shooter != null && p.getPlayer().getUniqueId().equals(mega_cow_shooter.getPlayer().getUniqueId())) {
                 Cow cow = (Cow) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.COW);
+                cow.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 2, false, false));
                 VoteChicken mega_cow = new VoteChicken(p.getTeam(), cow);
                 chickens.add(mega_cow);
                 chickens.add(mega_cow);
@@ -654,11 +649,11 @@ public class DecisionDome extends Minigame {
             }
 
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
-            chicken.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 1, false, false));
+            chicken.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 2, false, false));
             chickens.add(new VoteChicken(p.getTeam(), chicken));
             if(doubled) {
                 Chicken chickenTwo = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
-                chickenTwo.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 1, false, false));
+                chickenTwo.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 2, false, false));
                 chickens.add(new VoteChicken(p.getTeam(), chickenTwo));
             }
             

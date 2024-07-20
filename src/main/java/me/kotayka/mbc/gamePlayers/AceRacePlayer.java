@@ -143,7 +143,7 @@ public class AceRacePlayer extends GamePlayer {
             p.addCurrentScore(AceRace.FINISH_RACE_POINTS);
 
             // final placement bonuses
-            if (placement < 9) {
+            if (placement < 11) {
                 p.addCurrentScore(AceRace.PLACEMENT_BONUSES[placement-1]);
             }
         }

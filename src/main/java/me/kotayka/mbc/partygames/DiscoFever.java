@@ -14,6 +14,8 @@ import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.PartyGame;
+import me.kotayka.mbc.gamePlayers.AceRacePlayer;
+
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
@@ -56,6 +58,27 @@ public class DiscoFever extends PartyGame {
     private Region back = null;
     private Pattern randomPattern = null;
     private EditSession editSession = null;
+
+    public Map<ColorType, Material> woodMap = Map.of(ColorType.RED, Material.MANGROVE_PLANKS, ColorType.YELLOW, 
+                                                        Material.BIRCH_PLANKS, ColorType.GREEN, Material.LIME_TERRACOTTA, 
+                                                        ColorType.BLUE, Material.WARPED_PLANKS, ColorType.PINK, Material.CRIMSON_PLANKS);
+    public Map<ColorType, Material> concreteMap = Map.of(ColorType.RED, Material.RED_CONCRETE, ColorType.YELLOW, 
+                                                        Material.YELLOW_CONCRETE, ColorType.GREEN, Material.LIME_CONCRETE, 
+                                                        ColorType.BLUE, Material.BLUE_CONCRETE, ColorType.PINK, Material.PURPLE_CONCRETE);
+    public Map<ColorType, Material> oreMap = Map.of(ColorType.RED, Material.REDSTONE_BLOCK, ColorType.YELLOW, 
+                                                        Material.GOLD_BLOCK, ColorType.GREEN, Material.EMERALD_BLOCK, 
+                                                        ColorType.BLUE, Material.LAPIS_BLOCK, ColorType.PINK, Material.AMETHYST_BLOCK);
+    public Map<ColorType, Material> woolMap = Map.of(ColorType.RED, Material.RED_WOOL, ColorType.YELLOW, 
+                                                        Material.YELLOW_WOOL, ColorType.GREEN, Material.LIME_WOOL, 
+                                                        ColorType.BLUE, Material.BLUE_WOOL, ColorType.PINK, Material.PURPLE_WOOL);
+    public Map<ColorType, Material> miscMapOne = Map.of(ColorType.RED, Material.RED_MUSHROOM_BLOCK, ColorType.YELLOW, 
+                                                        Material.HONEYCOMB_BLOCK, ColorType.GREEN, Material.MELON, 
+                                                        ColorType.BLUE, Material.WARPED_WART_BLOCK, ColorType.PINK, Material.PURPUR_BLOCK);
+    public Map<ColorType, Material> miscMapTwo = Map.of(ColorType.RED, Material.BRICKS, ColorType.YELLOW, 
+                                                        Material.SPONGE, ColorType.GREEN, Material.MOSS_BLOCK, 
+                                                        ColorType.BLUE, Material.PRISMARINE_BRICKS, ColorType.PINK, Material.STRIPPED_CHERRY_WOOD);
+
+    public Map<ColorType, Material> randomizedBlocks = new HashMap<ColorType, Material>();
 
     public final int STAGE_POINTS = 2;
     public final int SURVIVAL_POINTS = 1;
@@ -299,7 +322,10 @@ public class DiscoFever extends PartyGame {
                 }
                 if (delay > 20) {
                     delay -= 10;
-                } else {
+                } else if (delay == 12) {
+                    delay -= 2;
+                }
+                else {
                     delay -= 4;
                 }
                 Bukkit.broadcastMessage(ChatColor.YELLOW+"Things are speeding up!");
@@ -475,12 +501,43 @@ public class DiscoFever extends PartyGame {
      * - No two blocks have the same TextureType
      */
     private void initializePalette() {
-        // TODO: Randomization
-        palette.put(ColorType.RED, Material.ACACIA_PLANKS);
-        palette.put(ColorType.YELLOW, Material.YELLOW_CONCRETE);
-        palette.put(ColorType.GREEN, Material.EMERALD_BLOCK);
-        palette.put(ColorType.BLUE, Material.LAPIS_BLOCK);
-        palette.put(ColorType.PINK, Material.PURPLE_WOOL);
+
+        List<ColorType> colorList = new ArrayList<>();
+        colorList.add(ColorType.RED);
+        colorList.add(ColorType.YELLOW);
+        colorList.add(ColorType.GREEN);
+        colorList.add(ColorType.BLUE);
+        colorList.add(ColorType.PINK);
+
+        Collections.shuffle(colorList);
+        // place 1 is wood, place 2 is concrete, place 3 is ores, place 4 is wool, place 5 is one of the two 
+
+        for (int i = 0; i < colorList.size(); i++) {
+            ColorType c = colorList.get(i);
+            Material m;
+            switch (i) {
+                case 0 -> {
+                    palette.put(c, woodMap.get(c));
+                }
+                case 1 -> {
+                    palette.put(c, concreteMap.get(c));
+                }
+                case 2 -> {
+                    palette.put(c, oreMap.get(c));
+                }
+                case 3 -> {
+                    palette.put(c, woolMap.get(c));
+                }
+                case 4 -> {
+                    if (Math.random()*2 == 1) {
+                        palette.put(c, miscMapOne.get(c));
+                    } else {
+                        palette.put(c, miscMapTwo.get(c));
+                    }
+                }
+            }
+            // TODO: this randomization sucks someone should make it better
+        }
     }
 
     /**
