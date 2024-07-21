@@ -5,6 +5,7 @@ import java.util.List;
 
 import me.kotayka.mbc.games.Party;
 import me.kotayka.mbc.partygames.BeepTest;
+import me.kotayka.mbc.partygames.Dragons;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -153,13 +154,15 @@ public abstract class PartyGame extends Game {
     }
 
     public void updatePlayersAlive(Participant p) {
-        Bukkit.broadcastMessage(p.getFormattedName() + " partied too hard!");
-        logger.log(p.getFormattedName() + " partied too hard!");
         playersAlive.remove(p);
         checkLastTeam(p.getTeam());
         updatePlayersAliveScoreboard();
 
-        if (playersAlive.size() == 0) {
+        if (this instanceof Dragons && teamsAlive.size() == 1) {
+            endEvents();
+            return;
+        }
+        if (playersAlive.isEmpty()) {
             endEvents();
         }
     }
@@ -200,6 +203,7 @@ public abstract class PartyGame extends Game {
         setGameState(GameState.INACTIVE);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().setMaxHealth(20);
+            p.getPlayer().setInvulnerable(false);
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);

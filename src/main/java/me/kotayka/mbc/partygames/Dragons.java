@@ -6,6 +6,7 @@ import me.kotayka.mbc.gameMaps.dragonsMap.DragonsMap;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -15,6 +16,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -46,7 +48,10 @@ public class Dragons extends PartyGame {
     public HashMap<EnderDragon, Double> yLocations = new HashMap<>();
     private Random random = new Random();
 
-    private final int SURVIVAL_POINTS = 2;
+    // SCORING
+    private final int SURVIVAL_POINTS = 2; // points given to all surviving players when a player dies
+    private final int WIN_POINTS = 5; // points given to every player who survives 5 minutes
+    private final int SPAWN_POINTS = 1; // points given to every living player when a dragon spawns
 
     public static PartyGame getInstance() {
         if (instance == null) {
@@ -75,8 +80,11 @@ public class Dragons extends PartyGame {
     public void start() {
         super.start();
 
-
         teamsAlive.addAll(getValidTeams());
+
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().setInvulnerable(false);
+        }
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
             if (playersAlive.isEmpty()) {
@@ -161,13 +169,66 @@ public class Dragons extends PartyGame {
     }
 
     @Override
+    public void roundWinners(int points) {
+        String s;
+        if (playersAlive.size() > 1) {
+            StringBuilder survivors = new StringBuilder("The winners of this round are: ");
+            for (int i = 0; i < playersAlive.size(); i++) {
+                Participant p = playersAlive.get(i);
+                winEffects(p);
+                p.getPlayer().sendMessage(ChatColor.GREEN+"You survived the dragon rampage!");
+                if (points > 0) {
+                    p.addCurrentScore(points);
+                }
+
+                if (i == playersAlive.size()-1) {
+                    survivors.append("and ").append(p.getFormattedName());
+                } else {
+                    survivors.append(p.getFormattedName()).append(", ");
+                }
+            }
+            s = survivors.toString()+ChatColor.WHITE+"!";
+        } else if (playersAlive.size() == 1) {
+            playersAlive.get(0).getPlayer().sendMessage(ChatColor.GREEN+"You survived the dragon rampage!");
+            playersAlive.get(0).addCurrentScore(points);
+            winEffects(playersAlive.get(0));
+            s = playersAlive.get(0).getFormattedName()+" survived the dragons!";
+        } else {
+            s = "Nobody survived the round.";
+        }
+        logger.log(s+"\n");
+        Bukkit.broadcastMessage(s);
+
+    }
+
+    @Override
     public void endEvents() {
+        roundWinners(WIN_POINTS);
+        removeDragons();
+
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            p.getPlayer().stopSound(Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS);
+        }
+
+        logger.logStats();
+
+        if (MBC.getInstance().party == null) {
+            for (Participant p : MBC.getInstance().getPlayers()) {
+                p.addCurrentScoreToTotal();
+            }
+            MBC.getInstance().updatePlacings();
+            returnToLobby();
+        } else {
+            // start next game
+            setupNext();
+        }
 
     }
 
     @Override
     public void onRestart() {
-
+        map.resetMap();
+        removeDragons();
     }
 
     @Override
@@ -200,11 +261,11 @@ public class Dragons extends PartyGame {
         if (!fallDamage) {
             deathMessage = p.getFormattedName()+" fell into the void";
         } else {
-            deathMessage = p.getFormattedName()+" fell from too high";
+            deathMessage = p.getFormattedName()+" fell from a high place";
         }
 
-        //getLogger().log(deathMessage);
         Bukkit.broadcastMessage(deathMessage);
+        logger.log(deathMessage);
 
         updatePlayersAlive(p);
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
@@ -237,27 +298,31 @@ public class Dragons extends PartyGame {
                         p.playSound(p, Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS,1,1); // temp?
                     }
                     for (Participant p : MBC.getInstance().getPlayers()) {
-                        p.getInventory().addItem(new ItemStack(Material.IRON_AXE));
+                        ItemStack i = new ItemStack(Material.IRON_AXE);
+                        i.getItemMeta().setUnbreakable(true);
+                        p.getInventory().addItem(i);
                     }
                     setGameState(GameState.ACTIVE);
                     setTimer(300);
                 }
                 break;
-            case END_GAME:
-                gameEndEvents();
-                break;
             case ACTIVE:
+                if (timeRemaining == 0) {
+                    endEvents();
+                    return;
+                }
                 if ((timeRemaining < 297 && enderDragons.size() == 0)
                     || (timeRemaining < 255 && enderDragons.size() == 1)
                     || (timeRemaining < 210 && enderDragons.size() == 2)
                     || (timeRemaining < 165 && enderDragons.size() == 3)
                     || (timeRemaining < 120 && enderDragons.size() == 4)
-                    || (timeRemaining < 075 && enderDragons.size() == 5)
-                    || (timeRemaining < 030 && enderDragons.size() == 6)) {
+                    || (timeRemaining < 75 && enderDragons.size() == 5)
+                    || (timeRemaining < 30 && enderDragons.size() == 6)) {
 
                     EnderDragon enderDragon = (EnderDragon) map.getWorld().spawnEntity(map.DRAGON_SPAWN, EntityType.ENDER_DRAGON);
 
                     Bukkit.broadcastMessage(ChatColor.GOLD+"" + ChatColor.BOLD + "Ender Dragon Spawning!");
+                    logger.log("Ender Dragon has spawned!");
 
                     enderDragon.setPhase(EnderDragon.Phase.CIRCLING);
 
@@ -269,20 +334,25 @@ public class Dragons extends PartyGame {
 
                     enderDragons.add(enderDragon);
 
+                    for (Participant p : playersAlive) {
+                        p.addCurrentScore(SPAWN_POINTS);
+                    }
+
                 }
                 break;
         }
-
     }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if (!isGameActive()) return;
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK && e.getAction() != Action.RIGHT_CLICK_AIR) return;
 
-        if ((e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) && e.getPlayer().getItemInHand().getType() == Material.IRON_AXE) {
+        if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.IRON_AXE ||
+            e.getPlayer().getInventory().getItemInOffHand().getType() == Material.IRON_AXE) {
             Player player = e.getPlayer();
             if (canJump.containsKey(player.getUniqueId()) && canJump.get(player.getUniqueId())) {
-                player.setVelocity(player.getLocation().getDirection().multiply(2));
+                player.setVelocity(player.getLocation().getDirection().multiply(1.75));
+                map.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1);
                 player.setFallDistance(0);
                 canJump.put(player.getUniqueId(), false);
                 cooldowns.put(player, System.currentTimeMillis());
@@ -305,6 +375,11 @@ public class Dragons extends PartyGame {
     }
 
     @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        e.setCancelled(true);
+    }
+
+    @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event)
     {
         if (!isGameActive()) return;
@@ -314,10 +389,11 @@ public class Dragons extends PartyGame {
 
     @Override
     public void createScoreboard(Participant p) {
+        createLine(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party! (" + name()) + ")", p);
+        createLine(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET), p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
 
-        updatePlayersAliveScoreboard();
         updateInGameTeamScoreboard();
     }
 
@@ -367,6 +443,17 @@ public class Dragons extends PartyGame {
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 event.setDamage(event.getDamage() * 0.75);
             }
+        }
+    }
+
+    @Override
+    public World world() {
+        return map.getWorld();
+    }
+
+    private void removeDragons() {
+        for (EnderDragon dragon : enderDragons) {
+            dragon.remove();
         }
     }
 }

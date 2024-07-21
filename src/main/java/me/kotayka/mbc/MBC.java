@@ -797,13 +797,13 @@ public class MBC implements Listener {
     }
 
     /**
-     * Hides all players from each other.
+     * Hides all players from each other; spectators are unaffected
      */
     public void hideAllPlayers() {
         for (Participant p : getPlayers()) {
+            if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
             for (Participant p2 : getPlayers()) {
                 if (p.getPlayer().getUniqueId().equals(p2.getPlayer().getUniqueId())) continue;
-                if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
                 p.getPlayer().hidePlayer(plugin, p2.getPlayer());
             }
         }

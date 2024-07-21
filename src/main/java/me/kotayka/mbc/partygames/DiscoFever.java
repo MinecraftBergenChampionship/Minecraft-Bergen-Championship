@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -83,7 +84,6 @@ public class DiscoFever extends PartyGame {
     public final int SURVIVAL_POINTS = 1;
     public final int WIN_POINTS = 10;
     public final Location SPAWN = new Location(Bukkit.getWorld("Party"), 400, 1.5, 400, 0, 0);
-    private boolean gameOne = true;
 
     // game instance
     private static DiscoFever instance = null;
@@ -225,20 +225,7 @@ public class DiscoFever extends PartyGame {
                 break;
             case END_GAME:
                 if (timeRemaining == 0) {
-                    if (gameOne) {
-                        gameOne = false;
-                        if (MBC.getInstance().party != null) {
-                            MBC.getInstance().party.incrementGameNum();
-                        }
-                        deletedSpawn = false;
-                        delay = 80;
-                        setSpawnArea(true);
-                        Barriers(true);
-                        loadPlayers();
-                        initializeRegions();
-                        setGameState(GameState.STARTING);
-                        setTimer(16);
-                    } else if (MBC.getInstance().party == null) {
+                     if (MBC.getInstance().party == null) {
                         for (Participant p : MBC.getInstance().getPlayers()) {
                             p.addCurrentScoreToTotal();
                         }
@@ -580,6 +567,8 @@ public class DiscoFever extends PartyGame {
             Participant part = Participant.getParticipant(p);
             if (part == null) return;
             updatePlayersAlive(part);
+            Bukkit.broadcastMessage(part.getFormattedName() + " was eliminated!");
+            logger.log(p.getName() + " fell into the void at delay " + delay);
             MBC.getInstance().showPlayers(part);
             for (Participant i : playersAlive) {
                 i.addCurrentScore(SURVIVAL_POINTS);
@@ -588,6 +577,7 @@ public class DiscoFever extends PartyGame {
             // other things later
         }
     }
+
 
     /**
      * Prevent players from throwing items.
@@ -610,6 +600,20 @@ public class DiscoFever extends PartyGame {
             for (int x = 390; x <= 409; x++) {
                 world().getBlockAt(x, y, 402).setType(m);
             }
+        }
+    }
+
+    @EventHandler
+    public void onDisconnect(PlayerQuitEvent e) {
+        Player player = e.getPlayer();
+        if (player.getGameMode() == GameMode.ADVENTURE) {
+            playerClear(player);
+            Participant part = Participant.getParticipant(player);
+            updatePlayersAlive(part);
+            for (Participant i : playersAlive) {
+                i.addCurrentScore(SURVIVAL_POINTS);
+            }
+            updatePlayersAliveScoreboard();
         }
     }
 
