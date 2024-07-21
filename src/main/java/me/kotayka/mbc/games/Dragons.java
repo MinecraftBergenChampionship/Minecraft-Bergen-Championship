@@ -59,11 +59,11 @@ public class Dragons extends Game {
 
     public Dragons() {
         super("Dragons", new String[]{
-                "⑰ Dragons is a survival game where you attempt to survive a barage of dragons.",
-                "⑰ Dragons will gradually spawn and destroy the map (and you).\n\n" +
-                "⑰ Your goal is to survive the void, the dragons, and fall damage!",
-                "⑰ You'll get points for each player you outlive, along with points every time a dragon spawns." +
-                "⑰ Players recieve a bonus for surviving the round.",
+                "⑰ A blast from the past back from the grave!",
+                "⑰ Dragons will spawn and try to destroy the map (and you).\n\n" +
+                "⑰ You can die from the void and fall damage, so watch out!",
+                "⑰ You'll get points for each player you outlive, along with points every time a dragon spawns.\n\n" +
+                "⑰ Players also recieve a bonus for surviving the round.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "⑰ +2 points for each player outlived\n" +
                         "⑰ +1 points for being alive when a new dragon spawns" +
