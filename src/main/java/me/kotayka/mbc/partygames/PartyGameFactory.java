@@ -1,7 +1,7 @@
 package me.kotayka.mbc.partygames;
 
 import me.kotayka.mbc.PartyGame;
-import me.kotayka.mbc.games.Dragons;
+import org.bukkit.Bukkit;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PartyGameFactory {
-    private static List<String> gameNames = Arrays.asList("DiscoFever", "BeepTest");
+    private static List<String> gameNames = Arrays.asList("DiscoFever", "BeepTest", "Dragons");
     private static Map<String, PartyGame> games = new HashMap<>();
 
     public PartyGameFactory() {}
@@ -28,6 +28,9 @@ public class PartyGameFactory {
                     break;
                 case "BeepTest":
                     games.put(name, BeepTest.getInstance());
+                    break;
+                case "Dragons":
+                    games.put(name, Dragons.getInstance());
                     break;
                 default:
                     return null;

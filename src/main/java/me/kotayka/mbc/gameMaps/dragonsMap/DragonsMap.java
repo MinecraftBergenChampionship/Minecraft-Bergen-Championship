@@ -1,7 +1,7 @@
 package me.kotayka.mbc.gameMaps.dragonsMap;
 
 import me.kotayka.mbc.gameMaps.MBCMap;
-import me.kotayka.mbc.games.Dragons;
+import me.kotayka.mbc.partygames.Dragons;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 

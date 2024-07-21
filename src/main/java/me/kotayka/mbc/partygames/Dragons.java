@@ -1,22 +1,16 @@
-package me.kotayka.mbc.games;
+package me.kotayka.mbc.partygames;
 
 import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.dragonsMap.ConchStreet;
 import me.kotayka.mbc.gameMaps.dragonsMap.DragonsMap;
-import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
-import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEnderDragon;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
-import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -26,15 +20,13 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class Dragons extends Game {
+public class Dragons extends PartyGame {
 
     public DragonsMap map;
 
@@ -47,7 +39,6 @@ public class Dragons extends Game {
 
     private static final double DRAGON_MAX_SPEED = 0.6;
     private static final double REACH_DISTANCE = 1.0;
-    private List<MBCTeam> fullyAliveTeams = getValidTeams();
 
     public List<EnderDragon> enderDragons = new ArrayList<>();
     public HashMap<EnderDragon, Location> targetLocations = new HashMap<>();
@@ -57,7 +48,14 @@ public class Dragons extends Game {
 
     private final int SURVIVAL_POINTS = 2;
 
-    public Dragons() {
+    public static PartyGame getInstance() {
+        if (instance == null) {
+            instance = new Dragons();
+        }
+        return instance;
+    }
+
+    private Dragons() {
         super("Dragons", new String[]{
                 "⑰ Dragons is a survival game where you attempt to survive a barage of dragons.",
                 "⑰ Dragons will gradually spawn and destroy the map (and you).\n\n" +
@@ -77,17 +75,13 @@ public class Dragons extends Game {
     public void start() {
         super.start();
 
-        setGameState(GameState.TUTORIAL);
-
-        setTimer(30);
 
         teamsAlive.addAll(getValidTeams());
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
-            if (playersAlive.size() == 0) {
+            if (playersAlive.isEmpty()) {
                 return;
             }
-
 //            if (enderDragon != null && playerWhoBrokeBlock != null) {
 //                enderDragon.setTarget(playerWhoBrokeBlock);
 //                enderDragon.setPhase(EnderDragon.Phase.CHARGE_PLAYER);
@@ -161,6 +155,14 @@ public class Dragons extends Game {
             }
         }, 20, 1);
 
+        setGameState(GameState.TUTORIAL);
+
+        setTimer(30);
+    }
+
+    @Override
+    public void endEvents() {
+
     }
 
     @Override
@@ -213,10 +215,6 @@ public class Dragons extends Game {
 
         for (Participant p1 : playersAlive) {
             p1.addCurrentScore(SURVIVAL_POINTS);
-        }
-
-        if (fullyAliveTeams.size() > 1) {
-            fullyAliveTeams.remove(p.getTeam());
         }
     }
 
