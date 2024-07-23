@@ -244,7 +244,7 @@ public class BeepTest extends PartyGame {
                             timeForLevel = 25;
                             CURRENT_POINTS = EXTREME_POINTS;
                         }
-                        if (rounds % 4 == 1 && rounds > 1) {
+                        if (rounds % 4 == 3) {
                             for (Participant p : playersAlive) {
                                 p.getPlayer().sendMessage(ChatColor.GREEN + "You've moved onto the next stage!");
                                 p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
@@ -405,8 +405,8 @@ public class BeepTest extends PartyGame {
                 completedPlayers.add(p);
                 long currentTime = System.currentTimeMillis() - roundTime;
                 String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
-                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
-                logger.log(p.getFormattedName() + " completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
+                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + " seconds!");
+                logger.log(p.getFormattedName() + " completed " + currentLevel.getName().trim() + " in " + formattedTime + "seconds!");
                 if (completedPlayers.size() == 1) {
                     Bukkit.broadcastMessage(p.getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
                 }
@@ -416,9 +416,9 @@ public class BeepTest extends PartyGame {
             if (e.getTo().getZ() > OPPOSITE_Z) {
                 long currentTime = System.currentTimeMillis() - roundTime;
                 String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
-                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
-                logger.log(p.getFormattedName() + " completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
-                if (completedPlayers.size() == 0) {
+                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + " seconds!");
+                logger.log(p.getFormattedName() + " completed " + currentLevel.getName().trim() + " in " + formattedTime + " seconds!");
+                if (completedPlayers.isEmpty()) {
                     Bukkit.broadcastMessage(p.getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
                 }
                 completedPlayers.add(p);

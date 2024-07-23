@@ -28,6 +28,7 @@ public class Plugin extends JavaPlugin implements Listener {
         }
         Bukkit.getLogger().info("MBC enabled");
         Bukkit.broadcastMessage("Enable stat logging with /statlogs set true");
+        Bukkit.broadcastMessage("If this is after a reset, do /gamenum now!");
 
         getServer().getPluginManager().registerEvents(MBC.getInstance(), this);
         getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, this);

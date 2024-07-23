@@ -206,7 +206,6 @@ public abstract class PartyGame extends Game {
             p.getPlayer().setInvulnerable(false);
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
-            p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().setExp(0);

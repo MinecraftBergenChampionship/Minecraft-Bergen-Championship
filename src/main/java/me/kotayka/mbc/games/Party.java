@@ -195,11 +195,6 @@ public class Party extends Game {
         }
     }
 
-    public void addIndividual() {
-        for (Participant p : MBC.getInstance().getPlayers()) {
-        }
-    }
-
     public int getGameNum() {
         return gameNum;
     }

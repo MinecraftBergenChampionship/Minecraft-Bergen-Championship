@@ -19,7 +19,9 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
@@ -235,6 +237,7 @@ public class Dragons extends PartyGame {
     public void loadPlayers() {
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getInventory().clear();
+            p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
             p.getPlayer().teleport(map.SPAWN);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 255, false, false));
             playersAlive.add(p);
@@ -294,14 +297,16 @@ public class Dragons extends PartyGame {
             case STARTING:
                 startingCountdown();
                 if (timeRemaining == 0) {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS,1,1); // temp?
-                    }
                     for (Participant p : MBC.getInstance().getPlayers()) {
+                        p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS,1,1);
+                        p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                         ItemStack i = new ItemStack(Material.IRON_AXE);
-                        i.getItemMeta().setUnbreakable(true);
+                        ItemMeta meta = i.getItemMeta();
+                        meta.setUnbreakable(true);
+                        i.setItemMeta(meta);
                         p.getInventory().addItem(i);
                     }
+                    Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "DRAGONS ARE INVADING MBC!!! RUN!!!");
                     setGameState(GameState.ACTIVE);
                     setTimer(300);
                 }
@@ -443,6 +448,18 @@ public class Dragons extends PartyGame {
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 event.setDamage(event.getDamage() * 0.75);
             }
+        }
+    }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent e) {
+        Participant p = Participant.getParticipant(e.getPlayer());
+        updatePlayersAlive(p);
+        Bukkit.broadcastMessage(p.getFormattedName() + " has disconnected!");
+        logger.log(p.getPlayerName() + " disconnected!");
+
+        for (Participant x : playersAlive) {
+            x.addCurrentScore(SURVIVAL_POINTS);
         }
     }
 
