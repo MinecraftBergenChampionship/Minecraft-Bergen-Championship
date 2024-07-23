@@ -173,7 +173,7 @@ public class Quickfire extends FinaleGame {
     public void startRound() {
         Barriers(true);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
-            createLine(21, ChatColor.RESET.toString(), p);
+            resetLine(p, 21);
             p.getInventory().clear();
             p.getPlayer().setInvulnerable(false);
             if (p.getTeam().equals(firstPlace)) {
@@ -321,6 +321,7 @@ public class Quickfire extends FinaleGame {
             p.board.getTeam(firstPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
             p.board.getTeam(secondPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
             p.getPlayer().setMaxHealth(20);
+            p.getPlayer().setHealth(20);
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);

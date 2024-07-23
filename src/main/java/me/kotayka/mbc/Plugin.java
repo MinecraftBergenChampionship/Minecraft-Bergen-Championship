@@ -83,17 +83,20 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("partygame").setExecutor(pg);
         getCommand("partygame").setTabCompleter(pg);
 
-        getCommand("nick").setExecutor(new nick());
 
         // prevent crafting wooden axes (worldedit)
         Iterator<Recipe> it = getServer().recipeIterator();
         Recipe recipe;
         while (it.hasNext()) {
             recipe = it.next();
-            if (recipe != null && recipe.getResult().getType() == Material.WOODEN_AXE)
+            if (recipe == null) continue;
+            if (recipe.getResult().getType() == Material.WOODEN_AXE) {
                 it.remove();
-            if (recipe != null && recipe.getResult().getType() == Material.SNOW_BLOCK)
+            } else if (recipe.getResult().getType() == Material.SNOW_BLOCK) {
                 it.remove();
+            } else if (recipe.getResult().getType() == Material.SHIELD) {
+                it.remove();
+            }
         }
     }
 

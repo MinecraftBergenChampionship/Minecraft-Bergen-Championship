@@ -157,10 +157,6 @@ public abstract class PartyGame extends Game {
         checkLastTeam(p.getTeam());
         updatePlayersAliveScoreboard();
 
-        if (this instanceof Dragons && teamsAlive.size() == 1) {
-            endEvents();
-            return;
-        }
         if (playersAlive.isEmpty()) {
             endEvents();
         }

@@ -18,6 +18,8 @@ public class nick implements CommandExecutor {
             return false;
         }
 
+        sender.sendMessage("Please note this command currently does not work and I don't have time to fix it right now. :p");
+
         if (args.length != 3) {
             sender.sendMessage("Usage: /nick <nickname> <player>");
             return false;

@@ -6,7 +6,6 @@ import me.kotayka.mbc.gameMaps.dragonsMap.DragonsMap;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
-import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -54,6 +53,7 @@ public class Dragons extends PartyGame {
     private final int SURVIVAL_POINTS = 2; // points given to all surviving players when a player dies
     private final int WIN_POINTS = 5; // points given to every player who survives 5 minutes
     private final int SPAWN_POINTS = 1; // points given to every living player when a dragon spawns
+    private int remaining_spawns = 7;
 
     public static PartyGame getInstance() {
         if (instance == null) {
@@ -212,6 +212,10 @@ public class Dragons extends PartyGame {
             p.getPlayer().stopSound(Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS);
         }
 
+        for (Participant p : playersAlive) {
+            p.addCurrentScore(remaining_spawns);
+        }
+
         logger.logStats();
 
         if (MBC.getInstance().party == null) {
@@ -324,6 +328,7 @@ public class Dragons extends PartyGame {
                     || (timeRemaining < 75 && enderDragons.size() == 5)
                     || (timeRemaining < 30 && enderDragons.size() == 6)) {
 
+                    remaining_spawns--;
                     EnderDragon enderDragon = (EnderDragon) map.getWorld().spawnEntity(map.DRAGON_SPAWN, EntityType.ENDER_DRAGON);
 
                     Bukkit.broadcastMessage(ChatColor.GOLD+"" + ChatColor.BOLD + "Ender Dragon Spawning!");
@@ -379,6 +384,17 @@ public class Dragons extends PartyGame {
         }
     }
 
+    @Override
+    public void updatePlayersAlive(Participant p) {
+        playersAlive.remove(p);
+        checkLastTeam(p.getTeam());
+        updatePlayersAliveScoreboard();
+
+        if (teamsAlive.size() == 1) {
+            endEvents();
+        }
+    }
+
     @EventHandler
     public void onDrop(PlayerDropItemEvent e) {
         e.setCancelled(true);
@@ -407,7 +423,7 @@ public class Dragons extends PartyGame {
         if (event.getDamager() instanceof EnderDragon && event.getEntity() instanceof Player) {
             event.setDamage(0);
 
-            double knockbackFactor = 1;
+            double knockbackFactor = 1.2;
             Player player = (Player) event.getEntity();
             Vector knockbackDirection = player.getLocation().clone().toVector().subtract(event.getDamager().getLocation().toVector()).normalize();
             knockbackDirection.setY(Math.abs(knockbackDirection.getY()));
@@ -446,7 +462,7 @@ public class Dragons extends PartyGame {
     public void onFallDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-                event.setDamage(event.getDamage() * 0.75);
+                event.setDamage(event.getDamage() * 0.9);
             }
         }
     }
