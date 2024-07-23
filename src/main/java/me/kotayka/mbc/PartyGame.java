@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.kotayka.mbc.games.Party;
-import me.kotayka.mbc.partygames.BeepTest;
 import me.kotayka.mbc.partygames.Dragons;
 import org.bukkit.*;
 import org.bukkit.entity.Player;

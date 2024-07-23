@@ -209,6 +209,7 @@ public class Quickfire extends FinaleGame {
 
         timeElapsed = 0;
         Bukkit.broadcastMessage("\n"+winner.teamNameFormat() + " have won the round!\n");
+        logger.log(winner.getTeamName() + " have won the round!\n");
         createScoreboard();
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.stopSound(Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS);
@@ -238,8 +239,12 @@ public class Quickfire extends FinaleGame {
         if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
             Participant shot = Participant.getParticipant((Player) e.getHitEntity());
             Participant damager = Participant.getParticipant((Player) arrow.getShooter());
+
+            if (damager.getTeam().equals(shot.getTeam())) return;
+
             QuickfirePlayer damagerPlayer = getQuickfirePlayer(damager.getPlayer());
             QuickfirePlayer shotPlayer = getQuickfirePlayer(shot.getPlayer());
+
             damager.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(shot.getFormattedName() + " - " + ChatColor.RED + ((int)(shot.getPlayer().getHealth()-2))/2+ " ♥"));
             damager.getPlayer().playSound(damager.getPlayer(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
             damagerPlayer.incrementDamageDealt();
@@ -253,6 +258,7 @@ public class Quickfire extends FinaleGame {
                 shot.getPlayer().damage(2);
                 shot.getPlayer().setVelocity(new Vector(arrow.getVelocity().getX()*0.15, 0.3, arrow.getVelocity().getZ()*0.15));
                 arrow.remove();
+                logger.log(shotPlayer.getPlayer().getName() + " was shot by " + damager.getPlayerName());
             }
         }
     }
@@ -262,6 +268,7 @@ public class Quickfire extends FinaleGame {
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
         killer.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(victim.getFormattedName() + " - " + ChatColor.RED + "0 ♥"));
         Bukkit.broadcastMessage(victim.getFormattedName() + " was shot by " + killer.getFormattedName());
+        logger.log(victim.getPlayerName() + " was shot by " + killer.getPlayerName());
 
         if (victim.getTeam().equals(firstPlace)) {
             if (playersAlive[0] != 1) {
@@ -286,6 +293,7 @@ public class Quickfire extends FinaleGame {
 
     private void endGame(MBCTeam t) {
         Bukkit.broadcastMessage("\n" + t.teamNameFormat() + " win MBC!\n");
+        logger.log(t.getTeamName() + " win MBC!\n");
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.removePotionEffect(PotionEffectType.GLOWING);
             createScoreboard();
@@ -294,9 +302,12 @@ public class Quickfire extends FinaleGame {
             p.playSound(p, Sound.ENTITY_ENDER_DRAGON_DEATH, 1, 1);
             p.setInvulnerable(true);
         }
+
         for (Participant p : t.teamPlayers) {
             p.winner = true;
         }
+        logger.logStats();
+
         setGameState(GameState.END_GAME);
         createLineAll(21, ChatColor.RED.toString()+ChatColor.BOLD+"Back to lobby:");
         setTimer(13);
