@@ -38,8 +38,8 @@ public class DecisionDome extends Minigame {
 
     private List<MBCTeam> powerupTeams = new ArrayList<>();
     private final Map<VotePowerup, Integer> weights = Map.ofEntries(
-            entry(VotePowerup.DUNK, 2), entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.EGGSTRA_VOTES, 2), entry(VotePowerup.CROSSBOWS, 2),
-            entry(VotePowerup.CHICKEN_SWAP, 1)
+            entry(VotePowerup.DUNK, 5), entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.EGGSTRA_VOTES, 2), entry(VotePowerup.CROSSBOWS, 2),
+            entry(VotePowerup.CHICKEN_SWAP, 5)
     );
     private Participant mega_cow_shooter = null;
     private Player dunker = null;
@@ -627,7 +627,7 @@ public class DecisionDome extends Minigame {
         }
     }
 
-    public void setSectionGreen(Section s) {
+    private void setSectionGreen(Section s) {
         for (Location l : s.sectionLocs) {
             l.getBlock().setType(Material.LIME_GLAZED_TERRACOTTA);
         }

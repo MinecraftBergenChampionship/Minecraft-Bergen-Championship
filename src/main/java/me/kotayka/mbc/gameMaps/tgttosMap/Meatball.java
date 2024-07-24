@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Meatball extends TGTTOSMap {
     public Meatball() {
-        super("Meatball", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.SHEARS), new ItemStack(Material.LEATHER_BOOTS)});
+        super("Meatball", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.SHEARS), new ItemStack(Material.FEATHER), new ItemStack(Material.LEATHER_BOOTS)});
         super.loadMap(
                 new Location(getWorld(), -100, 70, 100),
                 new Location[]{new Location(getWorld(), -105, 144, 104), new Location(getWorld(), -107, 144, 102)},

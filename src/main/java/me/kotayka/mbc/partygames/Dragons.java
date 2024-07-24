@@ -48,6 +48,7 @@ public class Dragons extends PartyGame {
     public HashMap<EnderDragon, Boolean> resetting = new HashMap<>();
     public HashMap<EnderDragon, Double> yLocations = new HashMap<>();
     private Random random = new Random();
+    private int dragonsTaskID = -1;
 
     // SCORING
     private final int SURVIVAL_POINTS = 2; // points given to all surviving players when a player dies
@@ -88,7 +89,7 @@ public class Dragons extends PartyGame {
             p.getPlayer().setInvulnerable(false);
         }
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
+        dragonsTaskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
             if (playersAlive.isEmpty()) {
                 return;
             }
@@ -317,6 +318,9 @@ public class Dragons extends PartyGame {
                 break;
             case ACTIVE:
                 if (timeRemaining == 0) {
+                    if (dragonsTaskID != -1) {
+                        Bukkit.getScheduler().cancelTask(dragonsTaskID);
+                    }
                     endEvents();
                     return;
                 }
@@ -410,7 +414,7 @@ public class Dragons extends PartyGame {
 
     @Override
     public void createScoreboard(Participant p) {
-        createLine(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party! (" + name()) + ")", p);
+        createLine(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party (" + name()) + ")", p);
         createLine(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET), p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
