@@ -16,6 +16,8 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
+import static java.util.Map.entry;
+
 /**
  * DecisionDome is the representation of the Voting Phase of the tournament.
  * Chickens randomly walk into different quadrants, and the quadrant with the most chickens wins.
@@ -33,11 +35,18 @@ public class DecisionDome extends Minigame {
     public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑭ Ace Race", "⑬ Survival Games", "⑫ Skybattle", "⑯ Spleef", "⑮ Build Mart", "⑰ Party"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
+
     private List<MBCTeam> powerupTeams = new ArrayList<>();
+    private final Map<VotePowerup, Integer> weights = Map.ofEntries(
+            entry(VotePowerup.DUNK, 2), entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.EGGSTRA_VOTES, 2), entry(VotePowerup.CROSSBOWS, 2),
+            entry(VotePowerup.CHICKEN_SWAP, 1)
+    );
     private Participant mega_cow_shooter = null;
     private Player dunker = null;
+    private Player swapper = null;
     private ChatColor dunked_team = null;
     private Location[] dunked_corners = new Location[2];
+
     private final int[][] coordsForBorder = {
             {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}, {0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7},
             {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}, {-1, 0}, {-2, 0}, {-3, 0}, {-4, 0}, {-5, 0}, {-6, 0}, {-7, 0},
@@ -77,6 +86,7 @@ public class DecisionDome extends Minigame {
         // Powerups
         if (!powerupTeams.isEmpty()) powerupTeams.clear();
         if (dunker != null) dunker = null;
+        if (swapper != null) swapper = null;
         if (mega_cow_shooter != null) mega_cow_shooter = null;
 
         // Deal with players
@@ -214,6 +224,8 @@ public class DecisionDome extends Minigame {
                 case 9 -> {
                     for (Participant p : MBC.getInstance().getPlayers()) p.getPlayer().getInventory().clear();
                     raiseWalls(true);
+                }
+                case 8 -> {
                     Bukkit.broadcastMessage(ChatColor.GREEN + "Counting votes...");
                     createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Chosen game revealed: ");
                     winner = countVotes();
@@ -256,6 +268,7 @@ public class DecisionDome extends Minigame {
                     }
                     Bukkit.broadcastMessage(ChatColor.BOLD + winner.game + "!");
                     createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Warping to game: ");
+                    setSectionGreen(winner);
                     if (!revealedGames) revealedGames = true;
                     setGameState(GameState.END_GAME);
                     HandlerList.unregisterAll(this);
@@ -325,15 +338,25 @@ public class DecisionDome extends Minigame {
             p.getPlayer().sendTitle(p.getTeam().getChatColor() + "" + ChatColor.BOLD + "Vote!", "", 20, 60, 20);
         }
 
-        List<VotePowerup> powerups = new ArrayList<>();
-        powerups.add(VotePowerup.CROSSBOWS);
-        powerups.add(VotePowerup.MEGA_COW);
-        powerups.add(VotePowerup.DUNK);
-        powerups.add(VotePowerup.EGGSTRA_VOTES);
         if (powerupTeams == null || powerupTeams.isEmpty()) return;
+
+        // add powerups by weight amount, then add to set to ensure only one is chosen
+        List<VotePowerup> powerups = new ArrayList<>();
+        for (Map.Entry<VotePowerup, Integer> entry : weights.entrySet()) {
+            for (int i = 0; i < entry.getValue(); i++) {
+                powerups.add(entry.getKey());
+            }
+        }
+
+        Collections.shuffle(powerups);
+        Set<VotePowerup> pool = new HashSet<>();
+        for (int i = 0; i < powerups.size(); i++) {
+            pool.add(powerups.remove(0));
+        }
+
         for (MBCTeam t : powerupTeams) {
             // Randomly get powerup
-            VotePowerup powerup = powerups.get((int) (Math.random()*powerups.size()));
+            VotePowerup powerup = powerups.remove(0);
             // whole team powerups
             if (powerup == VotePowerup.CROSSBOWS || powerup == VotePowerup.EGGSTRA_VOTES) {
                 for (Participant p : t.getPlayers()) {
@@ -378,6 +401,11 @@ public class DecisionDome extends Minigame {
                         i.addUnsafeEnchantment(Enchantment.LUCK, 5);
                     }
                 }
+            }
+            case CHICKEN_SWAP -> {
+                swapper = p.getPlayer();
+                p.getPlayer().getInventory().addItem(new ItemStack(Material.BOW, 1));
+                p.getPlayer().getInventory().addItem(new ItemStack(Material.TIPPED_ARROW, 1));
             }
         }
     }
@@ -490,8 +518,13 @@ public class DecisionDome extends Minigame {
     public Section countVotes() {
         // count votes
         int currentMax = 0;
+
+        if (swapper != null) {
+            chickens.add(new VoteChicken(Participant.getParticipant(swapper).getTeam(), swapper.getLocation()));
+        }
+
         for (VoteChicken chicken : chickens) {
-            Location chickenLoc = chicken.getMob().getLocation();
+            Location chickenLoc = chicken.getLocation();
             Location matLoc = new Location(world, chickenLoc.getBlockX(), chickenLoc.getBlockY()-2, chickenLoc.getBlockZ());
             Location secLoc = new Location(world, chickenLoc.getBlockX(), chickenLoc.getBlockY()-1, chickenLoc.getBlockZ());
 
@@ -594,6 +627,12 @@ public class DecisionDome extends Minigame {
         }
     }
 
+    public void setSectionGreen(Section s) {
+        for (Location l : s.sectionLocs) {
+            l.getBlock().setType(Material.LIME_GLAZED_TERRACOTTA);
+        }
+    }
+
     public void setSectionsRed() {
         if (!sections.isEmpty()) {
             for (Section s : sections.values()) {
@@ -660,6 +699,15 @@ public class DecisionDome extends Minigame {
         } else if (e.getEntity().getType().equals(EntityType.ARROW)) {
             if (!(e.getEntity().getShooter() instanceof Player) || e.getEntity().getShooter() == null) return;
             if (e.getHitEntity() != null) {
+                Participant shooter = Participant.getParticipant((Player) e.getEntity().getShooter());
+                if (swapper != null && swapper.getUniqueId() == shooter.getPlayer().getUniqueId() && !(e.getHitEntity() instanceof Player)) {
+                    Location shooterLoc = shooter.getPlayer().getLocation();
+                    Location chickenLoc = e.getHitEntity().getLocation();
+                    e.getHitEntity().teleport(shooterLoc);
+                    shooter.getPlayer().teleport(chickenLoc);
+                    Bukkit.broadcastMessage(shooter.getFormattedName() + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + " swapped places with a chicken!");
+                }
+                // shootVotes also handles if a player is hit by dunk
                 shootVotes(e.getHitEntity(), (Player) e.getEntity().getShooter());
                 e.getEntity().remove();
                 return;
@@ -973,6 +1021,7 @@ class VoteChicken {
     public MBCTeam team;
     public Chicken chicken;
     public Cow cow;
+    public Location loc;
 
     public VoteChicken(MBCTeam team, Chicken chicken) {
         this.team = team;
@@ -986,11 +1035,20 @@ class VoteChicken {
         this.chicken = null;
     }
 
-    public Entity getMob() {
-        if (chicken != null) {
-            return chicken;
+    public VoteChicken(MBCTeam team, Location loc) {
+        this.cow = null;
+        this.chicken = null;
+        this.team = team;
+        this.loc = loc;
+    }
+
+    public Location getLocation() {
+        if (this.loc != null) {
+            return loc;
+        } else if (chicken != null){
+            return chicken.getLocation();
         } else {
-            return cow;
+            return cow.getLocation();
         }
     }
 }
