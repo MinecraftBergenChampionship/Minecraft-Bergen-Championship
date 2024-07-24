@@ -71,7 +71,7 @@ public class Dragons extends PartyGame {
                 "⑰ Players also recieve a bonus for surviving the round.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "⑰ +2 points for each player outlived\n" +
-                        "⑰ +1 points for being alive when a new dragon spawns" +
+                        "⑰ +1 points for being alive when a new dragon spawns\n" +
                         "⑰ +5 points for surviving until the end of the round"});
 
         map = new ConchStreet(this);
