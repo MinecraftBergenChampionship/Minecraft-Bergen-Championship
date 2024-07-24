@@ -241,12 +241,12 @@ public class Dragons extends PartyGame {
     public void loadPlayers() {
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getInventory().clear();
-            p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
             p.getPlayer().teleport(map.SPAWN);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 255, false, false));
             playersAlive.add(p);
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             canJump.put(p.getPlayer().getUniqueId(), true);
+            p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
 
             ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
             ItemStack chestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
@@ -390,8 +390,8 @@ public class Dragons extends PartyGame {
         checkLastTeam(p.getTeam());
         updatePlayersAliveScoreboard();
 
-        if (teamsAlive.size() == 1) {
-            endEvents();
+        if (teamsAlive.size() <= 1) {
+            timeRemaining = 1;
         }
     }
 
@@ -423,7 +423,7 @@ public class Dragons extends PartyGame {
         if (event.getDamager() instanceof EnderDragon && event.getEntity() instanceof Player) {
             event.setDamage(0);
 
-            double knockbackFactor = 1.2;
+            double knockbackFactor = 1.15;
             Player player = (Player) event.getEntity();
             Vector knockbackDirection = player.getLocation().clone().toVector().subtract(event.getDamager().getLocation().toVector()).normalize();
             knockbackDirection.setY(Math.abs(knockbackDirection.getY()));
@@ -433,11 +433,10 @@ public class Dragons extends PartyGame {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-
         Player p = e.getPlayer();
 
         if (p.getLocation().getY() < map.DEATH_Y) {
-            if (p.getGameMode() != GameMode.ADVENTURE) {
+            if (p.getGameMode() != GameMode.ADVENTURE || getState() != GameState.ACTIVE) {
                 p.teleport(map.SPAWN);
             } else {
                 handleDeath(p, false);

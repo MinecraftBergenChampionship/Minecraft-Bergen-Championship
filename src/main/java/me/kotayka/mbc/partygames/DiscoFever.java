@@ -327,18 +327,24 @@ public class DiscoFever extends PartyGame {
 
             // update BossBar
             // TODO can possibly be improved
-            // note but would the bossbar be able to refill in the 2 seconds where each player is standing on the blocks
-            // yeah ill work on that when everything else is done
             new BukkitRunnable() {
                 double tmp = delay;
                 @Override
                 public void run() {
                     if (tmp < 0) {
                         cancel();
-                        return;
+                        bossBar.setColor(BarColor.GREEN);
+                        bossBar.setTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "TIME");
+                        refillBar();
+                    } else {
+                        // these next two lines should go whenever it switches from red to green;
+                        // tried under bossBar = Bukkit.create() ... but didn't work in my limited testing.
+                        // this works fine, but is more computationally expensive, although I'm not sure if it is significant
+                        bossBar.setColor(BarColor.RED);
+                        bossBar.setTitle(ChatColor.RED + "" + ChatColor.BOLD + "TIME");
+                        bossBar.setProgress(tmp / delay);
+                        tmp--;
                     }
-                    bossBar.setProgress(tmp / delay);
-                    tmp--;
                 }
             }.runTaskTimer(MBC.getInstance().getPlugin(), 0, 1);
 
@@ -396,6 +402,21 @@ public class DiscoFever extends PartyGame {
             };
             removeFloor.runTaskLater(MBC.getInstance().getPlugin(), delay);
         }, 0, delay+40);
+    }
+
+    private void refillBar() {
+        new BukkitRunnable() {
+            int tmp = 0;
+            @Override
+            public void run() {
+                tmp++;
+                if ((tmp / 40.0) == 1) {
+                    cancel();
+                    return;
+                }
+                bossBar.setProgress(tmp / 40.0);
+            }
+        }.runTaskTimer(MBC.getInstance().getPlugin(), 0, 1);
     }
 
     /**

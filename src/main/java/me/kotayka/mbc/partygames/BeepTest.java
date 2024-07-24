@@ -213,6 +213,8 @@ public class BeepTest extends PartyGame {
                         newGround();
                         nextRound();
                         removeHealth();
+                        stagePoints();
+                        roundDisplay();
 
                         // for any players that are in the course but completed the level (??)
                         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -225,8 +227,6 @@ public class BeepTest extends PartyGame {
                             }
                         }
 
-                        stagePoints();
-                        roundDisplay();
                         fallenPlayers.clear();
                         completedPlayers.clear();
                         roundTime = System.currentTimeMillis();
@@ -244,7 +244,7 @@ public class BeepTest extends PartyGame {
                             timeForLevel = 25;
                             CURRENT_POINTS = EXTREME_POINTS;
                         }
-                        if (rounds % 4 == 3) {
+                        if (rounds % 4 == 0 && rounds != 0) {
                             for (Participant p : playersAlive) {
                                 p.getPlayer().sendMessage(ChatColor.GREEN + "You've moved onto the next stage!");
                                 p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
@@ -312,13 +312,12 @@ public class BeepTest extends PartyGame {
             }
 
             fallenPlayers.add(par);
+            p.setVelocity(new Vector(0, 0, 0));
             if (completedPlayers.contains(par) && !oppositeSide && p.getZ() <= REGULAR_Z) {
-                p.setVelocity(new Vector(0, 0, 0));
-                p.teleport(OPPOSITE_SPAWN);
+                p.teleport(new Location(Bukkit.getWorld("Party"), -522, -55, -458, 0, 0));
             }
             if (completedPlayers.contains(par) && oppositeSide && p.getZ() >= OPPOSITE_Z) {
-                p.setVelocity(new Vector(0, 0, 0));
-                p.teleport(SPAWN);
+                p.teleport(new Location(Bukkit.getWorld("Party"), -522, -55, -490, 180, 0));
             }
             p.sendMessage(ChatColor.RED + "You fell!");
             for (Player other : Bukkit.getOnlinePlayers()) {
