@@ -79,6 +79,11 @@ public class Quickfire extends FinaleGame {
                 "No points are awarded for this game.\n" + ChatColor.YELLOW + "The winning team will win the Minecraft Bruh Championship!\n"
         });
 
+        if (logger == null) {
+            initLogger();
+            //Bukkit.broadcastMessage("logger bad :(");
+        }
+
         ItemMeta bowMeta = CROSSBOW.getItemMeta();
         bowMeta.setUnbreakable(true);
         CROSSBOW.setItemMeta(bowMeta);
@@ -97,6 +102,13 @@ public class Quickfire extends FinaleGame {
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
         changeColor();
         loadPlayers();
+
+        if (logger == null) {
+            Bukkit.broadcastMessage("logger bad :( elsewhere wtf");
+            initLogger();
+        }
+
+
         setGameState(GameState.TUTORIAL);
         setTimer(53);
     }
@@ -400,6 +412,12 @@ public class Quickfire extends FinaleGame {
             world.getBlockAt(-20, y, -4).setType(m);
 
             world.getBlockAt(-21, y, -3).setType(m);
+
+            world.getBlockAt(-21, y, 3).setType(m);
+            world.getBlockAt(-21, y, -2).setType(m);
+            world.getBlockAt(21, y, -2).setType(m);
+            world.getBlockAt(21, y, -3).setType(m);
+
             world.getBlockAt(-17, y, -3).setType(m);
 
             world.getBlockAt(-16, y, -2).setType(m);

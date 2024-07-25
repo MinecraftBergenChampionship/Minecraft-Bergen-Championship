@@ -38,7 +38,7 @@ public class DecisionDome extends Minigame {
 
     private List<MBCTeam> powerupTeams = new ArrayList<>();
     private final Map<VotePowerup, Integer> weights = Map.ofEntries(
-            entry(VotePowerup.DUNK, 5), entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.EGGSTRA_VOTES, 2), entry(VotePowerup.CROSSBOWS, 2),
+            entry(VotePowerup.DUNK, 5), //entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.EGGSTRA_VOTES, 2), entry(VotePowerup.CROSSBOWS, 2),
             entry(VotePowerup.CHICKEN_SWAP, 5)
     );
     private Participant mega_cow_shooter = null;
@@ -79,9 +79,6 @@ public class DecisionDome extends Minigame {
         tie = false;
         doubled = true;
         winner = null;
-        if (dunked_team != null) {
-            dunked_team = null;
-        }
 
         // Powerups
         if (!powerupTeams.isEmpty()) powerupTeams.clear();
@@ -306,12 +303,12 @@ public class DecisionDome extends Minigame {
     public void createScoreboard(Participant p) {
         newObjective(p);
         createLine(21, ChatColor.RED + "" + ChatColor.BOLD + "Voting begins in:", p);
-        createLine(19, ChatColor.RESET.toString(), p);
+        createLine(19, " ", p);
         createLine(18, ChatColor.GREEN + "" + ChatColor.BOLD + "Your Team:", p);
         createLine(17, p.getTeam().getChatColor() + p.getTeam().teamNameFormat(), p);
         createLine(16, ChatColor.RESET.toString(), p);
-        createLine(15, ChatColor.AQUA + "" + ChatColor.RED + "Games Played: " + MBC.getInstance().gameNum + "/6", p);
-        createLine(14, String.format("%s%sPoint Multiplier: %.1f", ChatColor.RED, ChatColor.BOLD, MBC.getInstance().multiplier), p);
+        createLine(15, "Games Played: " + ChatColor.AQUA + MBC.getInstance().gameNum + "/6", p);
+        createLine(14, String.format("Point Multiplier: %s%.1f", ChatColor.YELLOW, MBC.getInstance().multiplier), p);
 
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         updatePlayerTotalScoreDisplay(p);
@@ -521,6 +518,8 @@ public class DecisionDome extends Minigame {
 
         if (swapper != null) {
             chickens.add(new VoteChicken(Participant.getParticipant(swapper).getTeam(), swapper.getLocation()));
+            chickens.add(new VoteChicken(Participant.getParticipant(swapper).getTeam(), swapper.getLocation()));
+            chickens.add(new VoteChicken(Participant.getParticipant(swapper).getTeam(), swapper.getLocation()));
         }
 
         for (VoteChicken chicken : chickens) {
@@ -705,10 +704,11 @@ public class DecisionDome extends Minigame {
                     Location chickenLoc = e.getHitEntity().getLocation();
                     e.getHitEntity().teleport(shooterLoc);
                     shooter.getPlayer().teleport(chickenLoc);
-                    Bukkit.broadcastMessage(shooter.getFormattedName() + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + " swapped places with a chicken!");
+                    Bukkit.broadcastMessage(shooter.getFormattedName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " swapped places with a chicken!");
+                } else {
+                    // shootVotes also handles if a player is hit by dunk
+                    shootVotes(e.getHitEntity(), (Player) e.getEntity().getShooter());
                 }
-                // shootVotes also handles if a player is hit by dunk
-                shootVotes(e.getHitEntity(), (Player) e.getEntity().getShooter());
                 e.getEntity().remove();
                 return;
             }
@@ -816,6 +816,7 @@ public class DecisionDome extends Minigame {
         }
     }
     private void replaceTube(Location topCorner, Location bottomCorner) {
+        Bukkit.broadcastMessage(" ");
         int copyFromX = 68;
         int copyFromY = -24;
         int copyFromZ = -3;
@@ -834,6 +835,7 @@ public class DecisionDome extends Minigame {
             copyFromX++;
             copyFromY = -24;
         }
+        Bukkit.broadcastMessage(" ");
     }
 
 

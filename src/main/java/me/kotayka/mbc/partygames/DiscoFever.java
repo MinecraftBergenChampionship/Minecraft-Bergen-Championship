@@ -626,6 +626,7 @@ public class DiscoFever extends PartyGame {
 
     @EventHandler
     public void onDisconnect(PlayerQuitEvent e) {
+        if (!getState().equals(GameState.ACTIVE)) return;
         Player player = e.getPlayer();
         if (player.getGameMode() == GameMode.ADVENTURE) {
             playerClear(player);

@@ -121,7 +121,7 @@ public class Dragons extends PartyGame {
                     if (resetting.get(dragon)) {
                         int index = random.nextInt(playersAlive.size());
 
-                        targetLocations.put(dragon, playersAlive.get(index).getPlayer().getLocation().clone().add(new Vector(0, -2, 0)));
+                        targetLocations.put(dragon, playersAlive.get(index).getPlayer().getLocation().clone().add(new Vector(0, -3, 0)));
                         resetting.put(dragon, false);
                     }
                     else {
@@ -360,6 +360,7 @@ public class Dragons extends PartyGame {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK && e.getAction() != Action.RIGHT_CLICK_AIR) return;
+        if (e.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
 
         if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.IRON_AXE ||
             e.getPlayer().getInventory().getItemInOffHand().getType() == Material.IRON_AXE) {
@@ -472,6 +473,7 @@ public class Dragons extends PartyGame {
 
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
+        if (!getState().equals(GameState.ACTIVE)) return;
         Participant p = Participant.getParticipant(e.getPlayer());
         updatePlayersAlive(p);
         Bukkit.broadcastMessage(p.getFormattedName() + " has disconnected!");

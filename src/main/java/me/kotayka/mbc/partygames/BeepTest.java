@@ -324,7 +324,11 @@ public class BeepTest extends PartyGame {
                 other.showPlayer(p);
             }
 
-            logger.log(par.getFormattedName() + " fell on " + currentLevel.getName());
+            if (p.getPlayer().getHealth() <= 2) {
+                logger.log(par.getFormattedName() + " lost their last life on " + currentLevel.getName());
+            } else {
+                logger.log(par.getFormattedName() + " fell on " + currentLevel.getName());
+            }
         }
     }
 
@@ -354,6 +358,7 @@ public class BeepTest extends PartyGame {
         List<Participant> toEliminate = new ArrayList<>();
         for (Participant p : alivePlayers) {
             if (completedPlayers.contains(p) && !fallenPlayers.contains(p)) continue;
+            logger.log(p.getPlayerName() + " didn't complete this level!");
             Player pl = p.getPlayer();
             if (pl.getHealth() <= 2) {
                 toEliminate.add(p);
@@ -390,7 +395,6 @@ public class BeepTest extends PartyGame {
             p.getPlayer().sendTitle(" ", ChatColor.RED + "You died!", 0, 60, 20);
             updatePlayersAlive(p);
             Bukkit.broadcastMessage(p.getFormattedName() + " was eliminated!");
-            logger.log(p.getPlayerName() + " lost their last life on " + currentLevel.getName()+ "!");
             MBC.getInstance().showPlayers(p);
             updatePlayersAliveScoreboard();
         }
@@ -507,6 +511,7 @@ public class BeepTest extends PartyGame {
     }
 
     private boolean inLevel(Player p) {
+        if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) return false;
         return p.getLocation().getZ() > -486 && p.getLocation().getZ() < -462;
     }
 

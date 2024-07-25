@@ -244,9 +244,11 @@ public class BuildMart extends Game {
 
         if (m.toString().endsWith("FAN") || m.toString().endsWith("CORAL")) {
             // TODO: This is a map dependent, temporary fix.
-            // Since there are no break areas corresponding to FAN and CORAL (due to me trying to shortcut),
-            // I cannot place this lower, as it will exit. Since MBC4 is approaching, I am leaving this temporary solution.
-            if (e.getBlock().getY() < 20) return;
+            // not that we'll have more maps anyway
+            if (e.getBlock().getY() < 20) {
+                e.setCancelled(true);
+                return;
+            }
 
             map.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(m));
             e.setCancelled(true);

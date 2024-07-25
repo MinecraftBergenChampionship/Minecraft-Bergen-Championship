@@ -36,8 +36,8 @@ public class TGTTOS extends Game {
     private static final int MAX_ROUNDS = 6;
     private TGTTOSMap map = null;
     private List<TGTTOSMap> maps = new ArrayList<>(
-            Arrays.asList(new Pit(), new Meatball(),//  new Walls(),
-                    new Cliffs(), new Elytra(), // new Skydive(),
+            Arrays.asList(new Pit(), new Meatball(), new Walls(),
+                    new Cliffs(), new Elytra(), new Skydive(),
                     new Boats(), new Glide()
             ));
 
@@ -442,7 +442,8 @@ public class TGTTOS extends Game {
         }
         if (count == p.getTeam().getPlayers().size()) {
             if (!firstTeamBonus) {
-                Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN + "" + ChatColor.BOLD + " was the first full team to finish!");
+                Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN + ChatColor.BOLD + " was the first full team to finish!");
+                logger.log(p.getTeam().teamNameFormat() + ChatColor.GREEN + ChatColor.BOLD + " was the first full team to finish!");
                 for (Participant teammate : p.getTeam().getPlayers()) {
                     teammate.addCurrentScore(FIRST_TEAM_BONUS);
                     teammate.getPlayer().sendMessage(ChatColor.GREEN+"Your team finished first and earned a " + (FIRST_TEAM_BONUS*MBC.getInstance().multiplier*p.getTeam().getPlayers().size()) + " point bonus!");
@@ -450,6 +451,7 @@ public class TGTTOS extends Game {
                 firstTeamBonus = true;
             } else {
                 Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN + "" + ChatColor.BOLD + " was the second full team to finish!");
+                logger.log(p.getTeam().teamNameFormat() + ChatColor.GREEN + ChatColor.BOLD + " was the first full team to finish!");
                 for (Participant teammate : p.getTeam().getPlayers()) {
                     teammate.addCurrentScore(SECOND_TEAM_BONUS);
                     teammate.getPlayer().sendMessage(ChatColor.GREEN+"Your team finished second and earned a " + (SECOND_TEAM_BONUS*MBC.getInstance().multiplier*p.getTeam().getPlayers().size()) + " point bonus!");
@@ -547,11 +549,13 @@ public class TGTTOS extends Game {
         // Check if the interaction is placing a boat or throwing meatball
         if (event.getItem() != null && (event.getItem().getType() == Material.OAK_BOAT || event.getItem().getType() == Material.SNOWBALL) && !getState().equals(GameState.ACTIVE)) {
             event.setCancelled(true);
+            return;
         }
 
         if (!(map instanceof Meatball)) return;
 
         Player player = event.getPlayer();
+        if (player.getGameMode() == GameMode.SPECTATOR) return;
         if (event.getAction().isRightClick() && getState().equals(GameState.ACTIVE) &&
            (player.getInventory().getItemInMainHand().getType() == Material.FEATHER ||
             player.getInventory().getItemInOffHand().getType() == Material.FEATHER)) {

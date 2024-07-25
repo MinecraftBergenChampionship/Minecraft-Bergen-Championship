@@ -758,15 +758,21 @@ public class MBC implements Listener {
     }
 
     public void ready(MBCTeam t, Player p) {
-        if (ready.get(t).equals(Boolean.FALSE)) {
+        if (ready.get(t) != null && ready.get(t).equals(Boolean.FALSE)) {
             Bukkit.broadcastMessage(t.teamNameFormat() + " are ready!");
+            ready.put(t, Boolean.TRUE);
             p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.GREEN + " Successfully readied up!");
         } else {
             p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + " Your team was already ready!");
         }
 
 
-        if (ready.size() == getValidTeams().size()) {
+        int allGood = 0;
+        for (Map.Entry<MBCTeam, Boolean> entry : ready.entrySet()) {
+            if (entry.getValue()) allGood++;
+        }
+
+        if (allGood == getValidTeams().size()) {
             if (getValidTeams().isEmpty()) {
                 announce("There are no teams! You may want to assign teams first!");
             } else if (!started) {
@@ -789,7 +795,7 @@ public class MBC implements Listener {
     }
 
     public void unready(MBCTeam t, Player p) {
-        if (ready.remove(t)) {
+        if (ready.get(t) != null && ready.get(t).equals(Boolean.TRUE)) {
             Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.RED + " are not ready.");
         } else {
             p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "Your team is currently not ready!");

@@ -227,13 +227,13 @@ public class SurvivalGames extends Game {
             //if (crates.size() > 0) { crateParticles(); }
 
             if (timeRemaining == 0) {
-                damagePoints();
                 if (teamsAlive.size() > 1) {
                     Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Border shrinking!");
                     map.Overtime();
                     setGameState(GameState.OVERTIME);
                     timeRemaining = 45;
                 } else {
+                    damagePoints();
                     createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD+"Round Over!");
                     for (Participant p : playersAlive) {
                         MBCTeam t = p.getTeam();
@@ -317,12 +317,12 @@ public class SurvivalGames extends Game {
             }
             UpdateEvent();
         } else if (getState().equals(GameState.OVERTIME)) {
-            damagePoints();
             if (timeRemaining == 0) {
                 for (Participant p : playersAlive) {
                     MBCTeam t = p.getTeam();
                     teamPlacements.put(t, 1);
                 }
+                damagePoints();
                 placementPoints();
                 createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD+"Round Over!");
                 if (!firstRound) {
@@ -533,7 +533,10 @@ public class SurvivalGames extends Game {
     private void damagePoints() {
         for (Player player : playerDamage.keySet()) {
             Participant p = Participant.getParticipant(player);
-            p.addCurrentScore(Math.min((int) (playerDamage.get(player) / 150) * 100, 10));
+            double percentage = playerDamage.get(player) / totalDamage;
+            int points = (int) Math.min(percentage * 150, 10);
+            p.addCurrentScore(points);
+            p.getPlayer().sendMessage(String.format("%sYou dealt %d of the total damage and earned %d!", ChatColor.GREEN, percentage*100, points));
         }
     }
 

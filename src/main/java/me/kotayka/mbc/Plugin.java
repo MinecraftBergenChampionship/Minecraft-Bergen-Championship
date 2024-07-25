@@ -83,6 +83,8 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("partygame").setExecutor(pg);
         getCommand("partygame").setTabCompleter(pg);
 
+        getCommand("skip").setExecutor(new skip());
+
 
         // prevent crafting wooden axes (worldedit)
         Iterator<Recipe> it = getServer().recipeIterator();
