@@ -403,7 +403,7 @@ public class SurvivalGames extends Game {
             }
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 36) {
-                for (Horcrus h : horcrusList) {
+                for (Horcrux h : horcruxList) {
                     h.inUse = false;
                     h.placed = false;
                     h.used = false;

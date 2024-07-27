@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -139,9 +140,6 @@ public class TGTTOS extends Game {
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             if (timeRemaining == 0) {
-                if (cooldownID != -1) {
-                    Bukkit.getScheduler().cancelTask(cooldownID);
-                }
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     if (!finishedParticipants.contains(p)) {
                         flightEffects(p);
@@ -161,6 +159,9 @@ public class TGTTOS extends Game {
             if (timeRemaining == 0) {
                 startRound();
             } else if (timeRemaining == 4) {
+                if (cooldownID != -1) {
+                    Bukkit.getScheduler().cancelTask(cooldownID);
+                }
                 roundOverGraphics();
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
@@ -168,6 +169,9 @@ public class TGTTOS extends Game {
             }
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 36) {
+                if (cooldownID != -1) {
+                    Bukkit.getScheduler().cancelTask(cooldownID);
+                }
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
                 }
@@ -294,6 +298,36 @@ public class TGTTOS extends Game {
             loadPlayers();
         }
 
+
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().getInventory().clear();
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            map.getWorld().spawnEntity(map.getEndLocation(), EntityType.CHICKEN);
+
+            if (p.getPlayer().getAllowFlight()) {
+                removeWinEffect(p);
+            }
+
+            if (map.getItems() == null) continue;
+
+            for (ItemStack i : map.getItems()) {
+                if (i.getType().equals(Material.WHITE_WOOL)) {
+                    ItemStack wool = p.getTeam().getColoredWool();
+                    wool.setAmount(64);
+                    p.getInventory().addItem(wool);
+                } else if (i.getType().equals(Material.SHEARS)) {
+                    ItemMeta meta = i.getItemMeta();
+                    meta.setUnbreakable(true);
+                    i.setItemMeta(meta);
+                    p.getInventory().addItem(i);
+                } else if (i.getType().equals(Material.LEATHER_BOOTS)) {
+                    p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(i));
+                } else {
+                    p.getInventory().addItem(i);
+                }
+            }
+        }
+
         if (map instanceof Meatball) {
             cooldownID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
 
@@ -325,34 +359,6 @@ public class TGTTOS extends Game {
             }, 20, 1);
         }
 
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().getInventory().clear();
-            p.getPlayer().setGameMode(GameMode.ADVENTURE);
-            map.getWorld().spawnEntity(map.getEndLocation(), EntityType.CHICKEN);
-
-            if (p.getPlayer().getAllowFlight()) {
-                removeWinEffect(p);
-            }
-
-            if (map.getItems() == null) continue;
-
-            for (ItemStack i : map.getItems()) {
-                if (i.getType().equals(Material.WHITE_WOOL)) {
-                    ItemStack wool = p.getTeam().getColoredWool();
-                    wool.setAmount(64);
-                    p.getInventory().addItem(wool);
-                } else if (i.getType().equals(Material.SHEARS)) {
-                    ItemMeta meta = i.getItemMeta();
-                    meta.setUnbreakable(true);
-                    i.setItemMeta(meta);
-                    p.getInventory().addItem(i);
-                } else if (i.getType().equals(Material.LEATHER_BOOTS)) {
-                    p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(i));
-                } else {
-                    p.getInventory().addItem(i);
-                }
-            }
-        }
         setGameState(GameState.STARTING);
         setTimer(20);
     }
@@ -545,6 +551,11 @@ public class TGTTOS extends Game {
     }
 
     @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        e.setCancelled(true);
+    }
+
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         // Check if the interaction is placing a boat or throwing meatball
         if (event.getItem() != null && (event.getItem().getType() == Material.OAK_BOAT || event.getItem().getType() == Material.SNOWBALL) && !getState().equals(GameState.ACTIVE)) {
@@ -562,8 +573,7 @@ public class TGTTOS extends Game {
 
             if (canJump.containsKey(player.getUniqueId()) && canJump.get(player.getUniqueId())) {
                 player.setVelocity(player.getLocation().getDirection().multiply(1.25));
-                map.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1);
-                player.setFallDistance(0);
+                map.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
                 canJump.put(player.getUniqueId(), false);
                 cooldowns.put(player, System.currentTimeMillis());
             }

@@ -38,8 +38,8 @@ public class DecisionDome extends Minigame {
 
     private List<MBCTeam> powerupTeams = new ArrayList<>();
     private final Map<VotePowerup, Integer> weights = Map.ofEntries(
-            entry(VotePowerup.DUNK, 5), //entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.EGGSTRA_VOTES, 2), entry(VotePowerup.CROSSBOWS, 2),
-            entry(VotePowerup.CHICKEN_SWAP, 5)
+            entry(VotePowerup.DUNK, 2), entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.EGGSTRA_VOTES, 2), entry(VotePowerup.CROSSBOWS, 3),
+            entry(VotePowerup.CHICKEN_SWAP, 1)
     );
     private Participant mega_cow_shooter = null;
     private Player dunker = null;
