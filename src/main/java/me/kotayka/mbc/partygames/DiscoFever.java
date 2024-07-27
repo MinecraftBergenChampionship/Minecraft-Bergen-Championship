@@ -14,7 +14,6 @@ import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.PartyGame;
-import me.kotayka.mbc.gamePlayers.AceRacePlayer;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -25,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -84,7 +84,6 @@ public class DiscoFever extends PartyGame {
     public final int SURVIVAL_POINTS = 1;
     public final int WIN_POINTS = 10;
     public final Location SPAWN = new Location(Bukkit.getWorld("Party"), 400, 1.5, 400, 0, 0);
-    private boolean gameOne = true;
 
     // game instance
     private static DiscoFever instance = null;
@@ -226,20 +225,7 @@ public class DiscoFever extends PartyGame {
                 break;
             case END_GAME:
                 if (timeRemaining == 0) {
-                    if (gameOne) {
-                        gameOne = false;
-                        if (MBC.getInstance().party != null) {
-                            MBC.getInstance().party.incrementGameNum();
-                        }
-                        deletedSpawn = false;
-                        delay = 80;
-                        setSpawnArea(true);
-                        Barriers(true);
-                        loadPlayers();
-                        initializeRegions();
-                        setGameState(GameState.STARTING);
-                        setTimer(16);
-                    } else if (MBC.getInstance().party == null) {
+                     if (MBC.getInstance().party == null) {
                         for (Participant p : MBC.getInstance().getPlayers()) {
                             p.addCurrentScoreToTotal();
                         }
@@ -257,7 +243,7 @@ public class DiscoFever extends PartyGame {
 
     @Override
     public void createScoreboard(Participant p) {
-        createLine(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party! (" + name()) + ")", p);
+        createLine(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party (" + name()) + ")", p);
         createLine(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET), p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
@@ -341,18 +327,24 @@ public class DiscoFever extends PartyGame {
 
             // update BossBar
             // TODO can possibly be improved
-            // note but would the bossbar be able to refill in the 2 seconds where each player is standing on the blocks
-            // yeah ill work on that when everything else is done
             new BukkitRunnable() {
                 double tmp = delay;
                 @Override
                 public void run() {
                     if (tmp < 0) {
                         cancel();
-                        return;
+                        bossBar.setColor(BarColor.GREEN);
+                        bossBar.setTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "TIME");
+                        refillBar();
+                    } else {
+                        // these next two lines should go whenever it switches from red to green;
+                        // tried under bossBar = Bukkit.create() ... but didn't work in my limited testing.
+                        // this works fine, but is more computationally expensive, although I'm not sure if it is significant
+                        bossBar.setColor(BarColor.RED);
+                        bossBar.setTitle(ChatColor.RED + "" + ChatColor.BOLD + "TIME");
+                        bossBar.setProgress(tmp / delay);
+                        tmp--;
                     }
-                    bossBar.setProgress(tmp / delay);
-                    tmp--;
                 }
             }.runTaskTimer(MBC.getInstance().getPlugin(), 0, 1);
 
@@ -410,6 +402,21 @@ public class DiscoFever extends PartyGame {
             };
             removeFloor.runTaskLater(MBC.getInstance().getPlugin(), delay);
         }, 0, delay+40);
+    }
+
+    private void refillBar() {
+        new BukkitRunnable() {
+            int tmp = 0;
+            @Override
+            public void run() {
+                tmp++;
+                if ((tmp / 40.0) == 1) {
+                    cancel();
+                    return;
+                }
+                bossBar.setProgress(tmp / 40.0);
+            }
+        }.runTaskTimer(MBC.getInstance().getPlugin(), 0, 1);
     }
 
     /**
@@ -581,6 +588,8 @@ public class DiscoFever extends PartyGame {
             Participant part = Participant.getParticipant(p);
             if (part == null) return;
             updatePlayersAlive(part);
+            Bukkit.broadcastMessage(part.getFormattedName() + " was eliminated!");
+            logger.log(p.getName() + " fell into the void at delay " + delay);
             MBC.getInstance().showPlayers(part);
             for (Participant i : playersAlive) {
                 i.addCurrentScore(SURVIVAL_POINTS);
@@ -589,6 +598,7 @@ public class DiscoFever extends PartyGame {
             // other things later
         }
     }
+
 
     /**
      * Prevent players from throwing items.
@@ -611,6 +621,21 @@ public class DiscoFever extends PartyGame {
             for (int x = 390; x <= 409; x++) {
                 world().getBlockAt(x, y, 402).setType(m);
             }
+        }
+    }
+
+    @EventHandler
+    public void onDisconnect(PlayerQuitEvent e) {
+        if (!getState().equals(GameState.ACTIVE)) return;
+        Player player = e.getPlayer();
+        if (player.getGameMode() == GameMode.ADVENTURE) {
+            playerClear(player);
+            Participant part = Participant.getParticipant(player);
+            updatePlayersAlive(part);
+            for (Participant i : playersAlive) {
+                i.addCurrentScore(SURVIVAL_POINTS);
+            }
+            updatePlayersAliveScoreboard();
         }
     }
 

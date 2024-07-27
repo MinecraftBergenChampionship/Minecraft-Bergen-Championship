@@ -4,10 +4,13 @@ import me.kotayka.mbc.commands.*;
 import me.kotayka.mbc.commands.tab.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.boss.BossBar;
+import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
@@ -25,6 +28,7 @@ public class Plugin extends JavaPlugin implements Listener {
         }
         Bukkit.getLogger().info("MBC enabled");
         Bukkit.broadcastMessage("Enable stat logging with /statlogs set true");
+        Bukkit.broadcastMessage("If this is after a reset, do /gamenum now!");
 
         getServer().getPluginManager().registerEvents(MBC.getInstance(), this);
         getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, this);
@@ -79,22 +83,32 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("partygame").setExecutor(pg);
         getCommand("partygame").setTabCompleter(pg);
 
-        getCommand("nick").setExecutor(new nick());
+        getCommand("skip").setExecutor(new skip());
+
 
         // prevent crafting wooden axes (worldedit)
         Iterator<Recipe> it = getServer().recipeIterator();
         Recipe recipe;
         while (it.hasNext()) {
             recipe = it.next();
-            if (recipe != null && recipe.getResult().getType() == Material.WOODEN_AXE)
+            if (recipe == null) continue;
+            if (recipe.getResult().getType() == Material.WOODEN_AXE) {
                 it.remove();
-            if (recipe != null && recipe.getResult().getType() == Material.SNOW_BLOCK)
+            } else if (recipe.getResult().getType() == Material.SNOW_BLOCK) {
                 it.remove();
+            } else if (recipe.getResult().getType() == Material.SHIELD) {
+                it.remove();
+            }
         }
     }
 
     @Override
     public void onDisable() {
         Bukkit.getLogger().info("MBC disabled");
+        for (@NotNull Iterator<KeyedBossBar> it = Bukkit.getBossBars(); it.hasNext(); ) {
+            BossBar b = it.next();
+            b.removeAll();
+            b.setVisible(false);
+        }
     }
 }

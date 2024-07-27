@@ -652,6 +652,7 @@ public class Skybattle extends Game {
         if (!(e.getPlayer().getWorld().equals(map.getWorld()))) return;
 
         SkybattlePlayer player = skybattlePlayerMap.get(e.getPlayer().getUniqueId());
+        if (player == null) return;
 
         // kill players immediately in void
         if (player.getPlayer().getLocation().getY() <= map.getVoidHeight()) {

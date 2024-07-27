@@ -12,6 +12,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
@@ -302,7 +303,7 @@ public abstract class Game extends Minigame {
     public void snowballHit(Snowball proj, Player p) {
         Vector snowballVelocity = proj.getVelocity();
         p.damage(0.1);
-        p.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.3, snowballVelocity.getZ() * 0.1));
+        p.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.15, snowballVelocity.getZ() * 0.1));
     }
 
     public static String getPlace(int place) {
@@ -611,6 +612,7 @@ public abstract class Game extends Minigame {
             if (p.getPlayer().getAllowFlight()) {
                 removeWinEffect(p);
             }
+            p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);

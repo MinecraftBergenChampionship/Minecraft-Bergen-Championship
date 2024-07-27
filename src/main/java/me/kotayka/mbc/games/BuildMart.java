@@ -50,6 +50,7 @@ public class BuildMart extends Game {
     public static final int COMPLETION_POINTS_MEDIUM = 8;
     public static final int COMPLETION_POINTS_HARD = 12;
     public static final int PLACEMENT_POINTS = 1;
+    public static final int MOST_BUILD_POINTS = 10;
 
     private Map<Participant, Material> hotbarSelector = new HashMap<Participant, Material>();
 
@@ -65,10 +66,10 @@ public class BuildMart extends Game {
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "⑮ +4 points **per player** for completing an easy build\n" +
                         "⑮ +8 points **per player** for completing a medium build\n" +
-                        "⑮ +10 points **per player** for completing a hard build\n" +
-                        "⑮ +1 points **per player** for each team beat when completing an easy or medium build\n" +
-                        "⑮ +2 points **per player** for each team beat when completing a hard build\n" +
-                        "⑮ Max +3 points **per player** for each build partially completed at game end"
+                        "⑮ +12 points **per player** for completing a hard build\n" +
+                        "⑮ +1 points **per player** for each team beat when completing a build\n" +
+                        "⑮ Max +3 points **per player** for each build partially completed at game end\n" +
+                        "⑮ +10 points **per player** on the team with the most builds completed of any team\n" 
         });
     }
 
@@ -184,7 +185,20 @@ public class BuildMart extends Game {
                             );
                             p.addCurrentScore(points / t.getTeam().teamPlayers.size());
                         }
+
+                        
                     }
+
+                    if (mostBuilds(t)) {
+                        for (Participant p : t.getTeam().teamPlayers) {
+                            p.getPlayer().sendMessage
+                                ("Your team finished with the most builds completed and earned " +
+                                ChatColor.BOLD + "" + ChatColor.GOLD + (MOST_BUILD_POINTS*t.getTeam().teamPlayers.size()) +
+                                ChatColor.RESET + " points!");
+                            p.addCurrentScore(MOST_BUILD_POINTS);
+                        }
+                    }
+
                 }
                 setGameState(GameState.END_GAME);
                 timeRemaining = 23;
@@ -217,6 +231,18 @@ public class BuildMart extends Game {
         }
     }
 
+    public boolean mostBuilds(BuildMartTeam b) {
+        int buildsCompletedB = b.getBuildsCompleted();
+        for (BuildMartTeam t : teams) {
+            int buildsCompletedT = t.getBuildsCompleted();
+            if (buildsCompletedB < buildsCompletedT) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     @EventHandler
     public void blockBreak(BlockBreakEvent e) {
         if (!(e.getBlock().getLocation().getWorld().equals(map.getWorld()))) return;
@@ -244,9 +270,11 @@ public class BuildMart extends Game {
 
         if (m.toString().endsWith("FAN") || m.toString().endsWith("CORAL")) {
             // TODO: This is a map dependent, temporary fix.
-            // Since there are no break areas corresponding to FAN and CORAL (due to me trying to shortcut),
-            // I cannot place this lower, as it will exit. Since MBC4 is approaching, I am leaving this temporary solution.
-            if (e.getBlock().getY() < 20) return;
+            // not that we'll have more maps anyway
+            if (e.getBlock().getY() < 20) {
+                e.setCancelled(true);
+                return;
+            }
 
             map.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(m));
             e.setCancelled(true);

@@ -267,4 +267,9 @@ public class Participant {
             }
         }
     }
+
+    @Override
+    public int hashCode() {
+        return player.getUniqueId().hashCode();
+    }
 }

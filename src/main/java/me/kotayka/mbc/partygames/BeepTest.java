@@ -62,7 +62,7 @@ public class BeepTest extends PartyGame {
     public long roundTime;
     private boolean ended = false;
 
-    public final int STAGE_POINTS = 4;
+    public final int STAGE_POINTS = 5;
     public final int EASY_POINTS = 1;
     public final int MEDIUM_POINTS = 2;
     public final int HARD_POINTS = 3;
@@ -96,7 +96,7 @@ public class BeepTest extends PartyGame {
                         "⑰ +2 points for each medium level completed\n" +
                         "⑰ +3 points for each hard level completed\n" +
                         "⑰ +4 points for each extreme level completed\n" +
-                        "⑰ +4 points for completing a color of difficulty\n"
+                        "⑰ +5 points for completing a color of difficulty"
         });
 
         loadCourses();
@@ -106,6 +106,8 @@ public class BeepTest extends PartyGame {
     @Override
     public void start() {
         super.start();
+
+        teamsAlive.addAll(getValidTeams());
 
         world().setTime(18000);
 
@@ -120,14 +122,6 @@ public class BeepTest extends PartyGame {
 
     @Override
     public void endEvents() {
-        // Debug
-        /*
-        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-        StackTraceElement e = stacktrace[2];//maybe this number needs to be corrected
-        String methodName = e.getMethodName();
-        Bukkit.broadcastMessage("In " + name() + ".endEvents(), called by " + methodName);
-         */
-
         if (ended) {
             return;
         }
@@ -208,17 +202,8 @@ public class BeepTest extends PartyGame {
                 break;
             case ACTIVE:
                 if (timeRemaining == 0) {
-                    // Debug
-                    /*
-                    Bukkit.broadcastMessage("[debug] rounds == " + rounds);
-                    Bukkit.broadcastMessage("[debug] playersAlive.size() == " + playersAlive.size());
-                    StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-                    StackTraceElement e = stacktrace[2];//maybe this number needs to be corrected
-                    String methodName = e.getMethodName();
-                    Bukkit.broadcastMessage("In BeepTest.events(), called by " + methodName);
-                     */
-
                     if (rounds > 14) {
+                        removeHealth();
                         endEvents();
                         return;
                     } else {
@@ -227,9 +212,21 @@ public class BeepTest extends PartyGame {
                         rounds++;
                         newGround();
                         nextRound();
-                        endRound();
+                        removeHealth();
                         stagePoints();
                         roundDisplay();
+
+                        // for any players that are in the course but completed the level (??)
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            if (inLevel(p)) {
+                                if (oppositeSide) {
+                                    p.teleport(SPAWN);
+                                } else {
+                                    p.teleport(OPPOSITE_SPAWN);
+                                }
+                            }
+                        }
+
                         fallenPlayers.clear();
                         completedPlayers.clear();
                         roundTime = System.currentTimeMillis();
@@ -247,6 +244,12 @@ public class BeepTest extends PartyGame {
                             timeForLevel = 25;
                             CURRENT_POINTS = EXTREME_POINTS;
                         }
+                        if (rounds % 4 == 0 && rounds != 0) {
+                            for (Participant p : playersAlive) {
+                                p.getPlayer().sendMessage(ChatColor.GREEN + "You've moved onto the next stage!");
+                                p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+                            }
+                        }
                         if (!ended) {
                             setTimer(timeForLevel+1);
                         }
@@ -259,7 +262,7 @@ public class BeepTest extends PartyGame {
 
     @Override
     public void createScoreboard(Participant p) {
-        createLine(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party! (" + name()) + ")", p);
+        createLine(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party (" + name()) + ")", p);
         createLine(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET), p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
@@ -297,22 +300,36 @@ public class BeepTest extends PartyGame {
             completedCourse(e);
         }
 
-        if (p.getLocation().getY() < -59 && (!fallenPlayers.contains(par) && !completedPlayers.contains(par))) {
-            fallenPlayers.add(par);
-            if (completedPlayers.contains(par) && !oppositeSide && p.getZ() <= REGULAR_Z) {
+        if (p.getLocation().getY() < -59 && !fallenPlayers.contains(par)) {
+            // teleport players who fell back up
+            if (completedPlayers.contains(par)) {
                 p.setVelocity(new Vector(0, 0, 0));
-                p.teleport(OPPOSITE_SPAWN);
+                if (oppositeSide)
+                    p.teleport(SPAWN);
+                else
+                    p.teleport(OPPOSITE_SPAWN);
+                return;
+            }
+
+            fallenPlayers.add(par);
+            p.setVelocity(new Vector(0, 0, 0));
+            if (completedPlayers.contains(par) && !oppositeSide && p.getZ() <= REGULAR_Z) {
+                p.teleport(new Location(Bukkit.getWorld("Party"), -522, -55, -458, 0, 0));
             }
             if (completedPlayers.contains(par) && oppositeSide && p.getZ() >= OPPOSITE_Z) {
-                p.setVelocity(new Vector(0, 0, 0));
-                p.teleport(SPAWN);
+                p.teleport(new Location(Bukkit.getWorld("Party"), -522, -55, -490, 180, 0));
             }
             p.sendMessage(ChatColor.RED + "You fell!");
             for (Player other : Bukkit.getOnlinePlayers()) {
+
                 other.showPlayer(p);
             }
 
-            logger.log(par.getFormattedName() + " fell on " + currentLevel.getName());
+            if (p.getPlayer().getHealth() <= 2) {
+                logger.log(par.getFormattedName() + " lost their last life on " + currentLevel.getName());
+            } else {
+                logger.log(par.getFormattedName() + " fell on " + currentLevel.getName());
+            }
         }
     }
 
@@ -338,10 +355,11 @@ public class BeepTest extends PartyGame {
         hardLevels = BeepTestLevelLoader.loadHardLevels();
     }
 
-    public void endRound() {
+    public void removeHealth() {
         List<Participant> toEliminate = new ArrayList<>();
         for (Participant p : alivePlayers) {
             if (completedPlayers.contains(p) && !fallenPlayers.contains(p)) continue;
+            logger.log(p.getPlayerName() + " didn't complete this level!");
             Player pl = p.getPlayer();
             if (pl.getHealth() <= 2) {
                 toEliminate.add(p);
@@ -377,6 +395,7 @@ public class BeepTest extends PartyGame {
             alivePlayers.remove(p);
             p.getPlayer().sendTitle(" ", ChatColor.RED + "You died!", 0, 60, 20);
             updatePlayersAlive(p);
+            Bukkit.broadcastMessage(p.getFormattedName() + " was eliminated!");
             MBC.getInstance().showPlayers(p);
             updatePlayersAliveScoreboard();
         }
@@ -390,7 +409,8 @@ public class BeepTest extends PartyGame {
                 completedPlayers.add(p);
                 long currentTime = System.currentTimeMillis() - roundTime;
                 String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
-                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
+                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + " seconds!");
+                logger.log(p.getFormattedName() + " completed " + currentLevel.getName().trim() + " in " + formattedTime + "seconds!");
                 if (completedPlayers.size() == 1) {
                     Bukkit.broadcastMessage(p.getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
                 }
@@ -400,9 +420,9 @@ public class BeepTest extends PartyGame {
             if (e.getTo().getZ() > OPPOSITE_Z) {
                 long currentTime = System.currentTimeMillis() - roundTime;
                 String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
-                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
-                logger.log(p.getFormattedName() + " completed " + currentLevel.getName().trim() + " in " + formattedTime + "!");
-                if (completedPlayers.size() == 0) {
+                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + " seconds!");
+                logger.log(p.getFormattedName() + " completed " + currentLevel.getName().trim() + " in " + formattedTime + " seconds!");
+                if (completedPlayers.isEmpty()) {
                     Bukkit.broadcastMessage(p.getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
                 }
                 completedPlayers.add(p);
@@ -489,6 +509,11 @@ public class BeepTest extends PartyGame {
                 }
             }
         }
+    }
+
+    private boolean inLevel(Player p) {
+        if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) return false;
+        return p.getLocation().getZ() > -486 && p.getLocation().getZ() < -462;
     }
 
     /**

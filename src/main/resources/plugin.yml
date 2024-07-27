@@ -30,6 +30,9 @@ commands:
     permission: minecraft.command.op
   ready:
     description: indicate a team is ready.
+  skip:
+    permission: minecraft.command.op
+    description: skip
   notready:
     description: indicate a team is not ready, if they were previously.
   startevent:

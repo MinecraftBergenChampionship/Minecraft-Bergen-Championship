@@ -5,6 +5,8 @@ import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.tgttosMap.*;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -26,6 +28,7 @@ import org.bukkit.util.Vector;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class TGTTOS extends Game {
@@ -43,6 +46,12 @@ public class TGTTOS extends Game {
     private List<Location> placedBlocks = new ArrayList<Location>(20);
     private boolean firstTeamBonus = false;  // determine whether or not a full team has completed yet
     private boolean secondTeamBonus = false;
+
+    // Meatball cooldowns from Dragons
+    private Map<UUID, Boolean> canJump = new HashMap<>(); // this is only for meatball currently
+    private Map<Player, Long> cooldowns = new HashMap<>();
+    private DecimalFormat df = new DecimalFormat("#.#");
+    private int cooldownID = -1;
 
     // Scoring
     public static int PLACEMENT_POINTS = 1; // awarded multiplied by the amount of players who havent finished yet
@@ -130,6 +139,9 @@ public class TGTTOS extends Game {
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             if (timeRemaining == 0) {
+                if (cooldownID != -1) {
+                    Bukkit.getScheduler().cancelTask(cooldownID);
+                }
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     if (!finishedParticipants.contains(p)) {
                         flightEffects(p);
@@ -202,6 +214,7 @@ public class TGTTOS extends Game {
             }
             if (map instanceof Meatball) {
                 p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 10, false, false));
+                canJump.put(p.getPlayer().getUniqueId(), true);
             }
         }
     }
@@ -279,6 +292,37 @@ public class TGTTOS extends Game {
 
         if (map != null) {
             loadPlayers();
+        }
+
+        if (map instanceof Meatball) {
+            cooldownID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
+
+                Iterator<Map.Entry<Player, Long>> iterator = cooldowns.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<Player, Long> entry = iterator.next();
+                    long storedTime = entry.getValue();
+
+                    if (System.currentTimeMillis() - storedTime >= 10000) {
+                        entry.getKey().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
+                        canJump.put(entry.getKey().getUniqueId(), true);
+                        iterator.remove();
+                        continue;
+                    }
+
+                    long timeLeft = 10000 - (System.currentTimeMillis() - storedTime);
+                    double secondsLeft = timeLeft / 1000.0;
+                    int iCooldown = (int) secondsLeft;
+
+                    String seconds = df.format(secondsLeft);
+
+                    if (seconds.length() == 1) {
+                        seconds+=".0";
+                    }
+
+                    String actionBarMessage = seconds + " seconds left §c" + "▐".repeat(iCooldown) + "§a" + "▐".repeat(10 - iCooldown);
+                    entry.getKey().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(actionBarMessage));
+                }
+            }, 20, 1);
         }
 
         for (Participant p : MBC.getInstance().getPlayers()) {
@@ -398,7 +442,8 @@ public class TGTTOS extends Game {
         }
         if (count == p.getTeam().getPlayers().size()) {
             if (!firstTeamBonus) {
-                Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN + "" + ChatColor.BOLD + " was the first full team to finish!");
+                Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN + ChatColor.BOLD + " was the first full team to finish!");
+                logger.log(p.getTeam().teamNameFormat() + ChatColor.GREEN + ChatColor.BOLD + " was the first full team to finish!");
                 for (Participant teammate : p.getTeam().getPlayers()) {
                     teammate.addCurrentScore(FIRST_TEAM_BONUS);
                     teammate.getPlayer().sendMessage(ChatColor.GREEN+"Your team finished first and earned a " + (FIRST_TEAM_BONUS*MBC.getInstance().multiplier*p.getTeam().getPlayers().size()) + " point bonus!");
@@ -406,6 +451,7 @@ public class TGTTOS extends Game {
                 firstTeamBonus = true;
             } else {
                 Bukkit.broadcastMessage(p.getTeam().teamNameFormat() + ChatColor.GREEN + "" + ChatColor.BOLD + " was the second full team to finish!");
+                logger.log(p.getTeam().teamNameFormat() + ChatColor.GREEN + ChatColor.BOLD + " was the first full team to finish!");
                 for (Participant teammate : p.getTeam().getPlayers()) {
                     teammate.addCurrentScore(SECOND_TEAM_BONUS);
                     teammate.getPlayer().sendMessage(ChatColor.GREEN+"Your team finished second and earned a " + (SECOND_TEAM_BONUS*MBC.getInstance().multiplier*p.getTeam().getPlayers().size()) + " point bonus!");
@@ -481,6 +527,7 @@ public class TGTTOS extends Game {
         Boat boat = (Boat) e.getVehicle();
         if (boat.getPassengers().size() > 1) {
             for (Entity en : boat.getPassengers()) {
+                en.setVelocity(new Vector(0, 0, 0));
                 Location l = en.getLocation().add(0, 1, 0);
                 en.teleport(l);
 
@@ -490,7 +537,9 @@ public class TGTTOS extends Game {
                 }
             }
         } else {
-            ((Player) e.getExited()).getInventory().addItem(new ItemStack(Material.OAK_BOAT));
+            Player entity = (Player) e.getExited();
+            entity.setVelocity(new Vector(0, 0, 0));
+            entity.getInventory().addItem(new ItemStack(Material.OAK_BOAT));
         }
         boat.remove();
     }
@@ -500,6 +549,38 @@ public class TGTTOS extends Game {
         // Check if the interaction is placing a boat or throwing meatball
         if (event.getItem() != null && (event.getItem().getType() == Material.OAK_BOAT || event.getItem().getType() == Material.SNOWBALL) && !getState().equals(GameState.ACTIVE)) {
             event.setCancelled(true);
+            return;
+        }
+
+        if (!(map instanceof Meatball)) return;
+
+        Player player = event.getPlayer();
+        if (player.getGameMode() == GameMode.SPECTATOR) return;
+        if (event.getAction().isRightClick() && getState().equals(GameState.ACTIVE) &&
+           (player.getInventory().getItemInMainHand().getType() == Material.FEATHER ||
+            player.getInventory().getItemInOffHand().getType() == Material.FEATHER)) {
+
+            if (canJump.containsKey(player.getUniqueId()) && canJump.get(player.getUniqueId())) {
+                player.setVelocity(player.getLocation().getDirection().multiply(1.25));
+                map.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1);
+                player.setFallDistance(0);
+                canJump.put(player.getUniqueId(), false);
+                cooldowns.put(player, System.currentTimeMillis());
+            }
+            else {
+                long storedTime = cooldowns.get(player);
+
+                long timeLeft = 10000 - (System.currentTimeMillis() - storedTime);
+                double secondsLeft = timeLeft / 1000.0;
+
+                String seconds = df.format(secondsLeft);
+
+                if (seconds.length() == 1) {
+                    seconds+=".0";
+                }
+
+                player.sendMessage(ChatColor.RED+seconds+" seconds left until you can use this");
+            }
         }
     }
 

@@ -249,13 +249,13 @@ public class SurvivalGames extends Game {
             //if (crates.size() > 0) { crateParticles(); }
 
             if (timeRemaining == 0) {
-                damagePoints();
                 if (teamsAlive.size() > 1) {
                     Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Border shrinking!");
                     map.Overtime();
                     setGameState(GameState.OVERTIME);
                     timeRemaining = 45;
                 } else {
+                    damagePoints();
                     createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD+"Round Over!");
                     for (Participant p : playersAlive) {
                         MBCTeam t = p.getTeam();
@@ -312,12 +312,12 @@ public class SurvivalGames extends Game {
                 bossBar.setVisible(true);
                 for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
                     bossBar.addPlayer(p.getPlayer());
-                    p.getPlayer().sendTitle("", MBC.MBC_STRING_PREFIX + ChatColor.RED+"Chests refilled!", 20, 60, 20);
+                    p.getPlayer().sendTitle("", ChatColor.RED+"Chests refilled!", 20, 60, 20);
                     p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_CHEST_OPEN, 1, 1);
                 }
                 regenChest();
                 getLogger().log(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
+                Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 //event = SurvivalGamesEvent.SUPPLY_CRATE;
                 event = SurvivalGamesEvent.DEATHMATCH;
                 //crateLocation();
@@ -339,12 +339,12 @@ public class SurvivalGames extends Game {
             }
             UpdateEvent();
         } else if (getState().equals(GameState.OVERTIME)) {
-            damagePoints();
             if (timeRemaining == 0) {
                 for (Participant p : playersAlive) {
                     MBCTeam t = p.getTeam();
                     teamPlacements.put(t, 1);
                 }
+                damagePoints();
                 placementPoints();
                 createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD+"Round Over!");
                 if (!firstRound) {
@@ -543,7 +543,7 @@ public class SurvivalGames extends Game {
         boolean mainHand = p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW;
         p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 60, 1, false, true));
         p.playSound(p.getLocation(), Sound.BLOCK_GRASS_BREAK, 1, 1);
-        map.getWorld().spawnParticle(Particle.BLOCK_CRACK, p.getEyeLocation(), 3, Material.DIRT.createBlockData());
+        map.getWorld().spawnParticle(Particle.BLOCK_CRACK, p.getEyeLocation(), 5, Material.DIRT.createBlockData());
 
         if (mainHand) {
             p.getInventory().setItemInMainHand(null);
@@ -555,7 +555,11 @@ public class SurvivalGames extends Game {
     private void damagePoints() {
         for (Player player : playerDamage.keySet()) {
             Participant p = Participant.getParticipant(player);
-            p.addCurrentScore(Math.min((int) (playerDamage.get(player) / 150) * 100, 10));
+            double percentage = playerDamage.get(player) / totalDamage;
+            int points = (int) Math.min(percentage * 150, 10);
+            p.addCurrentScore(points);
+            logger.log(p.getPlayerName() + " dealt " + percentage*100 + "% of the total damage and earned " + points + " points!");
+            p.getPlayer().sendMessage(String.format("%sYou dealt %.2f%% of the total damage and earned %d points!", ChatColor.GREEN, percentage*100, points));
         }
     }
 

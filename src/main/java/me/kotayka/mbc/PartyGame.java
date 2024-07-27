@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.kotayka.mbc.games.Party;
-import me.kotayka.mbc.partygames.BeepTest;
+import me.kotayka.mbc.partygames.Dragons;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -72,7 +72,7 @@ public abstract class PartyGame extends Game {
         }
         loadPlayers();
         createScoreboard();
-        createLineAll(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party! (" + name()) + ")");
+        createLineAll(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party (" + name()) + ")");
         createLineAll(15, String.format("%sGame Coins: %s(x%s%.1f%s)", ChatColor.AQUA, ChatColor.RESET, ChatColor.YELLOW, MBC.getInstance().multiplier, ChatColor.RESET));
     }
 
@@ -153,13 +153,11 @@ public abstract class PartyGame extends Game {
     }
 
     public void updatePlayersAlive(Participant p) {
-        Bukkit.broadcastMessage(p.getFormattedName() + " partied too hard!");
-        logger.log(p.getFormattedName() + " partied too hard!");
         playersAlive.remove(p);
         checkLastTeam(p.getTeam());
         updatePlayersAliveScoreboard();
 
-        if (playersAlive.size() == 0) {
+        if (playersAlive.isEmpty()) {
             endEvents();
         }
     }
@@ -200,9 +198,9 @@ public abstract class PartyGame extends Game {
         setGameState(GameState.INACTIVE);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().setMaxHealth(20);
+            p.getPlayer().setInvulnerable(false);
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
-            p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().setExp(0);

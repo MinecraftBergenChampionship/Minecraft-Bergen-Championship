@@ -6,18 +6,18 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 
-public class Classic extends DragonsMap {
-    public Classic(Dragons dragons) {
+public class ConchStreet extends DragonsMap {
+    public ConchStreet(Dragons dragons) {
         super(dragons);
         minX = 972;
-        maxX = 1013;
+        maxX = 1048;
         minY = 50;
-        maxY = 61;
-        minZ = 990;
+        maxY = 90;
+        minZ = 983;
         maxZ = 1020;
-        CENTER_OF_BUILD = new Location(getWorld(), 1000, 60, 1000);
+        CENTER_OF_BUILD = new Location(getWorld(), 1009, 60, 988);
         SPAWN = new Location(getWorld(), 0, 60, 0);
-        DRAGON_SPAWN = new Location(getWorld(), 20, 90, 20);
+        DRAGON_SPAWN = new Location(getWorld(), 0, 90, 45);
         DEATH_Y = 40;
     }
 

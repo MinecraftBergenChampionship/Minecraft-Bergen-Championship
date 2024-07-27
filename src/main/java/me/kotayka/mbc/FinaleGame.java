@@ -23,6 +23,7 @@ public class FinaleGame extends Minigame {
 
     public FinaleGame(String name, String[] intro) {
         super(name);
+        initLogger();
 
         if (MBC.getInstance().getValidTeams().size() == 1) {
             // only for debug

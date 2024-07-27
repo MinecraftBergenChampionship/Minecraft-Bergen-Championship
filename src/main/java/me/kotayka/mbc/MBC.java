@@ -77,7 +77,6 @@ public class MBC implements Listener {
     public Skybattle skybattle = null;
     public SurvivalGames sg = null;
     public Spleef spleef = null;
-    public Dragons dragons = null;
     public Party party = null;
     //public Dodgebolt dodgebolt = null;
     public Quickfire quickfire = null;
@@ -87,7 +86,7 @@ public class MBC implements Listener {
     private String STAT_DIRECTORY = "MBC_EVENT";
 
     //public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt","Quickfire"));
-    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire","Party", "Dragons"));
+    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire","Party"));
     //public final List<Game> gameList = new ArrayList<Game>(6);
     public static final String MBC_STRING_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "MBC" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: " + ChatColor.RESET;
     public static final String ADMIN_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "ADMIN" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: " + ChatColor.RESET;
@@ -167,11 +166,6 @@ public class MBC implements Listener {
                     party = new Party();
                 }
                 return party;
-            case "Dragons":
-                if (dragons == null) {
-                    dragons = new Dragons();
-                }
-                return dragons;
                 /*
             case "Dodgebolt":
                 if (dodgebolt == null) {
@@ -228,8 +222,6 @@ public class MBC implements Listener {
                 return spleef;
             case "Party":
                 return party;
-            case "Dragons":
-                return dragons;
             default:
                 return null;
         }
@@ -766,15 +758,21 @@ public class MBC implements Listener {
     }
 
     public void ready(MBCTeam t, Player p) {
-        if (ready.get(t).equals(Boolean.FALSE)) {
+        if (ready.get(t) != null && ready.get(t).equals(Boolean.FALSE)) {
             Bukkit.broadcastMessage(t.teamNameFormat() + " are ready!");
+            ready.put(t, Boolean.TRUE);
             p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.GREEN + " Successfully readied up!");
         } else {
             p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + " Your team was already ready!");
         }
 
 
-        if (ready.size() == getValidTeams().size()) {
+        int allGood = 0;
+        for (Map.Entry<MBCTeam, Boolean> entry : ready.entrySet()) {
+            if (entry.getValue()) allGood++;
+        }
+
+        if (allGood == getValidTeams().size()) {
             if (getValidTeams().isEmpty()) {
                 announce("There are no teams! You may want to assign teams first!");
             } else if (!started) {
@@ -797,7 +795,7 @@ public class MBC implements Listener {
     }
 
     public void unready(MBCTeam t, Player p) {
-        if (ready.remove(t)) {
+        if (ready.get(t) != null && ready.get(t).equals(Boolean.TRUE)) {
             Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.RED + " are not ready.");
         } else {
             p.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "Your team is currently not ready!");
@@ -805,13 +803,13 @@ public class MBC implements Listener {
     }
 
     /**
-     * Hides all players from each other.
+     * Hides all players from each other; spectators are unaffected
      */
     public void hideAllPlayers() {
         for (Participant p : getPlayers()) {
+            if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
             for (Participant p2 : getPlayers()) {
                 if (p.getPlayer().getUniqueId().equals(p2.getPlayer().getUniqueId())) continue;
-                if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
                 p.getPlayer().hidePlayer(plugin, p2.getPlayer());
             }
         }

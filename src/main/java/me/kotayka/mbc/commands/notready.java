@@ -22,8 +22,6 @@ public class notready implements CommandExecutor {
             return true;
         }
 
-
-
         MBC.getInstance().readyCheck = false;
         Participant par = Participant.getParticipant(p);
         MBC.getInstance().unready(par.getTeam(), p);

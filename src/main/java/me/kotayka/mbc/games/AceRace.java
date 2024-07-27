@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import java.text.SimpleDateFormat;
@@ -94,6 +95,7 @@ public class AceRace extends Game {
     public void onRestart() {
         for (AceRacePlayer p : aceRacePlayerMap.values()) {
             p.reset();
+            p.getParticipant().board.getTeam(p.getParticipant().getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.ALWAYS);
         }
     }
 
@@ -166,6 +168,9 @@ public class AceRace extends Game {
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 40) {
                 Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Fastest Laps: ");
+                for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+                    p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.ALWAYS);
+                }
             } else if (timeRemaining == 36) {
                 topLaps();
             } else if (timeRemaining < 34){
@@ -190,6 +195,7 @@ public class AceRace extends Game {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, PotionEffect.INFINITE_DURATION, 1, false, false));
+            p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             //p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
 
             aceRacePlayerMap.put(p.getPlayer().getUniqueId(), new AceRacePlayer(p, this));

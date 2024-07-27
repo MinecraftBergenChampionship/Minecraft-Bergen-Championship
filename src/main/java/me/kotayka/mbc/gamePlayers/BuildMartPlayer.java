@@ -3,7 +3,10 @@ package me.kotayka.mbc.gamePlayers;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameTeams.BuildMartTeam;
 import me.kotayka.mbc.games.BuildMart;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class BuildMartPlayer extends GamePlayer {
@@ -26,16 +29,20 @@ public class BuildMartPlayer extends GamePlayer {
     }
 
     public void respawn() {
-        getParticipant().getInventory().clear();
-        getParticipant().getPlayer().teleport(team.getSPAWN());
+        Player p = getParticipant().getPlayer();
+        p.getInventory().clear();
+        p.teleport(team.getSPAWN());
+        p.sendMessage(ChatColor.RED + "You fell off and lost your items...");
+
+        Bukkit.broadcastMessage(getParticipant().getFormattedName() + ChatColor.GRAY + " shopped til they dropped.");
 
         ItemStack[] items = BuildMart.getItemsForBuildMart();
 
         for (ItemStack i : items) {
             if (i.getType().equals(Material.ELYTRA)) {
-                getParticipant().getPlayer().getInventory().setChestplate(i);
+                p.getInventory().setChestplate(i);
             } else {
-                getParticipant().getPlayer().getInventory().addItem(i);
+                p.getInventory().addItem(i);
             }
         }
     }
