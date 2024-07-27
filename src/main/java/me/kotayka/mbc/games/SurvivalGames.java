@@ -6,28 +6,32 @@ import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.sgMaps.BCA;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.scoreboard.Team;
+import org.bukkit.util.Vector;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
@@ -55,6 +59,9 @@ public class SurvivalGames extends Game {
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
     private boolean firstRound = true;
     private Map<Player, Double> playerDamage = new HashMap<>();
+
+    private Map<MBCTeam, Horcrus> horcrusMap = new HashMap<>();
+    private List<Horcrus> horcrusList = new ArrayList<>();
 
     // Enchantment
     private final GUIItem[] guiItems = setupGUIItems();
@@ -128,6 +135,15 @@ public class SurvivalGames extends Game {
         for (Participant p : MBC.getInstance().getPlayers()) {
             playersAlive.add(p);
             p.getPlayer().getInventory().clear();
+            ItemStack endCrystal = new ItemStack(Material.END_CRYSTAL);
+
+            ItemMeta meta = endCrystal.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName("Horcrux");
+                endCrystal.setItemMeta(meta);
+            }
+
+            p.getInventory().setItem(8, endCrystal);
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().setAllowFlight(false);
             p.getPlayer().setExp(0);
@@ -144,6 +160,12 @@ public class SurvivalGames extends Game {
     @Override
     public void start() {
         super.start();
+
+        for (MBCTeam t : getValidTeams()) {
+            Horcrus h = new Horcrus(t);
+            horcrusMap.put(t, h);
+            horcrusList.add(h);
+        }
 
         for (ItemFrame i : map.getWorld().getEntitiesByClass(ItemFrame.class)) {
             i.setFixed(true);
@@ -537,6 +559,19 @@ public class SurvivalGames extends Game {
         }
     }
 
+    private void removeEndCrystal(Player player) {
+        // Remove one end crystal from the player's inventory
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.END_CRYSTAL) {
+                item.setAmount(item.getAmount() - 1);
+                if (item.getAmount() <= 0) {
+                    player.getInventory().remove(item);
+                }
+                break;
+            }
+        }
+    }
+
     /**
      * Handles Custom Inventory for Enchanting, Tracking opened loot boxes, and mushroom stew.
      */
@@ -559,6 +594,38 @@ public class SurvivalGames extends Game {
         if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.ENCHANTING_TABLE)) {
             e.setCancelled(true);
             setupGUI(e.getPlayer());
+        }
+
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getHand() == EquipmentSlot.HAND) {
+            Player player = e.getPlayer();
+            Participant person = Participant.getParticipant(player);
+            Block block = e.getClickedBlock();
+
+            if (block != null && e.getBlockFace() == org.bukkit.block.BlockFace.UP) {
+                ItemStack item = e.getItem();
+                if (item != null && item.getType() == Material.END_CRYSTAL) {
+                    for (Participant participant : MBC.getInstance().players) {
+                        if (participant.getTeam().equals(person.getTeam())) {
+                            removeEndCrystal(participant.getPlayer());
+                        }
+                    }
+
+                    Horcrus horcrus = horcrusMap.get(person.getTeam());
+
+                    e.setCancelled(true);
+
+                    if (horcrus.placed) {
+                        return;
+                    }
+
+                    Location loc = block.getLocation().clone().add(new Vector(0, 1, 0));
+
+                    Bukkit.broadcastMessage(loc.toString());
+
+                    horcrus.spawn(loc);
+                    horcrus.placed = true;
+                }
+            }
         }
 
         /*
@@ -629,8 +696,38 @@ public class SurvivalGames extends Game {
         }
     }
 
+    public void HandleInteractHorcrus(Player p, ArmorStand a) {
+        Horcrus horcrus = Horcrus.getHorcrux(horcrusList, a);
+        Participant participant = Participant.getParticipant(p);
+
+        if (participant.getTeam().equals(horcrus.team)) {
+            p.sendMessage(ChatColor.RED+"You can't break you own Horcrus!!!");
+        }
+        else if (horcrus.inUse) {
+            p.sendMessage(ChatColor.RED+"This Horcrus is currently in use");
+        }
+        else {
+            MBC.spawnFirework(a.getLocation().clone().add(0, 2, 0), horcrus.team.getColor());
+
+            for (Participant par : MBC.getInstance().players) {
+                if (par.getTeam().equals(horcrus.team)) {
+                    par.getPlayer().sendMessage(ChatColor.RED+"Your Horcrus has been destroyed!!!");
+                }
+            }
+
+            horcrus.used = true;
+            a.remove();
+        }
+    }
+
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player && e.getEntity() instanceof ArmorStand) {
+            HandleInteractHorcrus((Player) e.getDamager(), (ArmorStand) e.getEntity());
+            e.setCancelled(true);
+            return;
+        }
+
         if (!(e.getEntity() instanceof Player)) return;
         if (e.getDamager() instanceof Player) {
             playerDamage.put((Player) e.getDamager(), e.getDamage());
@@ -650,6 +747,7 @@ public class SurvivalGames extends Game {
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         Player victim = e.getPlayer();
+        Horcrus horcrus = horcrusMap.get(Participant.getParticipant(victim).getTeam());
         Participant killer = Participant.getParticipant(victim.getKiller());
         if (killer != null) {
             killer.addCurrentScore(killPoints);
@@ -662,41 +760,102 @@ public class SurvivalGames extends Game {
                 playerKills.put(e.getPlayer().getKiller(), kills);
                 createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
             }
-            deathEffectsWithHealth(e);
+            deathEffectsWithHealthSG(e, horcrus);
         } else {
             Participant p = Participant.getParticipant(victim);
             if (p == null) return;
             MBC.spawnFirework(p);
             e.setDeathMessage(e.getDeathMessage().replace(e.getPlayer().getName(), p.getFormattedName()));
-            updatePlayersAlive(p);
+            if (horcrus.used || !horcrus.placed) {
+                updatePlayersAlive(p);
+            }
         }
 
         victim.setGameMode(GameMode.SPECTATOR);
         getLogger().log(e.getDeathMessage());
 
         Bukkit.broadcastMessage(e.getDeathMessage());
+        Participant victimParticipant = Participant.getParticipant(victim);
+
+        if (horcrus.used || !horcrus.placed) {
+            int count = 0;
+            for (Participant p : victimParticipant.getTeam().teamPlayers) {
+                if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
+                    count++;
+                }
+            }
+
+            if (count == victimParticipant.getTeam().teamPlayers.size()) {
+                teamPlacements.put(victimParticipant.getTeam(), getValidTeams().size() - deadTeams);
+                deadTeams++;
+            }
+
+        }
+
         for (ItemStack i : victim.getPlayer().getInventory()) {
             if (i == null) continue;
             map.getWorld().dropItemNaturally(victim.getLocation(), i);
         }
+
         e.setCancelled(true);
 
-        int count = 0;
-        Participant victimParticipant = Participant.getParticipant(victim);
-        for (Participant p : victimParticipant.getTeam().teamPlayers) {
-            if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
-                count++;
+        for (Participant p : playersAlive) {
+            if (p != victimParticipant) {
+                p.addCurrentScore(SURVIVAL_POINTS);
             }
         }
 
-        if (count == victimParticipant.getTeam().teamPlayers.size()) {
-            teamPlacements.put(victimParticipant.getTeam(), getValidTeams().size() - deadTeams);
-            deadTeams++;
+        if (!horcrus.used && horcrus.placed) {
+            Bukkit.broadcastMessage(victimParticipant.getFormattedName()+ChatColor.GOLD+" is being respawned by their teams HORCRUS!");
+
+            ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
+            SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
+            if (skullMeta != null) {
+                skullMeta.setOwningPlayer(victim);
+                playerHead.setItemMeta(skullMeta);
+            }
+
+            // Set the player head on the ArmorStand
+            horcrus.armorStand.setHelmet(playerHead);
+            horcrus.inUse = true;
+
+            Bukkit.getScheduler().runTaskLater(MBC.getInstance().plugin, new Runnable() {
+                @Override
+                public void run() {
+                    victim.getInventory().clear();
+                    victim.teleport(horcrus.location);
+                    victim.setGameMode(GameMode.SURVIVAL);
+                    horcrus.armorStand.remove();
+                }
+            }, 100L);
         }
 
-        // may require testing due to concurrency
-        for (Participant p : playersAlive) {
-            p.addCurrentScore(SURVIVAL_POINTS);
+        horcrus.used = true;
+    }
+
+    public void deathEffectsWithHealthSG(PlayerDeathEvent e, Horcrus horcrus) {
+        Participant victim = Participant.getParticipant(e.getPlayer());
+        Participant killer = Participant.getParticipant(e.getPlayer().getKiller());
+        String deathMessage = e.getDeathMessage();
+
+        if (victim == null) return;
+
+        victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
+        victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
+        MBC.spawnFirework(victim);
+        deathMessage = deathMessage.replace(victim.getPlayerName(), victim.getFormattedName());
+
+        if (killer != null) {
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayerName() + "!");
+            killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
+            String health = String.format(" ["+ChatColor.RED+"♥ %.2f"+ChatColor.RESET+"]", killer.getPlayer().getHealth());
+            deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName()+health);
+        }
+
+        e.setDeathMessage(deathMessage);
+
+        if (horcrus.used || !horcrus.placed) {
+            updatePlayersAlive(victim);
         }
     }
 
@@ -765,7 +924,27 @@ public class SurvivalGames extends Game {
     @EventHandler
     public void onPlayerEntityInteract(PlayerInteractEntityEvent e) {
         if (e.getRightClicked().getType().equals(EntityType.ITEM_FRAME)) e.setCancelled(true);
+        if (e.getRightClicked() instanceof ArmorStand) {
+
+            Player player = e.getPlayer();
+            ArmorStand armorStand = (ArmorStand) e.getRightClicked();
+
+            HandleInteractHorcrus(player, armorStand);
+            e.setCancelled(true);
+        }
     }
+
+    @EventHandler
+    public void onPlayerEntityInteract(PlayerInteractAtEntityEvent e) {
+        if (e.getRightClicked() instanceof ArmorStand) {
+            Player player = e.getPlayer();
+            ArmorStand armorStand = (ArmorStand) e.getRightClicked();
+
+            HandleInteractHorcrus(player, armorStand);
+            e.setCancelled(true);
+        }
+    }
+
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
@@ -910,6 +1089,7 @@ public class SurvivalGames extends Game {
 
         p.openInventory(gui);
     }
+
 
     // TODO
     private void handleEnchantGUI(InventoryClickEvent e) {
@@ -1078,5 +1258,48 @@ class GUIItem {
         this.item = item;
         this.enchantment = enchantment;
         this.cost = cost;
+    }
+}
+
+class Horcrus {
+    public boolean placed = false;
+    public Location location;
+    public ArmorStand armorStand;
+
+    public boolean used = false;
+    public boolean inUse = false;
+
+    public MBCTeam team;
+
+    public Horcrus(MBCTeam t) {
+        team = t;
+    }
+
+    public void spawn(Location loc) {
+        location = loc;
+
+        armorStand = loc.getWorld().spawn(location, ArmorStand.class);
+        armorStand.setArms(true);
+        armorStand.setVisible(true);
+
+        ItemStack leatherHelmet = team.getColoredLeatherArmor(new ItemStack(Material.LEATHER_HELMET));
+        ItemStack leatherChestplate = team.getColoredLeatherArmor(new ItemStack(Material.LEATHER_CHESTPLATE));
+        ItemStack leatherLeggings = team.getColoredLeatherArmor(new ItemStack(Material.LEATHER_LEGGINGS));
+        ItemStack leatherBoots = team.getColoredLeatherArmor(new ItemStack(Material.LEATHER_BOOTS));
+
+        armorStand.setItem(EquipmentSlot.HEAD, leatherHelmet);
+        armorStand.setItem(EquipmentSlot.CHEST, leatherChestplate);
+        armorStand.setItem(EquipmentSlot.LEGS, leatherLeggings);
+        armorStand.setItem(EquipmentSlot.FEET, leatherBoots);
+    }
+
+    public static Horcrus getHorcrux(List<Horcrus> horcrusList, ArmorStand a) {
+        for (Horcrus h : horcrusList) {
+            if (h.armorStand.equals(a)) {
+                return h;
+            }
+        }
+
+        return null;
     }
 }
