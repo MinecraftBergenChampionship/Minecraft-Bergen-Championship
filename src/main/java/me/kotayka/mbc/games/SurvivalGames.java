@@ -43,6 +43,7 @@ import java.util.*;
 
 public class SurvivalGames extends Game {
     private final SurvivalGamesMap map = new BCA();
+    private WorldBorder border = null;
     private List<SurvivalGamesItem> items;
     //private List<SurvivalGamesItem> supply_items;
 
@@ -255,6 +256,7 @@ public class SurvivalGames extends Game {
                 }
             } else {
                 map.setBarriers(false);
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Grace ends in 30 seconds!");
                 bossBar = Bukkit.createBossBar(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "GRACE PERIOD", BarColor.PURPLE, BarStyle.SOLID);
                 bossBar.setVisible(true);
                 for (Participant p : MBC.getInstance().getPlayers()) {
@@ -264,7 +266,6 @@ public class SurvivalGames extends Game {
                     p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
                 }
                 setGameState(GameState.ACTIVE);
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Grace ends in 30 seconds!");
                 timeRemaining = 450;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
@@ -341,7 +342,7 @@ public class SurvivalGames extends Game {
             } else if (timeRemaining == 300) {
                 //spawnSupplyCrate();
                 killPoints -= 2;
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.RED + "Kill points are decreasing! (10 -> 8)");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (10 -> 8)");
                 bossBar.removeAll();
                 bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "HORCRUXES EXPIRE", BarColor.RED, BarStyle.SOLID);
                 bossBar.setVisible(true);
@@ -369,8 +370,8 @@ public class SurvivalGames extends Game {
             } else if (timeRemaining == 180) {
                 for (Horcrux h : horcruxList) {
                     h.inUse = false;
-                    h.placed = false;
-                    h.used = false;
+                    h.placed = true;
+                    h.used = true;
 
                     if (h.armorStand != null) {
                         h.armorStand.remove();
@@ -381,7 +382,7 @@ public class SurvivalGames extends Game {
                 for (Participant participant : MBC.getInstance().players) {
                     removeEndCrystal(participant.getPlayer());
                 }
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.RED + "Kill points are decreasing! (8 -> 5)");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (8 -> 5)");
                 bossBar.removeAll();
                 bossBar.setVisible(false);
             }
@@ -787,6 +788,8 @@ public class SurvivalGames extends Game {
             if (e.getDamager() instanceof Arrow) {
                 e.setCancelled(true);
                 e.getDamager().remove();
+                map.getWorld().dropItemNaturally(e.getEntity().getLocation(), new ItemStack(Material.ARROW));
+                return;
             }
         }
 
@@ -1280,21 +1283,24 @@ public class SurvivalGames extends Game {
 
     private void checkHorcruxes() {
         for (Horcrux h : horcruxList) {
-            WorldBorder border = map.getWorld().getWorldBorder();
-            double radius = border.getSize() / 2;
-            Location location = h.armorStand.getLocation();
+            if (border == null) {
+                border = map.getWorld().getWorldBorder();
+            }
 
-            if (map.Center().distanceSquared(location) >= (radius * radius)) {
+            if (h.armorStand == null || h.used) continue;
+
+            Location loc = h.armorStand.getLocation();
+            double size = border.getSize()/2;
+            Location center = border.getCenter();
+            double x = loc.getX() - center.getX(), z = loc.getZ() - center.getZ();
+            if ((x > size || (-x) > size) || (z > size || (-z) > size)) {
                 h.inUse = false;
-                h.placed = false;
-                h.used = false;
-                if (h.armorStand != null) {
-                    h.armorStand.remove();
-                    logger.log(h.team.getTeamName() + "'s Horcrux was destroyed by the border!");
-                    for (Participant p : h.team.getPlayers()) {
-                        p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Your Horcrux was destroyed by the border!");
-                    }
-                    h.armorStand = null;
+                h.placed = true;
+                h.used = true;
+                h.armorStand.remove();
+                logger.log(h.team.getTeamName() + "'s Horcrux was destroyed by the border!");
+                for (Participant p : h.team.getPlayers()) {
+                    p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Your Horcrux was destroyed by the border!");
                 }
             }
         }

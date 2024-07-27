@@ -46,4 +46,21 @@ public class BuildMartPlayer extends GamePlayer {
             }
         }
     }
+
+    public void spawn() {
+        Player p = getParticipant().getPlayer();
+        p.getInventory().clear();
+        p.teleport(team.getSPAWN());
+
+        ItemStack[] items = BuildMart.getItemsForBuildMart();
+
+        for (ItemStack i : items) {
+            if (i.getType().equals(Material.ELYTRA)) {
+                p.getInventory().setChestplate(i);
+            } else {
+                p.getInventory().addItem(i);
+            }
+        }
+
+    }
 }

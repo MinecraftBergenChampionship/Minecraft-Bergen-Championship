@@ -123,7 +123,7 @@ public class BuildMart extends Game {
                 MBC.getInstance().sendMutedMessages();
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
                 for (BuildMartPlayer bmp : buildMartPlayers) {
-                    bmp.respawn();
+                    bmp.spawn();
                 }
                 setGameState(GameState.STARTING);
                 timeRemaining = 30;
