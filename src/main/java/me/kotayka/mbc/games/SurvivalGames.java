@@ -60,8 +60,8 @@ public class SurvivalGames extends Game {
     private boolean firstRound = true;
     private Map<Player, Double> playerDamage = new HashMap<>();
 
-    private Map<MBCTeam, Horcrus> horcrusMap = new HashMap<>();
-    private List<Horcrus> horcrusList = new ArrayList<>();
+    private Map<MBCTeam, Horcrux> horcruxMap = new HashMap<>();
+    private List<Horcrux> horcruxList = new ArrayList<>();
 
     // Enchantment
     private final GUIItem[] guiItems = setupGUIItems();
@@ -84,11 +84,12 @@ public class SurvivalGames extends Game {
                 "⑬ There will be a short grace period.",
                 "⑬ Purchase items at the enchant table, drag and click books to enchant!\n\n" + 
                 "⑬ Additionally, watch out for the border, " + ChatColor.BOLD + " you will not be able to break glass or open doors behind the border.",
-                "⑬ Your team will get a placement bonus, so live as long as you can!\n\n" +
-                "But there are two rounds, so remember who killed you...",
+                "⑬ Live as long as you can, and place your teams horcrux for one revive!\n\n" +
+                "⑬ There are two rounds, so remember who killed you...",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "⑬ +10 points for eliminations\n" +
-                        "⑬ +2 points for every player outlived\n" +
+                        "⑬ +150 points split based on % of damage dealt\n" +
+                        "⑬ +1 points for every player outlived\n" +
                         "⑬ Team Bonuses (split amongst team):\n" +
                         "     ⑬ 1st: +10 points, 2nd: +8 points, 3rd: +7 points\n" +
                         "     ⑬ 4th: +6 points, 5th: +5 points, 6th: +4 points"
@@ -118,7 +119,7 @@ public class SurvivalGames extends Game {
 
     @Override
     public void loadPlayers() {
-        for (Horcrus h : horcrusList) {
+        for (Horcrux h : horcruxList) {
             h.inUse = false;
             h.placed = false;
             h.used = false;
@@ -178,9 +179,9 @@ public class SurvivalGames extends Game {
         super.start();
 
         for (MBCTeam t : getValidTeams()) {
-            Horcrus h = new Horcrus(t);
-            horcrusMap.put(t, h);
-            horcrusList.add(h);
+            Horcrux h = new Horcrux(t);
+            horcruxMap.put(t, h);
+            horcruxList.add(h);
         }
 
         for (ItemFrame i : map.getWorld().getEntitiesByClass(ItemFrame.class)) {
@@ -204,7 +205,7 @@ public class SurvivalGames extends Game {
             bossBar.setVisible(false);
         }
 
-        for (Horcrus h : horcrusList) {
+        for (Horcrux h : horcruxList) {
             h.inUse = false;
             h.placed = false;
             h.used = false;
@@ -657,18 +658,18 @@ public class SurvivalGames extends Game {
                         }
                     }
 
-                    Horcrus horcrus = horcrusMap.get(person.getTeam());
+                    Horcrux horcrux = horcruxMap.get(person.getTeam());
 
                     e.setCancelled(true);
 
-                    if (horcrus.placed) {
+                    if (horcrux.placed) {
                         return;
                     }
 
                     Location loc = block.getLocation().clone().add(new Vector(0.5, 1, 0.5));
 
-                    horcrus.spawn(loc);
-                    horcrus.placed = true;
+                    horcrux.spawn(loc);
+                    horcrux.placed = true;
                 }
             }
         }
@@ -741,34 +742,41 @@ public class SurvivalGames extends Game {
         }
     }
 
-    public void HandleInteractHorcrus(Player p, ArmorStand a) {
-        Horcrus horcrus = Horcrus.getHorcrux(horcrusList, a);
+    public void HandleInteractHorcrux(Player p, ArmorStand a) {
+        Horcrux horcrux = Horcrux.getHorcrux(horcruxList, a);
         Participant participant = Participant.getParticipant(p);
 
-        if (participant.getTeam().equals(horcrus.team)) {
-            p.sendMessage(ChatColor.RED+"You can't break you own Horcrus!!!");
+        if (participant.getTeam().equals(horcrux.team)) {
+            p.sendMessage(ChatColor.RED+"You cannot break your own Horcrux!");
         }
-        else if (horcrus.inUse) {
-            p.sendMessage(ChatColor.RED+"This Horcrus is currently in use");
+        else if (horcrux.inUse) {
+            p.sendMessage(ChatColor.RED+"This Horcrux is currently in use.");
         }
         else {
-            MBC.spawnFirework(a.getLocation().clone().add(0, 2, 0), horcrus.team.getColor());
+            MBC.spawnFirework(a.getLocation().clone().add(0, 2, 0), horcrux.team.getColor());
 
             for (Participant par : MBC.getInstance().players) {
-                if (par.getTeam().equals(horcrus.team)) {
-                    par.getPlayer().sendMessage(ChatColor.RED+"Your Horcrus has been destroyed by " + participant.getFormattedName());
+                if (par.getTeam().equals(horcrux.team)) {
+                    par.getPlayer().sendMessage(ChatColor.RED+"Your Horcrux has been destroyed by " + participant.getFormattedName() + "!");
                 }
             }
 
-            horcrus.used = true;
+            horcrux.used = true;
             a.remove();
         }
     }
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent e) {
+        if (e.getEntity() instanceof ArmorStand) {
+            if (e.getDamager() instanceof Arrow) {
+                e.setCancelled(true);
+                e.getDamager().remove();
+            }
+        }
+
         if (e.getDamager() instanceof Player && e.getEntity() instanceof ArmorStand) {
-            HandleInteractHorcrus((Player) e.getDamager(), (ArmorStand) e.getEntity());
+            HandleInteractHorcrux((Player) e.getDamager(), (ArmorStand) e.getEntity());
             e.setCancelled(true);
             return;
         }
@@ -802,7 +810,7 @@ public class SurvivalGames extends Game {
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         Player victim = e.getPlayer();
-        Horcrus horcrus = horcrusMap.get(Participant.getParticipant(victim).getTeam());
+        Horcrux horcrux = horcruxMap.get(Participant.getParticipant(victim).getTeam());
         Participant killer = Participant.getParticipant(victim.getKiller());
 
         // remove the horcruxes
@@ -823,13 +831,13 @@ public class SurvivalGames extends Game {
                 playerKills.put(e.getPlayer().getKiller(), kills);
                 createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
             }
-            deathEffectsWithHealthSG(e, horcrus);
+            deathEffectsWithHealthSG(e, horcrux);
         } else {
             Participant p = Participant.getParticipant(victim);
             if (p == null) return;
             MBC.spawnFirework(p);
             e.setDeathMessage(e.getDeathMessage().replace(e.getPlayer().getName(), p.getFormattedName()));
-            if (horcrus.used || !horcrus.placed) {
+            if (horcrux.used || !horcrux.placed) {
                 updatePlayersAlive(p);
             }
         }
@@ -840,7 +848,7 @@ public class SurvivalGames extends Game {
         Bukkit.broadcastMessage(e.getDeathMessage());
         Participant victimParticipant = Participant.getParticipant(victim);
 
-        if (horcrus.used || !horcrus.placed) {
+        if (horcrux.used || !horcrux.placed) {
             int count = 0;
             for (Participant p : victimParticipant.getTeam().teamPlayers) {
                 if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
@@ -868,8 +876,8 @@ public class SurvivalGames extends Game {
             }
         }
 
-        if (!horcrus.used && horcrus.placed) {
-            Bukkit.broadcastMessage(victimParticipant.getFormattedName()+ChatColor.GOLD+" is being respawned by their teams HORCRUS!");
+        if (!horcrux.used && horcrux.placed) {
+            Bukkit.broadcastMessage(victimParticipant.getFormattedName()+ChatColor.BOLD+" is being respawned by their team's " + ChatColor.GOLD + "horcrux!");
 
             ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
@@ -879,24 +887,24 @@ public class SurvivalGames extends Game {
             }
 
             // Set the player head on the ArmorStand
-            horcrus.armorStand.setHelmet(playerHead);
-            horcrus.inUse = true;
+            horcrux.armorStand.setHelmet(playerHead);
+            horcrux.inUse = true;
 
             Bukkit.getScheduler().runTaskLater(MBC.getInstance().plugin, new Runnable() {
                 @Override
                 public void run() {
                     victim.getInventory().clear();
-                    victim.teleport(horcrus.location);
+                    victim.teleport(horcrux.location);
                     victim.setGameMode(GameMode.SURVIVAL);
-                    horcrus.armorStand.remove();
+                    horcrux.armorStand.remove();
                 }
             }, 100L);
         }
 
-        horcrus.used = true;
+        horcrux.used = true;
     }
 
-    public void deathEffectsWithHealthSG(PlayerDeathEvent e, Horcrus horcrus) {
+    public void deathEffectsWithHealthSG(PlayerDeathEvent e, Horcrux horcrux) {
         Participant victim = Participant.getParticipant(e.getPlayer());
         Participant killer = Participant.getParticipant(e.getPlayer().getKiller());
         String deathMessage = e.getDeathMessage();
@@ -917,7 +925,7 @@ public class SurvivalGames extends Game {
 
         e.setDeathMessage(deathMessage);
 
-        if (horcrus.used || !horcrus.placed) {
+        if (horcrux.used || !horcrux.placed) {
             updatePlayersAlive(victim);
         }
     }
@@ -992,7 +1000,7 @@ public class SurvivalGames extends Game {
             Player player = e.getPlayer();
             ArmorStand armorStand = (ArmorStand) e.getRightClicked();
 
-            HandleInteractHorcrus(player, armorStand);
+            HandleInteractHorcrux(player, armorStand);
             e.setCancelled(true);
         }
     }
@@ -1003,7 +1011,7 @@ public class SurvivalGames extends Game {
             Player player = e.getPlayer();
             ArmorStand armorStand = (ArmorStand) e.getRightClicked();
 
-            HandleInteractHorcrus(player, armorStand);
+            HandleInteractHorcrux(player, armorStand);
             e.setCancelled(true);
         }
     }
@@ -1324,7 +1332,7 @@ class GUIItem {
     }
 }
 
-class Horcrus {
+class Horcrux {
     public boolean placed = false;
     public Location location;
     public ArmorStand armorStand;
@@ -1334,7 +1342,7 @@ class Horcrus {
 
     public MBCTeam team;
 
-    public Horcrus(MBCTeam t) {
+    public Horcrux(MBCTeam t) {
         team = t;
     }
 
@@ -1356,8 +1364,8 @@ class Horcrus {
         armorStand.setItem(EquipmentSlot.FEET, leatherBoots);
     }
 
-    public static Horcrus getHorcrux(List<Horcrus> horcrusList, ArmorStand a) {
-        for (Horcrus h : horcrusList) {
+    public static Horcrux getHorcrux(List<Horcrux> horcruxList, ArmorStand a) {
+        for (Horcrux h : horcruxList) {
             if (h.armorStand.equals(a)) {
                 return h;
             }
