@@ -144,6 +144,7 @@ public class SurvivalGames extends Game {
         }
         for (Participant p : MBC.getInstance().getPlayers()) {
             playersAlive.add(p);
+            playerDamage.put(p.getPlayer(), 0.0);
             p.getPlayer().getInventory().clear();
             ItemStack endCrystal = new ItemStack(Material.END_CRYSTAL);
 
