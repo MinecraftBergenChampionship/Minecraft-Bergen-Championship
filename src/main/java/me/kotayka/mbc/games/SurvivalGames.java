@@ -342,7 +342,7 @@ public class SurvivalGames extends Game {
                 killPoints -= 2;
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.RED + "Kill points are decreasing! (10 -> 8)");
                 bossBar.removeAll();
-                bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "TIME BEFORE MINIMUM KILL POINTS", BarColor.RED, BarStyle.SOLID);
+                bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "HORCRUXES EXPIRE", BarColor.RED, BarStyle.SOLID);
                 bossBar.setVisible(true);
                 for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
                     bossBar.addPlayer(p.getPlayer());
@@ -366,6 +366,16 @@ public class SurvivalGames extends Game {
                 //event = SurvivalGamesEvent.DEATHMATCH;
                  */
             } else if (timeRemaining == 180) {
+                for (Horcrux h : horcruxList) {
+                    h.inUse = false;
+                    h.placed = false;
+                    h.used = false;
+
+                    if (h.armorStand != null) {
+                        h.armorStand.remove();
+                        h.armorStand = null;
+                    }
+                }
                 killPoints -= 2;
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.RED + "Kill points are decreasing! (8 -> 5)");
                 bossBar.removeAll();
