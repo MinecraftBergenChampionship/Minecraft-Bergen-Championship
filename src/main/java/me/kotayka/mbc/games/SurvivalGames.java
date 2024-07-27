@@ -71,7 +71,7 @@ public class SurvivalGames extends Game {
     // SCORING
     public final int KILL_POINTS_INITIAL = 10;
     public int killPoints = KILL_POINTS_INITIAL;
-    public final int SURVIVAL_POINTS = 2;
+    public final int SURVIVAL_POINTS = 1;
     // Shared amongst each team: 10, 8, 7, 6, 5, 4 points for each player
     public final int[] TEAM_BONUSES_4 = {40, 32, 28, 24, 20, 16};
     public final int[] TEAM_BONUSES_3 = {30, 24, 21, 18, 15, 12};
@@ -122,6 +122,10 @@ public class SurvivalGames extends Game {
             h.inUse = false;
             h.placed = false;
             h.used = false;
+            if (h.armorStand != null) {
+                h.armorStand.remove();
+                h.armorStand = null;
+            }
         }
 
         setPVP(false);
@@ -198,6 +202,11 @@ public class SurvivalGames extends Game {
             h.inUse = false;
             h.placed = false;
             h.used = false;
+
+            if (h.armorStand != null) {
+                h.armorStand.remove();
+                h.armorStand = null;
+            }
         }
 
         map.resetMap();
@@ -619,7 +628,7 @@ public class SurvivalGames extends Game {
 
             if (block != null && e.getBlockFace() == org.bukkit.block.BlockFace.UP) {
                 ItemStack item = e.getItem();
-                if (item != null && item.getType() == Material.END_CRYSTAL) {
+                if (item != null && item.getType() == Material.END_CRYSTAL && getState().equals(GameState.ACTIVE)) {
                     for (Participant participant : MBC.getInstance().players) {
                         if (participant.getTeam().equals(person.getTeam())) {
                             removeEndCrystal(participant.getPlayer());
@@ -635,8 +644,6 @@ public class SurvivalGames extends Game {
                     }
 
                     Location loc = block.getLocation().clone().add(new Vector(0, 1, 0));
-
-                    Bukkit.broadcastMessage(loc.toString());
 
                     horcrus.spawn(loc);
                     horcrus.placed = true;
