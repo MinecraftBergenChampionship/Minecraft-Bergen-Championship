@@ -746,7 +746,7 @@ public class SurvivalGames extends Game {
 
             for (Participant par : MBC.getInstance().players) {
                 if (par.getTeam().equals(horcrus.team)) {
-                    par.getPlayer().sendMessage(ChatColor.RED+"Your Horcrus has been destroyed!!!");
+                    par.getPlayer().sendMessage(ChatColor.RED+"Your Horcrus has been destroyed by " + participant.getFormattedName());
                 }
             }
 
