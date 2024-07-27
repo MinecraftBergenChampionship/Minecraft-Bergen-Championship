@@ -127,6 +127,11 @@ public class SurvivalGames extends Game {
                 h.armorStand = null;
             }
         }
+        totalDamage = 0;
+
+        if (bossBar != null) {
+            bossBar.setVisible(false);
+        }
 
         setPVP(false);
         deadTeams = 0;
@@ -210,6 +215,10 @@ public class SurvivalGames extends Game {
             }
         }
 
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            playerDamage.put(p.getPlayer(), 0.0);
+        }
+
         map.resetMap();
     }
 
@@ -277,8 +286,8 @@ public class SurvivalGames extends Game {
                     setGameState(GameState.OVERTIME);
                     timeRemaining = 45;
                 } else {
-                    damagePoints();
                     createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD+"Round Over!");
+                    damagePoints();
                     for (Participant p : playersAlive) {
                         MBCTeam t = p.getTeam();
                         teamPlacements.put(t, 1);
@@ -288,6 +297,7 @@ public class SurvivalGames extends Game {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             p.stopSound(Sound.MUSIC_DISC_FAR, SoundCategory.RECORDS);
                         }
+                        bossBar.setVisible(false);
                         gameOverGraphics();
                         roundWinners(0);
                         setGameState(GameState.END_GAME);
@@ -299,6 +309,7 @@ public class SurvivalGames extends Game {
                         roundOverGraphics();
                         roundWinners(0);
                         setGameState(GameState.END_ROUND);
+                        bossBar.setVisible(false);
                         firstRound = false;
                         timeRemaining = 10;
                     }
@@ -362,13 +373,13 @@ public class SurvivalGames extends Game {
             UpdateEvent();
         } else if (getState().equals(GameState.OVERTIME)) {
             if (timeRemaining == 0) {
+                createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD+"Round Over!");
                 for (Participant p : playersAlive) {
                     MBCTeam t = p.getTeam();
                     teamPlacements.put(t, 1);
                 }
                 damagePoints();
                 placementPoints();
-                createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD+"Round Over!");
                 if (!firstRound) {
                     gameOverGraphics();
                     roundWinners(0);
@@ -754,7 +765,12 @@ public class SurvivalGames extends Game {
 
         if (!(e.getEntity() instanceof Player)) return;
         if (e.getDamager() instanceof Player) {
-            playerDamage.put((Player) e.getDamager(), e.getDamage());
+            Player damager = (Player) e.getDamager();
+            if (playerDamage.get(damager) == null) {
+                return;
+            }
+            double previous = playerDamage.get(damager);
+            playerDamage.put((Player) e.getDamager(), previous + e.getDamage());
             totalDamage += e.getDamage();
             return;
         }
@@ -762,8 +778,11 @@ public class SurvivalGames extends Game {
         if (e.getDamager() instanceof Projectile) {
             ProjectileSource shooter = ((Projectile) e.getDamager()).getShooter();
             if (!(shooter instanceof Player)) return;
+            if (playerDamage.get(shooter) == null) {
+                return;
+            }
             totalDamage += e.getDamage();
-            playerDamage.put((Player) shooter, e.getDamage());
+            playerDamage.compute((Player) shooter, (k, previous) -> previous + e.getDamage());
         }
     }
 
@@ -775,6 +794,14 @@ public class SurvivalGames extends Game {
         Player victim = e.getPlayer();
         Horcrus horcrus = horcrusMap.get(Participant.getParticipant(victim).getTeam());
         Participant killer = Participant.getParticipant(victim.getKiller());
+
+        // remove the horcruxes
+        for (ItemStack i : victim.getInventory()) {
+            if (i != null && i.getType().toString().endsWith("CRYSTAL")) {
+                victim.getInventory().remove(i);
+            }
+        }
+
         if (killer != null) {
             killer.addCurrentScore(killPoints);
             if (playerKills.get(victim.getKiller()) == null) {
@@ -818,7 +845,7 @@ public class SurvivalGames extends Game {
 
         }
 
-        for (ItemStack i : victim.getPlayer().getInventory()) {
+        for (ItemStack i : victim.getInventory()) {
             if (i == null) continue;
             map.getWorld().dropItemNaturally(victim.getLocation(), i);
         }
