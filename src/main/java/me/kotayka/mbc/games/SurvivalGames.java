@@ -269,6 +269,7 @@ public class SurvivalGames extends Game {
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             decrementBossBar();
+            checkHorcruxes();
             /*
              * Event timeline:
              *  7:30: Game Starts
@@ -377,6 +378,9 @@ public class SurvivalGames extends Game {
                     }
                 }
                 killPoints -= 2;
+                for (Participant participant : MBC.getInstance().players) {
+                    removeEndCrystal(participant.getPlayer());
+                }
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.RED + "Kill points are decreasing! (8 -> 5)");
                 bossBar.removeAll();
                 bossBar.setVisible(false);
@@ -763,8 +767,9 @@ public class SurvivalGames extends Game {
             p.sendMessage(ChatColor.RED+"This Horcrux is currently in use.");
         }
         else {
-            MBC.spawnFirework(a.getLocation().clone().add(0, 2, 0), horcrux.team.getColor());
+            MBC.spawnFirework(a.getLocation().clone().add(0.5, 2, 0.5), horcrux.team.getColor());
 
+            logger.log(horcrux.team.getTeamName() + "'s Horcrux was destroyed by " + participant.getPlayerName());
             for (Participant par : MBC.getInstance().players) {
                 if (par.getTeam().equals(horcrux.team)) {
                     par.getPlayer().sendMessage(ChatColor.RED+"Your Horcrux has been destroyed by " + participant.getFormattedName() + "!");
@@ -1271,6 +1276,12 @@ public class SurvivalGames extends Game {
         items[6] = new GUIItem(multishot, Enchantment.MULTISHOT, 2);
 
         return items;
+    }
+
+    private void checkHorcruxes() {
+        for (Horcrux h : horcruxList) {
+            if (h.armorStand.getLocation().
+        }
     }
 
     /**
