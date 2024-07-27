@@ -402,6 +402,16 @@ public class SurvivalGames extends Game {
             }
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 36) {
+                for (Horcrus h : horcrusList) {
+                    h.inUse = false;
+                    h.placed = false;
+                    h.used = false;
+
+                    if (h.armorStand != null) {
+                        h.armorStand.remove();
+                        h.armorStand = null;
+                    }
+                }
                 map.resetMap();
             }
             gameEndEvents();
