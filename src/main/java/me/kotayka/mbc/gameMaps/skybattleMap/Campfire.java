@@ -25,12 +25,12 @@ public class Campfire extends SkybattleMap {
     public final double HEIGHT_SHRINK_AMOUNT = 0.2;
     private float borderRadius = 90;
     private final Location[] SPAWNS = {
-            new Location(getWorld(), 0, 77, 74),
-            new Location(getWorld(), -60, 77, 37),
-            new Location(getWorld(), -60, 77, -37),
-            new Location(getWorld(), 0, 77, -74),
-            new Location(getWorld(), 60, 77, -37),
-            new Location(getWorld(), 60, 77, 37),
+            new Location(getWorld(), 0, 78, 74),
+            new Location(getWorld(), -60, 78, 37),
+            new Location(getWorld(), -60, 78, -37),
+            new Location(getWorld(), 0, 78, -74),
+            new Location(getWorld(), 60, 78, -37),
+            new Location(getWorld(), 60, 78, 37),
     };
     public Campfire(Skybattle skb) {
         super(skb);
