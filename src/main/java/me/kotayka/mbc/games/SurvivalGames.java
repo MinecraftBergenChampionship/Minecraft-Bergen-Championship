@@ -746,6 +746,13 @@ public class SurvivalGames extends Game {
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent e) {
+        if (e.getEntity() instanceof ArmorStand) {
+            if (e.getDamager() instanceof Arrow) {
+                e.setCancelled(true);
+                e.getDamager().remove();
+            }
+        }
+
         if (e.getDamager() instanceof Player && e.getEntity() instanceof ArmorStand) {
             HandleInteractHorcrus((Player) e.getDamager(), (ArmorStand) e.getEntity());
             e.setCancelled(true);
