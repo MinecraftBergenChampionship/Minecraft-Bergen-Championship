@@ -167,7 +167,7 @@ public class AceRacePlayer extends GamePlayer {
             Lap();
         } else { // not last checkpoint
             if (checkpoint != 0) {
-                this.getParticipant().getPlayer().sendTitle(ChatColor.YELLOW + "Checkpoint!", ChatColor.YELLOW + "" + checkpoint + "/" + ACE_RACE.map.mapLength, 0, 60, 20);
+                this.getParticipant().getPlayer().sendTitle(" ", ChatColor.YELLOW + "Checkpoint " + (checkpoint+1) + "/" + ACE_RACE.map.mapLength, 0, 40, 20);
             }
             checkpoint++;
             ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());

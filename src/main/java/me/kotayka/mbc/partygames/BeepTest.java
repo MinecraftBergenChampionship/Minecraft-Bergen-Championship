@@ -321,6 +321,7 @@ public class BeepTest extends PartyGame {
             }
             p.sendMessage(ChatColor.RED + "You fell!");
             for (Player other : Bukkit.getOnlinePlayers()) {
+
                 other.showPlayer(p);
             }
 

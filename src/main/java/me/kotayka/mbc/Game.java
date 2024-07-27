@@ -12,6 +12,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
@@ -611,6 +612,7 @@ public abstract class Game extends Minigame {
             if (p.getPlayer().getAllowFlight()) {
                 removeWinEffect(p);
             }
+            p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
