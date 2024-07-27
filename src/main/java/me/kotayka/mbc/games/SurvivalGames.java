@@ -644,7 +644,7 @@ public class SurvivalGames extends Game {
                         return;
                     }
 
-                    Location loc = block.getLocation().clone().add(new Vector(0, 1, 0));
+                    Location loc = block.getLocation().clone().add(new Vector(0.5, 1, 0.5));
 
                     horcrus.spawn(loc);
                     horcrus.placed = true;
@@ -755,12 +755,14 @@ public class SurvivalGames extends Game {
         if (!(e.getEntity() instanceof Player)) return;
         if (e.getDamager() instanceof Player) {
             playerDamage.put((Player) e.getDamager(), e.getDamage());
+            totalDamage += e.getDamage();
             return;
         }
 
         if (e.getDamager() instanceof Projectile) {
             ProjectileSource shooter = ((Projectile) e.getDamager()).getShooter();
             if (!(shooter instanceof Player)) return;
+            totalDamage += e.getDamage();
             playerDamage.put((Player) shooter, e.getDamage());
         }
     }
