@@ -2,7 +2,6 @@ package me.kotayka.mbc.games;
 
 import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.skybattleMap.Campfire;
-import me.kotayka.mbc.gameMaps.skybattleMap.Classic;
 import me.kotayka.mbc.gameMaps.skybattleMap.SkybattleMap;
 import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
 import org.bukkit.*;

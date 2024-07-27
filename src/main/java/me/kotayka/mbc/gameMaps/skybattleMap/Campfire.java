@@ -91,8 +91,8 @@ public class Campfire extends SkybattleMap {
             }
         }
 
-        for (int x = -14; x < 14; x+=2) {
-            for (int z = -13; z < 13; z+=2) {
+        for (int x = -28; x < 28; x+=2) {
+            for (int z = -28; z < 28; z+=2) {
                 getWorld().spawnParticle(Particle.REDSTONE, x, getBorderHeight(), z, 1, SKYBATTLE.TOP_BORDER_PARTICLE);
             }
         }
@@ -157,12 +157,24 @@ public class Campfire extends SkybattleMap {
 
     @Override
     public void Overtime() {
-
+        Border();
+        reduceBorderHeight(HEIGHT_SHRINK_AMOUNT);
+        reduceBorderRadius(RADIUS_SHRINK_AMOUNT);
     }
 
     @Override
     public void removeBarriers() {
-
+        for (Location l : SPAWNS) {
+            for (int x_offset = -2; x_offset <= 2; x_offset++) {
+                for (int y_offset = 0; y_offset <= 3; y_offset++) {
+                    for (int z_offset = -2; z_offset <= 2; z_offset++) {
+                        if (getWorld().getBlockAt(l.getBlockX() + x_offset, l.getBlockY() + y_offset, l.getBlockZ() + z_offset).getType().equals(Material.BARRIER)) {
+                            getWorld().getBlockAt(l.getBlockX() + x_offset, l.getBlockY() + y_offset, l.getBlockZ() + z_offset).setType(Material.AIR);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void initSpawnItems() {
