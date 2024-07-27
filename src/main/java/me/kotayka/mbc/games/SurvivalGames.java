@@ -1280,7 +1280,23 @@ public class SurvivalGames extends Game {
 
     private void checkHorcruxes() {
         for (Horcrux h : horcruxList) {
-            if (h.armorStand.getLocation().
+            WorldBorder border = map.getWorld().getWorldBorder();
+            double radius = border.getSize() / 2;
+            Location location = h.armorStand.getLocation();
+
+            if (map.Center().distanceSquared(location) >= (radius * radius)) {
+                h.inUse = false;
+                h.placed = false;
+                h.used = false;
+                if (h.armorStand != null) {
+                    h.armorStand.remove();
+                    logger.log(h.team.getTeamName() + "'s Horcrux was destroyed by the border!");
+                    for (Participant p : h.team.getPlayers()) {
+                        p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Your Horcrux was destroyed by the border!");
+                    }
+                    h.armorStand = null;
+                }
+            }
         }
     }
 
