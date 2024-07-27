@@ -118,6 +118,12 @@ public class SurvivalGames extends Game {
 
     @Override
     public void loadPlayers() {
+        for (Horcrus h : horcrusList) {
+            h.inUse = false;
+            h.placed = false;
+            h.used = false;
+        }
+
         setPVP(false);
         deadTeams = 0;
         killPoints = KILL_POINTS_INITIAL;
@@ -186,6 +192,12 @@ public class SurvivalGames extends Game {
         killPoints = KILL_POINTS_INITIAL;
         if (bossBar != null) {
             bossBar.setVisible(false);
+        }
+
+        for (Horcrus h : horcrusList) {
+            h.inUse = false;
+            h.placed = false;
+            h.used = false;
         }
 
         map.resetMap();
