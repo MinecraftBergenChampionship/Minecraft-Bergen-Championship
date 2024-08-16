@@ -60,7 +60,7 @@ public class AceRace extends Game {
                     ChatColor.BOLD + "Scoring:\n" + ChatColor.RESET +
                             "⑭ +1 point for completing a lap\n" +
                             "⑭ +1 point for every player beaten on a lap\n" +
-                            "⑭ +8 points for finishing the course\n" +
+                            "⑭ +10 points for finishing the course\n" +
                             "⑭ +3 points for every player beaten on the final lap\n" +
                             "⑭ Top 8 Bonuses- 1st:+30, 2nd,3rd:+20, 4th,5th:+15, 6th-8th:+10, 9th-10th:+5"
             });

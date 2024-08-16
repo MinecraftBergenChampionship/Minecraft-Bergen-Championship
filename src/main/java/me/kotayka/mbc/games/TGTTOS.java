@@ -59,7 +59,7 @@ public class TGTTOS extends Game {
     public static int COMPLETION_POINTS = 1; // awarded for completing the course
     public static int FIRST_TEAM_BONUS = 4; // awarded per player on team
     public static int SECOND_TEAM_BONUS = 2; // awarded per player on team
-    public static int TOP_THREE_BONUS = 5; // bonus for placing top 3
+    public static int TOP_THREE_BONUS = 3; // bonus for placing top 3
 
     public TGTTOS() {
         super("TGTTOS", new String[] {
@@ -74,7 +74,7 @@ public class TGTTOS extends Game {
                         "⑪ +1 point for every player outplaced\n" +
                         "⑪ +4 points for each player on the first full team to finish a course\n" +
                         "⑪ +2 points for each player on the second full team to finish a course\n" +
-                        "⑪ +5 bonus points for placing Top 3 in a course\n"
+                        "⑪ +3 bonus points for placing Top 3 in a course\n"
         });
     }
 
