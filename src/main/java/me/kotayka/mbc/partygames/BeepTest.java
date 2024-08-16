@@ -232,7 +232,7 @@ public class BeepTest extends PartyGame {
                         roundTime = System.currentTimeMillis();
                         int timeForLevel;
                         if (rounds < 4) {
-                            timeForLevel = 10;
+                            timeForLevel = 15;
                             CURRENT_POINTS = EASY_POINTS;
                         } else if (rounds < 8) {
                             timeForLevel = 15;
