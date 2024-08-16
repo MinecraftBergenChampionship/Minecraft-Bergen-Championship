@@ -1,6 +1,7 @@
 package me.kotayka.mbc.gameMaps.quickfireMap;
 
 import me.kotayka.mbc.gameMaps.MBCMap;
+import me.kotayka.mbc.MBCTeam;
 import me.kotayka.mbc.Quickfire;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -42,4 +43,6 @@ public abstract class QuickfireMap extends MBCMap {
      * @implSpec should call removeEntities() and resetKillMaps()
      */
     public abstract void resetBarriers(boolean b);
+
+    public abstract void changeColor(MBCTeam firstPlace, MBCTeam secondPlace);
 }

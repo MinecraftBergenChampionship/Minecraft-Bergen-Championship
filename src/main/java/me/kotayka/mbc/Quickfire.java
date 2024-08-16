@@ -409,31 +409,7 @@ public class Quickfire extends FinaleGame {
     }
 
     private void changeColor() {
-        Material first = firstPlace.getConcrete().getType();
-        Material second = secondPlace.getConcrete().getType();
-
-        // spawn area floor
-        for (int x = 16; x <= 22; x++) {
-            for (int z = -3; z <= 3; z++) {
-                if (world.getBlockAt(x,-61, z).getType().equals(Material.MYCELIUM)) continue;
-                if (x == 16 || x == 22 && z >= -1 && z <= 1) {
-                    world.getBlockAt(x, -61, z).setType(first);
-                    world.getBlockAt(-x, -61, z).setType(second);
-                } else if (z == -2 || z == 2 && x >= 18 && x <= 20) {
-                    world.getBlockAt(x, -61, z).setType(first);
-                    world.getBlockAt(-x, -61, z).setType(second);
-                } else {
-                    world.getBlockAt(x, -61, z).setType(first);
-                    world.getBlockAt(-x, -61, z).setType(second);
-                }
-            }
-        }
-
-        // wool blocks on bridge
-        for (int z = -6; z <= 6; z+=2) {
-            world.getBlockAt(12, -57, z).setType(first);
-            world.getBlockAt(-12, -57, z).setType(second);
-        }
+        map.changeColor(firstPlace, secondPlace);
     }
 
     @EventHandler
