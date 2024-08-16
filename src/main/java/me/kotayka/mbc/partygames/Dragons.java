@@ -51,9 +51,9 @@ public class Dragons extends PartyGame {
     private int dragonsTaskID = -1;
 
     // SCORING
-    private final int SURVIVAL_POINTS = 2; // points given to all surviving players when a player dies
+    private final int SURVIVAL_POINTS = 1; // points given to all surviving players when a player dies
     private final int WIN_POINTS = 5; // points given to every player who survives 5 minutes
-    private final int SPAWN_POINTS = 1; // points given to every living player when a dragon spawns
+    private final int SPAWN_POINTS = 3; // points given to every living player when a dragon spawns
     private int remaining_spawns = 7;
 
     public static PartyGame getInstance() {
@@ -71,8 +71,8 @@ public class Dragons extends PartyGame {
                 "⑰ You'll get points for each player you outlive, along with points every time a dragon spawns.\n\n" +
                 "⑰ Players also recieve a bonus for surviving the round.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "⑰ +2 points for each player outlived\n" +
-                        "⑰ +1 points for being alive when a new dragon spawns\n" +
+                        "⑰ +1 points for each player outlived\n" +
+                        "⑰ +3 points for being alive when a new dragon spawns\n" +
                         "⑰ +5 points for surviving until the end of the round"});
 
         map = new ConchStreet(this);

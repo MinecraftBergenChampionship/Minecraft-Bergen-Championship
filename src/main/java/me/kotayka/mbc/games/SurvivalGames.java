@@ -73,9 +73,9 @@ public class SurvivalGames extends Game {
     public final int KILL_POINTS_INITIAL = 10;
     public int killPoints = KILL_POINTS_INITIAL;
     public final int SURVIVAL_POINTS = 1;
-    // Shared amongst each team: 10, 8, 7, 6, 5, 4 points for each player
-    public final int[] TEAM_BONUSES_4 = {40, 32, 28, 24, 20, 16};
-    public final int[] TEAM_BONUSES_3 = {30, 24, 21, 18, 15, 12};
+    // Shared amongst each team: 14, 11, 10, 9, 8, 6 points for each player
+    public final int[] TEAM_BONUSES_4 = {56, 44, 40, 36, 32, 24};
+    public final int[] TEAM_BONUSES_3 = {42, 33, 30, 27, 24, 18};
     private double totalDamage = 0;
     // public final int WIN_POINTS = 36; // shared amongst all remaining players
 
@@ -92,8 +92,8 @@ public class SurvivalGames extends Game {
                         "⑬ +150 points split based on % of damage dealt\n" +
                         "⑬ +1 points for every player outlived\n" +
                         "⑬ Team Bonuses (split amongst team):\n" +
-                        "     ⑬ 1st: +10 points, 2nd: +8 points, 3rd: +7 points\n" +
-                        "     ⑬ 4th: +6 points, 5th: +5 points, 6th: +4 points"
+                        "     ⑬ 1st: +14 points, 2nd: +11 points, 3rd: +10 points\n" +
+                        "     ⑬ 4th: +9 points, 5th: +8 points, 6th: +6 points"
         });
 
         for (MBCTeam t : getValidTeams()) {
@@ -612,13 +612,21 @@ public class SurvivalGames extends Game {
     }
 
     private void damagePoints() {
+        int sqrtSum = 0;
+        for (Player player : playerDamage.keySet()) {
+            sqrtSum += playerDamage.get(player);
+        }
+
         for (Player player : playerDamage.keySet()) {
             Participant p = Participant.getParticipant(player);
-            double percentage = playerDamage.get(player) / totalDamage;
-            int points = (int) Math.min(percentage * 150, 10);
+            double percentage = 100 *(playerDamage.get(player) / totalDamage);
+            int points = (int) Math.log(Math.pow(150*Math.sqrt(percentage)/sqrtSum, 5.25)/8);
+            if (points < 0) {
+                points = 0;
+            }
             p.addCurrentScore(points);
-            logger.log(p.getPlayerName() + " dealt " + percentage*100 + "% of the total damage and earned " + points + " points!");
-            p.getPlayer().sendMessage(String.format("%sYou dealt %.2f%% of the total damage and earned %d points!", ChatColor.GREEN, percentage*100, points));
+            logger.log(p.getPlayerName() + " dealt " + percentage + "% of the total damage and earned " + points + " points!");
+            p.getPlayer().sendMessage(String.format("%sYou dealt %.2f%% of the total damage and earned %d points!", ChatColor.GREEN, percentage, points));
         }
     }
 

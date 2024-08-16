@@ -38,7 +38,7 @@ public class AceRace extends Game {
     public SortedMap<Long, List<String>> fastestLaps = new TreeMap<Long, List<String>>();
 
     // SCORING VARIABLES
-    public static final int FINISH_RACE_POINTS = 8;           // points for finishing the race
+    public static final int FINISH_RACE_POINTS = 10;           // points for finishing the race
     public static final int PLACEMENT_LAP_POINTS = 1;         // points for placement for first laps
     public static final int LAP_COMPLETION_POINTS = 1;
     public static final int PLACEMENT_FINAL_LAP_POINTS = 3;   // points for placement for last lap

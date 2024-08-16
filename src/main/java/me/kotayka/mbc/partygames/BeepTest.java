@@ -62,7 +62,7 @@ public class BeepTest extends PartyGame {
     public long roundTime;
     private boolean ended = false;
 
-    public final int STAGE_POINTS = 5;
+    public final int STAGE_POINTS = 6;
     public final int EASY_POINTS = 1;
     public final int MEDIUM_POINTS = 2;
     public final int HARD_POINTS = 3;
@@ -96,7 +96,7 @@ public class BeepTest extends PartyGame {
                         "⑰ +2 points for each medium level completed\n" +
                         "⑰ +3 points for each hard level completed\n" +
                         "⑰ +4 points for each extreme level completed\n" +
-                        "⑰ +5 points for completing a color of difficulty"
+                        "⑰ +6 points for completing a color of difficulty"
         });
 
         loadCourses();
