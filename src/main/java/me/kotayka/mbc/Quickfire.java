@@ -2,6 +2,8 @@ package me.kotayka.mbc;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
+import me.kotayka.mbc.gameMaps.quickfireMap.Castle;
 import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
 
 import java.util.HashMap;
@@ -28,14 +30,15 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class Quickfire extends FinaleGame {
+    private final QuickfireMap map = new Castle(this);
     public static final ItemStack CROSSBOW = new ItemStack(Material.CROSSBOW);
     public static final ItemStack BOOTS = new ItemStack(Material.LEATHER_BOOTS);
     public Map<UUID, QuickfirePlayer> quickfirePlayers = new HashMap<>();
     public static final int MAX_DIST_FROM_CENTER = 13225;
     private World world = Bukkit.getWorld("Quickfire");
-    private final Location TEAM_ONE_SPAWN = new Location(world, 19.5, -60, 0);
-    private final Location TEAM_TWO_SPAWN = new Location(world, -19.5,  -60, 0);
-    private final Location SPAWN = new Location(Bukkit.getWorld("Quickfire"), 1.5, -35, 0.5, -90, 90);
+    private final Location TEAM_ONE_SPAWN = map.getTeamOneSpawn();
+    private final Location TEAM_TWO_SPAWN = map.getTeamTwoSpawn();
+    private final Location SPAWN = map.getSpawn();
     private int[] playersAlive;
     private int timeElapsed = 0;
     private int roundNum = 0;
@@ -402,74 +405,7 @@ public class Quickfire extends FinaleGame {
     }
 
     public void Barriers(boolean b) {
-        Material m = b ? Material.BARRIER : Material.AIR;
-
-        // TODO make this not dumb as shi
-        for (int y = -60; y <=-59; y++) {
-            // second place team
-            world.getBlockAt(-18, y, -4).setType(m);
-            world.getBlockAt(-19, y, -4).setType(m);
-            world.getBlockAt(-20, y, -4).setType(m);
-
-            world.getBlockAt(-21, y, -3).setType(m);
-
-            world.getBlockAt(-21, y, 3).setType(m);
-            world.getBlockAt(-21, y, -2).setType(m);
-            world.getBlockAt(21, y, -2).setType(m);
-            world.getBlockAt(21, y, -3).setType(m);
-
-            world.getBlockAt(-17, y, -3).setType(m);
-
-            world.getBlockAt(-16, y, -2).setType(m);
-            world.getBlockAt(-22, y, -2).setType(m);
-
-            world.getBlockAt(-23, y, -1).setType(m);
-            world.getBlockAt(-23, y, 0).setType(m);
-            world.getBlockAt(-23, y, 1).setType(m);
-
-            world.getBlockAt(-15, y, -1).setType(m);
-            world.getBlockAt(-15, y, 0).setType(m);
-            world.getBlockAt(-15, y, 1).setType(m);
-
-            world.getBlockAt(-22, y, 2).setType(m);
-            world.getBlockAt(-16, y, 2).setType(m);
-
-            world.getBlockAt(-17, y, 3).setType(m);
-            //world.getBlockAt(-21, y, -2).setType(m);
-
-            world.getBlockAt(-18, y, 4).setType(m);
-            world.getBlockAt(-19, y, 4).setType(m);
-            world.getBlockAt(-20, y, 4).setType(m);
-
-            // first place team
-            world.getBlockAt(18, y, -4).setType(m);
-            world.getBlockAt(19, y, -4).setType(m);
-            world.getBlockAt(20, y, -4).setType(m);
-
-            world.getBlockAt(21, y, 3).setType(m);
-            world.getBlockAt(17, y, -3).setType(m);
-
-            world.getBlockAt(16, y, -2).setType(m);
-            world.getBlockAt(22, y, -2).setType(m);
-
-            world.getBlockAt(23, y, -1).setType(m);
-            world.getBlockAt(23, y, 0).setType(m);
-            world.getBlockAt(23, y, 1).setType(m);
-
-            world.getBlockAt(15, y, -1).setType(m);
-            world.getBlockAt(15, y, 0).setType(m);
-            world.getBlockAt(15, y, 1).setType(m);
-
-            world.getBlockAt(22, y, 2).setType(m);
-            world.getBlockAt(16, y, 2).setType(m);
-
-            world.getBlockAt(17, y, 3).setType(m);
-            //world.getBlockAt(21, y, -2).setType(m);
-
-            world.getBlockAt(18, y, 4).setType(m);
-            world.getBlockAt(19, y, 4).setType(m);
-            world.getBlockAt(20, y, 4).setType(m);
-        }
+        map.resetBarriers(b);
     }
 
     private void changeColor() {
