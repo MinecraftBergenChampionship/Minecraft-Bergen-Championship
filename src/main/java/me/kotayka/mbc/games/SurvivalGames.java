@@ -620,9 +620,12 @@ public class SurvivalGames extends Game {
         for (Player player : playerDamage.keySet()) {
             Participant p = Participant.getParticipant(player);
             double percentage = 100 *(playerDamage.get(player) / totalDamage);
-            int points = (int) Math.log(Math.pow(150*Math.sqrt(percentage)/sqrtSum, 5.25)/8);
-            if (points < 0) {
-                points = 0;
+            int points = 0;
+            if (percentage != 0) {
+                points = (int) Math.log(Math.pow(150*Math.sqrt(percentage)/sqrtSum, 5.25)/8);
+                if (points < 0) {
+                    points = 0;
+                }
             }
             p.addCurrentScore(points);
             logger.log(p.getPlayerName() + " dealt " + percentage + "% of the total damage and earned " + points + " points!");
