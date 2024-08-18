@@ -42,6 +42,7 @@ public class Quickfire extends FinaleGame {
     private final Location SPAWN = map.getSpawn();
     private int[] playersAlive;
     private int timeElapsed = 0;
+    private int timeUntilGlowing = map.getTimeUntilGlowing();
     private int roundNum = 0;
     private boolean disconnect = false;
     public Quickfire() {
@@ -160,7 +161,7 @@ public class Quickfire extends FinaleGame {
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             createLineAll(20, ChatColor.RED.toString() + ChatColor.BOLD + "Time: " + ChatColor.RESET + getFormattedTime(timeElapsed));
-            if (timeElapsed == 60) {
+            if (timeElapsed == timeUntilGlowing) {
                 for (Participant p : firstPlace.teamPlayers) {
                     if (!p.getPlayer().getGameMode().equals(GameMode.SPECTATOR))
                         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, PotionEffect.INFINITE_DURATION, 2, false, false));

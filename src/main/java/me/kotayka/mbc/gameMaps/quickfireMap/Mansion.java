@@ -11,11 +11,12 @@ public class Mansion extends QuickfireMap {
     private World world = Bukkit.getWorld("Quickfire");
     private Location TEAM_ONE_SPAWN = new Location(world, 530, 1, 500);
     private Location TEAM_TWO_SPAWN = new Location(world, 470, 1, 500);
+    private int timeUntilGlowing = 90;
     private Location SPAWN = new Location(Bukkit.getWorld("Quickfire"), 500, 60, 500, -90, 90);
 
     public Mansion(Quickfire qf) {
         super(qf);
-        loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, SPAWN);
+        loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, SPAWN, timeUntilGlowing);
     }
 
     public void resetBarriers(boolean b) {
