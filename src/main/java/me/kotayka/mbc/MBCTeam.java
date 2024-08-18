@@ -171,6 +171,18 @@ public abstract class MBCTeam {
         };
     }
 
+    public ItemStack getGlass() {
+        return switch (getChatColor()) {
+            case RED -> new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            case YELLOW -> new ItemStack(Material.YELLOW_STAINED_GLASS_PANE);
+            case GREEN -> new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
+            case BLUE -> new ItemStack(Material.BLUE_STAINED_GLASS_PANE);
+            case DARK_PURPLE -> new ItemStack(Material.PURPLE_STAINED_GLASS_PANE);
+            case LIGHT_PURPLE -> new ItemStack(Material.PINK_STAINED_GLASS_PANE);
+            default -> new ItemStack(Material.GLASS_PANE);
+        };
+    }
+
     public static MBCTeam getTeam(String team) {
         switch (team.strip().toLowerCase()) {
             case "redrabbits":

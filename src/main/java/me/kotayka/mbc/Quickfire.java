@@ -4,6 +4,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
 import me.kotayka.mbc.gameMaps.quickfireMap.Castle;
+import me.kotayka.mbc.gameMaps.quickfireMap.Mansion;
 import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
 
 import java.util.HashMap;
@@ -30,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class Quickfire extends FinaleGame {
-    private final QuickfireMap map = new Castle(this);
+    private final QuickfireMap map = new Mansion(this);
     public static final ItemStack CROSSBOW = new ItemStack(Material.CROSSBOW);
     public static final ItemStack BOOTS = new ItemStack(Material.LEATHER_BOOTS);
     public Map<UUID, QuickfirePlayer> quickfirePlayers = new HashMap<>();
