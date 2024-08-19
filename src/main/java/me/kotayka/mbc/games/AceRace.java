@@ -12,7 +12,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -274,6 +276,16 @@ public class AceRace extends Game {
         if (!e.getPlayer().getLocation().getWorld().equals(map.getWorld())) return;
         e.setCancelled(true);
    }
+
+       @EventHandler
+    public void onInteract(PlayerInteractEvent e) {
+        if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Set<Material> trapdoorList = Set.of(Material.OAK_TRAPDOOR, Material.DARK_OAK_TRAPDOOR, Material.SPRUCE_TRAPDOOR, Material.BIRCH_TRAPDOOR,
+                                        Material.ACACIA_TRAPDOOR, Material.CHERRY_TRAPDOOR, Material.MANGROVE_TRAPDOOR, Material.JUNGLE_TRAPDOOR,
+                                        Material.CRIMSON_TRAPDOOR, Material.WARPED_TRAPDOOR);
+            if(trapdoorList.contains(e.getClickedBlock().getType())) e.setCancelled(true);
+        }
+    }
 
    @EventHandler
     public void onReconnect(PlayerJoinEvent e) {
