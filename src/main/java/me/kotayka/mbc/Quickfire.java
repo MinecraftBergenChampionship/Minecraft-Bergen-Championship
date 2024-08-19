@@ -16,8 +16,10 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -403,6 +405,15 @@ public class Quickfire extends FinaleGame {
 
         if (e.getPlayer().getLocation().distanceSquared(SPAWN) > MAX_DIST_FROM_CENTER) {
             e.getPlayer().teleport(SPAWN);
+        }
+    }
+
+    @EventHandler
+    public void onInteract(PlayerInteractEvent e) {
+        if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if(e.getClickedBlock().getType() == Material.SPRUCE_TRAPDOOR || 
+                e.getClickedBlock().getType() == Material.DARK_OAK_TRAPDOOR ||
+                e.getClickedBlock().getType() == Material.OAK_TRAPDOOR) e.setCancelled(true);
         }
     }
 
