@@ -41,7 +41,6 @@ public class OneShot extends Game {
     private OneShotMap map = new Meltdown(this);
     private Map<MBCTeam, Integer> teamKills = new HashMap<>();
     public Map<UUID, OneShotPlayer> oneShotPlayerMap = new HashMap<>();
-    private HashMap<OneShotPlayer, Long> cooldowns = new HashMap<>();
     public Location[] spawnpoints = map.spawnpoints;
     private final int WIN_POINTS = 10;
     private final int KILL_POINTS = 1;
@@ -100,15 +99,33 @@ public class OneShot extends Game {
     }
 
     public void playerRespawn(Participant p) {
-        Location l = spawnpoints[(int)Math.random()*spawnpoints.length];
+        Location l = spawnpoints[(int)(Math.random()*spawnpoints.length)];
         p.getPlayer().teleport(l);
         p.getPlayer().setInvulnerable(true);
-        p.getPlayer().setGameMode(GameMode.SURVIVAL);
+        p.getPlayer().setGameMode(GameMode.ADVENTURE);
         p.getPlayer().setFlying(false);
-        for (Participant part : MBC.getInstance().getPlayers()) {
-            part.getPlayer().showPlayer(p.getPlayer());
+        p.getPlayer().getInventory().clear();
 
-        }
+        
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { regainItems(p);}
+          }, 60L);
+    }
+
+    public void regainItems(Participant p) {
+        p.getPlayer().setInvulnerable(false);
+
+        ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
+        ItemStack chestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
+        ItemStack leggings = new ItemStack(Material.LEATHER_LEGGINGS);
+        ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
+
+        p.getInventory().setHelmet(p.getTeam().getColoredLeatherArmor(helmet));
+        p.getInventory().setChestplate(p.getTeam().getColoredLeatherArmor(chestplate));
+        p.getInventory().setLeggings(p.getTeam().getColoredLeatherArmor(leggings));
+        p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(boots));
+
         switch(teamKills.get(p.getTeam()) / 10) {
             case 0:
                 p.getInventory().addItem(CROSSBOW_QUICK_CHARGE);
@@ -133,17 +150,15 @@ public class OneShot extends Game {
                 Bukkit.broadcastMessage("This shouldn't be happening.");
         }
 
-        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
-            @Override
-            public void run() { p.getPlayer().setInvulnerable(false);}
-          }, 40L);
+        
+
     }
 
     @Override
     public void createScoreboard(Participant p) {
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
-        createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Kills: "+ChatColor.RESET+"0", p);
+        createLine(3, ChatColor.YELLOW+""+ChatColor.BOLD+"Kills: "+ChatColor.RESET+"0", p);
         updatePlayersAliveScoreboard();
         updateInGameTeamScoreboard();
     }
@@ -168,7 +183,6 @@ public class OneShot extends Game {
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().getInventory().clear();
             p.getPlayer().setFlying(false);
-            p.getPlayer().setAllowFlight(false);
 
             oneShotPlayerMap.put(p.getPlayer().getUniqueId(), new OneShotPlayer(p));
 
@@ -177,10 +191,9 @@ public class OneShot extends Game {
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false));
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 255, false, false));
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 255, false, false));
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 60, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, PotionEffect.INFINITE_DURATION, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
             // reset scoreboard & variables after each round
             updatePlayersAliveScoreboard(p);
 
@@ -193,7 +206,10 @@ public class OneShot extends Game {
             p.getInventory().setChestplate(p.getTeam().getColoredLeatherArmor(chestplate));
             p.getInventory().setLeggings(p.getTeam().getColoredLeatherArmor(leggings));
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(boots));
+
         }
+
+        createScoreboard();
 
         for (MBCTeam m : MBC.getInstance().getValidTeams()) {
             teamKills.put(m, 0);
@@ -204,9 +220,9 @@ public class OneShot extends Game {
 
     private void spawnPlayers() {
         for (Participant p : MBC.getInstance().getPlayers()) {
-            Location l = spawnpoints[(int)Math.random()*spawnpoints.length];
+            Location l = spawnpoints[(int)(Math.random()*spawnpoints.length)];
             p.getPlayer().teleport(l);
-            p.getPlayer().setGameMode(GameMode.SURVIVAL);
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
         }
         
     }
@@ -217,12 +233,13 @@ public class OneShot extends Game {
         if (map == null) return;
 
         if (e.getPlayer().getLocation().getY() < map.DEATH_Y) {
-            if (e.getPlayer().getGameMode() != GameMode.SURVIVAL) {
-                e.getPlayer().teleport(map.spawnpoints[(int)Math.random()*spawnpoints.length]);
+            if (e.getPlayer().getGameMode() != GameMode.ADVENTURE) {
+                e.getPlayer().teleport(map.spawnpoints[(int)(Math.random()*spawnpoints.length)]);
                 return;
             }
-            e.getPlayer().teleport(map.spawnpoints[(int)Math.random()*spawnpoints.length]);
             e.getPlayer().setVelocity(new Vector(0, 0, 0));
+            OneShotPlayer s = oneShotPlayerMap.get(((Entity)e.getPlayer()).getUniqueId());
+            s.streak = 0;
             Death(Participant.getParticipant((Player) e.getPlayer()));
         }
     }
@@ -249,7 +266,7 @@ public class OneShot extends Game {
                 setPVP(true);
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().setInvulnerable(false);
-                    p.getPlayer().setGameMode(GameMode.SURVIVAL);
+                    p.getPlayer().setGameMode(GameMode.ADVENTURE);
                     p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
                     p.getInventory().addItem(CROSSBOW_QUICK_CHARGE);
                     p.getInventory().addItem(new ItemStack(Material.ARROW,64));
@@ -260,6 +277,7 @@ public class OneShot extends Game {
         }
     }
 
+    @EventHandler
     public void hit(ProjectileHitEvent e) {
         if (!getState().equals(GameState.ACTIVE)) return;
         if (e.getEntity() instanceof Arrow) {
@@ -269,6 +287,24 @@ public class OneShot extends Game {
                 Participant shot = Participant.getParticipant((Player) e.getHitEntity());
                 Participant damager = Participant.getParticipant((Player) arrow.getShooter());
                 if (shot.getTeam().equals(damager.getTeam())) return;
+                if (shot.getPlayer().isInvulnerable())  return;
+
+                OneShotPlayer d = oneShotPlayerMap.get(((Entity) arrow.getShooter()).getUniqueId());
+                d.kills++;
+                d.streak++;
+                createLine(3, ChatColor.YELLOW+""+ChatColor.BOLD+"Kills: "+ChatColor.RESET+d.kills, damager);
+
+                OneShotPlayer s = oneShotPlayerMap.get(e.getHitEntity().getUniqueId());
+                s.streak = 0;
+
+                damager.addCurrentScore(KILL_POINTS);
+                if (d.streak >=3) {
+                    damager.addCurrentScore(STREAK_POINTS);
+                    if (d.streak == 3) {
+                        Bukkit.broadcastMessage(damager.getFormattedName() + "" + ChatColor.BOLD + " has reached a streak of 3!");
+                    }
+                }
+                arrow.remove();
                 Death(shot, damager);
             }
         }
@@ -279,15 +315,37 @@ public class OneShot extends Game {
                 Participant shot = Participant.getParticipant((Player) e.getHitEntity());
                 Participant damager = Participant.getParticipant((Player) trident.getShooter());
                 if (shot.getTeam().equals(damager.getTeam())) return;
+                if (shot.getPlayer().isInvulnerable())  return;
+
+                OneShotPlayer d = oneShotPlayerMap.get(((Entity) trident.getShooter()).getUniqueId());
+                d.kills++;
+                d.streak++;
+                createLine(3, ChatColor.YELLOW+""+ChatColor.BOLD+"Kills: "+ChatColor.RESET+d.kills, damager);
+
+                OneShotPlayer s = oneShotPlayerMap.get(e.getHitEntity().getUniqueId());
+                if (s.streak >=3) {
+                    Bukkit.broadcastMessage(damager.getFormattedName() + "" + ChatColor.BOLD + " has broke " + ChatColor.RESET + "" +
+                        shot.getFormattedName() + ChatColor.BOLD + "'s streak of " + s.streak + "!");
+                }
+                s.streak = 0;
+
+                damager.addCurrentScore(KILL_POINTS);
+                if (d.streak >=3) {
+                    damager.addCurrentScore(STREAK_POINTS);
+                    if (d.streak == 3) {
+                        Bukkit.broadcastMessage(damager.getFormattedName() + "" + ChatColor.BOLD + " has reached a streak of 3!");
+                    }
+                }
                 Death(shot, damager);
             }
         }
     }
 
+    @EventHandler
     public void hit(EntityDamageByEntityEvent event) {
         if (!getState().equals(GameState.ACTIVE)) return;
         if (!(event.getEntity() instanceof Player) || !(event.getDamager() instanceof Player)) return;
-        if (((Player) event.getDamager()).getGameMode() != GameMode.SURVIVAL) return;
+        if (((Player) event.getDamager()).getGameMode() != GameMode.ADVENTURE) return;
         if (teamKills.get(Participant.getParticipant(((Player) event.getDamager())).getTeam()) != 40) return;
 
         if(((Player)event.getDamager()).getInventory().getItemInMainHand().getType() == Material.DIAMOND_SWORD ||
@@ -353,9 +411,6 @@ public class OneShot extends Game {
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().getInventory().clear();
             p.getPlayer().setFlying(true);
-            p.getPlayer().setGameMode(GameMode.SURVIVAL);
-            p.getPlayer().setAllowFlight(false);
-            p.getPlayer().setHealth(1);
         }
         
         Bukkit.broadcastMessage(ChatColor.BOLD + "The " + ChatColor.RESET + m.teamNameFormat() + " have won!");
@@ -363,35 +418,20 @@ public class OneShot extends Game {
     }
 
     private void Death(Participant shot, Participant damager) {
-        if (damager.getTeam().equals(shot.getTeam())) return;
-    
         damager.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Killed " + ChatColor.RESET + shot.getFormattedName()));
         damager.getPlayer().playSound(damager.getPlayer(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
-                
-        OneShotPlayer d = oneShotPlayerMap.get(damager);
-        d.kills++;
-        d.streak++;
-        createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Kills: "+ChatColor.RESET+d.kills, damager);
-
-        OneShotPlayer s = oneShotPlayerMap.get(shot);
-        s.streak = 0;
-
-        damager.addCurrentScore(KILL_POINTS);
-        if (d.streak >=3) {
-            damager.addCurrentScore(STREAK_POINTS);
-        }
 
         MBCTeam m = damager.getTeam();
 
         int damagerTeamKills = teamKills.get(m);
         damagerTeamKills++;
+        teamKills.replace(m, damagerTeamKills);
         if (damagerTeamKills == 41) {
             EndGame(m);
         }
         else if (damagerTeamKills % 10 == 0) {
             nextWeapon(m);
         }
-        teamKills.replace(m, damagerTeamKills);
 
         damager.getPlayer().sendMessage(ChatColor.RED + "You killed " + ChatColor.RESET + shot.getFormattedName() + "!");
         shot.getPlayer().sendMessage(ChatColor.RED + "You were killed by " + ChatColor.RESET + damager.getFormattedName() + "!");
@@ -406,12 +446,7 @@ public class OneShot extends Game {
         shot.getInventory().remove(Material.DIAMOND_SWORD);
         shot.getInventory().remove(Material.ARROW);
         shot.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 255, false, false));
-        shot.getPlayer().setFlying(true);
-
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().hidePlayer(shot.getPlayer());
-
-        }
+        shot.getPlayer().setGameMode(GameMode.SPECTATOR);
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
             public void run() { playerRespawn(shot);}
@@ -419,9 +454,6 @@ public class OneShot extends Game {
     }
 
     private void Death(Participant died) {
-        OneShotPlayer s = oneShotPlayerMap.get(died);
-        s.streak = 0;
-
         died.getPlayer().sendMessage(ChatColor.RED + "You fell!");
         died.getPlayer().sendTitle(ChatColor.BOLD + "Respawning in 3 seconds...", "", 0, 15, 15);
 
@@ -433,12 +465,7 @@ public class OneShot extends Game {
         died.getInventory().remove(Material.DIAMOND_SWORD);
         died.getInventory().remove(Material.ARROW);
         died.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 255, false, false));
-        died.getPlayer().setFlying(true);
-
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().hidePlayer(died.getPlayer());
-
-        }
+        died.getPlayer().setGameMode(GameMode.SPECTATOR);
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
             public void run() { playerRespawn(died);}
