@@ -12,6 +12,7 @@ public abstract class QuickfireMap extends MBCMap {
     private Location TEAM_ONE_SPAWN;
     private Location TEAM_TWO_SPAWN;
     private Location SPAWN;
+    private int timeUntilGlowing;
 
     public QuickfireMap(Quickfire qf) {
         super(Bukkit.getWorld("Quickfire"));
@@ -31,10 +32,15 @@ public abstract class QuickfireMap extends MBCMap {
         return SPAWN;
     }
 
-    public void loadWorld(Location TEAM_ONE_SPAWN, Location TEAM_TWO_SPAWN, Location SPAWN) {
+    public int getTimeUntilGlowing() {
+        return timeUntilGlowing;
+    }
+
+    public void loadWorld(Location TEAM_ONE_SPAWN, Location TEAM_TWO_SPAWN, Location SPAWN, int timeUntilGlowing) {
         this.TEAM_ONE_SPAWN = TEAM_ONE_SPAWN;
         this.TEAM_TWO_SPAWN = TEAM_TWO_SPAWN;
         this.SPAWN = SPAWN;
+        this.timeUntilGlowing = timeUntilGlowing;
     }
 
     /**
