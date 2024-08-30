@@ -52,6 +52,10 @@ public class BuildMart extends Game {
     public static final int PLACEMENT_POINTS = 1;
     public static final int MOST_BUILD_POINTS = 10;
 
+    private final List<Build> EASY_FIRST_BUILDS = new ArrayList<>();
+    private final List<Build> MEDIUM_FIRST_BUILDS = new ArrayList<>();
+    private final List<Build> HARD_FIRST_BUILDS = new ArrayList<>();
+
     private Map<Participant, Material> hotbarSelector = new HashMap<Participant, Material>();
 
     public BuildMart() {
@@ -71,6 +75,17 @@ public class BuildMart extends Game {
                         "⑮ Max +3 points **per player** for each build partially completed at game end\n" +
                         "⑮ +10 points **per player** on the team with the most builds completed of any team\n" 
         });
+
+
+        //where the builds which are first are initialized. change these based off of event
+        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, 2))); //graveyard
+        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -285, 185, 2))); //skeleton face
+        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -114, 185, 2))); // wither skeleton face
+        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -258, 185, -28))); //ghost
+        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -267, 185, -28))); //witch cauldron
+        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -33, 185, -58))); //murder
+        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -58))); //pumpkin
+        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -186, 185, -58))); //dungeon
     }
 
     public void createScoreboard(Participant p) {
@@ -433,6 +448,28 @@ public class BuildMart extends Game {
         Collections.shuffle(EASY_BUILDS);
         Collections.shuffle(MEDIUM_BUILDS);
         Collections.shuffle(HARD_BUILDS);
+
+        Collections.shuffle(EASY_FIRST_BUILDS);
+        Collections.shuffle(MEDIUM_FIRST_BUILDS);
+        Collections.shuffle(HARD_FIRST_BUILDS);
+
+        //load first easy builds at the start
+        for (Build b : EASY_FIRST_BUILDS) {
+            EASY_BUILDS.remove(b);
+            EASY_BUILDS.add(0, b);
+        }
+
+        //load first medium builds at the start
+        for (Build b : MEDIUM_FIRST_BUILDS) {
+            MEDIUM_BUILDS.remove(b);
+            MEDIUM_BUILDS.add(0, b);
+        }
+
+        //load first hard builds at the start
+        for (Build b : HARD_FIRST_BUILDS) {
+            HARD_BUILDS.remove(b);
+            HARD_BUILDS.add(0, b);
+        }
 
     }
 
