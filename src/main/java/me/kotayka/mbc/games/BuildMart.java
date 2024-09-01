@@ -83,6 +83,7 @@ public class BuildMart extends Game {
         EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -114, 185, 2))); // wither skeleton face
         MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -258, 185, -28))); //ghost
         MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -267, 185, -28))); //witch cauldron
+        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, -28))); //shark
         HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -33, 185, -58))); //murder
         HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -58))); //pumpkin
         HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -186, 185, -58))); //dungeon

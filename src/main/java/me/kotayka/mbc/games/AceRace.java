@@ -261,6 +261,7 @@ public class AceRace extends Game {
    public void topLaps() {
         StringBuilder topFive = new StringBuilder();
         int counter = 0;
+        
         //Bukkit.broadcastMessage("[Debug] fastestLaps.keySet().size() == " + fastestLaps.keySet().size());
         for (Long l : fastestLaps.keySet()) {
             for (int i = 0; i < fastestLaps.get(l).size(); i++) {

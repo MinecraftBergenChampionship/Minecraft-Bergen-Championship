@@ -22,6 +22,9 @@ public class AceRacePlayer extends GamePlayer {
     public long lapStartTime;
     public long totalTime;
     public int placement;
+    public boolean completedFirstLap = false;
+    public boolean fastestLapsContainsPlayer;
+    public long fastestLap;
 
     public AceRacePlayer(Participant p, AceRace ar) {
         super(p);
@@ -57,13 +60,24 @@ public class AceRacePlayer extends GamePlayer {
             lapStartTime = System.currentTimeMillis();
         }
 
+        if (ACE_RACE.fastestLaps.size() == 5 && completedFirstLap) {
+            if (ACE_RACE.fastestLaps.get(fastestLap) == null) {
+                fastestLapsContainsPlayer = false;
+            }
+        }
+        completedFirstLap = true;
         // only add to Top 5 if this lap's split was faster or equal to the 5th (map is maintained to be at max size 5).
         // TODO: this may be buggy and may require a second review. The use of a set means equivalent laps are also not tracked
         if (ACE_RACE.fastestLaps.size() == 0) {
+            //this is the first lap completed
             List<String> t = new ArrayList<String>();
             t.add(this.getParticipant().getFormattedName());
             ACE_RACE.fastestLaps.put(lapTime,t);
-        } else if (lapTime <= ACE_RACE.fastestLaps.lastKey() || ACE_RACE.fastestLaps.size() < 5) {
+            fastestLapsContainsPlayer = true;
+            fastestLap = lapTime;
+        } else if ((!fastestLapsContainsPlayer && lapTime <= ACE_RACE.fastestLaps.lastKey()) || (!fastestLapsContainsPlayer && ACE_RACE.fastestLaps.size() < 5)) {
+            // either top 5 currently doesnt have player and player completes faster lap than top 5
+            // or top 5 currently doesnt have player and there are not 5 laps completed yet
             Set<Long> times = ACE_RACE.fastestLaps.keySet();
             if (times.contains(lapTime)) {
                 ACE_RACE.fastestLaps.get(lapTime).add(this.getParticipant().getFormattedName());
@@ -72,12 +86,21 @@ public class AceRacePlayer extends GamePlayer {
                 t.add(this.getParticipant().getFormattedName());
                 ACE_RACE.fastestLaps.put(lapTime,t);
             }
+            fastestLapsContainsPlayer = true;
+            fastestLap = lapTime;
 
             // trim map to only contain top 5
             if (ACE_RACE.fastestLaps.size() > 5) {
                 long tmp = ACE_RACE.fastestLaps.lastKey();
                 ACE_RACE.fastestLaps.remove(tmp);
             }
+        }
+        else if (fastestLapsContainsPlayer && lapTime <= ACE_RACE.fastestLaps.lastKey() && lapTime < fastestLap) {
+            // top 5 has player but current lap is faster than fastest lap
+            ACE_RACE.fastestLaps.remove(fastestLap);
+            List<String> t = new ArrayList<String>();
+            t.add(this.getParticipant().getFormattedName());
+            ACE_RACE.fastestLaps.put(lapTime,t);
         }
 
         if (lap < 3) {
