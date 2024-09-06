@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class Quickfire extends FinaleGame {
-    private final QuickfireMap map = new Mansion(this);
+    private final QuickfireMap map = new Castle(this);
     public static final ItemStack CROSSBOW = new ItemStack(Material.CROSSBOW);
     public static final ItemStack BOOTS = new ItemStack(Material.LEATHER_BOOTS);
     public Map<UUID, QuickfirePlayer> quickfirePlayers = new HashMap<>();
