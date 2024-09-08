@@ -161,7 +161,7 @@ public class SurvivalGames extends Game {
                 endCrystal.setItemMeta(meta);
             }
 
-            p.getInventory().setItem(8, endCrystal);
+            //p.getInventory().setItem(8, endCrystal);
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().setAllowFlight(false);
             p.getPlayer().setExp(0);
