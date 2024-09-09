@@ -42,7 +42,7 @@ public class Skybattle extends Game {
         super("Skybattle", new String[] {
                 "⑫ Make your way to the center of the map, collecting resources and eliminating other players as you go!\n\n" + 
                 "⑫ Utility items are spread across the map, but the best items are always in the middle.",
-                "⑫ You'll have " + ChatColor.BOLD + "infinite blocks" + ChatColor.RESET + " so build as much as you need to!\n\n" + 
+                "⑫ You'll have " + ChatColor.BOLD + "infinite blt ocks" + ChatColor.RESET + " so build as much as you need to!\n\n" + 
                 "⑫ Just be careful of the void below...",
                 "⑫ Make sure to " + ChatColor.BOLD + "TURN ON PARTICLES" + ChatColor.RESET + " to see the border.\n\n" +
                 "⑫ There's also a " + ChatColor.BOLD + "height border" + ChatColor.RESET + " that lowers over time!",

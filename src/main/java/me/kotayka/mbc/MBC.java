@@ -38,6 +38,7 @@ public class MBC implements Listener {
     public static final int MAX_TEAMS = 6;
     public static final int MAX_PLAYERS = MAX_PLAYERS_PER_TEAM * MAX_TEAMS;
     public static final int GAME_COUNT = 6;
+    public static final double[] MULTIPLIERS = {1.0, 1.5, 2.0, 2.0, 2.5, 3.0};
 
     /**
      * `players` represents all current active players.
@@ -66,7 +67,7 @@ public class MBC implements Listener {
     public final Scoreboard board = manager.getNewScoreboard();
 
     private Minigame currentGame;
-    public int gameNum = 1; // REVERT THIS AFTER TEST
+    public int gameNum = 1;
 
     public Plugin plugin;
     public final Lobby lobby = new Lobby();

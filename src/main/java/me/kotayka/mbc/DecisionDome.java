@@ -38,14 +38,16 @@ public class DecisionDome extends Minigame {
 
     private List<MBCTeam> powerupTeams = new ArrayList<>();
     private final Map<VotePowerup, Integer> weights = Map.ofEntries(
-            entry(VotePowerup.DUNK, 2), entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.EGGSTRA_VOTES, 2), entry(VotePowerup.CROSSBOWS, 3),
+            entry(VotePowerup.DUNK, 2), entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.EGGSTRA_VOTES, 2), entry(VotePowerup.CROSSBOWS, 2),
             entry(VotePowerup.CHICKEN_SWAP, 1)
     );
     private Participant mega_cow_shooter = null;
     private Player dunker = null;
     private Player swapper = null;
     private ChatColor dunked_team = null;
-    private Location[] dunked_corners = new Location[2];
+
+    private final Location BOTTOM_CORNER = new Location(world, -17, -31, -16);
+    private final Location TOP_CORNER = new Location(world, 18, -24, 16);
 
     private final int[][] coordsForBorder = {
             {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}, {0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7},
@@ -113,6 +115,7 @@ public class DecisionDome extends Minigame {
 
     @Override
     public void loadPlayers() {
+        replaceAll();
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {
             Location l = getTeleportLocation(t.getChatColor());
             for (Participant p : t.getPlayers()) {
@@ -280,12 +283,6 @@ public class DecisionDome extends Minigame {
             }
             switch (timeRemaining) {
                 case 0 -> {
-                    if (dunked_team != null) {
-                        replaceTube(dunked_corners[0], dunked_corners[1]);
-                    }
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.stopSound(Sound.MUSIC_DISC_CAT, SoundCategory.RECORDS);
-                    }
                     // start game
                     stopTimer();
                     MBC.getInstance().startGame(winner.game.substring(2));
@@ -308,7 +305,7 @@ public class DecisionDome extends Minigame {
         createLine(17, p.getTeam().getChatColor() + p.getTeam().teamNameFormat(), p);
         createLine(16, ChatColor.RESET.toString(), p);
         createLine(15, "Games Played: " + ChatColor.AQUA + (MBC.getInstance().gameNum-1) + "/6", p);
-        createLine(14, String.format("Point Multiplier: %s%.1f", ChatColor.YELLOW, MBC.getInstance().multiplier), p);
+        createLine(14, String.format("Point Multiplier: %s%.1f", ChatColor.YELLOW, MBC.MULTIPLIERS[MBC.getInstance().gameNum-1]), p);
 
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         updatePlayerTotalScoreDisplay(p);
@@ -700,6 +697,7 @@ public class DecisionDome extends Minigame {
             if (e.getHitEntity() != null) {
                 Participant shooter = Participant.getParticipant((Player) e.getEntity().getShooter());
                 if (swapper != null && swapper.getUniqueId() == shooter.getPlayer().getUniqueId() && !(e.getHitEntity() instanceof Player)) {
+                    e.setCancelled(true);
                     Location shooterLoc = shooter.getPlayer().getLocation();
                     Location chickenLoc = e.getHitEntity().getLocation();
                     e.getHitEntity().teleport(shooterLoc);
@@ -782,8 +780,6 @@ public class DecisionDome extends Minigame {
             }
         }
         removeTube(l1, l2);
-        dunked_corners[0] = l1;
-        dunked_corners[1] = l2;
 
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().sendTitle(" ", team.teamNameFormat() + ChatColor.RESET + " were dunked!", 0, 60, 30);
@@ -815,29 +811,31 @@ public class DecisionDome extends Minigame {
             pasteToY = -24;
         }
     }
-    private void replaceTube(Location topCorner, Location bottomCorner) {
-        Bukkit.broadcastMessage(" ");
-        int copyFromX = 68;
-        int copyFromY = -24;
-        int copyFromZ = -3;
-        for (int x = bottomCorner.getBlockX(); x <= topCorner.getBlockX(); x++) {
-            for (int y = bottomCorner.getBlockY(); y <= topCorner.getBlockY(); y++) {
-                for (int z = bottomCorner.getBlockZ(); z <= topCorner.getBlockZ(); z++) {
+
+
+    private void replaceAll() {
+        int copyFromX = 114;
+        int copyFromY = -30;
+        int copyFromZ = -16;
+        for (int x = BOTTOM_CORNER.getBlockX(); x <= TOP_CORNER.getBlockX(); x++) {
+            for (int y = BOTTOM_CORNER.getBlockY(); y <= TOP_CORNER.getBlockY(); y++) {
+                for (int z = BOTTOM_CORNER.getBlockZ(); z <= TOP_CORNER.getBlockZ(); z++) {
                     Block copyFrom = world.getBlockAt(copyFromX, copyFromY, copyFromZ);
                     Block pasteTo = world.getBlockAt(x,y,z);
-                    pasteTo.setType(copyFrom.getType());
-                    pasteTo.setBlockData(copyFrom.getBlockData());
+                    if (copyFrom.getType() != pasteTo.getType()) {
+                        pasteTo.setType(copyFrom.getType());
+                        pasteTo.setBlockData(copyFrom.getBlockData());
+                    }
                     copyFromZ++;
                 }
                 copyFromY++;
-                copyFromZ = -3;
+                copyFromZ = -16;
             }
             copyFromX++;
-            copyFromY = -24;
+            copyFromY = -30;
         }
-        Bukkit.broadcastMessage(" ");
-    }
 
+    }
 
     @EventHandler
     public void chickenHatch(PlayerEggThrowEvent e) {
