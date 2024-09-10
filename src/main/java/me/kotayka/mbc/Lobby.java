@@ -284,13 +284,13 @@ public class Lobby extends Minigame {
     }
 
     public void end() {
+        stopTimer();
         MBC.getInstance().setCurrentGame(this);
         setGameState(GameState.END_GAME);
-        createScoreboardEnd();
         world.setTime(18000);
+        createScoreboardEnd();
         loadPlayersEnd();
         MBC.getInstance().lobby.populatePodium();
-        stopTimer();
         setTimer(28);
     }
 
@@ -610,12 +610,12 @@ public class Lobby extends Minigame {
             Location l_0 = locs[i];
             //Location l_1 = locs[i][1];
 
-            NPC npc1 = MBC.npcManager.createNPC(p,l_0);
+            //NPC npc1 = MBC.npcManager.createNPC(p,l_0);
             //NPC npc2 = MBC.npcManager.createNPC(p,l_1);
 
             //MBC.npcManager.showAll(npc1);
             //MBC.npcManager.showAll(npc2);
-            podiumNPCS.add(npc1);
+            //podiumNPCS.add(npc1);
             //podiumNPCS.add(npc2);
         }
     }

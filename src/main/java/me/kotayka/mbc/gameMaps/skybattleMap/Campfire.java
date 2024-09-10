@@ -21,7 +21,7 @@ import java.util.List;
 public class Campfire extends SkybattleMap {
     private final Location CENTER = new Location(getWorld(), 0, 75, 0);
     private List<ItemStack> spawnItems = new ArrayList<>();
-    public final double RADIUS_SHRINK_AMOUNT = 0.3;
+    public final double RADIUS_SHRINK_AMOUNT = 0.365;
     public final double HEIGHT_SHRINK_AMOUNT = 0.2;
     private float borderRadius = 90;
     private final Location[] SPAWNS = {
@@ -45,7 +45,7 @@ public class Campfire extends SkybattleMap {
         setBorderHeight(120);
         setBorderRadius(borderRadius);
 
-        // reset world (center @ -300 75 300)
+        // reset world (center @ 300 75 -300)
         int x = 933;
         int y = 65;
         int z = 922;
@@ -83,7 +83,7 @@ public class Campfire extends SkybattleMap {
 
     @Override
     public void Border() {
-        for (int y = 50; y <= 110; y += 10) {
+        for (int y = 50; y <= 100; y += 5) {
             for (double t = 0; t < 50; t+=0.5) {
                 double x = (getBorderRadius() * (float) Math.cos(t)) + CENTER.getX();
                 double z = (getBorderRadius() * (float) Math.sin(t)) + CENTER.getZ();
