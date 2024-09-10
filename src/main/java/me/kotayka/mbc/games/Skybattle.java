@@ -47,10 +47,10 @@ public class Skybattle extends Game {
                 "⑫ Make sure to " + ChatColor.BOLD + "TURN ON PARTICLES" + ChatColor.RESET + " to see the border.\n\n" +
                 "⑫ There's also a " + ChatColor.BOLD + "height border" + ChatColor.RESET + " that lowers over time!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑬ +10 points for eliminations\n" +
-                                "⑬ +10 points for winning\n" +
-                                "⑬ +1 points for every player outlived\n" +
-                                "⑬ Team Bonuses (split amongst team):\n" +
+                                "⑫ +10 points for eliminations\n" +
+                                "⑫ +10 points for winning\n" +
+                                "⑫ +1 points for every player outlived\n" +
+                                "⑫ Team Bonuses (split amongst team):\n" +
                                 "     ⑬ 1st: +6 points, 2nd: +5 points, 3rd: +4 points\n" +
                                 "     ⑬ 4th: +3 points, 5th: +2 points, 6th: +1 points"
         });
