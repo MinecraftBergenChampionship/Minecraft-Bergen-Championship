@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 public class Green extends MBCTeam {
 
     public Green() {
-        super("GreenGuardians", "Green Guardians", 'Ⓖ', ChatColor.GREEN);
+        //super("GreenGuardians", "Green Guardians", 'Ⓖ', ChatColor.GREEN);
+        super("GreenGoblins", "Green Goblins", 'Ⓖ', ChatColor.GREEN);
     }
 }

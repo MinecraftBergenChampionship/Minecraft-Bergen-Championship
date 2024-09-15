@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 public class Pink extends MBCTeam {
 
     public Pink() {
-        super("PinkPiglets", "Pink Piglets", 'Ⓟ', ChatColor.LIGHT_PURPLE);
+        //super("PinkPiglets", "Pink Piglets", 'Ⓟ', ChatColor.LIGHT_PURPLE);
+        super("FuschiaFrankensteins", "Fuschia Frankensteins", 'Ⓟ', ChatColor.LIGHT_PURPLE);
     }
 }
