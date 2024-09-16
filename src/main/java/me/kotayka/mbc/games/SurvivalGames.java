@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.sgMaps.BCA;
+import me.kotayka.mbc.gameMaps.sgMaps.JesuscraftTwo;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -18,7 +19,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
@@ -42,7 +45,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class SurvivalGames extends Game {
-    private final SurvivalGamesMap map = new BCA();
+    private final SurvivalGamesMap map = new JesuscraftTwo();
     private WorldBorder border = null;
     private List<SurvivalGamesItem> items;
     //private List<SurvivalGamesItem> supply_items;
@@ -150,6 +153,7 @@ public class SurvivalGames extends Game {
             playersAlive.clear();
         }
         for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
             playersAlive.add(p);
             playerDamage.put(p.getPlayer(), 0.0);
             p.getPlayer().getInventory().clear();
@@ -162,6 +166,9 @@ public class SurvivalGames extends Game {
             }
 
             //p.getInventory().setItem(8, endCrystal);
+            if (map.type == "Elytra") {
+                p.getInventory().setChestplate(new ItemStack(Material.ELYTRA));
+            }
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().setAllowFlight(false);
             p.getPlayer().setExp(0);
@@ -274,7 +281,7 @@ public class SurvivalGames extends Game {
             /*
              * Event timeline:
              *  7:30: Game Starts
-             *  7:00: Grace Ends, border starts to move; kills worth 10
+             *  7:00: Grace Ends, border starts to move; kills worth 10; elytra removed for elytra maps
              *  6:00: 1 minute to chest refill, 1st supply crate announced
              *  5:00: Chest Refill, 1st supply crate drops, 2nd supply crate announced; kills worth 8
              *  4:00: 2nd supply crate drops, 3rd supply crate announced
@@ -287,6 +294,11 @@ public class SurvivalGames extends Game {
                     Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Border shrinking!");
                     map.Overtime();
                     setGameState(GameState.OVERTIME);
+                    if (map.type.equals("Elytra")) {
+                        for (Participant p : playersAlive) {
+                            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, PotionEffect.INFINITE_DURATION, 2, false, false));
+                        }
+                    }
                     timeRemaining = 45;
                 } else {
                     createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD+"Round Over!");
@@ -329,10 +341,16 @@ public class SurvivalGames extends Game {
                     bossBar.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
                     p.getPlayer().setInvulnerable(false);
+                    if (map.type == "Elytra") {
+                        p.getInventory().setChestplate(new ItemStack(Material.AIR));
+                    }
                 }
                 setPVP(true);
                 getLogger().log(ChatColor.DARK_RED+"Grace period is now over.");
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED+"Grace period is now over.");
+                if (map.type == "Elytra") {
+                    Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED+"Elytras have been removed.");
+                }
                 map.startBorder();
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Border will continue to shrink!");
             } else if (timeRemaining == 360) {
@@ -393,6 +411,7 @@ public class SurvivalGames extends Game {
                 for (Participant p : playersAlive) {
                     MBCTeam t = p.getTeam();
                     teamPlacements.put(t, 1);
+                    
                 }
                 damagePoints();
                 placementPoints();
@@ -407,6 +426,7 @@ public class SurvivalGames extends Game {
                     setGameState(GameState.END_ROUND);
                     firstRound = false;
                     timeRemaining = 10;
+                    
                 }
             }
         } else if (getState().equals(GameState.END_ROUND)) {
@@ -427,6 +447,9 @@ public class SurvivalGames extends Game {
                         h.armorStand.remove();
                         h.armorStand = null;
                     }
+                }
+                for (Participant p : MBC.getInstance().getPlayers()) {
+                    p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
                 }
                 map.resetMap();
             }
@@ -578,6 +601,19 @@ public class SurvivalGames extends Game {
         }
     }
 
+    @EventHandler
+    public void fallDamage(EntityDamageEvent e) {
+        // cancel fall damage during grace period
+        if (e.getEntity() instanceof Player) {
+            if (getState().equals(GameState.ACTIVE) && timeRemaining >= 420 && timeRemaining <= 450) {
+                if (e.getCause().equals(DamageCause.FALL)) {
+                    return;
+                }
+            }
+        }
+        
+    }
+
     public void placementPoints() {
         for (MBCTeam t : getValidTeams()) {
             for (Participant p : t.getPlayers()) {
@@ -614,7 +650,7 @@ public class SurvivalGames extends Game {
     private void damagePoints() {
         int sqrtSum = 0;
         for (Player player : playerDamage.keySet()) {
-            sqrtSum += playerDamage.get(player);
+            sqrtSum += Math.sqrt(playerDamage.get(player));
         }
 
         for (Player player : playerDamage.keySet()) {
@@ -873,6 +909,7 @@ public class SurvivalGames extends Game {
 
         victim.setGameMode(GameMode.SPECTATOR);
         getLogger().log(e.getDeathMessage());
+        victim.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
 
         Bukkit.broadcastMessage(e.getDeathMessage());
         Participant victimParticipant = Participant.getParticipant(victim);

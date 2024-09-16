@@ -16,8 +16,10 @@ import java.util.HashMap;
 public abstract class SurvivalGamesMap extends MBCMap {
     public int[][] spawns;
     public Location CENTER;
+    public String type;
     public java.util.Map<Location, Block> blocks = new HashMap<Location, Block>();
     public Location[] middleChests;
+    public int spawnY;
     public java.util.Map<Location, Material> brokenBlocks = new HashMap<Location, Material>();
 
     protected WorldBorder border = getWorld().getWorldBorder();
@@ -41,7 +43,7 @@ public abstract class SurvivalGamesMap extends MBCMap {
 
         ArrayList<Location> tempSpawns = new ArrayList<>(spawns.length);
         for (int[] spawn : spawns) {
-            tempSpawns.add(new Location(getWorld(), spawn[0], 2, spawn[1]));
+            tempSpawns.add(new Location(getWorld(), spawn[0], spawnY, spawn[1]));
         }
 
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {

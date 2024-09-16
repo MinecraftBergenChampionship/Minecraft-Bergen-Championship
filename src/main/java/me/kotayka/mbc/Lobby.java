@@ -102,7 +102,16 @@ public class Lobby extends Minigame {
                 toVoting();
             }
         } else if (getState().equals(GameState.ACTIVE)) {
+            if (MBC.getInstance().gameNum == 4 && (timeRemaining == 228 || timeRemaining == 114)) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
+                    p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
+                }
+            }
             if (timeRemaining == 0) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
+                }
                 toVoting();
             }
         } else if (getState().equals(GameState.END_ROUND)) {
@@ -277,9 +286,15 @@ public class Lobby extends Minigame {
         loadPlayers();
         updateTeamStandings();
         if (MBC.getInstance().gameNum == 4) {
-            setTimer(300);
+            setTimer(342);
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
+            }
         } else {
-            setTimer(120);
+            setTimer(114);
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
+            }
         }
     }
 
