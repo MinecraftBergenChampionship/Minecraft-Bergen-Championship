@@ -195,6 +195,14 @@ public class Spleef extends Game {
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
                 startingCountdown();
+                if (timeRemaining == 5 && map.getMapType().equals("Gravity")) {
+                    Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "Prepare for an antigravity experience!\n");
+                    for (Participant p : MBC.getInstance().getPlayers()) {
+                        p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_END_PORTAL_SPAWN, 1, 1);
+                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PotionEffect.INFINITE_DURATION, 3, false, false));
+                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, PotionEffect.INFINITE_DURATION, 1, false, false));
+                    }
+                }
             } else {
                 //setPVP(true);
                 openFloor(true);
@@ -215,6 +223,14 @@ public class Spleef extends Game {
                 setPVP(false);
                 for (Participant p : playersAlive) {
                     (getSpleefPlayer(p.getPlayer())).setPlacement(1);
+                }
+
+                for (Participant p : MBC.getInstance().getPlayers()) {
+                    p.getPlayer().setGameMode(GameMode.SURVIVAL);
+                    if (map.getMapType().equals("Gravity")) {
+                        p.getPlayer().removePotionEffect(PotionEffectType.JUMP);
+                        p.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
+                    }
                 }
 
                 if (roundNum < 3) {
@@ -316,6 +332,8 @@ public class Spleef extends Game {
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 20);
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
+        victim.getPlayer().removePotionEffect(PotionEffectType.JUMP);
+        victim.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
         MBC.spawnFirework(victim.getParticipant());
         victim.getPlayer().teleport(spawnpoint);
         victim.setPlacement(playersAlive.size()+1);

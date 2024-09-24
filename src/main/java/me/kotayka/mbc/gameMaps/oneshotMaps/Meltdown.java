@@ -11,7 +11,7 @@ public class Meltdown extends OneShotMap {
     
     public Meltdown(OneShot oneshot) {
         super(oneshot);
-        spawnpoints = new Location[28];
+        spawnpoints = new Location[31];
         addSpawnpoints();
         DEATH_Y = -20;
     }
@@ -45,5 +45,8 @@ public class Meltdown extends OneShotMap {
         spawnpoints[25] = new Location(Bukkit.getWorld("Party"), -2074, 0, -1973);
         spawnpoints[26] = new Location(Bukkit.getWorld("Party"), -2054, -4, -1959);
         spawnpoints[27] = new Location(Bukkit.getWorld("Party"), -2062, -6, -1970);
+        spawnpoints[28] = new Location(Bukkit.getWorld("Party"), -2048, -2, -1945);
+        spawnpoints[29] = new Location(Bukkit.getWorld("Party"), -2042, -6, -1938);
+        spawnpoints[30] = new Location(Bukkit.getWorld("Party"), -2054, -4, -1954);
     }
 }

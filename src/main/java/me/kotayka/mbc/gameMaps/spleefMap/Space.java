@@ -17,7 +17,7 @@ public class Space extends SpleefMap {
     private Set<Block> toRemove = new HashSet<>();
     int erosion = -1;
     public Space() {
-        super("Space", 80);
+        super("Space", 80, "Gravity");
     }
 
     @Override

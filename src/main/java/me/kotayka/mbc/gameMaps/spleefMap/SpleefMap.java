@@ -7,17 +7,23 @@ public abstract class SpleefMap {
     private final String name;
     private final int deathY;
     private final World world = Bukkit.getWorld("spleef");
+    private final String mapType;
 
 
-    public SpleefMap(String name, int deathY) {
+    public SpleefMap(String name, int deathY, String mapType) {
         this.name = name;
         this.deathY = deathY;
+        this.mapType = mapType;
     }
 
     public World getWorld() { return world; }
 
     public String Name() {
         return name;
+    }
+
+    public String getMapType() {
+        return mapType;
     }
 
     /**

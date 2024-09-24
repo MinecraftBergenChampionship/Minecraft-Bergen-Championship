@@ -17,7 +17,7 @@ public class SkySpleef extends SpleefMap {
     private Set<Block> toRemove = new HashSet<>();
     int erosion = -1;
     public SkySpleef() {
-        super("Sky Spleef", 90);
+        super("Sky Spleef", 90, "Regular");
     }
 
     @Override

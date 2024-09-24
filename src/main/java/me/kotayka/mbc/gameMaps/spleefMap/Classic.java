@@ -19,7 +19,7 @@ public class Classic extends SpleefMap {
     int[] layerRadius = new int[]{20, 20, 20, 25};
 
     public Classic() {
-        super("Classic", 60);
+        super("Classic", 60, "Regular");
     }
 
     @Override
