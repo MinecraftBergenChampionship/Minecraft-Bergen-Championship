@@ -222,8 +222,8 @@ public abstract class MBCTeam {
                 return MBC.getInstance().purple;
             case "pinkpiglets":
             case "pinkpiglet":
-            case "fuschiafrankensteins":
-            case "fuschiafrankenstein":
+            case "fuchsiafrankensteins":
+            case "fuchsiafrankenstein":
             case "pink":
             case "pink_":
                 return MBC.getInstance().pink;
