@@ -285,8 +285,7 @@ public class OneShot extends Game {
             } else {
                 setGameState(GameState.ACTIVE);
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, 1, 1);
-                    
+                    p.playSound(p, Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS, 1, 1);
                 }
                 setPVP(true);
                        
@@ -308,7 +307,7 @@ public class OneShot extends Game {
         } 
         else if (getState().equals(GameState.END_ROUND)) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.stopSound(Sound.MUSIC_DISC_13, SoundCategory.RECORDS);
+                p.stopSound(Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS);
             }
             for (MBCTeam m : MBC.getInstance().getValidTeams()) {
                 BossBar b = teamBossBars.get(m);
