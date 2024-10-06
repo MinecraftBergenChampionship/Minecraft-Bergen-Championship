@@ -165,7 +165,7 @@ public class SurvivalGames extends Game {
                 endCrystal.setItemMeta(meta);
             }
 
-            //p.getInventory().setItem(8, endCrystal);
+            p.getInventory().setItem(8, endCrystal);
             if (map.type == "Elytra") {
                 p.getInventory().setChestplate(new ItemStack(Material.ELYTRA));
             }
@@ -1457,7 +1457,7 @@ class Horcrux {
 
     public static Horcrux getHorcrux(List<Horcrux> horcruxList, ArmorStand a) {
         for (Horcrux h : horcruxList) {
-            if (h.armorStand.equals(a)) {
+            if (h.armorStand != null && h.armorStand.equals(a)) {
                 return h;
             }
         }
