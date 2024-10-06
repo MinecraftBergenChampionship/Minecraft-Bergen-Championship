@@ -1,7 +1,7 @@
 package me.kotayka.mbc.gameMaps.oneshotMaps;
 
 import me.kotayka.mbc.gameMaps.MBCMap;
-import me.kotayka.mbc.games.OneShot;
+import me.kotayka.mbc.partygames.OneShot;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 

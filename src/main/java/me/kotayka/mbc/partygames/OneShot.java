@@ -1,13 +1,8 @@
-package me.kotayka.mbc.games;
+package me.kotayka.mbc.partygames;
 
 import me.kotayka.mbc.*;
-import me.kotayka.mbc.gameMaps.spleefMap.*;
-import me.kotayka.mbc.gameMaps.tgttosMap.Boats;
-import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
-import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
 import me.kotayka.mbc.gamePlayers.OneShotPlayer;
 import me.kotayka.mbc.gameMaps.oneshotMaps.*;
-import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -16,17 +11,11 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -38,7 +27,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.enchantments.Enchantment;
 
-public class OneShot extends Game {
+public class OneShot extends PartyGame {
     private OneShotMap map = new Meltdown(this);
     private Map<MBCTeam, Integer> teamKills = new HashMap<>();
     public Map<UUID, OneShotPlayer> oneShotPlayerMap = new HashMap<>();
@@ -50,13 +39,14 @@ public class OneShot extends Game {
     private final int WEAPON_POINTS = 5;
     private Map<MBCTeam, BossBar> teamBossBars = new HashMap<>();
 
+    private static OneShot instance = null;
     public static final ItemStack CROSSBOW_QUICK_CHARGE = new ItemStack(Material.CROSSBOW);
     public static final ItemStack BOW = new ItemStack(Material.BOW);
     public static final ItemStack CROSSBOW_MULTISHOT = new ItemStack(Material.CROSSBOW);
     public static final ItemStack TRIDENT = new ItemStack(Material.TRIDENT);
     public static final ItemStack SWORD = new ItemStack(Material.DIAMOND_SWORD);
 
-    public OneShot() {
+    private OneShot() {
         super("OneShot", new String[] {
                 "⑰ Use your weapons to kill other players with a one shot kill!\n\n" + 
                 "⑰ You can't kill people yet, obviously, but you'll be able to soon!",
@@ -94,12 +84,38 @@ public class OneShot extends Game {
         TRIDENT.setItemMeta(tridentMeta);
     }
 
+    public static PartyGame getInstance() {
+        if (instance == null) {
+            instance = new OneShot();
+        }
+        return instance;
+    }
+
     public void start() {
         super.start();
 
         setGameState(GameState.TUTORIAL);
 
         setTimer(30);
+    }
+
+    @Override
+    public void endEvents() {
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            p.getPlayer().stopSound(Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS);
+        }
+        logger.logStats();
+
+        if (MBC.getInstance().party == null) {
+            for (Participant p : MBC.getInstance().getPlayers()) {
+                p.addCurrentScoreToTotal();
+            }
+            MBC.getInstance().updatePlacings();
+            returnToLobby();
+        } else {
+            // start next game
+            setupNext();
+        }
     }
 
     public void playerRespawn(Participant p) {

@@ -4,6 +4,7 @@ import me.kotayka.mbc.NPCs.NPCManager;
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
 import me.kotayka.mbc.games.*;
+import me.kotayka.mbc.partygames.OneShot;
 import me.kotayka.mbc.teams.*;
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import org.bukkit.*;
@@ -81,7 +82,6 @@ public class MBC implements Listener {
     public SurvivalGames sg = null;
     public Spleef spleef = null;
     public Party party = null;
-    public OneShot oneshot = null;
     //public Dodgebolt dodgebolt = null;
     public Quickfire quickfire = null;
     public boolean finalGame = false;
@@ -170,11 +170,6 @@ public class MBC implements Listener {
                     party = new Party();
                 }
                 return party;
-            case "OneShot":
-                if (oneshot == null) {
-                    oneshot = new OneShot();
-                }
-                return oneshot;
                 /*
             case "Dodgebolt":
                 if (dodgebolt == null) {

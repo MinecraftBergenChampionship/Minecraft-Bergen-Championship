@@ -15,7 +15,7 @@ import java.util.*;
 public class Party extends Game {
     private final World world = Bukkit.getWorld("Party");
     protected final Location LOBBY = new Location(world, 0.5, -17.5, -999.5);
-    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "BeepTest", "Dragons"));
+    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "BeepTest", "Dragons","OneShot"));
     public static final int GAMES_PLAYED = 3;
     private int gameNum;
     private PartyGame partyGame = null;

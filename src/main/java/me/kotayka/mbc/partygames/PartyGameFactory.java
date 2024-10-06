@@ -32,6 +32,9 @@ public class PartyGameFactory {
                 case "Dragons":
                     games.put(name, Dragons.getInstance());
                     break;
+                case "OneShot":
+                    games.put(name, PartyGame.getInstance());
+                    break;
                 default:
                     return null;
             }
