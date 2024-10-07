@@ -166,7 +166,7 @@ public class SurvivalGames extends Game {
             }
 
             p.getInventory().setItem(8, endCrystal);
-            if (map.type == "Elytra") {
+            if (map.type.equals("Elytra")) {
                 p.getInventory().setChestplate(new ItemStack(Material.ELYTRA));
             }
             p.getPlayer().setInvulnerable(true);
@@ -341,8 +341,7 @@ public class SurvivalGames extends Game {
                     bossBar.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
                     p.getPlayer().setInvulnerable(false);
-                    if (map.type == "Elytra") {
-                        p.getInventory().setChestplate(new ItemStack(Material.AIR));
+                    if (map.type.equals("Elytra")) {
                         p.getPlayer().getInventory().remove(Material.ELYTRA);
                     }
                 }
@@ -363,7 +362,7 @@ public class SurvivalGames extends Game {
                 killPoints -= 2;
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (10 -> 8)");
                 bossBar.removeAll();
-                bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "HORCRUXES EXPIRE", BarColor.RED, BarStyle.SOLID);
+                bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "KILL POINTS DECREASE", BarColor.RED, BarStyle.SOLID);
                 bossBar.setVisible(true);
                 for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
                     bossBar.addPlayer(p.getPlayer());
@@ -387,6 +386,7 @@ public class SurvivalGames extends Game {
                 //event = SurvivalGamesEvent.DEATHMATCH;
                  */
             } else if (timeRemaining == 180) {
+                /*
                 for (Horcrux h : horcruxList) {
                     h.inUse = false;
                     h.placed = true;
@@ -397,10 +397,11 @@ public class SurvivalGames extends Game {
                         h.armorStand = null;
                     }
                 }
-                killPoints -= 2;
                 for (Participant participant : MBC.getInstance().players) {
                     removeEndCrystal(participant.getPlayer());
                 }
+                 */
+                killPoints -= 2;
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (8 -> 5)");
                 bossBar.removeAll();
                 bossBar.setVisible(false);
@@ -412,7 +413,6 @@ public class SurvivalGames extends Game {
                 for (Participant p : playersAlive) {
                     MBCTeam t = p.getTeam();
                     teamPlacements.put(t, 1);
-                    
                 }
                 damagePoints();
                 placementPoints();
@@ -427,7 +427,6 @@ public class SurvivalGames extends Game {
                     setGameState(GameState.END_ROUND);
                     firstRound = false;
                     timeRemaining = 10;
-                    
                 }
             }
         } else if (getState().equals(GameState.END_ROUND)) {

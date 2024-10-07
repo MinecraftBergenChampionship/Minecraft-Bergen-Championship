@@ -15,7 +15,7 @@ import java.util.*;
 public class Party extends Game {
     private final World world = Bukkit.getWorld("Party");
     protected final Location LOBBY = new Location(world, 0.5, -17.5, -999.5);
-    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "BeepTest", "Dragons","OneShot"));
+    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "BeepTest", "Dragons")); // first is forced to be oneshot
     public static final int GAMES_PLAYED = 3;
     private int gameNum;
     private PartyGame partyGame = null;
@@ -67,7 +67,7 @@ public class Party extends Game {
      */
     public PartyGame getRandomPartyGame() {
         if (gameNames.size() > 0) {
-            if (gameNames.size() == 4) {
+            if (gameNum == 0) {
                 return PartyGameFactory.getPartyGame("OneShot");
             } else {
                 String randomGame = gameNames.get((int)(Math.random()*gameNames.size()));

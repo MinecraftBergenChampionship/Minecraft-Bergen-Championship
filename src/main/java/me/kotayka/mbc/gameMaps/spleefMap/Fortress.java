@@ -31,7 +31,7 @@ public class Fortress extends SpleefMap {
         int copy_from_x = 380;
         int copy_from_z = 380;
         for (int paste_to_x = -20; paste_to_x <= 20; paste_to_x++) {
-            for (int paste_to_z = -20; paste_to_z <= -20; paste_to_z++) {
+            for (int paste_to_z = -20; paste_to_z <= 20; paste_to_z++) {
                 for (int y = 70; y<= 89; y++) {
                     Block paste_from = getWorld().getBlockAt(copy_from_x, y, copy_from_z);
                     if (paste_from.getType().equals(Material.AIR) || paste_from.getType().equals(Material.GOLD_BLOCK)) continue;
@@ -50,7 +50,7 @@ public class Fortress extends SpleefMap {
     @Override
     public void deleteMap() {
         for (int paste_to_x = -20; paste_to_x <= 20; paste_to_x++) {
-            for (int paste_to_z = -20; paste_to_z <= -20; paste_to_z++) {
+            for (int paste_to_z = -20; paste_to_z <= 20; paste_to_z++) {
                 for (int y = 70; y<= 89; y++) {
                     getWorld().getBlockAt(paste_to_x, y, paste_to_z).setType(Material.AIR);
                 }

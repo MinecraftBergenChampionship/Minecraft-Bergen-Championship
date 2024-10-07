@@ -25,8 +25,7 @@ import java.util.*;
 public class Spleef extends Game {
     private SpleefMap map = null;
     private List<SpleefMap> maps = new ArrayList<>(
-            //Arrays.asList(new Classic(), new SkySpleef(), new HotSprings())
-            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings())
+            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress())
     );
     //private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
     //public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
@@ -239,17 +238,15 @@ public class Spleef extends Game {
                     (getSpleefPlayer(p.getPlayer())).setPlacement(1);
                 }
 
-                for (Participant p : MBC.getInstance().getPlayers()) {
-                    p.getPlayer().setGameMode(GameMode.SURVIVAL);
-                    if (map.getMapType().equals("Gravity")) {
-                        p.getPlayer().removePotionEffect(PotionEffectType.JUMP);
-                        p.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
-                    }
-                }
-
                 if (roundNum < 3) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.stopSound(Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS);
+                        if (map.getMapType().equals("Gravity")) {
+                            p.getPlayer().removePotionEffect(PotionEffectType.JUMP);
+                            p.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
+                        } else if (map.getMapType().equals("Blind")) {
+                            p.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
+                        }
                     }
                     roundOverGraphics();
                     roundWinners(0);
@@ -259,6 +256,12 @@ public class Spleef extends Game {
                 } else {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.stopSound(Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS);
+                        if (map.getMapType().equals("Gravity")) {
+                            p.getPlayer().removePotionEffect(PotionEffectType.JUMP);
+                            p.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
+                        } else if (map.getMapType().equals("Blind")) {
+                            p.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
+                        }
                     }
                     gameOverGraphics();
                     roundWinners(0);
