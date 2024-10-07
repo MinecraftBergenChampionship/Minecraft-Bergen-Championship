@@ -319,19 +319,6 @@ public class OneShot extends PartyGame {
                     b.setVisible(true);
                 } 
             }
-            
-        } else if (getState().equals(GameState.ACTIVE)) {
-        } 
-        else if (getState().equals(GameState.END_ROUND)) {
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                p.stopSound(Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS);
-            }
-            for (MBCTeam m : MBC.getInstance().getValidTeams()) {
-                BossBar b = teamBossBars.get(m);
-                b.removeAll();
-                b.setVisible(false);
-            } 
-            Bukkit.broadcastMessage("Something else will happen now, but since this isn't a party game yet, I probably shouldn't implement it");
         }
     }
 
@@ -548,6 +535,14 @@ public class OneShot extends PartyGame {
         }
         
         Bukkit.broadcastMessage(ChatColor.BOLD + "The " + ChatColor.RESET + m.teamNameFormat() + " have won!");
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.stopSound(Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS);
+        }
+        for (MBCTeam mt : MBC.getInstance().getValidTeams()) {
+            BossBar b = teamBossBars.get(mt);
+            b.removeAll();
+            b.setVisible(false);
+        }
         endEvents();
     }
 
