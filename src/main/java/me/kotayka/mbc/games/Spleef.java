@@ -198,10 +198,24 @@ public class Spleef extends Game {
                 if (timeRemaining == 5 && map.getMapType().equals("Gravity")) {
                     Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "Prepare for an antigravity experience!\n");
                     for (Participant p : MBC.getInstance().getPlayers()) {
-                        p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_END_PORTAL_SPAWN, 1, 1);
+                        if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
+                        p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.RECORDS, 1, 1);
                         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PotionEffect.INFINITE_DURATION, 3, false, false));
                         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, PotionEffect.INFINITE_DURATION, 1, false, false));
                     }
+                }
+
+                if (map.getMapType().equals("Blind")) {
+                   if (timeRemaining == 8) {
+                       Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "Power going out!\n");
+                   } else if (timeRemaining == 9 || timeRemaining % 8 == 0) {
+                       for (Participant p : MBC.getInstance().getPlayers()) {
+                           if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
+                           p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.RECORDS, 1, 1);
+                           p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PotionEffect.INFINITE_DURATION, 3, false, false));
+                           p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, PotionEffect.INFINITE_DURATION, 1, false, false));
+                       }
+                   }
                 }
             } else {
                 //setPVP(true);

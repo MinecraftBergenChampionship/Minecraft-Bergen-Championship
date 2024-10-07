@@ -79,7 +79,8 @@ public class BuildMart extends Game {
 
         //where the builds which are first are initialized. change these based off of event
 
-        
+
+        /*
         EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, 2))); //graveyard
         EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -285, 185, 2))); //skeleton face
         EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -294, 185, 2))); //nether star
@@ -92,6 +93,7 @@ public class BuildMart extends Game {
         HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -58))); //pumpkin
         HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -186, 185, -58))); //dungeon
         HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -195, 185, -58))); //black cat
+         */
         
     }
 
