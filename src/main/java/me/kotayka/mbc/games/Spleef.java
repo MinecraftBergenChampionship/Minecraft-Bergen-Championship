@@ -38,6 +38,9 @@ public class Spleef extends Game {
     private Map<UUID, Long> damageMap = new HashMap<>();
     private List<MBCTeam> fullyAliveTeams = getValidTeams();
 
+    private int blindnessTime = 240;
+    private boolean isBlind = false;
+
     // scoring
     private final int SURVIVAL_POINTS = 2;
     private final int KILL_POINTS = 2;
@@ -97,7 +100,7 @@ public class Spleef extends Game {
         damageMap.clear();
         brokenBlocks.clear();
         maps = new ArrayList<>(
-                Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings())
+                Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress())
         );
         brokenBlocks.clear();
         map.resetMap();
@@ -203,18 +206,8 @@ public class Spleef extends Game {
                         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, PotionEffect.INFINITE_DURATION, 1, false, false));
                     }
                 }
-
                 if (map.getMapType().equals("Blind")) {
-                   if (timeRemaining == 8) {
-                       Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "Power going out!\n");
-                   } else if (timeRemaining == 9 || timeRemaining % 8 == 0) {
-                       for (Participant p : MBC.getInstance().getPlayers()) {
-                           if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
-                           p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.RECORDS, 1, 1);
-                           p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PotionEffect.INFINITE_DURATION, 3, false, false));
-                           p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, PotionEffect.INFINITE_DURATION, 1, false, false));
-                       }
-                   }
+                    blindnessTime = 240 - (int)(5*Math.random() + 10);
                 }
             } else {
                 //setPVP(true);
@@ -229,6 +222,29 @@ public class Spleef extends Game {
                 timeRemaining = 240;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
+            if (map.getMapType().equals("Blind") && timeRemaining == blindnessTime) {
+                if (isBlind) {
+                    isBlind = false;
+                    blindnessTime = timeRemaining - (int)(3*Math.random() + 5);
+                    for (Participant p : MBC.getInstance().getPlayers()) {
+                        p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1, 1);
+                        if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
+                        p.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
+                    }
+                }
+                else {
+                    isBlind = true;
+                    if (timeRemaining > 220) {
+                        Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "Power going out!\n");
+                    }
+                    blindnessTime = timeRemaining - (int)(5*Math.random() + 10);
+                    for (Participant p : MBC.getInstance().getPlayers()) {
+                        p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 1);
+                        if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
+                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, PotionEffect.INFINITE_DURATION, 3, false, false));
+                    }
+                }
+            }
             checkResetDamagers();
             checkBlocks();
             map.Border(timeRemaining);
@@ -351,6 +367,7 @@ public class Spleef extends Game {
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
         victim.getPlayer().removePotionEffect(PotionEffectType.JUMP);
         victim.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
+        victim.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
         MBC.spawnFirework(victim.getParticipant());
         victim.getPlayer().teleport(spawnpoint);
         victim.setPlacement(playersAlive.size()+1);
