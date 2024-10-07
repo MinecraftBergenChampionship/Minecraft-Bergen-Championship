@@ -451,6 +451,7 @@ public class OneShot extends PartyGame {
         switch (teamKills.get(m)) {
             case 10:
                 for (Participant p : m.getPlayers()) {
+                    p.getPlayer().activeBossBars();
                     p.getInventory().remove(Material.CROSSBOW);
                     p.getInventory().addItem(BOW);
                     p.addCurrentScore(WEAPON_POINTS);
