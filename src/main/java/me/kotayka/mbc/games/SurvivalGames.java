@@ -343,6 +343,7 @@ public class SurvivalGames extends Game {
                     p.getPlayer().setInvulnerable(false);
                     if (map.type == "Elytra") {
                         p.getInventory().setChestplate(new ItemStack(Material.AIR));
+                        p.getPlayer().getInventory().remove(Material.ELYTRA);
                     }
                 }
                 setPVP(true);

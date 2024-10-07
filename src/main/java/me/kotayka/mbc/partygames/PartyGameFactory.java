@@ -33,7 +33,7 @@ public class PartyGameFactory {
                     games.put(name, Dragons.getInstance());
                     break;
                 case "OneShot":
-                    games.put(name, PartyGame.getInstance());
+                    games.put(name, OneShot.getInstance());
                     break;
                 default:
                     return null;
