@@ -548,7 +548,7 @@ public class OneShot extends PartyGame {
         }
         
         Bukkit.broadcastMessage(ChatColor.BOLD + "The " + ChatColor.RESET + m.teamNameFormat() + " have won!");
-        setGameState(GameState.END_ROUND);
+        endEvents();
     }
 
     private void Death(Participant shot, Participant damager) {

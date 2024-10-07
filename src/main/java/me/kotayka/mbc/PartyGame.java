@@ -197,6 +197,9 @@ public abstract class PartyGame extends Game {
         HandlerList.unregisterAll(this);
         setGameState(GameState.INACTIVE);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            if (p.getPlayer().getAllowFlight()) {
+                removeWinEffect(p);
+            }
             p.getPlayer().setMaxHealth(20);
             p.getPlayer().setInvulnerable(false);
             p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
