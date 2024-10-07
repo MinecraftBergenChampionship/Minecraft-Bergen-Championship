@@ -87,6 +87,7 @@ public class OneShot extends PartyGame {
     public static PartyGame getInstance() {
         if (instance == null) {
             instance = new OneShot();
+            Bukkit.broadcastMessage("new one shot");
         }
         return instance;
     }

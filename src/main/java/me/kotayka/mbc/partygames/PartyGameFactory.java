@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PartyGameFactory {
-    private static List<String> gameNames = Arrays.asList("DiscoFever", "BeepTest", "Dragons");
+    private static List<String> gameNames = Arrays.asList("DiscoFever", "BeepTest", "Dragons", "OneShot");
     private static Map<String, PartyGame> games = new HashMap<>();
 
     public PartyGameFactory() {}
@@ -33,7 +33,7 @@ public class PartyGameFactory {
                     games.put(name, Dragons.getInstance());
                     break;
                 case "OneShot":
-                    games.put(name, PartyGame.getInstance());
+                    games.put(name, OneShot.getInstance());
                     break;
                 default:
                     return null;

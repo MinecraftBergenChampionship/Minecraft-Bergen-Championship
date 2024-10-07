@@ -26,7 +26,7 @@ public class Party extends Game {
             "⑰ Make sure to read the instructions for each game carefully!\n\n" +
             "⑰ Each game has unique gameplay, rules and scoring.",
             "⑰ The three minigames will be chosen from in a random order.\n\n" +
-            "⑰ Our three games for this event are " + ChatColor.BOLD + "Dragons, Disco Fever, and Beep Test." + ChatColor.RESET,
+            "⑰ Our four games for this event are " + ChatColor.BOLD + "Dragons, Disco Fever, Beep Test, and One Shot." + ChatColor.RESET,
             ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                     "⑰ You'll find out! "
         });

@@ -625,7 +625,7 @@ public class Lobby extends Minigame {
             Location l_0 = locs[i];
             //Location l_1 = locs[i][1];
 
-            //NPC npc1 = MBC.npcManager.createNPC(p,l_0);
+            NPC npc1 = MBC.npcManager.createNPC(p,l_0);
             //NPC npc2 = MBC.npcManager.createNPC(p,l_1);
 
             //MBC.npcManager.showAll(npc1);
