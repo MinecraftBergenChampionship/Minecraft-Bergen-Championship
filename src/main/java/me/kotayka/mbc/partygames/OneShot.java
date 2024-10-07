@@ -320,6 +320,7 @@ public class OneShot extends PartyGame {
                 } 
             }
         }
+        
     }
 
     private void incrementBossBar(BossBar b, int k, MBCTeam m) {
@@ -448,13 +449,13 @@ public class OneShot extends PartyGame {
 
     private void nextWeapon(MBCTeam m) {
         BossBar b = teamBossBars.get(m);
+        b.removeAll();
         switch (teamKills.get(m)) {
             case 10:
                 for (Participant p : m.getPlayers()) {
                     p.getInventory().remove(Material.CROSSBOW);
                     p.getInventory().addItem(BOW);
                     p.addCurrentScore(WEAPON_POINTS);
-                    b.removePlayer(p.getPlayer());
                     b = Bukkit.createBossBar(ChatColor.YELLOW + "" + ChatColor.BOLD + "CURRENT WEAPON: Bow", BarColor.YELLOW, BarStyle.SOLID);
                     b.setProgress(0);
                     teamBossBars.replace(m, b);
@@ -470,7 +471,6 @@ public class OneShot extends PartyGame {
                     p.getInventory().remove(Material.BOW);
                     p.getInventory().addItem(CROSSBOW_MULTISHOT);
                     p.addCurrentScore(WEAPON_POINTS);
-                    b.removePlayer(p.getPlayer());
                     b = Bukkit.createBossBar(ChatColor.GREEN + "" + ChatColor.BOLD + "CURRENT WEAPON: Multishot Crossbow", BarColor.GREEN, BarStyle.SOLID);
                     b.setProgress(0);
                     teamBossBars.replace(m, b);
@@ -487,7 +487,6 @@ public class OneShot extends PartyGame {
                     p.getInventory().remove(Material.ARROW);
                     p.getInventory().addItem(TRIDENT);
                     p.addCurrentScore(WEAPON_POINTS);
-                    b.removePlayer(p.getPlayer());
                     b = Bukkit.createBossBar(ChatColor.AQUA + "" + ChatColor.BOLD + "CURRENT WEAPON: Trident", BarColor.BLUE, BarStyle.SOLID);
                     b.setProgress(0);
                     teamBossBars.replace(m, b);
@@ -504,7 +503,6 @@ public class OneShot extends PartyGame {
                     p.getInventory().addItem(SWORD);
                     p.addCurrentScore(WEAPON_POINTS);
                     p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
-                    b.removePlayer(p.getPlayer());
                     b = Bukkit.createBossBar(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "CURRENT WEAPON: Sword", BarColor.PURPLE, BarStyle.SOLID);
                     b.setProgress(0);
                     teamBossBars.replace(m, b);
