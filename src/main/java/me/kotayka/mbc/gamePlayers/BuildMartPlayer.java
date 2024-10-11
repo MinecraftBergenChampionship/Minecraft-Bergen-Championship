@@ -19,12 +19,12 @@ public class BuildMartPlayer extends GamePlayer {
         this.bsabm = buildMart;
 
         switch (p.getTeam().getTeamName()) {
-            case "RedRabbits" -> team = buildMart.red;
-            case "YellowYaks" -> team = buildMart.yellow;
-            case "GreenGuardians" -> team = buildMart.green;
-            case "BlueBats" -> team = buildMart.blue;
-            case "PurplePandas" -> team = buildMart.purple;
-            case "PinkPiglets" -> team = buildMart.pink;
+            case "RedRabbits", "RedRavens", "RedReindeer" -> team = buildMart.red;
+            case "YellowYaks", "MustardMummies", "YellowYetis" -> team = buildMart.yellow;
+            case "GreenGuardians", "GreenGoblins", "EmeraldElves" -> team = buildMart.green;
+            case "BlueBats", "BlueBanshees", "SapphireSantas" -> team = buildMart.blue;
+            case "PurplePandas", "VioletVampires", "PurplePenguins" -> team = buildMart.purple;
+            case "PinkPiglets", "PinkParrots", "PinkPresents", "FuchsiaFrankensteins" -> team = buildMart.pink;
         }
     }
 
@@ -50,7 +50,11 @@ public class BuildMartPlayer extends GamePlayer {
     public void spawn() {
         Player p = getParticipant().getPlayer();
         p.getInventory().clear();
+        if (team == null) {
+            Bukkit.broadcastMessage(p.getName());
+        }
         p.teleport(team.getSPAWN());
+        Bukkit.broadcastMessage("Succeeded in " + team);
 
         ItemStack[] items = BuildMart.getItemsForBuildMart();
 

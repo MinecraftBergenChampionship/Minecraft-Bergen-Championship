@@ -7,6 +7,6 @@ public class Purple extends MBCTeam {
 
     public Purple() {
         //super("PurplePandas", "Purple Pandas", 'Ⓤ', ChatColor.DARK_PURPLE);
-        super("Violet Vampires", "Violet Vampires", 'Ⓤ', ChatColor.DARK_PURPLE);
+        super("VioletVampires", "Violet Vampires", 'Ⓤ', ChatColor.DARK_PURPLE);
     }
 }

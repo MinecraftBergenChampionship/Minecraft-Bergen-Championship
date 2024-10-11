@@ -197,7 +197,7 @@ public abstract class PartyGame extends Game {
         HandlerList.unregisterAll(this);
         setGameState(GameState.INACTIVE);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
-            if (p.getPlayer().getAllowFlight()) {
+            if (p.getPlayer().getAllowFlight() && !p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
                 removeWinEffect(p);
             }
             p.getPlayer().setMaxHealth(20);
