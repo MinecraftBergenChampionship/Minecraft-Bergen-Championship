@@ -241,6 +241,7 @@ public class Participant {
                 scoreboardTeam.setPrefix(String.format("%s%c ", ChatColor.WHITE, p.getTeam().getIcon()));
                 scoreboardTeam.setAllowFriendlyFire(false);
                 scoreboardTeam.addPlayer(p.getPlayer());
+                scoreboardTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             } else {
                 board.getTeam(p.getTeam().fullName).addPlayer(p.getPlayer());
             }
@@ -252,6 +253,7 @@ public class Participant {
                 scoreboardTeam.setPrefix(String.format("%s%c ", ChatColor.WHITE, team.getIcon()));
                 scoreboardTeam.setAllowFriendlyFire(false);
                 scoreboardTeam.addPlayer(player);
+                scoreboardTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             } else {
                 // add player to team
                 p.board.getTeam(team.fullName).addPlayer(player);

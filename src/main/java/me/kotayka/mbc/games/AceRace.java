@@ -97,7 +97,6 @@ public class AceRace extends Game {
     public void onRestart() {
         for (AceRacePlayer p : aceRacePlayerMap.values()) {
             p.reset();
-            p.getParticipant().board.getTeam(p.getParticipant().getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.ALWAYS);
         }
     }
 
@@ -170,9 +169,6 @@ public class AceRace extends Game {
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 40) {
                 Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Fastest Laps: ");
-                for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
-                    p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.ALWAYS);
-                }
             } else if (timeRemaining == 36) {
                 topLaps();
             } else if (timeRemaining < 34){
