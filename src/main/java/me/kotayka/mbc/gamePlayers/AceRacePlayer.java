@@ -101,6 +101,8 @@ public class AceRacePlayer extends GamePlayer {
             List<String> t = new ArrayList<String>();
             t.add(this.getParticipant().getFormattedName());
             ACE_RACE.fastestLaps.put(lapTime,t);
+            fastestLapsContainsPlayer = true;
+            fastestLap = lapTime;
         }
 
         if (lap < 3) {
