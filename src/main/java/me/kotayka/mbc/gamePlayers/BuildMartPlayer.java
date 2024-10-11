@@ -54,7 +54,6 @@ public class BuildMartPlayer extends GamePlayer {
             Bukkit.broadcastMessage(p.getName());
         }
         p.teleport(team.getSPAWN());
-        Bukkit.broadcastMessage("Succeeded in " + team);
 
         ItemStack[] items = BuildMart.getItemsForBuildMart();
 

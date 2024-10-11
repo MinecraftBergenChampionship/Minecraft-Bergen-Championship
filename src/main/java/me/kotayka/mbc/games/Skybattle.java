@@ -30,6 +30,7 @@ public class Skybattle extends Game {
     public Map<Entity, Player> TNTPlacers = new HashMap<Entity, Player>(5);
     // Creeper Entity, Player (that spawned them); used for determining kills by creeper explosion
     public Map<Entity, Player> creeperSpawners = new HashMap<Entity, Player>(5);
+    public Map<Entity,Player> witchSpawners = new HashMap<>();
     private final int KILL_POINTS = 10;
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
     private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
@@ -98,6 +99,8 @@ public class Skybattle extends Game {
             p.getPlayer().removePotionEffect(PotionEffectType.JUMP);
             p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+            p.getPlayer().removePotionEffect(PotionEffectType.SLOW);
+            p.getPlayer().removePotionEffect(PotionEffectType.POISON);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false));
             if (roundNum == 1) {
                 skybattlePlayerMap.put(p.getPlayer().getUniqueId(), new SkybattlePlayer(p));
@@ -124,6 +127,9 @@ public class Skybattle extends Game {
     public void resetMaps() {
         if (creeperSpawners != null) {
             creeperSpawners.clear();
+        }
+        if (witchSpawners != null) {
+            witchSpawners.clear();
         }
 
         if (TNTPlacers != null) {
@@ -335,6 +341,25 @@ public class Skybattle extends Game {
             Location spawn = getLocationToSpawnEntity(p.getTargetBlock(null, 5), e.getBlockFace());
             creeperSpawners.put(p.getWorld().spawn(spawn, Creeper.class), p);
         }
+
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getMaterial() == Material.WITCH_SPAWN_EGG) {
+            e.setCancelled(true);
+            Player p = e.getPlayer();
+            for(int i = 0; i < p.getInventory().getSize(); i++){
+                ItemStack itm = p.getInventory().getItem(i);
+                if(itm != null && itm.getType().equals(Material.WITCH_SPAWN_EGG)) {
+                    int amt = itm.getAmount() - 1;
+                    itm.setAmount(amt);
+                    p.getInventory().setItem(i, amt > 0 ? itm : null);
+                    p.updateInventory();
+                    break;
+                }
+            }
+
+            // Add each creeper spawned to a map, use to check kill credit
+            Location spawn = getLocationToSpawnEntity(p.getTargetBlock(null, 5), e.getBlockFace());
+            witchSpawners.put(p.getWorld().spawn(spawn, Witch.class), p);
+        }
     }
 
     /**
@@ -388,6 +413,11 @@ public class Skybattle extends Game {
         if (!e.getBlock().getLocation().getWorld().toString().equals(map.getWorld().toString())) return;
         if (e.getBlock().getType().toString().endsWith("CONCRETE")) return;
 
+        if (e.getBlock().getType() == Material.IRON_ORE) {
+            map.getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.IRON_INGOT, 1));
+            return;
+        }
+
         for (ItemStack i : e.getBlock().getDrops()) {
             map.getWorld().dropItemNaturally(e.getBlock().getLocation(), i);
         }
@@ -414,6 +444,13 @@ public class Skybattle extends Game {
             Participant damager = Participant.getParticipant(creeperSpawners.get(e.getDamager()));
             if (damager.getTeam().equals(player.getParticipant().getTeam())) return;
             player.lastDamager = creeperSpawners.get(e.getDamager());
+            return;
+        }
+
+        if (witchSpawners.containsKey(e.getDamager())) {
+            Participant damager = Participant.getParticipant(witchSpawners.get(e.getDamager()));
+            if (damager.getTeam().equals(player.getParticipant().getTeam())) return;
+            player.lastDamager = witchSpawners.get(e.getDamager());
             return;
         }
 
@@ -459,7 +496,17 @@ public class Skybattle extends Game {
     @EventHandler
     public void onSplashEvent(PotionSplashEvent e) {
         if (!isGameActive()) return;
-        if (!(e.getPotion().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
+
+        if (!(e.getHitEntity() instanceof Player)) return;
+
+        if (e.getPotion().getShooter() instanceof Witch && witchSpawners.containsKey((Witch) e.getPotion().getShooter())) {
+            Participant damager = Participant.getParticipant(witchSpawners.get((Witch) e.getPotion().getShooter()));
+            SkybattlePlayer hurt = skybattlePlayerMap.get(((Player) e.getHitEntity()).getUniqueId());
+            if (damager.getTeam().equals(hurt.getParticipant().getTeam())) return;
+            hurt.lastDamager = damager.getPlayer();
+        }
+
+        if (!(e.getPotion().getShooter() instanceof Player)) return;
 
         ThrownPotion potion = e.getPotion();
 
@@ -699,9 +746,9 @@ public class Skybattle extends Game {
     @EventHandler
     public void onReconnect(PlayerJoinEvent e) {
         SkybattlePlayer p = skybattlePlayerMap.get(e.getPlayer().getUniqueId());
+        if (p == null) return;
         p.voidDeath = false;
         p.lastDamager = null;
-        if (p == null) return; // new login; doesn't matter
         p.setPlayer(e.getPlayer());
 
         // if log back in during paused/starting, manually teleport them

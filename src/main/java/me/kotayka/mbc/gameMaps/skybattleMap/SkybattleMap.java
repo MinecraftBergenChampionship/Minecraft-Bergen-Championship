@@ -56,18 +56,23 @@ public abstract class SkybattleMap extends MBCMap {
         for (Item item : getWorld().getEntitiesByClass(Item.class)) {
             item.remove();
         }
-
         for (Entity tnt : getWorld().getEntitiesByClass(TNTPrimed.class)) {
             tnt.remove();
         }
         for (Entity creeper : getWorld().getEntitiesByClass(Creeper.class)) {
             creeper.remove();
         }
+        for (Entity witch : getWorld().getEntitiesByClass(Witch.class)) {
+            witch.remove();
+        }
         for (Entity pearl : getWorld().getEntitiesByClass(EnderPearl.class)) {
             pearl.remove();
         }
         for (Entity minecart : getWorld().getEntitiesByClass(Minecart.class)) {
             minecart.remove();
+        }
+        for (Entity boat : getWorld().getEntitiesByClass(Boat.class)) {
+            boat.remove();
         }
     }
 

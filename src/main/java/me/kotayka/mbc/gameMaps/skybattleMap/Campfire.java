@@ -78,7 +78,6 @@ public class Campfire extends SkybattleMap {
             x++;
         }
         removeEntities();
-
     }
 
     @Override
