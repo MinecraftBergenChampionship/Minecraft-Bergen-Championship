@@ -242,6 +242,7 @@ public class AceRace extends Game {
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
+            player.setCheckpoint();
             //p.setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
             return;
         }
