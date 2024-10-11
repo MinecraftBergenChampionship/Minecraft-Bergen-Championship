@@ -5,6 +5,7 @@ import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
+import me.kotayka.mbc.gameMaps.aceRaceMap.iDrgCity;
 import me.kotayka.mbc.gameMaps.aceRaceMap.semoiB;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
 import org.bukkit.*;
@@ -30,7 +31,7 @@ import java.util.*;
 public class AceRace extends Game {
     // Change this to determine played map
     //public AceRaceMap map = new Biomes();
-    public AceRaceMap map = new semoiB();
+    public AceRaceMap map = new iDrgCity();
     public static World world = Bukkit.getWorld("AceRace");;
     public Map<UUID, AceRacePlayer> aceRacePlayerMap = new HashMap<UUID, AceRacePlayer>();
     public short[] finishedPlayersByLap = {0, 0, 0};
@@ -86,7 +87,7 @@ public class AceRace extends Game {
         //}
 
         for (AceRacePlayer p : aceRacePlayerMap.values()) {
-            p.getPlayer().teleport(new Location(map.getWorld(), -2158, 13, -2303, 90, 0));
+            p.getPlayer().teleport(map.getIntroLocation());
             p.reset();
         }
 
@@ -126,7 +127,7 @@ public class AceRace extends Game {
             if (timeRemaining <= 0) {
                 map.setBarriers(true);
                 for (AceRacePlayer p : aceRacePlayerMap.values()) {
-                    p.getPlayer().teleport(new Location(map.getWorld(), -2158, 13, -2303, 90, 0));
+                    p.getPlayer().teleport(map.getIntroLocation());
                     //p.getPlayer().teleport(new Location(map.getWorld(), 2, 26, 150, 90, 0));
                     p.checkpoint = 0;
                 }
