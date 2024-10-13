@@ -55,7 +55,7 @@ public class Quickfire extends FinaleGame {
                 "Eliminate the entire opposing team to win a round.\n" + ChatColor.YELLOW + "Quickfire is best of 5 rounds.\n",
                 "Once the timer exceeds a minute and a half, all players will receive the " + ChatColor.BOLD + "glowing" + ChatColor.RESET + " effect.\n",
                 "Each crossbow has the " + ChatColor.BOLD + "Quick Charge" + ChatColor.RESET + " enchantment, so be sure to fire fast!\n",
-                "No points are awarded for this game.\n" + ChatColor.YELLOW + "The winning team will win the Minecraft Bruh Championship!\n"
+                "No points are awarded for this game.\n" + ChatColor.YELLOW + "The winning team will win the Minecraft Bergen Championship!\n"
         });
 
         /*
@@ -83,7 +83,7 @@ public class Quickfire extends FinaleGame {
                 "Eliminate the entire opposing team to win a round.\n" + ChatColor.YELLOW + "Quickfire is best of 5 rounds.\n",
                 "Once the timer exceeds a minute and a half, all players will receive the " + ChatColor.BOLD + "glowing" + ChatColor.RESET + " effect.\n",
                 "Each crossbow has the " + ChatColor.BOLD + "Quick Charge" + ChatColor.RESET + " enchantment, so be sure to fire fast!\n",
-                "No points are awarded for this game.\n" + ChatColor.YELLOW + "The winning team will win the Minecraft Bruh Championship!\n"
+                "No points are awarded for this game.\n" + ChatColor.YELLOW + "The winning team will win the Minecraft Bergen Championship!\n"
         });
 
         if (logger == null) {
