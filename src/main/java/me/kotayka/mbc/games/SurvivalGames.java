@@ -658,13 +658,13 @@ public class SurvivalGames extends Game {
             double percentage = 100 *(playerDamage.get(player) / totalDamage);
             int points = 0;
             if (percentage != 0) {
-                points = (int) Math.log(Math.pow(150*Math.sqrt(percentage)/sqrtSum, 5.25)/8);
+                points = (int) (Math.log(Math.pow(150*Math.sqrt(percentage)/sqrtSum, 5.5)/7));
                 if (points < 0) {
                     points = 0;
                 }
             }
             p.addCurrentScore(points);
-            logger.log(p.getPlayerName() + " dealt " + percentage + "% of the total damage and earned " + points + " points!");
+            logger.log(String.format("%s dealt %.2f%% of the total damage and earned %d points!", p.getPlayerName(),percentage,points));
             p.getPlayer().sendMessage(String.format("%sYou dealt %.2f%% of the total damage and earned %d points!", ChatColor.GREEN, percentage, points));
         }
     }
