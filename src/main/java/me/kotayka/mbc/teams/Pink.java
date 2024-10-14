@@ -10,9 +10,9 @@ public class Pink extends MBCTeam {
         //super("PinkPiglets", "Pink Piglets", 'Ⓟ', ChatColor.LIGHT_PURPLE);
 
         //halloween
-        //super("FuchsiaFrankensteins", "Fuchsia Frankensteins", 'Ⓟ', ChatColor.LIGHT_PURPLE);
+        //super("FuchsiaFrankensteins", "Fuchsia Frankensteins", 'Ⓕ', ChatColor.LIGHT_PURPLE);
 
         //christmas
-        super("PinkPresents", "Pink Presents", 'Ⓟ', ChatColor.LIGHT_PURPLE);
+        super("PinkPresents", "Pink Presents", 'ⓟ', ChatColor.LIGHT_PURPLE);
     }
 }

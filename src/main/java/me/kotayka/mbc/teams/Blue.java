@@ -10,9 +10,9 @@ public class Blue extends MBCTeam {
         //super("BlueBats", "Blue Bats", 'Ⓑ', ChatColor.BLUE);
 
         //halloween
-        //super("BlueBanshees", "Blue Banshees", 'Ⓑ', ChatColor.BLUE);
+        //super("BlueBanshees", "Blue Banshees", 'Ⓗ', ChatColor.BLUE);
 
         //christmas
-        super("SapphireSantas", "Sapphire Santas", 'Ⓑ', ChatColor.BLUE);
+        super("SapphireSantas", "Sapphire Santas", 'ⓑ', ChatColor.BLUE);
     }
 }
