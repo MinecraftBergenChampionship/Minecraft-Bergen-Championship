@@ -6,7 +6,13 @@ import org.bukkit.ChatColor;
 public class Green extends MBCTeam {
 
     public Green() {
+        //regular
         //super("GreenGuardians", "Green Guardians", 'Ⓖ', ChatColor.GREEN);
-        super("GreenGoblins", "Green Goblins", 'Ⓖ', ChatColor.GREEN);
+
+        //halloween
+        //super("GreenGoblins", "Green Goblins", 'Ⓖ', ChatColor.GREEN);
+
+        //christmas
+        super("Emerald Elves", "Emerald Elves", 'Ⓖ', ChatColor.GREEN);
     }
 }

@@ -189,6 +189,8 @@ public abstract class MBCTeam {
             case "redrabbit":
             case "redravens":
             case "redraven":
+            case "redreindeers":
+            case "redreindeer":
             case "red":
             case "red_":
                 return MBC.getInstance().red;
@@ -196,6 +198,8 @@ public abstract class MBCTeam {
             case "yellowyak":
             case "mustardmummies":
             case "mustardmummie":
+            case "yellowyetis":
+            case "yellowyeti":
             case "yellow":
             case "yellow_":
                 return MBC.getInstance().yellow;
@@ -203,6 +207,8 @@ public abstract class MBCTeam {
             case "greenguardian":
             case "greengoblins":
             case "greengoblin":
+            case "emeraldelves":
+            case "emeraldelve":
             case "green":
             case "green_":
                 return MBC.getInstance().green;
@@ -210,6 +216,8 @@ public abstract class MBCTeam {
             case "bluebat":
             case "bluebanshees":
             case "bluebanshee":
+            case "sapphiresantas":
+            case "sapphiresanta":
             case "blue":
             case "blue_":
                 return MBC.getInstance().blue;
@@ -217,6 +225,8 @@ public abstract class MBCTeam {
             case "purplepanda":
             case "violetvampires":
             case "violetvampire":
+            case "purplepenguins":
+            case "purplepenguin":
             case "purple":
             case "purple_":
                 return MBC.getInstance().purple;
@@ -224,6 +234,8 @@ public abstract class MBCTeam {
             case "pinkpiglet":
             case "fuchsiafrankensteins":
             case "fuchsiafrankenstein":
+            case "pinkpresents":
+            case "pinkpresent":
             case "pink":
             case "pink_":
                 return MBC.getInstance().pink;
