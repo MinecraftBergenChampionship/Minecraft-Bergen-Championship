@@ -111,7 +111,6 @@ public class AceRace extends Game {
                     p.getPlayer().sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "Practice Over!", "", 0, 60, 20);
                     createLine(6, ChatColor.GREEN.toString()+ChatColor.BOLD+"Lap: " + ChatColor.RESET+"1/3", p.getParticipant());
                 }
-                // something breaks like right here. idk why
                 setGameState(GameState.END_ROUND);
                 timeRemaining = 5;
             } else if (!finishedIntro && timeRemaining > 0 && timeRemaining % 7 == 0 && timeRemaining != TUTORIAL_TIME-30) {
@@ -168,6 +167,11 @@ public class AceRace extends Game {
                 timeRemaining = 42;
             }
         } else if (getState().equals(GameState.END_GAME)) {
+            if (timeRemaining == 41) {
+                for (Participant p : MBC.getInstance().getPlayers()) {
+                    MBC.getInstance().showPlayers(p);
+                }
+            }
             if (timeRemaining == 40) {
                 Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Fastest Laps: ");
             } else if (timeRemaining == 36) {
@@ -208,6 +212,27 @@ public class AceRace extends Game {
             return;
         }
 
+        // experimental: making players disappear for others if they are within 8 blocks
+        if (e.getPlayer().getGameMode() != GameMode.SPECTATOR) {
+            Player mover = e.getPlayer();
+            for (Participant p : MBC.getInstance().getPlayers()) {
+                Player player = p.getPlayer();
+                if (mover != player && player.getGameMode() != GameMode.SPECTATOR) {
+                    double diffX = player.getX() - mover.getX();
+                    double diffY = player.getY() - mover.getY();
+                    double diffZ = player.getZ() - mover.getZ();
+                    if (Math.sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ) <= 8) {
+                        player.hidePlayer(mover);
+                        mover.hidePlayer(player);
+                    }
+                    else {
+                        mover.showPlayer(player);
+                        player.showPlayer(mover);
+                    }
+                }
+            }
+        }
+        
         Player p = e.getPlayer();
         AceRacePlayer player = getGamePlayer(p);
         if (player == null) return;

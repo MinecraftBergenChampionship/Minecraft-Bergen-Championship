@@ -77,13 +77,13 @@ public class Quickfire extends FinaleGame {
 
     public Quickfire(@NotNull MBCTeam firstPlace, @NotNull MBCTeam secondPlace) {
         super("Quickfire", firstPlace, secondPlace, new String[] {
-                "Welcome to the Finale of MBC; Quickfire!\n Only the top two teams will play this round.\n",
-                "Quickfire is a shooter game where every player has a crossbow, infinite arrows, and 4 hearts.\n",
-                "Shooting another player will deal exactly one heart of health.\n" + ChatColor.RED + "Shoot someone four times to eliminate them.\n",
-                "Eliminate the entire opposing team to win a round.\n" + ChatColor.YELLOW + "Quickfire is best of 5 rounds.\n",
-                "Once the timer exceeds a minute and a half, all players will receive the " + ChatColor.BOLD + "glowing" + ChatColor.RESET + " effect.\n",
-                "Each crossbow has the " + ChatColor.BOLD + "Quick Charge" + ChatColor.RESET + " enchantment, so be sure to fire fast!\n",
-                "No points are awarded for this game.\n" + ChatColor.YELLOW + "The winning team will win the Minecraft Bergen Championship!\n"
+                "⑩ Welcome to the Finale of MBC; Quickfire!\n Only the top two teams will play this round.\n",
+                "⑩ Quickfire is a shooter game where every player has a crossbow, infinite arrows, and 4 hearts.\n",
+                "⑩ Shooting another player will deal exactly one heart of health.\n" + ChatColor.RED + "Shoot someone four times to eliminate them.\n",
+                "⑩ Eliminate the entire opposing team to win a round.\n" + ChatColor.YELLOW + "Quickfire is best of 5 rounds.\n",
+                "⑩ Once the timer exceeds a minute and a half, all players will receive the " + ChatColor.BOLD + "glowing" + ChatColor.RESET + " effect.\n",
+                "⑩ Each crossbow has the " + ChatColor.BOLD + "Quick Charge" + ChatColor.RESET + " enchantment, so be sure to fire fast!\n",
+                "⑩ No points are awarded for this game.\n" + ChatColor.YELLOW + "The winning team will win the Minecraft Bergen Championship!\n"
         });
 
         if (logger == null) {

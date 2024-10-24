@@ -102,7 +102,7 @@ public class Lobby extends Minigame {
                 toVoting();
             }
         } else if (getState().equals(GameState.ACTIVE)) {
-            if (MBC.getInstance().gameNum == 4 && (timeRemaining == 228 || timeRemaining == 114)) {
+            if (MBC.getInstance().gameNum == 4 && (timeRemaining == 278 || timeRemaining == 139)) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
                     p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
@@ -286,12 +286,12 @@ public class Lobby extends Minigame {
         loadPlayers();
         updateTeamStandings();
         if (MBC.getInstance().gameNum == 4) {
-            setTimer(342);
+            setTimer(417);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
             }
         } else {
-            setTimer(114);
+            setTimer(139);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
             }

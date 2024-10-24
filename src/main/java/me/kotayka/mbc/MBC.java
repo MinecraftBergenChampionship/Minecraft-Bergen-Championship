@@ -395,12 +395,12 @@ public class MBC implements Listener {
         for (Participant p : getPlayersAndSpectators()) {
             if (player.getUniqueId().equals(p.getPlayer().getUniqueId())) {
                 msg = msg.replace("%", "%%")
-                        .replace(":blue:", "Ⓑ")
-                        .replace(":green:", "Ⓖ")
-                        .replace(":red:", "Ⓡ")
-                        .replace(":yellow:", "Ⓨ")
-                        .replace(":pink:", "Ⓟ")
-                        .replace(":purple:", "Ⓤ")
+                        .replace(":blue:", "ⓑ")
+                        .replace(":green:", "ⓖ")
+                        .replace(":red:", "ⓡ")
+                        .replace(":yellow:", "ⓨ")
+                        .replace(":pink:", "ⓟ")
+                        .replace(":purple:", "ⓤ")
                         .replace(":crown:", "④")
                         .replace(":dub:", "④")
                         .replace(":win:", "④")

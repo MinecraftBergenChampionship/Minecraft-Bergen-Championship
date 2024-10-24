@@ -138,6 +138,8 @@ public class AceRacePlayer extends GamePlayer {
 
             ACE_RACE.createLine(6, ChatColor.GREEN.toString()+ChatColor.BOLD+"Lap: " + ChatColor.RESET+"Complete!", this.getParticipant());
             ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " + ChatColor.RESET+"Complete!", this.getParticipant());
+            
+            MBC.getInstance().showPlayers(this.getParticipant());
 
             // check if all players on team have finished last lap
             int done = 0;
