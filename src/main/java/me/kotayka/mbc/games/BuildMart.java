@@ -50,7 +50,7 @@ public class BuildMart extends Game {
     public static final int COMPLETION_POINTS_MEDIUM = 8;
     public static final int COMPLETION_POINTS_HARD = 12;
     public static final int PLACEMENT_POINTS = 1;
-    public static final int MOST_BUILD_POINTS = 10;
+    public static final int MOST_BUILD_POINTS = 16;
 
     private final List<Build> EASY_FIRST_BUILDS = new ArrayList<>();
     private final List<Build> MEDIUM_FIRST_BUILDS = new ArrayList<>();
