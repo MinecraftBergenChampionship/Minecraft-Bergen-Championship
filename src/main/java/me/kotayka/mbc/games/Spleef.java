@@ -208,6 +208,11 @@ public class Spleef extends Game {
                 }
                 if (map.getMapType().equals("Blind")) {
                     blindnessTime = 240 - (int)(5*Math.random() + 10);
+                    Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The lights are dimming, and soon will go out...\n");
+                }
+                if (map.getMapType().equals("Regular")) {
+                    blindnessTime = 240 - (int)(5*Math.random() + 10);
+                    Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "No effects are present for this map!\n");
                 }
             } else {
                 //setPVP(true);
