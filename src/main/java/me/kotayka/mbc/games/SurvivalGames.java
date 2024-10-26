@@ -73,12 +73,12 @@ public class SurvivalGames extends Game {
     private BossBar bossBar;
 
     // SCORING
-    public final int KILL_POINTS_INITIAL = 10;
+    public final int KILL_POINTS_INITIAL = 15;
     public int killPoints = KILL_POINTS_INITIAL;
     public final int SURVIVAL_POINTS = 1;
-    // Shared amongst each team: 14, 11, 10, 9, 8, 6 points for each player
-    public final int[] TEAM_BONUSES_4 = {56, 44, 40, 36, 32, 24};
-    public final int[] TEAM_BONUSES_3 = {42, 33, 30, 27, 24, 18};
+    // Shared amongst each team: 12, 10, 9, 7, 6, 5 points for each player
+    public final int[] TEAM_BONUSES_4 = {48, 40, 36, 28, 24, 20};
+    public final int[] TEAM_BONUSES_3 = {36, 30, 27, 21, 18, 15};
     private double totalDamage = 0;
     // public final int WIN_POINTS = 36; // shared amongst all remaining players
 
@@ -362,8 +362,8 @@ public class SurvivalGames extends Game {
                 //crateLocation();
             } else if (timeRemaining == 300) {
                 //spawnSupplyCrate();
-                killPoints -= 2;
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (10 -> 8)");
+                killPoints -= 5;
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (15 -> 10)");
                 bossBar.removeAll();
                 bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "KILL POINTS DECREASE", BarColor.RED, BarStyle.SOLID);
                 bossBar.setVisible(true);
@@ -404,8 +404,8 @@ public class SurvivalGames extends Game {
                     removeEndCrystal(participant.getPlayer());
                 }
                  */
-                killPoints -= 2;
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (8 -> 5)");
+                killPoints -= 5;
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (10 -> 5)");
                 bossBar.removeAll();
                 bossBar.setVisible(false);
             }
