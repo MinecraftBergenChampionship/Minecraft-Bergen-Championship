@@ -208,7 +208,7 @@ public class DecisionDome extends Minigame {
                 case 0 -> {
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         for (ItemStack i : p.getPlayer().getInventory()) {
-                            if (i != null && i.getType() == Material.EGG) {
+                            if (i != null) {
                                 p.getInventory().remove(i);
                             }
                         }
@@ -674,6 +674,7 @@ public class DecisionDome extends Minigame {
             if (p == null) return;
 
             if (mega_cow_shooter != null && p.getPlayer().getUniqueId().equals(mega_cow_shooter.getPlayer().getUniqueId())) {
+                Bukkit.broadcastMessage(mega_cow_shooter.getFormattedName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " unleashed the mega cow!");
                 Cow cow = (Cow) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.COW);
                 cow.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 2, false, false));
                 VoteChicken mega_cow = new VoteChicken(p.getTeam(), cow);
@@ -751,7 +752,7 @@ public class DecisionDome extends Minigame {
             return;
         }
 
-        Bukkit.broadcastMessage(team.teamNameFormat() + ChatColor.RED + " were dunked by " + damager.getFormattedName());
+        Bukkit.broadcastMessage(team.teamNameFormat() + ChatColor.RED + " were dunked by " + damager.getFormattedName() + ChatColor.RED +  "!");
         Location l1, l2;
         switch (team.getChatColor()) {
             case RED -> {

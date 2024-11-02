@@ -104,6 +104,7 @@ public class OneShot extends PartyGame {
     public void endEvents() {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().stopSound(Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS);
+            p.getPlayer().setFireTicks(0);
         }
         logger.logStats();
 
@@ -177,7 +178,7 @@ public class OneShot extends PartyGame {
     @Override
     public void createScoreboard(Participant p) {
         createLine(25,String.format("%s%sGame %d/6: %s%s", ChatColor.AQUA, ChatColor.BOLD, MBC.getInstance().gameNum, ChatColor.WHITE, "Party (" + name()) + ")", p);
-        createLine(20, ChatColor.RED+""+ChatColor.BOLD+"Team in First:" + ChatColor.YELLOW + " Tied!", p);
+        createLine(20, ChatColor.RED+""+ChatColor.BOLD+"First:" + ChatColor.YELLOW + " Tied!", p);
         createLine(19, ChatColor.RESET.toString(), p);
         createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
         createLine(3, ChatColor.YELLOW+""+ChatColor.BOLD+"Kills: "+ChatColor.RESET+"0", p);
@@ -569,7 +570,7 @@ public class OneShot extends PartyGame {
 
         for (Participant p : MBC.getInstance().getPlayers()) {
             if (checkTopTeam() == null) {
-                createLine(20, ChatColor.RED+""+ChatColor.BOLD+"Team in First:" + ChatColor.YELLOW + " Tied!", p);
+                createLine(20, ChatColor.RED+""+ChatColor.BOLD+"First:" + ChatColor.YELLOW + " Tied!", p);
             }
             else {
                 createLine(20, ChatColor.RED+""+ChatColor.BOLD+"First: " + checkTopTeam().teamNameFormat(), p);
