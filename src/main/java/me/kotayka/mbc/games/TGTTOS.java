@@ -39,7 +39,7 @@ public class TGTTOS extends Game {
     private List<TGTTOSMap> maps = new ArrayList<>(
             Arrays.asList(new Pit(), new Meatball(), new Walls(),
                     new Cliffs(), new Elytra(), new Skydive(),
-                    new Boats(), new Glide()
+                    new Boats(), new Glide(), new SquidGame()
             ));
 
     private List<Participant> finishedParticipants;
@@ -53,6 +53,10 @@ public class TGTTOS extends Game {
     private Map<Player, Long> cooldowns = new HashMap<>();
     private DecimalFormat df = new DecimalFormat("#.#");
     private int cooldownID = -1;
+
+    private int lightTime;
+    private boolean redLight = false;
+    private ArrayList<Player> redLightList = new ArrayList<>();
 
     // Scoring
     public static int PLACEMENT_POINTS = 1; // awarded multiplied by the amount of players who havent finished yet
@@ -132,6 +136,9 @@ public class TGTTOS extends Game {
                 setPVP(true);
                 setGameState(GameState.ACTIVE);
                 timeRemaining = 120;
+                if (map.getName().equals("SquidGame")) {
+                    lightTime = 120 - (int)(3*Math.random() + 3);
+                }
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS, 1, 1);
                 }
@@ -155,7 +162,15 @@ public class TGTTOS extends Game {
                     timeRemaining = 5;
                 }
             }
+            if (map.getName().equals("SquidGame") && timeRemaining == lightTime) {
+                if (redLight) greenLight();
+                else redLight();
+            }
         } else if (getState().equals(GameState.END_ROUND)) {
+            if (map.getName().equals("SquidGame")) {
+                redLight = false;
+                redLightList.clear();
+            }
             if (timeRemaining == 0) {
                 startRound();
             } else if (timeRemaining == 4) {
@@ -188,7 +203,7 @@ public class TGTTOS extends Game {
         roundNum = 0;
         maps = new ArrayList<>(
                 Arrays.asList(new Pit(), new Meatball(), new Walls(),
-                        new Cliffs(), new Glide(), new Skydive(), new Boats()
+                        new Cliffs(), new Glide(), new Skydive(), new Boats(), new SquidGame()
                 )
         );
         removePlacedBlocks();
@@ -363,6 +378,28 @@ public class TGTTOS extends Game {
         setTimer(20);
     }
 
+    private void greenLight() {
+        redLight = false;
+        redLightList.clear();
+        lightTime = timeRemaining - (int)(3*Math.random() + 2);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_AMETHYST_BLOCK_HIT, SoundCategory.BLOCKS, 1, 1);
+            p.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "GREEN LIGHT!", "", 0, (timeRemaining - lightTime)*20, 0);
+        }
+    }
+
+    private void redLight() {
+        lightTime = timeRemaining - (int)(3*Math.random() + 4);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_ANVIL_FALL, SoundCategory.BLOCKS, 1, 1);
+            p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "RED LIGHT!", "", 0, (timeRemaining - lightTime)*20, 0);
+        }
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { redLight = true;}
+          }, 20L);
+    }
+
     private void setDeathMessages() {
         try {
             FileReader fr = new FileReader("tgttos_death_messages.txt");
@@ -423,6 +460,27 @@ public class TGTTOS extends Game {
             e.getPlayer().setVelocity(new Vector(0, 0, 0));
             e.getPlayer().teleport(map.getSpawnLocation());
             printDeathMessage(Participant.getParticipant(e.getPlayer()));
+        }
+
+        if (redLight) {
+            Player mover = e.getPlayer();
+            Location og = e.getFrom();
+
+            if (mover.getLocation().distance(og) == 0) {
+                return;
+            }
+
+            if (e.getPlayer().getGameMode() != GameMode.SURVIVAL) {
+                return;
+            }
+            if (!redLightList.contains(e.getPlayer())) {
+                redLightList.add(e.getPlayer());
+                map.getWorld().playSound(e.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 2);
+                printDeathMessage(Participant.getParticipant(e.getPlayer()));
+            }
+            
+            e.getPlayer().setVelocity(new Vector(0, 0, 0));
+            e.getPlayer().teleport(map.getSpawnLocation());
         }
     }
 
