@@ -2,6 +2,7 @@ package me.kotayka.mbc.gamePlayers;
 
 import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
+import me.kotayka.mbc.MBCTeam;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.games.AceRace;
 import org.bukkit.Bukkit;
@@ -147,6 +148,7 @@ public class AceRacePlayer extends GamePlayer {
                 if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) done++;
             }
             if (done == this.getParticipant().getTeam().teamPlayers.size()) {
+                ACE_RACE.teamPoints(this.getParticipant().getTeam());
                 Bukkit.broadcastMessage(this.getParticipant().getTeam().teamNameFormat() + " have all finished the race!");
             }
 

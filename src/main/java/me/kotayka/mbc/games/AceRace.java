@@ -3,6 +3,7 @@ package me.kotayka.mbc.games;
 import me.kotayka.mbc.Game;
 import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
+import me.kotayka.mbc.MBCTeam;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
 import me.kotayka.mbc.gameMaps.aceRaceMap.iDrgCity;
@@ -47,6 +48,8 @@ public class AceRace extends Game {
     public static final int PLACEMENT_FINAL_LAP_POINTS = 3;   // points for placement for last lap
     public static final int[] PLACEMENT_BONUSES = {20, 15, 15, 10, 10, 5, 5, 5, 5, 5}; // points for Top 10 finishers
     public static final int TUTORIAL_TIME = 240;
+    public static final int FIRST_FULL_TEAM_BONUS = 10;
+    public static final int SECOND_FULL_TEAM_BONUS = 5;
 
     private boolean finishedIntro = false;
 
@@ -65,7 +68,7 @@ public class AceRace extends Game {
                             "⑭ +1 point for every player beaten on a lap\n" +
                             "⑭ +10 points for finishing the course\n" +
                             "⑭ +3 points for every player beaten on the final lap\n" +
-                            "⑭ Top 8 Bonuses- 1st:+30, 2nd,3rd:+20, 4th,5th:+15, 6th-8th:+10, 9th-10th:+5"
+                            "⑭ Top 8 Bonuses- 1st:+20, 2nd,3rd:+15, 4th,5th:+10, 6th-10th:+5"
             });
     }
 
@@ -202,6 +205,42 @@ public class AceRace extends Game {
             //p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
 
             aceRacePlayerMap.put(p.getPlayer().getUniqueId(), new AceRacePlayer(p, this));
+        }
+    }
+
+    public void teamPoints(MBCTeam finished) {
+        int teamsFinished = 0;
+        for (MBCTeam m : getValidTeams()) {
+            int teamFinishers = 0;
+            for (Participant p : m.getPlayers()) {
+                if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) teamFinishers++;
+            }
+            if (teamFinishers == m.teamPlayers.size()) {
+                teamsFinished++;
+            }
+        }
+
+        if (teamsFinished == 1) {
+            for (Participant p : finished.getPlayers()) {
+                p.addCurrentScore(FIRST_FULL_TEAM_BONUS);
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in 1st place, and earned a bonus of " + (FIRST_FULL_TEAM_BONUS*MBC.getInstance().multiplier) + " points!");
+            }
+        }
+        else if (teamsFinished == 2) {
+            for (Participant p : finished.getPlayers()) {
+                p.addCurrentScore(SECOND_FULL_TEAM_BONUS);
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in 2nd place, and earned a bonus of " + (SECOND_FULL_TEAM_BONUS*MBC.getInstance().multiplier) + " points!");
+            }
+        }
+        else if (teamsFinished == 3) {
+            for (Participant p : finished.getPlayers()) {
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in 3rd place!");
+            }
+        }
+        else {
+            for (Participant p : finished.getPlayers()) {
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + finished +"th place!");
+            }
         }
     }
 
