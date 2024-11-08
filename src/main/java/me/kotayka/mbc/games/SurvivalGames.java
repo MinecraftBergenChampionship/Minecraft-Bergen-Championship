@@ -91,12 +91,12 @@ public class SurvivalGames extends Game {
                 "⑬ Live as long as you can, and place your teams horcrux for one revive!\n\n" +
                 "⑬ There are two rounds, so remember who killed you...",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "⑬ +10 points for eliminations\n" +
+                        "⑬ +5-15 points for eliminations\n" +
                         "⑬ +150 points split based on % of damage dealt\n" +
                         "⑬ +1 points for every player outlived\n" +
                         "⑬ Team Bonuses (split amongst team):\n" +
-                        "     ⑬ 1st: +14 points, 2nd: +11 points, 3rd: +10 points\n" +
-                        "     ⑬ 4th: +9 points, 5th: +8 points, 6th: +6 points"
+                        "     ⑬ 1st: +12 points, 2nd: +10 points, 3rd: +9 points\n" +
+                        "     ⑬ 4th: +7 points, 5th: +6 points, 6th: +5 points"
         });
 
         for (MBCTeam t : getValidTeams()) {

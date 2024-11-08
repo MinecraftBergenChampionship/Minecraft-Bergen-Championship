@@ -31,13 +31,13 @@ public class Skybattle extends Game {
     // Creeper Entity, Player (that spawned them); used for determining kills by creeper explosion
     public Map<Entity, Player> creeperSpawners = new HashMap<Entity, Player>(5);
     public Map<Entity,Player> witchSpawners = new HashMap<>();
-    private final int KILL_POINTS = 10;
+    private final int KILL_POINTS = 9;
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
     private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
     private final int SURVIVAL_POINTS = 1;
     private final int WIN_POINTS = 10;
     // Team bonuses split among team
-    private final int[] TEAM_BONUSES_3 = {18, 15, 12, 9, 6, 3};
+    private final int[] TEAM_BONUSES_3 = {21, 18, 15, 12, 9, 9};
 
     public Skybattle() {
         super("Skybattle", new String[] {
@@ -48,12 +48,12 @@ public class Skybattle extends Game {
                 "⑫ Make sure to " + ChatColor.BOLD + "TURN ON PARTICLES" + ChatColor.RESET + " to see the border.\n\n" +
                 "⑫ There's also a " + ChatColor.BOLD + "height border" + ChatColor.RESET + " that lowers over time!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑫ +10 points for eliminations\n" +
+                                "⑫ +9 points for eliminations\n" +
                                 "⑫ +10 points for winning\n" +
                                 "⑫ +1 points for every player outlived\n" +
                                 "⑫ Team Bonuses (split amongst team):\n" +
-                                "     ⑬ 1st: +6 points, 2nd: +5 points, 3rd: +4 points\n" +
-                                "     ⑬ 4th: +3 points, 5th: +2 points, 6th: +1 points"
+                                "     ⑬ 1st: +7 points, 2nd: +6 points, 3rd: +5 points\n" +
+                                "     ⑬ 4th: +4 points, 5th: +3 points, 6th: +3 points"
         });
     }
     private int roundNum = 1;
@@ -210,6 +210,7 @@ public class Skybattle extends Game {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
                         }
+                        placementPoints();
                         roundWinners(WIN_POINTS);
                         timeRemaining = 38;
                         setGameState(GameState.END_GAME);
@@ -255,6 +256,7 @@ public class Skybattle extends Game {
                     p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
                 }
                 roundWinners(WIN_POINTS);
+                placementPoints();
                 timeRemaining = 38;
                 setGameState(GameState.END_GAME);
             }
