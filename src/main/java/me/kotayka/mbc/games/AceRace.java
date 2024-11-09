@@ -9,6 +9,9 @@ import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
 import me.kotayka.mbc.gameMaps.aceRaceMap.iDrgCity;
 import me.kotayka.mbc.gameMaps.aceRaceMap.semoiB;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
@@ -42,14 +45,12 @@ public class AceRace extends Game {
     public SortedMap<Long, List<String>> fastestLaps = new TreeMap<Long, List<String>>();
 
     // SCORING VARIABLES
-    public static final int FINISH_RACE_POINTS = 10;           // points for finishing the race
+    public static final int FINISH_RACE_POINTS = 12;           // points for finishing the race
     public static final int PLACEMENT_LAP_POINTS = 1;         // points for placement for first laps
     public static final int LAP_COMPLETION_POINTS = 1;
     public static final int PLACEMENT_FINAL_LAP_POINTS = 3;   // points for placement for last lap
     public static final int[] PLACEMENT_BONUSES = {20, 15, 15, 10, 10, 5, 5, 5, 5, 5}; // points for Top 10 finishers
     public static final int TUTORIAL_TIME = 240;
-    public static final int FIRST_FULL_TEAM_BONUS = 10;
-    public static final int SECOND_FULL_TEAM_BONUS = 5;
 
     private boolean finishedIntro = false;
 
@@ -112,6 +113,9 @@ public class AceRace extends Game {
                     p.getPlayer().setVelocity(new Vector(0,0,0));
                     p.getPlayer().removePotionEffect(PotionEffectType.SPEED);
                     p.getPlayer().sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "Practice Over!", "", 0, 60, 20);
+                    p.getPlayer().getInventory().remove(Material.RED_DYE);
+                    p.getPlayer().getInventory().remove(Material.YELLOW_DYE);
+                    p.getPlayer().getInventory().remove(Material.LIME_DYE);
                     createLine(6, ChatColor.GREEN.toString()+ChatColor.BOLD+"Lap: " + ChatColor.RESET+"1/3", p.getParticipant());
                 }
                 setGameState(GameState.END_ROUND);
@@ -193,9 +197,25 @@ public class AceRace extends Game {
         trident.addEnchantment(Enchantment.RIPTIDE, 1);
         ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
 
+        ItemStack redDye = new ItemStack(Material.RED_DYE);
+        ItemMeta redMeta = redDye.getItemMeta();
+        redMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.RED + "Return To Start");
+        redDye.setItemMeta(redMeta);
+        ItemStack yellowDye = new ItemStack(Material.YELLOW_DYE);
+        ItemMeta yellowMeta = redDye.getItemMeta();
+        yellowMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.YELLOW + "Last Checkpoint");
+        yellowDye.setItemMeta(yellowMeta);
+        ItemStack limeDye = new ItemStack(Material.LIME_DYE);
+        ItemMeta limeMeta = limeDye.getItemMeta();
+        limeMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.GREEN + "Next Checkpoint");
+        limeDye.setItemMeta(limeMeta);
+
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getInventory().clear();
             //p.getInventory().addItem(trident);
+            p.getInventory().addItem(redDye);
+            p.getInventory().addItem(yellowDye);
+            p.getInventory().addItem(limeDye);
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
@@ -208,42 +228,6 @@ public class AceRace extends Game {
         }
     }
 
-    public void teamPoints(MBCTeam finished) {
-        int teamsFinished = 0;
-        for (MBCTeam m : getValidTeams()) {
-            int teamFinishers = 0;
-            for (Participant p : m.getPlayers()) {
-                if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) teamFinishers++;
-            }
-            if (teamFinishers == m.teamPlayers.size()) {
-                teamsFinished++;
-            }
-        }
-
-        if (teamsFinished == 1) {
-            for (Participant p : finished.getPlayers()) {
-                p.addCurrentScore(FIRST_FULL_TEAM_BONUS);
-                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in 1st place, and earned a bonus of " + (FIRST_FULL_TEAM_BONUS*MBC.getInstance().multiplier) + " points!");
-            }
-        }
-        else if (teamsFinished == 2) {
-            for (Participant p : finished.getPlayers()) {
-                p.addCurrentScore(SECOND_FULL_TEAM_BONUS);
-                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in 2nd place, and earned a bonus of " + (SECOND_FULL_TEAM_BONUS*MBC.getInstance().multiplier) + " points!");
-            }
-        }
-        else if (teamsFinished == 3) {
-            for (Participant p : finished.getPlayers()) {
-                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in 3rd place!");
-            }
-        }
-        else {
-            for (Participant p : finished.getPlayers()) {
-                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + finished +"th place!");
-            }
-        }
-    }
-
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if (e.getPlayer().getGameMode() == GameMode.SPECTATOR && map.checkDeath(e.getPlayer().getLocation())) {
@@ -251,16 +235,16 @@ public class AceRace extends Game {
             return;
         }
 
-        // experimental: making players disappear for others if they are within 8 blocks
+        // experimental: making players disappear for others if they are within 5 blocks
         if (e.getPlayer().getGameMode() != GameMode.SPECTATOR) {
             Player mover = e.getPlayer();
             for (Participant p : MBC.getInstance().getPlayers()) {
                 Player player = p.getPlayer();
-                if (mover != player && player.getGameMode() != GameMode.SPECTATOR) {
+                if (mover != player && player.getGameMode() != GameMode.SPECTATOR && (getState().equals(GameState.TUTORIAL) || getState().equals(GameState.ACTIVE))) {
                     double diffX = player.getX() - mover.getX();
                     double diffY = player.getY() - mover.getY();
                     double diffZ = player.getZ() - mover.getZ();
-                    if (Math.sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ) <= 8) {
+                    if (Math.sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ) <= 5) {
                         player.hidePlayer(mover);
                         mover.hidePlayer(player);
                     }
@@ -320,6 +304,32 @@ public class AceRace extends Game {
         return aceRacePlayerMap.get(p.getUniqueId());
     }
 
+    public void lastCheckpoint(Player p) {
+        AceRacePlayer player = getGamePlayer(p);
+        int checkpoint = player.checkpoint;
+        player.checkpointSetter(checkpoint-1);
+        p.teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength-1 : checkpoint-1));
+        p.removePotionEffect(PotionEffectType.SPEED);
+        p.setFireTicks(0);
+    }
+
+    public void nextCheckpoint(Player p) {
+        AceRacePlayer player = getGamePlayer(p);
+        int checkpoint = player.checkpoint;
+        player.checkpointSetter(checkpoint+1);
+        p.teleport(map.getRespawns().get(checkpoint));
+        p.removePotionEffect(PotionEffectType.SPEED);
+        p.setFireTicks(0);
+    }
+
+    public void firstCheckpoint(Player p) {
+        AceRacePlayer player = getGamePlayer(p);
+        player.checkpointSetter(0);
+        p.teleport(map.getRespawns().get(0));
+        p.removePotionEffect(PotionEffectType.SPEED);
+        p.setFireTicks(0);
+    }
+    
    public void topLaps() {
         StringBuilder topFive = new StringBuilder();
         int counter = 0;
@@ -342,6 +352,14 @@ public class AceRace extends Game {
 
        @EventHandler
     public void onInteract(PlayerInteractEvent e) {
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RED_DYE ||
+            e.getPlayer().getInventory().getItemInOffHand().getType() == Material.IRON_AXE) firstCheckpoint(e.getPlayer());
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.YELLOW_DYE ||
+            e.getPlayer().getInventory().getItemInOffHand().getType() == Material.YELLOW_DYE) lastCheckpoint(e.getPlayer());
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE ||
+            e.getPlayer().getInventory().getItemInOffHand().getType() == Material.LIME_DYE) nextCheckpoint(e.getPlayer());
+        }
         if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Set<Material> trapdoorList = Set.of(Material.OAK_TRAPDOOR, Material.DARK_OAK_TRAPDOOR, Material.SPRUCE_TRAPDOOR, Material.BIRCH_TRAPDOOR,
                                         Material.ACACIA_TRAPDOOR, Material.CHERRY_TRAPDOOR, Material.MANGROVE_TRAPDOOR, Material.JUNGLE_TRAPDOOR,

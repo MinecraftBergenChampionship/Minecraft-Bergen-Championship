@@ -148,7 +148,6 @@ public class AceRacePlayer extends GamePlayer {
                 if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) done++;
             }
             if (done == this.getParticipant().getTeam().teamPlayers.size()) {
-                ACE_RACE.teamPoints(this.getParticipant().getTeam());
                 Bukkit.broadcastMessage(this.getParticipant().getTeam().teamNameFormat() + " have all finished the race!");
             }
 
@@ -212,6 +211,19 @@ public class AceRacePlayer extends GamePlayer {
     public boolean checkCoords() {
         // If checkpoint is out of bounds, player is on last lap and should compare to first checkpoint
         return (ACE_RACE.map.checkpoints.get(checkpoint < ACE_RACE.map.mapLength ? checkpoint : 0).distance(getParticipant().getPlayer().getLocation()) <= 6);
+    }
+
+    /**
+     * For practice mode: will set your checkpoint to i.
+     */
+    public void checkpointSetter(int i) {
+        if (i >= ACE_RACE.map.mapLength || i < 0) {
+            checkpoint = 0;
+            ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
+        } else {
+            checkpoint = i;
+            ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
+        }
     }
 
     public void reset() {

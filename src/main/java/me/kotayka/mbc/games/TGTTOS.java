@@ -1,14 +1,31 @@
 package me.kotayka.mbc.games;
 
-import me.kotayka.mbc.Game;
-import me.kotayka.mbc.GameState;
-import me.kotayka.mbc.MBC;
-import me.kotayka.mbc.Participant;
-import me.kotayka.mbc.gameMaps.tgttosMap.*;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.*;
-import org.bukkit.entity.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.entity.Boat;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -18,6 +35,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -26,11 +44,22 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.*;
+import me.kotayka.mbc.Game;
+import me.kotayka.mbc.GameState;
+import me.kotayka.mbc.MBC;
+import me.kotayka.mbc.Participant;
+import me.kotayka.mbc.gameMaps.tgttosMap.Boats;
+import me.kotayka.mbc.gameMaps.tgttosMap.Cliffs;
+import me.kotayka.mbc.gameMaps.tgttosMap.Elytra;
+import me.kotayka.mbc.gameMaps.tgttosMap.Glide;
+import me.kotayka.mbc.gameMaps.tgttosMap.Meatball;
+import me.kotayka.mbc.gameMaps.tgttosMap.Pit;
+import me.kotayka.mbc.gameMaps.tgttosMap.Skydive;
+import me.kotayka.mbc.gameMaps.tgttosMap.SquidGame;
+import me.kotayka.mbc.gameMaps.tgttosMap.TGTTOSMap;
+import me.kotayka.mbc.gameMaps.tgttosMap.Walls;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class TGTTOS extends Game {
     private int roundNum = 0;
@@ -242,7 +271,8 @@ public class TGTTOS extends Game {
         roundNum++;
 
         finishedParticipants = new ArrayList<>(MBC.getInstance().players.size());
-        map = maps.get((int) (Math.random() * maps.size()));
+        //map = maps.get((int) (Math.random() * maps.size()));
+        map = maps.get((int) (maps.size()-1)); // will auto do the newest map first which is prob p cool
         maps.remove(map);
         map.Barriers(true);
 
@@ -378,6 +408,7 @@ public class TGTTOS extends Game {
         setTimer(20);
     }
 
+    //green light
     private void greenLight() {
         redLight = false;
         redLightList.clear();
@@ -388,6 +419,7 @@ public class TGTTOS extends Game {
         }
     }
 
+    // red light
     private void redLight() {
         lightTime = timeRemaining - (int)(3*Math.random() + 4);
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -457,31 +489,45 @@ public class TGTTOS extends Game {
             if (map instanceof Boats) {
                 e.getPlayer().getInventory().addItem(new ItemStack(Material.OAK_BOAT));
             }
-            e.getPlayer().setVelocity(new Vector(0, 0, 0));
-            e.getPlayer().teleport(map.getSpawnLocation());
-            printDeathMessage(Participant.getParticipant(e.getPlayer()));
-        }
 
+            death(e.getPlayer());
+        }
         if (redLight) {
-            Player mover = e.getPlayer();
-            Location og = e.getFrom();
+            Player player = e.getPlayer();
+            Location from = e.getFrom();
+            Location to = e.getTo();
+            if (player.getGameMode() != GameMode.SURVIVAL) return;
 
-            if (mover.getLocation().distance(og) == 0) {
+            if (from.getY() < 59) {
                 return;
             }
 
-            if (e.getPlayer().getGameMode() != GameMode.SURVIVAL) {
-                return;
-            }
-            if (!redLightList.contains(e.getPlayer())) {
-                redLightList.add(e.getPlayer());
-                map.getWorld().playSound(e.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 2);
-                printDeathMessage(Participant.getParticipant(e.getPlayer()));
-            }
-            
-            e.getPlayer().setVelocity(new Vector(0, 0, 0));
-            e.getPlayer().teleport(map.getSpawnLocation());
+            if (from.distance(to) > 0.04) {
+                if (from.getX() == to.getX() && from.getY() == to.getY() && from.getZ() == to.getZ()) {
+                    return;
+                }
+                else deathRedLight(player);
+            }    
+                
         }
+    }
+
+    //kills players
+    public void death(Player p) {
+        p.setVelocity(new Vector(0, 0, 0));
+        p.teleport(map.getSpawnLocation());
+        printDeathMessage(Participant.getParticipant(p));
+    }
+
+    //kills players exclusively on squid game map
+    public void deathRedLight(Player p) {
+        if (!redLightList.contains(p)) {
+            redLightList.add(p);
+            map.getWorld().playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 2);
+            printDeathMessage(Participant.getParticipant(p));
+        }
+        p.setVelocity(new Vector(0, 0, 0));
+        p.teleport(map.getSpawnLocation());
     }
 
     @EventHandler
