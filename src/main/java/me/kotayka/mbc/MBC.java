@@ -89,6 +89,7 @@ public class MBC implements Listener {
     public SurvivalGames sg = null;
     public Spleef spleef = null;
     public Party party = null;
+    public PowerTag powertag = null;
     //public Dodgebolt dodgebolt = null;
     public Quickfire quickfire = null;
     public boolean finalGame = false;
@@ -97,7 +98,7 @@ public class MBC implements Listener {
     private String STAT_DIRECTORY = "MBC_EVENT";
 
     //public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt","Quickfire"));
-    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire","Party","OneShot"));
+    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire","Party","OneShot","PowerTag"));
     //public final List<Game> gameList = new ArrayList<Game>(6);
     public static final String MBC_STRING_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "MBC" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: " + ChatColor.RESET;
     public static final String ADMIN_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "ADMIN" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: " + ChatColor.RESET;
@@ -177,6 +178,11 @@ public class MBC implements Listener {
                     party = new Party();
                 }
                 return party;
+            case "PowerTag":
+                if (powertag == null) {
+                    powertag = new PowerTag();
+                }
+                return powertag;
                 /*
             case "Dodgebolt":
                 if (dodgebolt == null) {

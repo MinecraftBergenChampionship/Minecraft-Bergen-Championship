@@ -118,7 +118,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
 
         // bricks
         Location spawn_bricks = new Location(w, -43, 73, 63, 45, 0);
-        addBreakArea(new BreakArea(Material.STONE_BRICKS, new Location(w, -36, 66, 71), new Location(w, -28, 72, 81), spawn_bricks));
+        addBreakArea(new BreakArea(Material.STONE_BRICKS, new Location(w, -38, 66, 71), new Location(w, -28, 72, 81), spawn_bricks));
         addBreakArea(new BreakArea(Material.BRICKS, new Location(w, -50, 66, 71), new Location(w, -40, 72, 81), spawn_bricks));
         addBreakArea(new BreakArea(Material.CHISELED_STONE_BRICKS, new Location(w, -62, 66, 71), new Location(w, -52, 72, 81), spawn_bricks));
         addBreakArea(new BreakArea(Material.PRISMARINE_BRICKS, new Location(w, -62, 66, 59), new Location(w, -52, 72, 69), spawn_bricks));
