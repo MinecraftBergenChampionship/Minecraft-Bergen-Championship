@@ -531,4 +531,22 @@ public class PowerTag extends Game {
 
         e.setCancelled(true);
     }
+
+    /**
+     * Checks if block interacted with is door or trapdoor and cancels if so. Will also be powerup spot (soon)
+     */
+    @EventHandler
+    public void onInteract(PlayerInteractEvent e) {
+        
+        if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Set<Material> trapdoorList = Set.of(Material.OAK_TRAPDOOR, Material.DARK_OAK_TRAPDOOR, Material.SPRUCE_TRAPDOOR, Material.BIRCH_TRAPDOOR,
+                                        Material.ACACIA_TRAPDOOR, Material.CHERRY_TRAPDOOR, Material.MANGROVE_TRAPDOOR, Material.JUNGLE_TRAPDOOR,
+                                        Material.CRIMSON_TRAPDOOR, Material.WARPED_TRAPDOOR);
+            Set<Material> doorList = Set.of(Material.OAK_DOOR, Material.DARK_OAK_DOOR, Material.SPRUCE_DOOR, Material.BIRCH_DOOR,
+                                        Material.ACACIA_DOOR, Material.CHERRY_DOOR, Material.MANGROVE_DOOR, Material.JUNGLE_DOOR,
+                                        Material.CRIMSON_DOOR, Material.WARPED_DOOR);
+            if(trapdoorList.contains(e.getClickedBlock().getType())) e.setCancelled(true);
+            if(doorList.contains(e.getClickedBlock().getType())) e.setCancelled(true);
+        }
+    }
 }
