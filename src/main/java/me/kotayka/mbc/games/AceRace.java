@@ -353,12 +353,9 @@ public class AceRace extends Game {
        @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
-            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RED_DYE ||
-            e.getPlayer().getInventory().getItemInOffHand().getType() == Material.IRON_AXE) firstCheckpoint(e.getPlayer());
-            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.YELLOW_DYE ||
-            e.getPlayer().getInventory().getItemInOffHand().getType() == Material.YELLOW_DYE) lastCheckpoint(e.getPlayer());
-            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE ||
-            e.getPlayer().getInventory().getItemInOffHand().getType() == Material.LIME_DYE) nextCheckpoint(e.getPlayer());
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RED_DYE) firstCheckpoint(e.getPlayer());
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.YELLOW_DYE) lastCheckpoint(e.getPlayer());
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE) nextCheckpoint(e.getPlayer());
         }
         if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Set<Material> trapdoorList = Set.of(Material.OAK_TRAPDOOR, Material.DARK_OAK_TRAPDOOR, Material.SPRUCE_TRAPDOOR, Material.BIRCH_TRAPDOOR,
