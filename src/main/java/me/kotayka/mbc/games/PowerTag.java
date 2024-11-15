@@ -2,6 +2,7 @@ package me.kotayka.mbc.games;
 
 import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.powerTagMaps.Room;
+import me.kotayka.mbc.gamePlayers.OneShotPlayer;
 import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
 import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
 
@@ -49,26 +50,28 @@ public class PowerTag extends Game {
     //powerups
     public String hunterPowerup;
     public Map<PowerTagPlayer, String> hiderPowerupMap = new HashMap<>();
-    public String[] hunterPowerupList = {};
+    public PowerTagPlayer hunterSelector;
+    public String[] hunterPowerupList = {"TRACKER", "TRIDENT", "TROLL"};
     public String[] hiderPowerupList = {"SPEED", "INVISIBILITY"};
+    public boolean clicked = false;
 
     // scoring
-    private final int FIND_POINTS = 8;
+    private final int FIND_POINTS = 10;
     private final int INCREMENT_POINTS = 1;
     private final int SURVIVAL_POINTS = 8;
 
     public PowerTag() {
         super("PowerTag", new String[] {
-                "⑱ Each round of Power Tag, you'll be either a hunter or a hider. Every team hunts once.\n\n" + 
-                "⑱ The map is a 3x3 grid, and will have a random layout with random rooms each round.",
-                "⑱ If you are hiding, live as long as possible without being eliminated by the hunters.\n\n" + 
-                "⑱ If you are hunting, find as many players as possible in as short of time as possible.",
-                "⑱ Each round, each hider gets a powerup they can use to help escape the hunters.\n\n" +
-                "⑱ However, the hunters will also get to choose a powerup to help find the hiders.",
+                "⑱ Power Tag is a lot like regular tag, but with some special quirks!\n\n" + 
+                "⑱ Each round, you'll be either a hunter or a hider. Every team hunts once.",
+                "⑱ If you are a hider, hide as long as possible without being found by the hunters.\n\n" + 
+                "⑱ If you are a hunter, find as many players as quick as you can!",
+                "⑱ Each hider gets a powerup they can use to help escape the hunters.\n\n" +
+                "⑱ However, the hunters will also get to choose a special power to help find the hiders.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑱ +8 points for eliminating a player while hunting\n" +
-                                "⑱ +1 point each 10 seconds you hide without being caught\n" +
-                                "⑱ +8 points for not being caught while hiding"
+                                "⑱ +10 points for finding a player as a hunter\n" +
+                                "⑱ +1 point for surviving 10 seconds as a hider\n" +
+                                "⑱ +8 points for surviving an entire round as a hider"
         });
     }
     private int roundNum = 0;
@@ -128,11 +131,11 @@ public class PowerTag extends Game {
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().getInventory().clear();
             p.getPlayer().setFlying(false);
-            p.getPlayer().setAllowFlight(false);
             p.getPlayer().setHealth(20);
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_BOOTS)));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 255, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PotionEffect.INFINITE_DURATION, 255, false, false));
             if (roundNum == 0) {
                 powerTagPlayerMap.put(p.getPlayer().getUniqueId(), new PowerTagPlayer(p));
             }
@@ -200,6 +203,7 @@ public class PowerTag extends Game {
 
                     glowing();
                     hiderPowerups();
+                    hunterPowerup();
                 }
                 else if (timeRemaining == 0) {
                     setGameState(GameState.ACTIVE);
@@ -220,7 +224,10 @@ public class PowerTag extends Game {
         }
         else if (getState().equals(GameState.ACTIVE)) {
             if (timeRemaining > 90) countdownHunters();
-            else if (timeRemaining == 90) barrierHunters(false);
+            else if (timeRemaining == 90)  {
+                removeHunterPowerups();
+                barrierHunters(false);
+            }
             else if (timeRemaining < 90 && timeRemaining > 0) {
                 if (timeRemaining % 10 == 0) incrementPoints(90-timeRemaining);
                 if (timeRemaining == 20) {
@@ -235,6 +242,9 @@ public class PowerTag extends Game {
                     p.incrementHideRounds();
                     createLine(3, ChatColor.YELLOW+"Rounds Survived: "+ChatColor.RESET+ p.getSurvivals() + "/" + p.getHideRounds(), p.getParticipant());
                     p.getPlayer().getInventory().removeItem(getHiderPowerupTool());
+                }
+                for (PowerTagPlayer p : hunters) {
+                    if (!hunterPowerup.equals(hunterPowerupList[2])) p.getPlayer().getInventory().removeItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
                 }
                 if (roundNum == MBC.getInstance().getValidTeams().size()) {
                     setGameState(GameState.END_GAME);
@@ -344,7 +354,7 @@ public class PowerTag extends Game {
         speedMeta.setUnbreakable(true);
         speedPowerup.setItemMeta(speedMeta);
 
-        ItemStack invisPowerup = new ItemStack(Material.ENDER_EYE);
+        ItemStack invisPowerup = new ItemStack(Material.DRAGON_BREATH);
         ItemMeta invisMeta = invisPowerup.getItemMeta();
         invisMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "INVISIBILITY");
         invisMeta.setUnbreakable(true);
@@ -376,7 +386,7 @@ public class PowerTag extends Game {
 
             ItemStack[] items = getHiderPowerupSelectors();
 
-            hiderPowerupMap.put(p, "SPEED");
+            hiderPowerupMap.put(p, hiderPowerupList[0]);
 
             for (ItemStack i : items) {
                 p.getPlayer().getInventory().addItem(i);
@@ -385,7 +395,7 @@ public class PowerTag extends Game {
     }
 
     /**
-    * Removes powerups from all hiders and locks in selection. Gives player lime dye to use powerup
+    * Removes powerup selectors from all hiders and locks in selection. Gives player lime dye to use powerup
     */
     public void removeHiderPowerups() {
         for (PowerTagPlayer p : hiders) {
@@ -406,10 +416,10 @@ public class PowerTag extends Game {
     public void hiderUsePowerup(PowerTagPlayer p) {
         p.getPlayer().getInventory().removeItem(getHiderPowerupTool());
         if (hiderPowerupMap.get(p).equals(hiderPowerupList[0])) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 1, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 1, false, false));
         }
         if (hiderPowerupMap.get(p).equals(hiderPowerupList[1])) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 60, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 40, 255, false, false));
         }
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
@@ -418,12 +428,177 @@ public class PowerTag extends Game {
     }
 
     /**
-    * Returns powerup use tool IF gamestate is active.
+    * Gives powertagplayer p powerup use tool IF gamestate is active.
     */
     public void returnPowerupTool(PowerTagPlayer p) {
         if (getState().equals(GameState.ACTIVE)) {
             p.getPlayer().getInventory().addItem(getHiderPowerupTool());
         }
+    }
+
+    /**
+    * Returns a list of all possible hunter powerups.
+    */
+    public static ItemStack[] getHunterPowerupSelectors() {
+        ItemStack tracker = new ItemStack(Material.ENDER_EYE);
+        ItemMeta trackerMeta = tracker.getItemMeta();
+        trackerMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "TRACKER");
+        trackerMeta.setUnbreakable(true);
+        tracker.setItemMeta(trackerMeta);
+        
+        ItemStack trident = new ItemStack(Material.PRISMARINE_SHARD);
+        ItemMeta tridentMeta = trident.getItemMeta();
+        tridentMeta.setDisplayName(ChatColor.BLUE + "" + ChatColor.BOLD + "TRIDENT");
+        tridentMeta.setUnbreakable(true);
+        trident.setItemMeta(tridentMeta);
+
+        ItemStack troll = new ItemStack(Material.PUFFERFISH);
+        ItemMeta trollMeta = troll.getItemMeta();
+        trollMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "TROLL");
+        trollMeta.setUnbreakable(true);
+        troll.setItemMeta(trollMeta);
+
+        ItemStack[] items = {tracker, trident, troll};
+
+        return items;
+    }
+
+    /**
+    * Gives one hunter the ability to choose their teams powerup. Automatically, a random player is assigned to choose your teams powerup. 
+    */
+    public void hunterPowerup() {
+
+        hunterPowerup = hunterPowerupList[0];
+
+        hunterSelector = hunters.get((int)(Math.random()*hunters.size()));
+
+        ItemStack[] items = getHunterPowerupSelectors();
+        for (ItemStack i : items) {
+            hunterSelector.getPlayer().getInventory().addItem(i);
+        }
+
+        for (PowerTagPlayer p : hunters) {
+            p.getPlayer().sendMessage(hunterSelector.getParticipant().getFormattedName() + ChatColor.GREEN + " has been selected to choose a powerup for your team!");
+        }        
+    }
+
+    /**
+    * Removes powerup selectors from selected hunter. Resets selected hunter and locks in selection. Sends appropriate titles to each powertagplayer.
+    */
+    public void removeHunterPowerups() {
+        ItemStack[] items = getHunterPowerupSelectors();
+        for (ItemStack i : items) {
+            hunterSelector.getPlayer().getInventory().removeItem(i);
+        }
+
+        for (PowerTagPlayer p : hunters) {
+            p.getPlayer().sendMessage(ChatColor.GREEN + "Your powerup is: " + ChatColor.BOLD + hunterPowerup);
+            giveHunterPowerups(p);
+        }   
+
+        for (PowerTagPlayer p : powerTagPlayerMap.values()) {
+            hunterPowerupTitles(p);
+        }   
+    }
+
+    /**
+    * Sends appropriate hunter powerup titles to powertagplayer p.
+    */
+    public void hunterPowerupTitles(PowerTagPlayer p) {
+        p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+        if (hunterPowerup.equals(hunterPowerupList[0])) {
+            p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
+                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the tracker powerup!");
+            p.getPlayer().sendTitle(ChatColor.BOLD + "TRACKER TAG!", "Make sure you aren't being watched...", 0, 60, 20);
+        }
+        if (hunterPowerup.equals(hunterPowerupList[1])) {
+            p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
+                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the trident powerup!");
+            p.getPlayer().sendTitle(ChatColor.BOLD + "TRIDENT TAG!", "The hunters have been given extra range...", 0, 60, 20);
+        }
+        if (hunterPowerup.equals(hunterPowerupList[2])) {
+            p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
+                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the troll powerup!");
+            p.getPlayer().sendTitle(ChatColor.BOLD + "TROLL TAG!", "The power is in the hands of the players...", 0, 60, 20);
+        }
+    }
+
+
+    /**
+    * Gives powertagplayer p hunter powerup IF gamestate is active.
+    */
+    public void giveHunterPowerups(PowerTagPlayer p) {
+        if (getState().equals(GameState.ACTIVE)) {
+            ItemStack powerup = getHunterPowerupTool(hunterPowerup, hunterPowerupList);
+            if (powerup != null) p.getPlayer().getInventory().addItem(powerup);
+        }
+    }
+
+    /**
+    * Returns the hunter powerup user tool, given the hunter powerup and the hunter powerup list.
+    */
+    public static ItemStack getHunterPowerupTool(String powerup, String[] powerupList) {
+        if (powerup.equals(powerupList[0])) {
+            ItemStack tracker = new ItemStack(Material.RECOVERY_COMPASS);
+            ItemMeta trackerMeta = tracker.getItemMeta();
+            trackerMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "TRACKER");
+            trackerMeta.setUnbreakable(true);
+            tracker.setItemMeta(trackerMeta);
+            return tracker;
+        }
+        if (powerup.equals(powerupList[1])) {
+            ItemStack trident = new ItemStack(Material.TRIDENT);
+            ItemMeta tridentMeta = trident.getItemMeta();
+            tridentMeta.setDisplayName(ChatColor.BLUE + "" + ChatColor.BOLD + "TRIDENT");
+            tridentMeta.setUnbreakable(true);
+            trident.setItemMeta(tridentMeta);
+            return trident;
+
+        }
+        if (powerup.equals(powerupList[2])) {
+            return null;
+        }
+
+        return null;
+    }
+
+    /**
+    * PowerTagPlayer p finds closest player and how many blocks they are away. Alerts player found that they have been tracked. Removes compass and returns after 15 seconds given the game is still active.
+    */
+    public void trackerUse(PowerTagPlayer p) {
+        double lowestDistance = 1000;
+        PowerTagPlayer closest = null;
+        for (PowerTagPlayer hider : aliveHiders) {
+            double currentDistance = hider.getPlayer().getLocation().distance(p.getPlayer().getLocation());
+            if (closest == null) {
+                closest = hider;
+                lowestDistance = currentDistance;
+            }
+            else if (lowestDistance > currentDistance) {
+                closest = hider;
+                lowestDistance = currentDistance;
+            }
+        }
+
+        if (closest == null && lowestDistance == 1000) return;
+
+        int distance = (int)lowestDistance;
+        p.getPlayer().sendMessage(ChatColor.GOLD + "\nClosest player: " + ChatColor.RESET + closest.getParticipant().getFormattedName()
+                                    + ChatColor.GOLD + "\nCurrent Distance: " + ChatColor.BOLD + distance + "\n");
+        closest.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20, 255, false, false));
+        closest.getPlayer().sendMessage(ChatColor.RED + "You were just tracked by " + ChatColor.RESET + p.getParticipant().getFormattedName() + ChatColor.RED + "!");
+
+        
+        p.getPlayer().getInventory().removeItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { giveHunterPowerups(p);}
+          }, 300L);
+    }
+
+    public void troll(PowerTagPlayer hitter, PowerTagPlayer hider) {
+        hider.getPlayer().sendMessage(ChatColor.GREEN + "You just got trolled by " + ChatColor.RESET + hitter.getParticipant().getFormattedName() + ChatColor.GREEN + " !");
+        hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20, 255, false, false));
     }
 
     /**
@@ -687,7 +862,7 @@ public class PowerTag extends Game {
      */
     @EventHandler
     public void onEntityDamageEntity(EntityDamageByEntityEvent e) {
-        if (!isGameActive())  {
+        if (!isGameActive() || timeRemaining > 90)  {
             e.setCancelled(true);
             return;
         }
@@ -698,10 +873,16 @@ public class PowerTag extends Game {
 
 
         if (e.getDamager() instanceof Player) {
-            PowerTagPlayer hunter =  powerTagPlayerMap.get(((Player) e.getDamager()).getUniqueId());
+            PowerTagPlayer hitter =  powerTagPlayerMap.get(((Player) e.getDamager()).getUniqueId());
             PowerTagPlayer hider =  powerTagPlayerMap.get(((Player) e.getEntity()).getUniqueId());
-            if (hunters.contains(hunter) && aliveHiders.contains(hider)) {
-                kill(hunter, hider);
+            if (hunters.contains(hitter) && aliveHiders.contains(hider)) {
+                kill(hitter, hider);
+                e.setCancelled(true);
+            }
+
+            if (aliveHiders.contains(hitter) && aliveHiders.contains(hider) && !hitter.getParticipant().getTeam().equals(hider.getParticipant().getTeam()) && hunterPowerup.equals(hunterPowerupList[2])) {
+                troll(hitter, hider);
+                return;
             }
         }
 
@@ -716,18 +897,41 @@ public class PowerTag extends Game {
 
         PowerTagPlayer p = powerTagPlayerMap.get(e.getPlayer().getUniqueId());
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
-            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.SUGAR && hiders.contains(p)) {
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.SUGAR && hiders.contains(p) && !hiderPowerupMap.get(p).equals(hiderPowerupList[0])) {
                 hiderPowerupMap.replace(p, hiderPowerupList[0]);
-                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.BOLD + "SPEED");
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.RESET + "" + ChatColor.BLUE + "" + ChatColor.BOLD + "SPEED");
                 e.setCancelled(true);
             }
-            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.ENDER_EYE && hiders.contains(p)) {
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.DRAGON_BREATH && hiders.contains(p) && !hiderPowerupMap.get(p).equals(hiderPowerupList[1])) {
                 hiderPowerupMap.replace(p, hiderPowerupList[1]);
-                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.BOLD + "INVISIBILITY");
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.RESET + "" + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "INVISIBILITY");
                 e.setCancelled(true);
             }
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE && hiders.contains(p)) {
                 hiderUsePowerup(p);
+                e.setCancelled(true);
+            }
+
+
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.ENDER_EYE && hunterSelector.equals(p) && hunterPowerup != hunterPowerupList[0]) {
+                hunterPowerup = hunterPowerupList[0];
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.LIGHT_PURPLE +""+ ChatColor.BOLD + "TRACKER");
+                e.setCancelled(true);
+            }
+            else if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.ENDER_EYE) e.setCancelled(true);
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.PRISMARINE_SHARD && hunterSelector.equals(p) && hunterPowerup != hunterPowerupList[1]) {
+                hunterPowerup = hunterPowerupList[1];
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.BLUE +""+ ChatColor.BOLD + "TRIDENT");
+                e.setCancelled(true);
+            }
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.PUFFERFISH && hunterSelector.equals(p) && hunterPowerup != hunterPowerupList[2]) {
+                hunterPowerup = hunterPowerupList[2];
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.GREEN +""+ChatColor.BOLD + "TROLL");
+                e.setCancelled(true);
+            }
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RECOVERY_COMPASS && hunters.contains(p) && hunterPowerup.equals(hunterPowerupList[0])) {
+                trackerUse(p);
+                e.setCancelled(true);
             }
         }
         
@@ -740,6 +944,39 @@ public class PowerTag extends Game {
                                         Material.CRIMSON_DOOR, Material.WARPED_DOOR);
             if(trapdoorList.contains(e.getClickedBlock().getType())) e.setCancelled(true);
             if(doorList.contains(e.getClickedBlock().getType())) e.setCancelled(true);
+        }
+    }
+
+     @EventHandler
+    public void hit(ProjectileHitEvent e) {
+        if (e.getEntity() instanceof Trident) {
+            Trident trident = (Trident) e.getEntity();
+            if (!isGameActive()) {
+                trident.remove();
+                e.setCancelled(true);
+                return;
+            }
+            if (!(trident.getShooter() instanceof Player)) {
+                trident.remove();
+                e.setCancelled(true);
+                return;
+            }
+            if (e.getHitBlock() != null) {
+                trident.remove();
+                ((Player) trident.getShooter()).getInventory().addItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
+                ((Player) trident.getShooter()).playSound(((Player) trident.getShooter()), Sound.ITEM_TRIDENT_HIT_GROUND, 1, 1);
+                return;
+            }
+            if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
+                PowerTagPlayer hitter =  powerTagPlayerMap.get(((Player) trident.getShooter()).getUniqueId());
+                PowerTagPlayer hider =  powerTagPlayerMap.get(((Player) e.getHitEntity()).getUniqueId());
+                if (hunters.contains(hitter) && aliveHiders.contains(hider)) {
+                    kill(hitter, hider);
+                }
+            
+                trident.remove();
+                ((Player) trident.getShooter()).getInventory().addItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
+            }
         }
     }
 
@@ -770,7 +1007,7 @@ public class PowerTag extends Game {
     @EventHandler
     public void onReconnect(PlayerJoinEvent e) {
         PowerTagPlayer p = powerTagPlayerMap.get(e.getPlayer().getUniqueId());
-        if (p == null) return;
+        if (!powerTagPlayerMap.values().contains(e.getPlayer().getUniqueId())) return;
 
         nameTagVisibility(false);
 
