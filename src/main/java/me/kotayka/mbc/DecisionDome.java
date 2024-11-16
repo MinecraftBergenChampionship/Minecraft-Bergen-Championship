@@ -32,7 +32,7 @@ public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
     private boolean revealedGames;
     // Icon display code is kinda missy can probably be improved; a refactoring of game class may need to be made for cleanest icon support but not doing it yet @see Game
-    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑭ Ace Race", "⑬ Survival Games", "⑫ Skybattle", "⑯ Spleef", "⑮ Build Mart", "⑰ Party"));
+    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑭ Ace Race", "⑬ Survival Games", "⑫ Skybattle", "⑯ Spleef", "⑮ Build Mart", "⑰ Party", "⑱ Power Tag"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
 
@@ -206,13 +206,7 @@ public class DecisionDome extends Minigame {
             }
             switch (timeRemaining) {
                 case 0 -> {
-                    for (Participant p : MBC.getInstance().getPlayers()) {
-                        for (ItemStack i : p.getPlayer().getInventory()) {
-                            if (i != null) {
-                                p.getInventory().remove(i);
-                            }
-                        }
-                    }
+                    for (Participant p : MBC.getInstance().getPlayers()) p.getPlayer().getInventory().clear();
                     setGameState(GameState.END_ROUND);
                     createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Deciding game...");
                     timeRemaining = 17;
@@ -221,7 +215,7 @@ public class DecisionDome extends Minigame {
             }
         } else if (getState().equals(GameState.END_ROUND)) {
             switch (timeRemaining) {
-                case 9 -> {
+                case 11 -> {
                     for (Participant p : MBC.getInstance().getPlayers()) p.getPlayer().getInventory().clear();
                     raiseWalls(true);
                 }
