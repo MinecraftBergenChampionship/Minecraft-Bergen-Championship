@@ -11,7 +11,7 @@ public class Walls extends TGTTOSMap {
         Location l = new Location(getWorld(), 100, 72, -98);
         l.setYaw((float) 180);
         super.loadMap(
-                l, new Location[]{new Location(getWorld(), 94, 83, -182), new Location(getWorld(), 108, 83, -186)},
+            new Location[]{l}, new Location[]{new Location(getWorld(), 94, 83, -182), new Location(getWorld(), 108, 83, -186)},
                 57
         );
     }

@@ -8,7 +8,7 @@ public class Elytra extends TGTTOSMap {
     public Elytra() {
         super("Elytra", new ItemStack[]{new ItemStack(Material.ELYTRA), new ItemStack(Material.LEATHER_BOOTS)});
         super.loadMap(
-                new Location(getWorld(), 300, 66, 0),
+            new Location[]{new Location(getWorld(), 300, 66, 0)},
                 new Location[]{new Location(getWorld(), 448, 33, -2), new Location(getWorld(), 452, 33, 2)},
                10
         );

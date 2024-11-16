@@ -128,6 +128,7 @@ public class Quickfire extends FinaleGame {
             p.getPlayer().setGameMode(GameMode.SPECTATOR);
             p.getPlayer().getInventory().clear();
             p.getPlayer().teleport(SPAWN);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
             p.board.getTeam(firstPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
             p.board.getTeam(secondPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
             if (p.getTeam().equals(firstPlace) || p.getTeam().equals(secondPlace)) { quickfirePlayers.put(p.getPlayer().getUniqueId(), new QuickfirePlayer(p)); }
@@ -173,6 +174,11 @@ public class Quickfire extends FinaleGame {
                         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, PotionEffect.INFINITE_DURATION, 2, false, false));
                 }
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + ChatColor.BOLD + " All players are now glowing!");
+            }
+            else if (timeElapsed%217 == 201) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
+                }
             }
             timeElapsed++;
         } else if (getState().equals(GameState.END_ROUND)) {

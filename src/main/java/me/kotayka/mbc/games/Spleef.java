@@ -206,11 +206,11 @@ public class Spleef extends Game {
                         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, PotionEffect.INFINITE_DURATION, 1, false, false));
                     }
                 }
-                if (map.getMapType().equals("Blind")) {
+                if (timeRemaining == 5 && map.getMapType().equals("Blind")) {
                     blindnessTime = 240 - (int)(5*Math.random() + 10);
                     Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The lights are dimming, and soon will go out...\n");
                 }
-                if (map.getMapType().equals("Regular")) {
+                if (timeRemaining == 5 && map.getMapType().equals("Regular")) {
                     blindnessTime = 240 - (int)(5*Math.random() + 10);
                     Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "No effects are present for this map!\n");
                 }

@@ -238,6 +238,9 @@ public class PowerTag extends Game {
             else if (timeRemaining == 0) {
                 aliveUntilEnd();
                 nameTagVisibility(true);
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    //p.stopsound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS); not yet updated to 1.21
+                }
                 for (PowerTagPlayer p : hiders) {
                     p.incrementHideRounds();
                     createLine(3, ChatColor.YELLOW+"Rounds Survived: "+ChatColor.RESET+ p.getSurvivals() + "/" + p.getHideRounds(), p.getParticipant());

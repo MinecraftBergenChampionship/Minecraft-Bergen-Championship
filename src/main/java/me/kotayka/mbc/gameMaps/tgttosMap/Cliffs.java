@@ -10,7 +10,7 @@ public class Cliffs extends TGTTOSMap {
         Location l = new Location(getWorld(), -100, 71, -100);
         l.setYaw((float) 180);
         super.loadMap(
-                l, new Location[]{new Location(getWorld(), -113, 75, -212), new Location(getWorld(), -110, 75, -208)},
+            new Location[]{l}, new Location[]{new Location(getWorld(), -113, 75, -212), new Location(getWorld(), -110, 75, -208)},
                60
         );
     }

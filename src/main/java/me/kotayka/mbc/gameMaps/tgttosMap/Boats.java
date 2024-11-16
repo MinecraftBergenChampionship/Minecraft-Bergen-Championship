@@ -10,7 +10,7 @@ public class Boats extends TGTTOSMap {
         Location l = new Location(getWorld(), 300, 70, -300);
         l.setYaw((float) -90);
         super.loadMap(
-                l, new Location[]{new Location(getWorld(), 462, 65, -262), new Location(getWorld(), 467, 65, -269)},
+            new Location[]{l}, new Location[]{new Location(getWorld(), 462, 65, -262), new Location(getWorld(), 467, 65, -269)},
                55
         );
     }

@@ -11,7 +11,7 @@ public class Pit extends TGTTOSMap {
         Location l = new Location(getWorld(), 100, 70, 100);
         l.setYaw((float) -90);
         super.loadMap(
-                l, new Location[]{new Location(getWorld(), 151, 59, 104), new Location(getWorld(), 145, 59, 104)},
+            new Location[]{l}, new Location[]{new Location(getWorld(), 151, 59, 104), new Location(getWorld(), 145, 59, 104)},
                 50
         );
     }

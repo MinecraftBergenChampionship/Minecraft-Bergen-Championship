@@ -11,7 +11,7 @@ public class Skydive extends TGTTOSMap {
         Location l = new Location(getWorld(), -300, 120, 300);
         l.setYaw((float) 90);
         super.loadMap(
-                l, new Location[]{new Location(getWorld(), -399, 50, 297), new Location(getWorld(), -394, 50, 302)},
+            new Location[]{l}, new Location[]{new Location(getWorld(), -399, 50, 297), new Location(getWorld(), -394, 50, 302)},
                 45
         );
     }

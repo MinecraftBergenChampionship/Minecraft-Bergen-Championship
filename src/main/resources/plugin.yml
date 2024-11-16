@@ -2,7 +2,7 @@ name: MBC
 version: '${project.version}'
 main: me.kotayka.mbc.Plugin
 api-version: '1.20'
-authors: [ Kotayka, rspacerr ]
+authors: [ Kotayka, rspacerr, bigkirbypuff ]
 description: Minecraft Bergen Championship
 depend: [Citizens, WorldEdit]
 commands:
@@ -10,6 +10,9 @@ commands:
     description: list all commands
   changeTeam:
     description: Changing a team
+  playMusic:
+    description: Playing music
+    permission: minecraft.command.op
   start:
     description: start a game
     permission: minecraft.command.op

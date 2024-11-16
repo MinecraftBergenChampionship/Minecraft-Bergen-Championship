@@ -103,7 +103,7 @@ public class OneShot extends PartyGame {
     @Override
     public void endEvents() {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
-            p.getPlayer().stopSound(Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS);
+            p.getPlayer().stopSound(Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS);
             p.getPlayer().setFireTicks(0);
         }
         logger.logStats();

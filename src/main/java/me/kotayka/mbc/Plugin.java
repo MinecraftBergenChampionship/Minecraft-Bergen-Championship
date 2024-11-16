@@ -40,6 +40,9 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("changeTeam").setExecutor(new changeTeam());
         getCommand("changeTeam").setTabCompleter(new changeTeamTabCompletion());
 
+        getCommand("playMusic").setExecutor(new playMusic());
+        getCommand("playMusic").setTabCompleter(new playMusicTabCompletion());
+
         getCommand("ready").setExecutor(new ready());
         getCommand("notready").setExecutor(new notready());
         getCommand("readycheck").setExecutor(new readycheck());

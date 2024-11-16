@@ -13,7 +13,7 @@ import java.util.List;
 
 public abstract class TGTTOSMap {
     // changed from Location[] to just Location; let's just spawn everyone at one square, at least for now
-    private Location spawn;
+    private Location[] spawn;
     private Location[] end;
     private int deathY;
     private final String name;
@@ -26,7 +26,7 @@ public abstract class TGTTOSMap {
             items = new ArrayList<>(Arrays.asList(i));
     }
 
-    public void loadMap(Location spawn, Location[] end, int spawnDeath) {
+    public void loadMap(Location[] spawn, Location[] end, int spawnDeath) {
         this.spawn = spawn;
         this.end = end;
         this.deathY = spawnDeath;
@@ -35,7 +35,7 @@ public abstract class TGTTOSMap {
     public World getWorld() { return world; }
 
     public Location getSpawnLocation() {
-        return spawn;
+        return spawn[(int)(Math.random()*spawn.length)];
     }
 /*
     public Location getSpawnLocation() {
