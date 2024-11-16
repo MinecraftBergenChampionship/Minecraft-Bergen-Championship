@@ -37,6 +37,14 @@ public abstract class TGTTOSMap {
     public Location getSpawnLocation() {
         return spawn[(int)(Math.random()*spawn.length)];
     }
+
+    // note: 0 <= i < 6
+    public Location getSpawnLocation(int i) {
+        if (i > spawn.length) {
+            return spawn[spawn.length-1];
+        }
+        return spawn[i];
+    }
 /*
     public Location getSpawnLocation() {
         double x1 = Math.min(spawn[0].getX(), spawn[1].getX());

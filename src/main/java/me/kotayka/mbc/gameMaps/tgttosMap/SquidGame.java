@@ -8,7 +8,7 @@ public class SquidGame extends TGTTOSMap {
     public SquidGame() {
         super("SquidGame", new ItemStack[]{new ItemStack(Material.SNOWBALL, 4), new ItemStack(Material.LEATHER_BOOTS)});
         super.loadMap(
-            new Location[]{new Location(getWorld(), 507, 60, 499, 180, 0), new Location(getWorld(), 503, 60, 499, 180, 0), new Location(getWorld(), 499, 60, 499, 180, 0), new Location(getWorld(), 511, 60, 499, 180, 0),new Location(getWorld(), 515, 60, 499, 180, 0), new Location(getWorld(), 519, 60, 499, 180, 0)},
+            new Location[]{new Location(getWorld(), 499, 60, 499, 180, 0), new Location(getWorld(), 503, 60, 499, 180, 0), new Location(getWorld(), 507, 60, 499, 180, 0), new Location(getWorld(), 511, 60, 499, 180, 0),new Location(getWorld(), 515, 60, 499, 180, 0), new Location(getWorld(), 519, 60, 499, 180, 0)},
                 new Location[]{new Location(getWorld(), 531, 56, 438), new Location(getWorld(), 522, 56, 438), new Location(getWorld(), 513, 56, 438), new Location(getWorld(), 504, 56, 438), new Location(getWorld(), 495, 56, 438), new Location(getWorld(), 486, 56, 438)},
                10
         );

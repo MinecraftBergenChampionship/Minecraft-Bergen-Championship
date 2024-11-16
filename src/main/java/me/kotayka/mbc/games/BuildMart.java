@@ -73,7 +73,7 @@ public class BuildMart extends Game {
                         "⑮ +12 points **per player** for completing a hard build\n" +
                         "⑮ +1 points **per player** for each team beat when completing a build\n" +
                         "⑮ Max +3 points **per player** for each build partially completed at game end\n" +
-                        "⑮ +10 points **per player** on the team with the most builds completed of any team\n" 
+                        "⑮ +16 points **per player** on the team with the most builds completed of any team\n" 
         });
 
 

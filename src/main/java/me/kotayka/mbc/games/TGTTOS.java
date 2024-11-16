@@ -252,7 +252,7 @@ public class TGTTOS extends Game {
 
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().setVelocity(new Vector(0, 0, 0));
-            p.getPlayer().teleport(map.getSpawnLocation());
+            p.getPlayer().teleport(map.getSpawnLocation(MBC.getInstance().teams.indexOf(p.getTeam())));
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             if (p.getTeam().equals(MBC.getInstance().spectator)) {
                 p.getPlayer().setGameMode(GameMode.SPECTATOR);
@@ -483,7 +483,7 @@ public class TGTTOS extends Game {
 
         if (e.getPlayer().getLocation().getY() < map.getDeathY()) {
             if (e.getPlayer().getGameMode() != GameMode.SURVIVAL) {
-                e.getPlayer().teleport(map.getSpawnLocation());
+                e.getPlayer().teleport(map.getSpawnLocation(MBC.getInstance().teams.indexOf(Participant.getParticipant(e.getPlayer()).getTeam())));
                 return;
             }
             if (map instanceof Boats) {
@@ -515,7 +515,7 @@ public class TGTTOS extends Game {
     //kills players
     public void death(Player p) {
         p.setVelocity(new Vector(0, 0, 0));
-        p.teleport(map.getSpawnLocation());
+        p.teleport(map.getSpawnLocation(MBC.getInstance().teams.indexOf(Participant.getParticipant(p).getTeam())));
         printDeathMessage(Participant.getParticipant(p));
     }
 
@@ -527,7 +527,7 @@ public class TGTTOS extends Game {
             printDeathMessage(Participant.getParticipant(p));
         }
         p.setVelocity(new Vector(0, 0, 0));
-        p.teleport(map.getSpawnLocation());
+        p.teleport(map.getSpawnLocation(MBC.getInstance().teams.indexOf(Participant.getParticipant(p).getTeam())));
     }
 
     @EventHandler
