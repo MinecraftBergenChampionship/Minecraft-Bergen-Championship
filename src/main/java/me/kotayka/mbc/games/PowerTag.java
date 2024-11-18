@@ -25,6 +25,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class PowerTag extends Game {
@@ -51,12 +52,13 @@ public class PowerTag extends Game {
     public String hunterPowerup;
     public Map<PowerTagPlayer, String> hiderPowerupMap = new HashMap<>();
     public PowerTagPlayer hunterSelector;
-    public String[] hunterPowerupList = {"TRACKER", "TRIDENT", "TROLL"};
+    public String[] hunterPowerupList = {"TRACKER", "TRIDENT", "TROLL", "TOXIC"};
     public String[] hiderPowerupList = {"SPEED", "INVISIBILITY"};
-    public boolean clicked = false;
+
+    public ArrayList<PowerTagPlayer> infected = new ArrayList<>();
 
     // scoring
-    private final int FIND_POINTS = 10;
+    private final int FIND_POINTS = 8;
     private final int INCREMENT_POINTS = 1;
     private final int SURVIVAL_POINTS = 8;
 
@@ -69,7 +71,7 @@ public class PowerTag extends Game {
                 "⑱ Each hider gets a powerup they can use to help escape the hunters.\n\n" +
                 "⑱ However, the hunters will also get to choose a special power to help find the hiders.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑱ +10 points for finding a player as a hunter\n" +
+                                "⑱ +8 points for finding a player as a hunter\n" +
                                 "⑱ +1 point for surviving 10 seconds as a hider\n" +
                                 "⑱ +8 points for surviving an entire round as a hider"
         });
@@ -85,7 +87,7 @@ public class PowerTag extends Game {
         if (powerTagPlayerMap.size() < 1) {
             createLine(2, ChatColor.YELLOW+"Players Found: "+ChatColor.RESET+"0", p);
             createLine(3, ChatColor.YELLOW+"Rounds Survived: "+ChatColor.RESET+ "0/0", p);
-        } else {
+        } else if (powerTagPlayerMap.get(p.getPlayer().getUniqueId()) != null){
             createLine(2, ChatColor.YELLOW+"Players Found: "+ChatColor.RESET+powerTagPlayerMap.get(p.getPlayer().getUniqueId()).getKills(), p);
             createLine(3, ChatColor.YELLOW+"Rounds Survived: "+ChatColor.RESET+ powerTagPlayerMap.get(p.getPlayer().getUniqueId()).getSurvivals() +"/" + 
                                                     powerTagPlayerMap.get(p.getPlayer().getUniqueId()).getHideRounds(), p);
@@ -148,6 +150,7 @@ public class PowerTag extends Game {
         }
         else {
             aliveHiders.clear();
+            infected.clear();
         }
     }
 
@@ -227,12 +230,12 @@ public class PowerTag extends Game {
             else if (timeRemaining == 90)  {
                 removeHunterPowerups();
                 barrierHunters(false);
+                speed();
             }
             else if (timeRemaining < 90 && timeRemaining > 0) {
                 if (timeRemaining % 10 == 0) incrementPoints(90-timeRemaining);
-                if (timeRemaining == 20) {
-                    Bukkit.broadcastMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Hunters have been given speed 2!");
-                    speed();
+                if (timeRemaining == 20 && hunterPowerup.equals(hunterPowerupList[3])) {
+                    infectedReveal();
                 }
             }
             else if (timeRemaining == 0) {
@@ -247,12 +250,12 @@ public class PowerTag extends Game {
                     p.getPlayer().getInventory().removeItem(getHiderPowerupTool());
                 }
                 for (PowerTagPlayer p : hunters) {
-                    if (!hunterPowerup.equals(hunterPowerupList[2])) p.getPlayer().getInventory().removeItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
+                    if (!hunterPowerup.equals(hunterPowerupList[2]) && !hunterPowerup.equals(hunterPowerupList[3])) p.getPlayer().getInventory().removeItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
                 }
                 if (roundNum == MBC.getInstance().getValidTeams().size()) {
                     setGameState(GameState.END_GAME);
                     gameOverGraphics();
-                    timeRemaining = 40;
+                    timeRemaining = 45;
                 }
                 else {
                     setGameState(GameState.END_ROUND);
@@ -274,13 +277,21 @@ public class PowerTag extends Game {
             }
         }
         else if (getState().equals(GameState.END_GAME)) {
+            if (timeRemaining == 40) {
+                Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Most Total Time Survived: ");
+            } else if (timeRemaining == 36) {
+                timeSurvivedPrint();
+            }
             if (timeRemaining <= 35) {
                 for (PowerTagPlayer p : powerTagPlayerMap.values()) {
                     p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
+                    if (p.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+                        p.getPlayer().setGameMode(GameMode.ADVENTURE);
+                    }
                 }
                 gameEndEvents();
             }
-            else if (timeRemaining == 38) {
+            else if (timeRemaining == 43) {
                 displaySurvivors();
             }
         }
@@ -385,7 +396,8 @@ public class PowerTag extends Game {
     */
     public void hiderPowerups() {
         for (PowerTagPlayer p : hiders) {
-            p.getPlayer().sendMessage(ChatColor.GREEN + "Select a powerup! Right click an item to select.");
+            p.getPlayer().sendMessage(ChatColor.GREEN + "Select a powerup! Right click an item to select. " 
+                                        + ChatColor.BLUE + "" + ChatColor.BOLD + hiderPowerupList[0] + ChatColor.RESET + "" + ChatColor.GREEN + " has been autmoatically selected.");
 
             ItemStack[] items = getHiderPowerupSelectors();
 
@@ -457,11 +469,17 @@ public class PowerTag extends Game {
 
         ItemStack troll = new ItemStack(Material.PUFFERFISH);
         ItemMeta trollMeta = troll.getItemMeta();
-        trollMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "TROLL");
+        trollMeta.setDisplayName(ChatColor.YELLOW + "" + ChatColor.BOLD + "TROLL");
         trollMeta.setUnbreakable(true);
         troll.setItemMeta(trollMeta);
 
-        ItemStack[] items = {tracker, trident, troll};
+        ItemStack toxic = new ItemStack(Material.ROTTEN_FLESH);
+        ItemMeta toxicMeta = toxic.getItemMeta();
+        toxicMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "TOXIC");
+        toxicMeta.setUnbreakable(true);
+        toxic.setItemMeta(toxicMeta);
+
+        ItemStack[] items = {tracker, trident, troll, toxic};
 
         return items;
     }
@@ -481,7 +499,8 @@ public class PowerTag extends Game {
         }
 
         for (PowerTagPlayer p : hunters) {
-            p.getPlayer().sendMessage(hunterSelector.getParticipant().getFormattedName() + ChatColor.GREEN + " has been selected to choose a powerup for your team!");
+            p.getPlayer().sendMessage(hunterSelector.getParticipant().getFormattedName() + ChatColor.GREEN + " has been selected to choose a powerup for your team!" + 
+                            ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + hunterPowerupList[0] + ChatColor.RESET + "" + ChatColor.GREEN + " has been autmoatically selected.");
         }        
     }
 
@@ -502,6 +521,10 @@ public class PowerTag extends Game {
         for (PowerTagPlayer p : powerTagPlayerMap.values()) {
             hunterPowerupTitles(p);
         }   
+
+        if (hunterPowerup.equals(hunterPowerupList[3])) {
+            infectedBegin();
+        }
     }
 
     /**
@@ -524,6 +547,11 @@ public class PowerTag extends Game {
                                         ChatColor.RED + "" + ChatColor.BOLD + " have chosen the troll powerup!");
             p.getPlayer().sendTitle(ChatColor.BOLD + "TROLL TAG!", "The power is in the hands of the players...", 0, 60, 20);
         }
+        if (hunterPowerup.equals(hunterPowerupList[3])) {
+            p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
+                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the toxic powerup!");
+            p.getPlayer().sendTitle(ChatColor.BOLD + "TOXIC TAG!", "Be careful who you're near...", 0, 60, 20);
+        }
     }
 
 
@@ -534,6 +562,42 @@ public class PowerTag extends Game {
         if (getState().equals(GameState.ACTIVE)) {
             ItemStack powerup = getHunterPowerupTool(hunterPowerup, hunterPowerupList);
             if (powerup != null) p.getPlayer().getInventory().addItem(powerup);
+        }
+    }
+
+    /**
+    * Infects a random hider.
+    */
+    public void infectedBegin() {
+        infected.clear();
+        if (getState().equals(GameState.ACTIVE) && timeRemaining > 85) {
+            PowerTagPlayer infectedHider = hiders.get((int)(Math.random()*hiders.size()));
+            infected.add(infectedHider);
+        }
+    }
+
+    /**
+    * Reveals all infected players and makes them glow for the remainder of the round.
+    */
+    public void infectedReveal() {
+        if (getState().equals(GameState.ACTIVE)) {
+            int count = 0;
+            for (int i = 0; i < infected.size(); i++) {
+                PowerTagPlayer p = infected.get(i);
+                if (p.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+                    Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + ChatColor.RED + "" + ChatColor.BOLD + " was infected, and has been revealed...");
+                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*timeRemaining, 255, false, false));
+                    count++;
+                }
+                else if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
+                    Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + ChatColor.RED + "" + ChatColor.BOLD + " was infected, but has already been found...");
+                }
+            }
+            //Bukkit.broadcastMessage(ChatColor.RED + "In total, " + ChatColor.BOLD + count + ChatColor.RESET + "" + ChatColor.RED + 
+                                        //" players were revealed! The player who began infected was " + infected.get(0).getParticipant().getFormattedName() + ".");
+            for (Participant p : MBC.getInstance().getPlayers()) {
+                p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
+            }
         }
     }
 
@@ -558,9 +622,8 @@ public class PowerTag extends Game {
             return trident;
 
         }
-        if (powerup.equals(powerupList[2])) {
-            return null;
-        }
+        if (powerup.equals(powerupList[2])) return null;
+        if (powerup.equals(powerupList[3])) return null;
 
         return null;
     }
@@ -596,7 +659,7 @@ public class PowerTag extends Game {
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
             public void run() { giveHunterPowerups(p);}
-          }, 300L);
+          }, 400L);
     }
 
     public void troll(PowerTagPlayer hitter, PowerTagPlayer hider) {
@@ -711,7 +774,42 @@ public class PowerTag extends Game {
             MBC.spawnFirework(p.getParticipant());
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, PotionEffect.INFINITE_DURATION, 255, false, false));
             p.incrementSurvivals();
+            p.incrementTimeSurvived(90);
         }
+    }
+
+    /**
+     * Displays the top 5 players based off of total time survived.
+     */
+    private void timeSurvivedPrint() {
+        PowerTagPlayer[] timeSurvivedSorted = new PowerTagPlayer[5];
+
+        ArrayList<PowerTagPlayer> arrayPowerTagPlayers = new ArrayList(powerTagPlayerMap.values());
+        for (int j = 0; j < arrayPowerTagPlayers.size(); j++) {
+            PowerTagPlayer p = arrayPowerTagPlayers.get(j);
+            for (int i = 0; i < timeSurvivedSorted.length; i++) {
+                if (timeSurvivedSorted[i] == null) {
+                    timeSurvivedSorted[i] = p;
+                    break;
+                }
+                if (timeSurvivedSorted[i].getTimeSurvived() < p.getTimeSurvived()) {
+                    PowerTagPlayer q = p;
+                    p = timeSurvivedSorted[i];
+                    timeSurvivedSorted[i] = q;
+                }
+            }
+        }
+
+
+        StringBuilder topFive = new StringBuilder();
+        
+        //Bukkit.broadcastMessage("[Debug] fastestLaps.keySet().size() == " + fastestLaps.keySet().size());
+        for (int i = 0; i < timeSurvivedSorted.length; i++) {
+            if (timeSurvivedSorted[i] == null) break;
+            topFive.append(String.format((i+1) + ". %-18s %s:%-9s\n", timeSurvivedSorted[i].getParticipant().getFormattedName(), (timeSurvivedSorted[i].getTimeSurvived()/60), (timeSurvivedSorted[i].getTimeSurvived()%60)));
+        }
+        Bukkit.broadcastMessage(topFive.toString());
+
     }
 
     /**
@@ -764,11 +862,11 @@ public class PowerTag extends Game {
     }
 
     /**
-     * Hunters have speed 2 for 20 seconds.
+     * Hunters have speed 2 for the remainder of the round.
      */
     private void speed() {
         for (PowerTagPlayer p : hunters) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 400, 1, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20*timeRemaining, 1, false, false));
         }
     }
 
@@ -835,6 +933,8 @@ public class PowerTag extends Game {
 
         MBC.spawnFirework(hider.getParticipant());
         hider.getPlayer().setGameMode(GameMode.SPECTATOR);
+        hider.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
+        hider.incrementTimeSurvived(90 - timeRemaining);
 
         hunter.incrementKills();
         hunter.getParticipant().addCurrentScore(FIND_POINTS);
@@ -929,7 +1029,12 @@ public class PowerTag extends Game {
             }
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.PUFFERFISH && hunterSelector.equals(p) && hunterPowerup != hunterPowerupList[2]) {
                 hunterPowerup = hunterPowerupList[2];
-                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.GREEN +""+ChatColor.BOLD + "TROLL");
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.YELLOW +""+ChatColor.BOLD + "TROLL");
+                e.setCancelled(true);
+            }
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.ROTTEN_FLESH && hunterSelector.equals(p) && hunterPowerup != hunterPowerupList[3]) {
+                hunterPowerup = hunterPowerupList[3];
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.GREEN +""+ChatColor.BOLD + "TOXIC");
                 e.setCancelled(true);
             }
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RECOVERY_COMPASS && hunters.contains(p) && hunterPowerup.equals(hunterPowerupList[0])) {
@@ -1037,6 +1142,26 @@ public class PowerTag extends Game {
             p.getPlayer().sendMessage(ChatColor.RED+"You died!");
             p.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
             p.getPlayer().setGameMode(GameMode.SPECTATOR);
+        }
+    }
+
+    /**
+     * Tests to see if a player moves, is infected, and is within 2 blocks of any other player. If so, infects them too.
+     */
+    @EventHandler
+    public void PlayerMoveEvent(PlayerMoveEvent e) {
+        if (!isGameActive()) return;
+        if (map == null) return;
+
+        PowerTagPlayer p = powerTagPlayerMap.get(e.getPlayer().getUniqueId());
+        if (timeRemaining > 20 && timeRemaining <= 90 && hunterPowerup.equals(hunterPowerupList[3]) && p.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+            if (infected.contains(p)) {
+                for (PowerTagPlayer runner : aliveHiders) {
+                    if (runner.getPlayer().getLocation().distance(p.getPlayer().getLocation()) <= 2 && runner.getPlayer().getGameMode().equals(GameMode.SURVIVAL) && !infected.contains(runner)) {
+                        infected.add(runner);
+                    }
+                }
+            }
         }
     }
 }

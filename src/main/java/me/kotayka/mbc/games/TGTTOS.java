@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
@@ -57,6 +58,7 @@ import me.kotayka.mbc.gameMaps.tgttosMap.Pit;
 import me.kotayka.mbc.gameMaps.tgttosMap.Skydive;
 import me.kotayka.mbc.gameMaps.tgttosMap.SquidGame;
 import me.kotayka.mbc.gameMaps.tgttosMap.TGTTOSMap;
+import me.kotayka.mbc.gameMaps.tgttosMap.Trident;
 import me.kotayka.mbc.gameMaps.tgttosMap.Walls;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -68,7 +70,8 @@ public class TGTTOS extends Game {
     private List<TGTTOSMap> maps = new ArrayList<>(
             Arrays.asList(new Pit(), new Meatball(), new Walls(),
                     new Cliffs(), new Elytra(), new Skydive(),
-                    new Boats(), new Glide(), new SquidGame()
+                    new Boats(), new Glide(), new SquidGame(),
+                    new Trident()
             ));
 
     private List<Participant> finishedParticipants;
@@ -232,7 +235,7 @@ public class TGTTOS extends Game {
         roundNum = 0;
         maps = new ArrayList<>(
                 Arrays.asList(new Pit(), new Meatball(), new Walls(),
-                        new Cliffs(), new Glide(), new Skydive(), new Boats(), new SquidGame()
+                        new Cliffs(), new Glide(), new Skydive(), new Boats(), new SquidGame(), new Trident()
                 )
         );
         removePlacedBlocks();
@@ -307,6 +310,13 @@ public class TGTTOS extends Game {
                     p.getInventory().addItem(i);
                 } else if (i.getType().equals(Material.LEATHER_BOOTS)) {
                     p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(i));
+                } else if (i.getType().equals(Material.TRIDENT)) {
+                    ItemStack trident = new ItemStack(Material.TRIDENT);
+                    ItemMeta itemMeta = trident.getItemMeta();
+                    itemMeta.setUnbreakable(true);
+                    trident.setItemMeta(itemMeta);
+                    trident.addEnchantment(Enchantment.RIPTIDE, 3);
+                    p.getInventory().addItem(trident);
                 } else {
                     p.getInventory().addItem(i);
                 }

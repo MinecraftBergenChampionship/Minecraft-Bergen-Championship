@@ -40,7 +40,7 @@ public abstract class TGTTOSMap {
 
     // note: 0 <= i < 6
     public Location getSpawnLocation(int i) {
-        if (i > spawn.length) {
+        if (i >= spawn.length) {
             return spawn[spawn.length-1];
         }
         return spawn[i];
