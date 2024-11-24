@@ -36,7 +36,7 @@ public class endgame implements CommandExecutor {
             if (p.getPlayer().getAllowFlight()) {
                 ((Game) game).removeWinEffect(p);
             }
-            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().addPotionEffect(MBC.SATURATION);

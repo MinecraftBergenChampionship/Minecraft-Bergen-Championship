@@ -46,7 +46,7 @@ public class partygame implements CommandExecutor, TabCompleter {
             for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
                 p.getPlayer().setMaxHealth(20);
                 p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
-                p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+                p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
                 p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
                 p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
                 p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);

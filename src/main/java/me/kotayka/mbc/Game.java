@@ -394,7 +394,7 @@ public abstract class Game extends Minigame {
        // standards
        for (Participant p : MBC.getInstance().getPlayers()) {
            p.getPlayer().removePotionEffect(PotionEffectType.LEVITATION);
-           p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+           p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
            p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
            p.getPlayer().setGameMode(GameMode.ADVENTURE);
            p.getPlayer().setLevel(0);
@@ -614,7 +614,7 @@ public abstract class Game extends Minigame {
                 removeWinEffect(p);
             }
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
-            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().removePotionEffect(PotionEffectType.DOLPHINS_GRACE);

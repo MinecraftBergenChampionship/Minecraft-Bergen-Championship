@@ -451,7 +451,7 @@ public class Lobby extends Minigame {
 
         //MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().dodgebolt, MBC.getInstance().plugin);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
-            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
@@ -506,7 +506,7 @@ public class Lobby extends Minigame {
         }
         //MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().dodgebolt, MBC.getInstance().plugin);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
-            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 100000, 10, false, false));
@@ -761,7 +761,7 @@ public class Lobby extends Minigame {
             p.getInventory().clear();
             p.setInvulnerable(false);
             p.removePotionEffect(PotionEffectType.NIGHT_VISION);
-            p.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.removePotionEffect(PotionEffectType.RESISTANCE);
             p.addPotionEffect(MBC.SATURATION);
         }
     }

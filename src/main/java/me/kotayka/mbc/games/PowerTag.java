@@ -137,7 +137,7 @@ public class PowerTag extends Game {
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_BOOTS)));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 255, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PotionEffect.INFINITE_DURATION, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 255, false, false));
             if (roundNum == 0) {
                 powerTagPlayerMap.put(p.getPlayer().getUniqueId(), new PowerTagPlayer(p));
             }
@@ -214,7 +214,7 @@ public class PowerTag extends Game {
                     barrierHiders(false);
                     blindness();
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        //p.playSound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS, 1, 1); not yet updated to 1.21
+                        p.playSound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS, 1, 1);
                     }
                     setPVP(true);
                     for (PowerTagPlayer p : powerTagPlayerMap.values()) {
@@ -242,7 +242,7 @@ public class PowerTag extends Game {
                 aliveUntilEnd();
                 nameTagVisibility(true);
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    //p.stopsound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS); not yet updated to 1.21
+                    p.stopSound(Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS);
                 }
                 for (PowerTagPlayer p : hiders) {
                     p.incrementHideRounds();
@@ -479,7 +479,9 @@ public class PowerTag extends Game {
         toxicMeta.setUnbreakable(true);
         toxic.setItemMeta(toxicMeta);
 
-        ItemStack[] items = {tracker, trident, troll, toxic};
+        //ItemStack[] items = {tracker, trident, troll, toxic};
+        ItemStack[] items = {tracker, trident, troll};
+
 
         return items;
     }
@@ -866,7 +868,7 @@ public class PowerTag extends Game {
      */
     private void speed() {
         for (PowerTagPlayer p : hunters) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20*timeRemaining, 1, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20*timeRemaining, 0, false, false));
         }
     }
 

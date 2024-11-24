@@ -60,7 +60,7 @@ public abstract class PartyGame extends Game {
         // standards
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().removePotionEffect(PotionEffectType.LEVITATION);
-            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
             p.getPlayer().setLevel(0);
@@ -202,7 +202,7 @@ public abstract class PartyGame extends Game {
             }
             p.getPlayer().setMaxHealth(20);
             p.getPlayer().setInvulnerable(false);
-            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));

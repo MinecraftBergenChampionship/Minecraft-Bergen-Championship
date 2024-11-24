@@ -71,7 +71,7 @@ public class OneShot extends PartyGame {
         ItemMeta bowMeta = BOW.getItemMeta();
         bowMeta.setUnbreakable(true);
         BOW.setItemMeta(bowMeta);
-        BOW.addEnchantment(Enchantment.ARROW_INFINITE, 1);
+        BOW.addEnchantment(Enchantment.INFINITY, 1);
 
         CrossbowMeta multishotMeta = (CrossbowMeta) CROSSBOW_MULTISHOT.getItemMeta();
         multishotMeta.addChargedProjectile(new ItemStack(Material.ARROW, 1));
@@ -222,10 +222,10 @@ public class OneShot extends PartyGame {
 
             oneShotPlayerMap.put(p.getPlayer().getUniqueId(), new OneShotPlayer(p));
 
-            p.getPlayer().removePotionEffect(PotionEffectType.JUMP);
+            p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
             p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
-            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 2, false, false));

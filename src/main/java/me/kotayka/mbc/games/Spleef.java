@@ -130,7 +130,7 @@ public class Spleef extends Game {
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
@@ -202,7 +202,7 @@ public class Spleef extends Game {
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
                         p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.RECORDS, 1, 1);
-                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PotionEffect.INFINITE_DURATION, 3, false, false));
+                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, PotionEffect.INFINITE_DURATION, 3, false, false));
                         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, PotionEffect.INFINITE_DURATION, 1, false, false));
                     }
                 }
@@ -263,7 +263,7 @@ public class Spleef extends Game {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.stopSound(Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS);
                         if (map.getMapType().equals("Gravity")) {
-                            p.getPlayer().removePotionEffect(PotionEffectType.JUMP);
+                            p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
                             p.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
                         } else if (map.getMapType().equals("Blind")) {
                             p.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
@@ -278,7 +278,7 @@ public class Spleef extends Game {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.stopSound(Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS);
                         if (map.getMapType().equals("Gravity")) {
-                            p.getPlayer().removePotionEffect(PotionEffectType.JUMP);
+                            p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
                             p.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
                         } else if (map.getMapType().equals("Blind")) {
                             p.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
@@ -370,7 +370,7 @@ public class Spleef extends Game {
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 20);
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
-        victim.getPlayer().removePotionEffect(PotionEffectType.JUMP);
+        victim.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
         victim.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
         victim.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
         MBC.spawnFirework(victim.getParticipant());

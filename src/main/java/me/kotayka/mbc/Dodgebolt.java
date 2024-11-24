@@ -164,7 +164,7 @@ public class Dodgebolt extends FinaleGame {
             }
             for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
-                p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+                p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
                 p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
                 p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
                 p.getPlayer().addPotionEffect(MBC.SATURATION);
@@ -611,7 +611,7 @@ public class Dodgebolt extends FinaleGame {
             trailTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
                 for (Arrow arrow : firedArrows) {
                     DodgeboltPlayer shooter = getDodgeboltPlayer((Player) arrow.getShooter());
-                    world.spawnParticle(Particle.REDSTONE, arrow.getLocation(), 3, new Particle.DustOptions(shooter.getParticipant().getTeam().getColor(), 3));
+                    //world.spawnParticle(Particle.REDSTONE, arrow.getLocation(), 3, new Particle.DustOptions(shooter.getParticipant().getTeam().getColor(), 3));
                 }
             }, 0, 2);
         }
@@ -673,7 +673,7 @@ public class Dodgebolt extends FinaleGame {
             if (l.getX() < 0 && l.getX() > -2) {
                 if (e.getPlayer().getLocation().getDirection().getX() < 0) {
                     e.getPlayer().damage(0.5);
-                    e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 5, true));
+                    e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 10, 5, true));
                     return;
                 }
             }
@@ -701,7 +701,7 @@ public class Dodgebolt extends FinaleGame {
             if (l.getX() > 1 && l.getX() < 3) {
                 if (e.getPlayer().getLocation().getDirection().getX() > 0) {
                     e.getPlayer().damage(0.5);
-                    e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 5, true));
+                    e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 10, 5, true));
                     return;
                 }
             }
@@ -806,7 +806,7 @@ public class Dodgebolt extends FinaleGame {
         setGameState(GameState.INACTIVE);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
-            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().addPotionEffect(MBC.SATURATION);

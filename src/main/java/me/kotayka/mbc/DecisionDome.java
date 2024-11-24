@@ -386,7 +386,7 @@ public class DecisionDome extends Minigame {
                 mega_cow_shooter = p;
                 for (ItemStack i : p.getPlayer().getInventory()) {
                     if (i != null && i.getType().equals(Material.EGG)) {
-                        i.addUnsafeEnchantment(Enchantment.LUCK, 5);
+                        i.addUnsafeEnchantment(Enchantment.FORTUNE, 5);
                     }
                 }
             }
@@ -429,7 +429,7 @@ public class DecisionDome extends Minigame {
         for (MBCTeam t : powerupTeams) {
             Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.LIGHT_PURPLE + " were chosen to receive a powerup!");
             for (Participant p : t.getPlayers()) {
-                p.getPlayer().spawnParticle(Particle.VILLAGER_HAPPY, p.getPlayer().getLocation().add(0.5, 0.75, 0.5), 3);
+                p.getPlayer().spawnParticle(Particle.HAPPY_VILLAGER, p.getPlayer().getLocation().add(0.5, 0.75, 0.5), 3);
             }
         }
     }
@@ -670,7 +670,7 @@ public class DecisionDome extends Minigame {
             if (mega_cow_shooter != null && p.getPlayer().getUniqueId().equals(mega_cow_shooter.getPlayer().getUniqueId())) {
                 Bukkit.broadcastMessage(mega_cow_shooter.getFormattedName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " unleashed the mega cow!");
                 Cow cow = (Cow) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.COW);
-                cow.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 2, false, false));
+                cow.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
                 VoteChicken mega_cow = new VoteChicken(p.getTeam(), cow);
                 chickens.add(mega_cow);
                 chickens.add(mega_cow);
@@ -679,11 +679,11 @@ public class DecisionDome extends Minigame {
             }
 
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
-            chicken.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 2, false, false));
+            chicken.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
             chickens.add(new VoteChicken(p.getTeam(), chicken));
             if(doubled) {
                 Chicken chickenTwo = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
-                chickenTwo.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, PotionEffect.INFINITE_DURATION, 2, false, false));
+                chickenTwo.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
                 chickens.add(new VoteChicken(p.getTeam(), chickenTwo));
             }
             
@@ -883,7 +883,7 @@ public class DecisionDome extends Minigame {
             if (e.getType().equals(EntityType.CHICKEN) || e.getType().equals(EntityType.COW)) {
                 ((Damageable) e).setHealth(0);
             }
-            if (e.getType().equals(EntityType.DROPPED_ITEM)) {
+            if (e.getType().equals(EntityType.ITEM)) {
                 e.remove();
             }
         }

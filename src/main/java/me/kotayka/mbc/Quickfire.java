@@ -221,7 +221,7 @@ public class Quickfire extends FinaleGame {
                 p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
             } else {
                 p.getPlayer().setGameMode(GameMode.SPECTATOR);
-                p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+                p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
                 p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             }
         }
@@ -347,7 +347,7 @@ public class Quickfire extends FinaleGame {
             p.board.getTeam(secondPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
             p.getPlayer().setMaxHealth(20);
             p.getPlayer().setHealth(20);
-            p.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);

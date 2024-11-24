@@ -96,10 +96,10 @@ public class Skybattle extends Game {
             p.getPlayer().setAllowFlight(false);
             p.getPlayer().setHealth(20);
 
-            p.getPlayer().removePotionEffect(PotionEffectType.JUMP);
+            p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
             p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
-            p.getPlayer().removePotionEffect(PotionEffectType.SLOW);
+            p.getPlayer().removePotionEffect(PotionEffectType.SLOWNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.POISON);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false));
             if (roundNum == 1) {
@@ -291,13 +291,13 @@ public class Skybattle extends Game {
             b.setType(Material.AIR);
             BlockFace blockFace = e.getBlockAgainst().getFace(b);
             Location spawn = getLocationToSpawnEntity(p.getTargetBlock(null, 5), blockFace);
-            TNTPlacers.put(map.getWorld().spawnEntity(spawn, EntityType.PRIMED_TNT), p);
+            TNTPlacers.put(map.getWorld().spawnEntity(spawn, EntityType.TNT), p);
         } else if (e.getBlock().getType().equals(Material.TNT_MINECART)) {
             Block against = e.getBlockAgainst();
             if (against.getType().toString().contains("RAIL")) {
                 Location spawn = p.getTargetBlock(null, 5).getLocation();
                 spawn.add(0.5, 1.5, 0.5);
-                TNTPlacers.put(map.getWorld().spawnEntity(spawn, EntityType.MINECART_TNT), p);
+                TNTPlacers.put(map.getWorld().spawnEntity(spawn, EntityType.TNT_MINECART), p);
             } else {
                 e.setCancelled(true);
             }
@@ -515,7 +515,7 @@ public class Skybattle extends Game {
         Collection<PotionEffect> effects = potion.getEffects();
         for (PotionEffect effect : effects) {
             PotionEffectType potionType = effect.getType();
-            if (!potionType.equals(PotionEffectType.HARM)) return;
+            if (!potionType.equals(PotionEffectType.INSTANT_DAMAGE)) return;
         }
 
         SkybattlePlayer player = skybattlePlayerMap.get(e.getHitEntity().getUniqueId());

@@ -39,10 +39,7 @@ public class playMusic implements CommandExecutor {
                     case ("DecisionDome") -> {p.playSound(p, Sound.MUSIC_DISC_CAT, SoundCategory.RECORDS, 1, 1);}
                     case ("Quickfire") -> {p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);}
                     case ("Party") -> {sender.sendMessage("No valid music - please select a specific party game");}
-                    case ("PowerTag") -> {
-                        sender.sendMessage("Not yet implemented.");
-                        //p.playSound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS, 1, 1); not yet updated to 1.21
-                    }
+                    case ("PowerTag") -> {p.playSound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS, 1, 1);}
                     case ("OneShot") -> {p.playSound(p, Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS, 1, 1);}
                     case ("BeepTest") -> {p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, 1, 1);}
                     case ("DiscoFever") -> {p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS, 1, 1);}
