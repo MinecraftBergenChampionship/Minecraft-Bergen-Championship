@@ -566,7 +566,7 @@ public class TGTTOS extends Game {
                 logger.log(p.getTeam().teamNameFormat() + ChatColor.GREEN + ChatColor.BOLD + " was the first full team to finish!");
                 for (Participant teammate : p.getTeam().getPlayers()) {
                     teammate.addCurrentScore(FIRST_TEAM_BONUS);
-                    teammate.getPlayer().sendMessage(ChatColor.GREEN+"Your team finished first and earned a " + (FIRST_TEAM_BONUS*MBC.getInstance().multiplier*p.getTeam().getPlayers().size()) + " point bonus!");
+                    teammate.getPlayer().sendMessage(ChatColor.GREEN+"Your team finished first!" + MBC.scoreFormatter(FIRST_TEAM_BONUS));
                 }
                 firstTeamBonus = true;
             } else {
@@ -574,7 +574,7 @@ public class TGTTOS extends Game {
                 logger.log(p.getTeam().teamNameFormat() + ChatColor.GREEN + ChatColor.BOLD + " was the first full team to finish!");
                 for (Participant teammate : p.getTeam().getPlayers()) {
                     teammate.addCurrentScore(SECOND_TEAM_BONUS);
-                    teammate.getPlayer().sendMessage(ChatColor.GREEN+"Your team finished second and earned a " + (SECOND_TEAM_BONUS*MBC.getInstance().multiplier*p.getTeam().getPlayers().size()) + " point bonus!");
+                    teammate.getPlayer().sendMessage(ChatColor.GREEN+"Your team finished second!" + MBC.scoreFormatter(SECOND_TEAM_BONUS));
                 }
                 secondTeamBonus = true;
             }
@@ -584,9 +584,11 @@ public class TGTTOS extends Game {
     public void chickenClick(Participant p, Entity chicken) {
         finishedParticipants.add(p);
         int placement = finishedParticipants.size();
+        int points = PLACEMENT_POINTS * (MBC.getInstance().getPlayers().size() - placement) + COMPLETION_POINTS;
         p.addCurrentScore(PLACEMENT_POINTS * (MBC.getInstance().getPlayers().size() - placement) + COMPLETION_POINTS);
         String place = getPlace(placement);
         if (placement < 4) {
+            points += TOP_THREE_BONUS;
             p.addCurrentScore(TOP_THREE_BONUS);
         }
         chicken.remove();
@@ -598,7 +600,7 @@ public class TGTTOS extends Game {
 
         MBC.spawnFirework(p);
         p.getPlayer().setGameMode(GameMode.SPECTATOR);
-        p.getPlayer().sendMessage(ChatColor.GREEN + "You finished in " + ChatColor.AQUA + place + ChatColor.GREEN + " place!");
+        p.getPlayer().sendMessage(ChatColor.GREEN + "You finished in " + ChatColor.AQUA + place + ChatColor.GREEN + " place!" + MBC.scoreFormatter(points));
 
         // check if all players on a team finished
         if (!firstTeamBonus || !secondTeamBonus)

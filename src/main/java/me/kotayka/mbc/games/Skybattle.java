@@ -372,7 +372,7 @@ public class Skybattle extends Game {
             for (Participant p : t.getPlayers()) {
                 int placement = teamPlacements.get(t);
                 p.addCurrentScore(TEAM_BONUSES_3[placement-1] / t.getPlayers().size());
-                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_3[placement-1] * MBC.getInstance().multiplier) + " points!");
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_3[placement-1] / t.getPlayers().size())));
             }
         }
     }
@@ -577,7 +577,14 @@ public class Skybattle extends Game {
 
         e.setCancelled(true);
 
-        Bukkit.broadcastMessage(e.getDeathMessage());
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (playersAlive.contains(Participant.getParticipant(p))) {
+                p.sendMessage(e.getDeathMessage() + MBC.scoreFormatter(SURVIVAL_POINTS));
+            }
+            else {
+                p.sendMessage(e.getDeathMessage());
+            }
+        }
 
         getLogger().log(e.getDeathMessage());
 
@@ -665,7 +672,7 @@ public class Skybattle extends Game {
             killer.kills++;
 
             createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
-            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!");
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!" + MBC.scoreFormatter(KILL_POINTS));
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
             killer.getParticipant().addCurrentScore(KILL_POINTS);
 
@@ -728,13 +735,23 @@ public class Skybattle extends Game {
     public void onDisconnect(PlayerQuitEvent e) {
         if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
             SkybattlePlayer p = skybattlePlayerMap.get(e.getPlayer().getUniqueId());
-            Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " disconnected!");
+
             updatePlayersAlive(p.getParticipant());
+
+            for (Player play : Bukkit.getOnlinePlayers()) {
+                if (playersAlive.contains(Participant.getParticipant(play))) {
+                    play.sendMessage(p.getParticipant().getFormattedName() + " disconnected!" + MBC.scoreFormatter(SURVIVAL_POINTS));
+                }
+                else {
+                    play.sendMessage(p.getParticipant().getFormattedName() + " disconnected!");
+                }
+            }
+
             if (p.lastDamager != null) {
                 SkybattlePlayer killer = skybattlePlayerMap.get(p.getPlayer().getUniqueId());
                 if (killer == null) return;
                 killer.getParticipant().addCurrentScore(KILL_POINTS);
-                killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + p.getParticipant().getPlayerName() + "!");
+                killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + p.getParticipant().getPlayerName() + "!" + MBC.scoreFormatter(KILL_POINTS));
                 killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + p.getParticipant().getFormattedName(), 0, 60, 20);
                 killer.kills++;
             }

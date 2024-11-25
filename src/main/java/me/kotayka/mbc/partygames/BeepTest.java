@@ -383,7 +383,7 @@ public class BeepTest extends PartyGame {
         if (rounds % 4 == 0) {
             for (Participant p : alivePlayers) {
                 p.addCurrentScore(STAGE_POINTS);
-                p.getPlayer().sendMessage(ChatColor.GREEN + "You completed stage #" + (rounds / 4) + "!");
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You completed stage #" + (rounds / 4) + "!" + MBC.scoreFormatter(STAGE_POINTS));
             }
         }
     }
@@ -409,7 +409,7 @@ public class BeepTest extends PartyGame {
                 completedPlayers.add(p);
                 long currentTime = System.currentTimeMillis() - roundTime;
                 String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
-                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + " seconds!");
+                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + " seconds!" + MBC.scoreFormatter(CURRENT_POINTS));
                 logger.log(p.getFormattedName() + " completed " + currentLevel.getName().trim() + " in " + formattedTime + "seconds!");
                 if (completedPlayers.size() == 1) {
                     Bukkit.broadcastMessage(p.getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");
@@ -420,7 +420,7 @@ public class BeepTest extends PartyGame {
             if (e.getTo().getZ() > OPPOSITE_Z) {
                 long currentTime = System.currentTimeMillis() - roundTime;
                 String formattedTime = new SimpleDateFormat("ss.S").format(new Date(currentTime));
-                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + " seconds!");
+                pl.sendMessage(ChatColor.GREEN + "You completed " + currentLevel.getName().trim() + " in " + formattedTime + " seconds!" + MBC.scoreFormatter(CURRENT_POINTS));
                 logger.log(p.getFormattedName() + " completed " + currentLevel.getName().trim() + " in " + formattedTime + " seconds!");
                 if (completedPlayers.isEmpty()) {
                     Bukkit.broadcastMessage(p.getFormattedName() + ChatColor.WHITE + " completed " + ChatColor.BOLD + ChatColor.GOLD + currentLevel.getName().trim() + ChatColor.RESET + " first, in " + formattedTime + " seconds!");

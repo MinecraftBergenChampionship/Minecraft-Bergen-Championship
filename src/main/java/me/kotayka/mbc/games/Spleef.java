@@ -331,14 +331,14 @@ public class Spleef extends Game {
                 int placement = p.getPlacement();
                 int points = BONUS_POINTS[placement-1];
                 p.getParticipant().addCurrentScore(points);
-                p.getPlayer().sendMessage(ChatColor.GREEN+"You placed " + getPlace(placement) + " and earned a bonus of " + (points*MBC.getInstance().multiplier) + " points!");
+                p.getPlayer().sendMessage(ChatColor.GREEN+"You placed " + getPlace(placement) + "!" + MBC.scoreFormatter(points));
             }
         }
 
         // in case multiple teams do not die (??)
         for (MBCTeam t : fullyAliveTeams) {
             for (Participant p : t.teamPlayers) {
-                p.getPlayer().sendMessage(ChatColor.GREEN+"Your team earned a bonus for being the last fully alive team!");
+                p.getPlayer().sendMessage(ChatColor.GREEN+"Your team earned a bonus for being the last fully alive team!" + MBC.scoreFormatter(LAST_TEAM_BONUS));
                 p.addCurrentScore(LAST_TEAM_BONUS);
             }
         }
@@ -353,7 +353,7 @@ public class Spleef extends Game {
             if (!killer.getParticipant().getTeam().equals(victim.getParticipant().getTeam())) {
                 killer.incrementKills();
                 killer.getParticipant().addCurrentScore(KILL_POINTS);
-                killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + victim.getPlayer().getName() + "!");
+                killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + victim.getPlayer().getName() + "!" + MBC.scoreFormatter(KILL_POINTS));
                 killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
                 createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+killer.getKills(), killer.getParticipant());
 
@@ -363,10 +363,18 @@ public class Spleef extends Game {
             }
         }
 
-        getLogger().log(deathMessage);
-        Bukkit.broadcastMessage(deathMessage);
-
         updatePlayersAlive(victim.getParticipant());
+        getLogger().log(deathMessage);
+
+        for (Player play : Bukkit.getOnlinePlayers()) {
+            if (playersAlive.contains(Participant.getParticipant(play))) {
+                play.sendMessage(deathMessage + MBC.scoreFormatter(SURVIVAL_POINTS));
+            }
+            else {
+                play.sendMessage(deathMessage);
+            }
+        }
+
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 20);
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
@@ -531,12 +539,20 @@ public class Spleef extends Game {
         SpleefPlayer p = getSpleefPlayer(e.getPlayer());
         if (p == null) return;
         updatePlayersAlive(p.getParticipant());
-        Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + " disconnected!");
+
+        for (Player play : Bukkit.getOnlinePlayers()) {
+            if (playersAlive.contains(Participant.getParticipant(play))) {
+                play.sendMessage(p.getParticipant().getFormattedName() + " disconnected!" + MBC.scoreFormatter(SURVIVAL_POINTS));
+            }
+            else {
+                play.sendMessage(p.getParticipant().getFormattedName() + " disconnected!");
+            }
+        }
 
         Participant killer = p.getLastDamager();
         if (killer != null) {
             killer.addCurrentScore(KILL_POINTS);
-            killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + p.getParticipant().getPlayerName() + "!");
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + p.getParticipant().getPlayerName() + "!" + MBC.scoreFormatter(KILL_POINTS));
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + p.getParticipant().getFormattedName(), 0, 60, 20);
             getSpleefPlayer(killer.getPlayer()).incrementKills();
         }

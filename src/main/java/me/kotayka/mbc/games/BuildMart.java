@@ -225,9 +225,7 @@ public class BuildMart extends Game {
                     if (mostBuilds(t)) {
                         for (Participant p : t.getTeam().teamPlayers) {
                             p.getPlayer().sendMessage
-                                ("Your team finished with the most builds completed and earned " +
-                                ChatColor.BOLD + "" + ChatColor.GOLD + (MOST_BUILD_POINTS*t.getTeam().teamPlayers.size()) +
-                                ChatColor.RESET + " points!");
+                                (ChatColor.GREEN + "Your team finished with the most builds completed!" + MBC.scoreFormatter(MOST_BUILD_POINTS));
                             p.addCurrentScore(MOST_BUILD_POINTS);
                         }
                     }
@@ -414,7 +412,14 @@ public class BuildMart extends Game {
         if (MBC.getInstance().logStats()) {
             getLogger().log(s);
         }
-        Bukkit.broadcastMessage(s);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (team.getTeam().teamPlayers.contains(Participant.getParticipant(p))) {
+                p.sendMessage(s + MBC.scoreFormatter(BUILD_COMPLETION_POINTS + BUILD_PLACEMENT_POINTS * (MBC.getInstance().getValidTeams().size() - placement)));
+            }
+            else {
+                p.sendMessage(s);
+            }
+        }
 
         // Generate next build based on which build was just completed
         Build nextBuild = switch (id) {

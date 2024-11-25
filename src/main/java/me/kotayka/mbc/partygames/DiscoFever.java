@@ -314,11 +314,17 @@ public class DiscoFever extends PartyGame {
                 else {
                     delay -= 4;
                 }
-                Bukkit.broadcastMessage(ChatColor.YELLOW+"Things are speeding up!");
-                logger.log("Things are speeding up! Delay = " + (delay/20.0));
-                for (Participant i : playersAlive) {
-                    i.addCurrentScore(STAGE_POINTS);
+
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (playersAlive.contains(Participant.getParticipant(p))) {
+                        Participant.getParticipant(p).addCurrentScore(STAGE_POINTS);
+                        p.sendMessage(ChatColor.YELLOW+"Things are speeding up!" + MBC.scoreFormatter(STAGE_POINTS));
+                    }
+                    else {
+                        p.sendMessage(ChatColor.YELLOW+"Things are speeding up!");
+                    }
                 }
+                logger.log("Things are speeding up! Delay = " + (delay/20.0));
                 counter = 0;
                 // Cancel task then call Disco() again to reinitialize it
                 Disco();
@@ -588,12 +594,17 @@ public class DiscoFever extends PartyGame {
             Participant part = Participant.getParticipant(p);
             if (part == null) return;
             updatePlayersAlive(part);
-            Bukkit.broadcastMessage(part.getFormattedName() + " was eliminated!");
+            for (Player person : Bukkit.getOnlinePlayers()) {
+                if (playersAlive.contains(Participant.getParticipant(person))) {
+                    Participant.getParticipant(person).addCurrentScore(SURVIVAL_POINTS);
+                    person.sendMessage(part.getFormattedName() + " was eliminated!" + MBC.scoreFormatter(SURVIVAL_POINTS));
+                }
+                else {
+                    person.sendMessage(part.getFormattedName() + " was eliminated!");
+                }
+            }
             logger.log(p.getName() + " fell into the void at delay " + delay);
             MBC.getInstance().showPlayers(part);
-            for (Participant i : playersAlive) {
-                i.addCurrentScore(SURVIVAL_POINTS);
-            }
             updatePlayersAliveScoreboard();
             // other things later
         }

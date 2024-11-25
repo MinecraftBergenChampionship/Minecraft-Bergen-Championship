@@ -98,13 +98,13 @@ public class Classic extends SkybattleMap {
             for (double t = 0; t < 50; t+=0.5) {
                 double x = (getBorderRadius() * (float) Math.cos(t)) + CENTER.getX();
                 double z = (getBorderRadius() * (float) Math.sin(t)) + CENTER.getZ();
-                getWorld().spawnParticle(Particle.REDSTONE, x, y, z, 1, SKYBATTLE.BORDER_PARTICLE);
+                getWorld().spawnParticle(Particle.DUST, x, y, z, 1, SKYBATTLE.BORDER_PARTICLE);
             }
         }
 
         for (int x = -14; x < 14; x+=2) {
             for (int z = -13; z < 13; z+=2) {
-                getWorld().spawnParticle(Particle.REDSTONE, x, getBorderHeight(), z, 1, SKYBATTLE.TOP_BORDER_PARTICLE);
+                getWorld().spawnParticle(Particle.DUST, x, getBorderHeight(), z, 1, SKYBATTLE.TOP_BORDER_PARTICLE);
             }
         }
 
@@ -128,7 +128,7 @@ public class Classic extends SkybattleMap {
 
     public void initSpawnItems() {
         ItemStack pick = new ItemStack(Material.IRON_PICKAXE);
-        pick.addEnchantment(Enchantment.DIG_SPEED, 3);
+        pick.addEnchantment(Enchantment.EFFICIENCY, 3);
         ItemMeta meta = pick.getItemMeta();
         meta.setUnbreakable(true);
         pick.setItemMeta(meta);

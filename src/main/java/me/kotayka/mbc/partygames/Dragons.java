@@ -179,7 +179,7 @@ public class Dragons extends PartyGame {
             for (int i = 0; i < playersAlive.size(); i++) {
                 Participant p = playersAlive.get(i);
                 winEffects(p);
-                p.getPlayer().sendMessage(ChatColor.GREEN+"You survived the dragon rampage!");
+                p.getPlayer().sendMessage(ChatColor.GREEN+"You survived the dragon rampage!" + ChatColor.WHITE + "[+" + (remaining_spawns+WIN_POINTS) + "]");
                 if (points > 0) {
                     p.addCurrentScore(points);
                 }
@@ -192,7 +192,7 @@ public class Dragons extends PartyGame {
             }
             s = survivors.toString()+ChatColor.WHITE+"!";
         } else if (playersAlive.size() == 1) {
-            playersAlive.get(0).getPlayer().sendMessage(ChatColor.GREEN+"You survived the dragon rampage!");
+            playersAlive.get(0).getPlayer().sendMessage(ChatColor.GREEN+"You survived the dragon rampage!" + MBC.scoreFormatter(remaining_spawns+WIN_POINTS));
             playersAlive.get(0).addCurrentScore(points);
             winEffects(playersAlive.get(0));
             s = playersAlive.get(0).getFormattedName()+" survived the dragons!";
@@ -272,7 +272,14 @@ public class Dragons extends PartyGame {
             deathMessage = p.getFormattedName()+" fell from a high place";
         }
 
-        Bukkit.broadcastMessage(deathMessage);
+        for (Player play : Bukkit.getOnlinePlayers()) {
+            if (playersAlive.contains(Participant.getParticipant(play))) {
+                play.sendMessage(deathMessage + MBC.scoreFormatter(SURVIVAL_POINTS));
+            }
+            else {
+                play.sendMessage(deathMessage);
+            }
+        }
         logger.log(deathMessage);
 
         updatePlayersAlive(p);
@@ -335,7 +342,15 @@ public class Dragons extends PartyGame {
                     remaining_spawns--;
                     EnderDragon enderDragon = (EnderDragon) map.getWorld().spawnEntity(map.DRAGON_SPAWN, EntityType.ENDER_DRAGON);
 
-                    Bukkit.broadcastMessage(ChatColor.GOLD+"" + ChatColor.BOLD + "Ender Dragon Spawning!");
+                    for (Player play : Bukkit.getOnlinePlayers()) {
+                        if (playersAlive.contains(Participant.getParticipant(play))) {
+                            play.sendMessage(ChatColor.GOLD+"" + ChatColor.BOLD + "Ender Dragon Spawning!" + MBC.scoreFormatter(SURVIVAL_POINTS));
+                        }
+                        else {
+                            play.sendMessage(ChatColor.GOLD+"" + ChatColor.BOLD + "Ender Dragon Spawning!");
+                        }
+                    }
+
                     logger.log("Ender Dragon has spawned!");
 
                     enderDragon.setPhase(EnderDragon.Phase.CIRCLING);

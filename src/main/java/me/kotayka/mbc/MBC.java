@@ -135,6 +135,12 @@ public class MBC implements Listener {
         return Objects.requireNonNull(mbc);
     }
 
+    // given int points, returns a string used at the end of certain messages to show points earned from an action
+    public static String scoreFormatter(int points) {
+        String s = ChatColor.RESET + "" + ChatColor.GOLD + "" + ChatColor.BOLD + " [+" + points + "]";
+        return s;
+    }
+
     public Minigame gameInstance(int gameNum) {
         switch(gameNameList.get(gameNum)) {
             case "DecisionDome":
@@ -618,7 +624,7 @@ public class MBC implements Listener {
     public static void spawnFirework(Participant p) {
         Location l = p.getPlayer().getLocation();
         l.setY(l.getY()+1);
-        org.bukkit.entity.Firework fw = (org.bukkit.entity.Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK);
+        org.bukkit.entity.Firework fw = (org.bukkit.entity.Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK_ROCKET);
         FireworkMeta fwm = fw.getFireworkMeta();
 
         fwm.addEffect(FireworkEffect.builder().withColor(p.getTeam().getColor()).build());
@@ -633,7 +639,7 @@ public class MBC implements Listener {
      * @param c Color for the firework to have
      */
     public static void spawnFirework(Location l, Color c) {
-        org.bukkit.entity.Firework fw = (org.bukkit.entity.Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK);
+        org.bukkit.entity.Firework fw = (org.bukkit.entity.Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK_ROCKET);
         FireworkMeta fwm = fw.getFireworkMeta();
         fwm.addEffect(FireworkEffect.builder().withColor(c).build());
         fw.setFireworkMeta(fwm);

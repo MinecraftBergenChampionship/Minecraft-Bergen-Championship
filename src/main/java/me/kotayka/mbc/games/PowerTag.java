@@ -397,7 +397,7 @@ public class PowerTag extends Game {
     public void hiderPowerups() {
         for (PowerTagPlayer p : hiders) {
             p.getPlayer().sendMessage(ChatColor.GREEN + "Select a powerup! Right click an item to select. " 
-                                        + ChatColor.BLUE + "" + ChatColor.BOLD + hiderPowerupList[0] + ChatColor.RESET + "" + ChatColor.GREEN + " has been autmoatically selected.");
+                                        + ChatColor.BLUE + " \n" + ChatColor.BOLD + hiderPowerupList[0] + ChatColor.RESET + "" + ChatColor.GREEN + " has been automatically selected.");
 
             ItemStack[] items = getHiderPowerupSelectors();
 
@@ -502,7 +502,7 @@ public class PowerTag extends Game {
 
         for (PowerTagPlayer p : hunters) {
             p.getPlayer().sendMessage(hunterSelector.getParticipant().getFormattedName() + ChatColor.GREEN + " has been selected to choose a powerup for your team!" + 
-                            ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + hunterPowerupList[0] + ChatColor.RESET + "" + ChatColor.GREEN + " has been autmoatically selected.");
+                            ChatColor.LIGHT_PURPLE + " \n" + ChatColor.BOLD + hunterPowerupList[0] + ChatColor.RESET + "" + ChatColor.GREEN + " has been automatically selected.");
         }        
     }
 
@@ -762,7 +762,7 @@ public class PowerTag extends Game {
     private void incrementPoints(int i) {
         for (PowerTagPlayer p : aliveHiders) {
             p.getParticipant().addCurrentScore(INCREMENT_POINTS);
-            p.getPlayer().sendMessage(ChatColor.GREEN + "You've stayed alive for " + i + " seconds.");
+            p.getPlayer().sendMessage(ChatColor.GREEN + "You've stayed alive for " + i + " seconds!" + MBC.scoreFormatter(INCREMENT_POINTS));
         }
     }
 
@@ -772,7 +772,7 @@ public class PowerTag extends Game {
     private void aliveUntilEnd() {
         for (PowerTagPlayer p : aliveHiders) {
             p.getParticipant().addCurrentScore(SURVIVAL_POINTS);
-            p.getPlayer().sendMessage(ChatColor.GREEN + "You survived until the end and have been awarded " + (SURVIVAL_POINTS * MBC.getInstance().multiplier) + " points!");
+            p.getPlayer().sendMessage(ChatColor.GREEN + "You survived until the end!" + MBC.scoreFormatter(SURVIVAL_POINTS));
             MBC.spawnFirework(p.getParticipant());
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, PotionEffect.INFINITE_DURATION, 255, false, false));
             p.incrementSurvivals();
@@ -808,7 +808,9 @@ public class PowerTag extends Game {
         //Bukkit.broadcastMessage("[Debug] fastestLaps.keySet().size() == " + fastestLaps.keySet().size());
         for (int i = 0; i < timeSurvivedSorted.length; i++) {
             if (timeSurvivedSorted[i] == null) break;
-            topFive.append(String.format((i+1) + ". %-18s %s:%-9s\n", timeSurvivedSorted[i].getParticipant().getFormattedName(), (timeSurvivedSorted[i].getTimeSurvived()/60), (timeSurvivedSorted[i].getTimeSurvived()%60)));
+            if (timeSurvivedSorted[i].getTimeSurvived()%60 < 10) topFive.append(String.format((i+1) + ". %-18s %s:0%-9s\n", timeSurvivedSorted[i].getParticipant().getFormattedName(), (timeSurvivedSorted[i].getTimeSurvived()/60), (timeSurvivedSorted[i].getTimeSurvived()%60)));
+            else topFive.append(String.format((i+1) + ". %-18s %s:%-9s\n", timeSurvivedSorted[i].getParticipant().getFormattedName(), (timeSurvivedSorted[i].getTimeSurvived()/60), (timeSurvivedSorted[i].getTimeSurvived()%60)));
+            
         }
         Bukkit.broadcastMessage(topFive.toString());
 
@@ -890,6 +892,9 @@ public class PowerTag extends Game {
         while (diamondBlock.getType() == Material.DIAMOND_BLOCK) {
             ROOMS.add(new Room(diamondBlock.getLocation()));
             diamondBlock = TAG_WORLD.getBlockAt(diamondBlock.getX() - 30, diamondBlock.getY(), diamondBlock.getZ());
+            while (diamondBlock.getType() == Material.GOLD_BLOCK) {
+                diamondBlock = TAG_WORLD.getBlockAt(diamondBlock.getX() - 30, diamondBlock.getY(), diamondBlock.getZ());
+            }
         }
     }
 
@@ -941,7 +946,7 @@ public class PowerTag extends Game {
         hunter.incrementKills();
         hunter.getParticipant().addCurrentScore(FIND_POINTS);
         hunter.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + hider.getParticipant().getFormattedName(), 0, 60, 20);
-        hunter.getPlayer().sendMessage(ChatColor.RED+"You found " + ChatColor.RESET + hider.getParticipant().getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + "!");
+        hunter.getPlayer().sendMessage(ChatColor.RED+"You found " + ChatColor.RESET + hider.getParticipant().getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + "!" + MBC.scoreFormatter(FIND_POINTS));
         createLine(2, ChatColor.YELLOW+"Players Found: "+ChatColor.RESET+hunter.getKills(), hunter.getParticipant());
         
         createLineAll(4, ChatColor.GREEN+""+ChatColor.BOLD+"Hiders Left: "+ChatColor.RESET+ aliveHiders.size() + "/" + hiders.size());

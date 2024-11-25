@@ -13,6 +13,6 @@ public class Green extends MBCTeam {
         //super("GreenGoblins", "Green Goblins", 'Ⓐ', ChatColor.GREEN);
 
         //christmas
-        super("Emerald Elves", "Emerald Elves", 'ⓖ', ChatColor.GREEN);
+        super("EmeraldElves", "Emerald Elves", 'ⓖ', ChatColor.GREEN);
     }
 }

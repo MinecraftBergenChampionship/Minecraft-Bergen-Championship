@@ -113,6 +113,8 @@ public class AceRacePlayer extends GamePlayer {
             ACE_RACE.getLogger().log(str);
             Bukkit.broadcastMessage(str);
             this.getParticipant().getPlayer().sendTitle(ChatColor.AQUA + "Completed Lap " + lap + "!", placementColor + placementString + ChatColor.GRAY + " | " + ChatColor.YELLOW + lapTimes[lap - 1], 0, 60, 20);
+            int pointsGained = (ACE_RACE.aceRacePlayerMap.size() - ACE_RACE.finishedPlayersByLap[lap-1]) * AceRace.PLACEMENT_LAP_POINTS + AceRace.LAP_COMPLETION_POINTS;
+            this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You completed a lap!" + MBC.scoreFormatter(pointsGained));
             lap++;
             ACE_RACE.createLine(6, ChatColor.GREEN.toString()+ChatColor.BOLD+"Lap: " + ChatColor.WHITE+lap+"/3", getParticipant());
         } else {
@@ -136,6 +138,12 @@ public class AceRacePlayer extends GamePlayer {
             this.getParticipant().getPlayer().sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "Overall: " + ChatColor.YELLOW + new SimpleDateFormat("m:ss.S").format(new Date(totalTime)));
             this.getParticipant().getPlayer().sendMessage("                                ");
             this.getParticipant().getPlayer().sendMessage(ChatColor.AQUA + "--------------------------------");
+
+            int pointsGained = (ACE_RACE.aceRacePlayerMap.size() - ACE_RACE.finishedPlayersByLap[lap-1]) * AceRace.PLACEMENT_FINAL_LAP_POINTS + AceRace.LAP_COMPLETION_POINTS + AceRace.FINISH_RACE_POINTS;
+            if (placement < 11) {
+                pointsGained+=AceRace.PLACEMENT_BONUSES[placement-1];
+            }
+            this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You completed the race!" + MBC.scoreFormatter(pointsGained));
 
             ACE_RACE.createLine(6, ChatColor.GREEN.toString()+ChatColor.BOLD+"Lap: " + ChatColor.RESET+"Complete!", this.getParticipant());
             ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " + ChatColor.RESET+"Complete!", this.getParticipant());

@@ -623,10 +623,10 @@ public class SurvivalGames extends Game {
                 int placement = teamPlacements.get(t);
                 if (t.getPlayers().size() == 4) {
                     p.addCurrentScore(TEAM_BONUSES_4[placement-1] / t.getPlayers().size());
-                    p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_4[placement-1] * MBC.getInstance().multiplier) + " points!");
+                    p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_4[placement-1] / t.getPlayers().size())));
                 } else {
                     p.addCurrentScore(TEAM_BONUSES_3[placement-1] / t.getPlayers().size());
-                    p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + " and earned a bonus of " + (TEAM_BONUSES_3[placement-1] * MBC.getInstance().multiplier) + " points!");
+                    p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_3[placement-1] / t.getPlayers().size())));
                 }
             }
         }
@@ -641,7 +641,7 @@ public class SurvivalGames extends Game {
         boolean mainHand = p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW;
         p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 60, 1, false, true));
         p.playSound(p.getLocation(), Sound.BLOCK_GRASS_BREAK, 1, 1);
-        map.getWorld().spawnParticle(Particle.BLOCK_CRACK, p.getEyeLocation(), 5, Material.DIRT.createBlockData());
+        map.getWorld().spawnParticle(Particle.BLOCK, p.getEyeLocation(), 5, Material.DIRT.createBlockData());
 
         if (mainHand) {
             p.getInventory().setItemInMainHand(null);
@@ -914,7 +914,15 @@ public class SurvivalGames extends Game {
         getLogger().log(e.getDeathMessage());
         victim.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
 
-        Bukkit.broadcastMessage(e.getDeathMessage());
+        for (Player play : Bukkit.getOnlinePlayers()) {
+            if (playersAlive.contains(Participant.getParticipant(play))) {
+                play.sendMessage(e.getDeathMessage() + MBC.scoreFormatter(SURVIVAL_POINTS));
+            }
+            else {
+                play.sendMessage(e.getDeathMessage());
+            }
+        }
+        
         Participant victimParticipant = Participant.getParticipant(victim);
 
         if (horcrux.used || !horcrux.placed) {
@@ -986,7 +994,7 @@ public class SurvivalGames extends Game {
         deathMessage = deathMessage.replace(victim.getPlayerName(), victim.getFormattedName());
 
         if (killer != null) {
-            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayerName() + "!");
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayerName() + "!" + MBC.scoreFormatter(killPoints));
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getFormattedName(), 0, 60, 20);
             String health = String.format(" ["+ChatColor.RED+"♥ %.2f"+ChatColor.RESET+"]", killer.getPlayer().getHealth());
             deathMessage = deathMessage.replace(killer.getPlayerName(), killer.getFormattedName()+health);
@@ -1098,8 +1106,19 @@ public class SurvivalGames extends Game {
         if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
             Participant p = Participant.getParticipant(e.getPlayer());
             if (p == null) return;
-            Bukkit.broadcastMessage(p.getFormattedName() + " disconnected!");
+
             updatePlayersAlive(p);
+
+            for (Player play : Bukkit.getOnlinePlayers()) {
+                if (playersAlive.contains(Participant.getParticipant(play))) {
+                    play.sendMessage(p.getFormattedName() + " disconnected!" + MBC.scoreFormatter(SURVIVAL_POINTS));
+                }
+                else {
+                    play.sendMessage(p.getFormattedName() + " disconnected!");
+                }
+            }
+            
+            
             for (Participant n : playersAlive) {
                 n.addCurrentScore(SURVIVAL_POINTS);
             }
@@ -1192,7 +1211,7 @@ public class SurvivalGames extends Game {
         if (ench == null) return;
 
         // TODO ? this can probably be rewritten a lot prettier using switches or something else
-        if (toolName.contains("SWORD") && (ench.equals(Enchantment.KNOCKBACK) || ench.equals(Enchantment.DAMAGE_ALL))) {
+        if (toolName.contains("SWORD") && (ench.equals(Enchantment.KNOCKBACK) || ench.equals(Enchantment.SHARPNESS))) {
             p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
             tool.addEnchantment(ench, 1);
             e.setCursor(null);
@@ -1200,15 +1219,15 @@ public class SurvivalGames extends Game {
             p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP,1, 2);
             tool.addEnchantment(ench, 1);
             e.setCursor(null);
-        } else if (toolName.contains("BOOTS") && (ench.equals(Enchantment.PROTECTION_FALL) || ench.equals(Enchantment.PROTECTION_ENVIRONMENTAL))) {
+        } else if (toolName.contains("BOOTS") && (ench.equals(Enchantment.PROTECTION) || ench.equals(Enchantment.PROTECTION))) {
             p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
             tool.addEnchantment(ench, 1);
             e.setCursor(null);
-        } else if (armorNotBoots && ench.equals(Enchantment.PROTECTION_ENVIRONMENTAL)) {
+        } else if (armorNotBoots && ench.equals(Enchantment.PROTECTION)) {
             p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
             tool.addEnchantment(ench, 1);
             e.setCursor(null);
-        } else if (tool.getType().equals(Material.BOW) && ench.equals(Enchantment.ARROW_DAMAGE)){
+        } else if (tool.getType().equals(Material.BOW) && ench.equals(Enchantment.POWER)){
             p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
             tool.addEnchantment(ench, 1);
             e.setCursor(null);
@@ -1274,12 +1293,12 @@ public class SurvivalGames extends Game {
         GUIItem[] items = new GUIItem[7];
 
         ItemStack sharpness = new ItemStack(Material.DIAMOND_SWORD);
-        sharpness.addEnchantment(Enchantment.DAMAGE_ALL, 1);
+        sharpness.addEnchantment(Enchantment.SHARPNESS, 1);
         ItemMeta sharpnessMeta = sharpness.getItemMeta();
         sharpnessMeta.setDisplayName(ChatColor.RED+"Sharpness I");
         sharpness.setItemMeta(sharpnessMeta);
         sharpness.setLore(List.of("Cost: 3 XP"));
-        items[0] = new GUIItem(sharpness, Enchantment.DAMAGE_ALL, 3);
+        items[0] = new GUIItem(sharpness, Enchantment.SHARPNESS, 3);
 
         ItemStack knockback = new ItemStack(Material.IRON_SWORD);
         knockback.addEnchantment(Enchantment.KNOCKBACK, 1);
@@ -1290,28 +1309,28 @@ public class SurvivalGames extends Game {
         items[1] = new GUIItem(knockback, Enchantment.KNOCKBACK, 1);
 
         ItemStack protection = new ItemStack(Material.DIAMOND_CHESTPLATE);
-        protection.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+        protection.addEnchantment(Enchantment.PROTECTION, 1);
         ItemMeta protMeta = protection.getItemMeta();
         protMeta.setDisplayName(ChatColor.GREEN+"Protection I");
         protMeta.setLore(List.of("Cost: 2 XP"));
         protection.setItemMeta(protMeta);
-        items[2] = new GUIItem(protection, Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+        items[2] = new GUIItem(protection, Enchantment.PROTECTION, 2);
 
         ItemStack featherFalling = new ItemStack(Material.IRON_BOOTS);
-        featherFalling.addEnchantment(Enchantment.PROTECTION_FALL, 1);
+        featherFalling.addEnchantment(Enchantment.FEATHER_FALLING, 1);
         ItemMeta ffMeta = featherFalling.getItemMeta();
         ffMeta.setDisplayName(ChatColor.GREEN+"Feather Falling I");
         featherFalling.setItemMeta(ffMeta);
         featherFalling.setLore(List.of("Cost: 1 XP"));
-        items[3] = new GUIItem(featherFalling, Enchantment.PROTECTION_FALL, 1);
+        items[3] = new GUIItem(featherFalling, Enchantment.FEATHER_FALLING, 1);
 
         ItemStack power = new ItemStack(Material.BOW);
-        power.addEnchantment(Enchantment.ARROW_DAMAGE, 1);
+        power.addEnchantment(Enchantment.POWER, 1);
         ItemMeta powerMeta = power.getItemMeta();
         powerMeta.setDisplayName(ChatColor.RED+"Power I");
         power.setItemMeta(powerMeta);
         power.setLore(List.of("Cost: 3 XP"));
-        items[4] = new GUIItem(power, Enchantment.ARROW_DAMAGE, 3);
+        items[4] = new GUIItem(power, Enchantment.POWER, 3);
 
         ItemStack quickCharge = new ItemStack(Material.CROSSBOW);
         quickCharge.addEnchantment(Enchantment.QUICK_CHARGE, 1);
