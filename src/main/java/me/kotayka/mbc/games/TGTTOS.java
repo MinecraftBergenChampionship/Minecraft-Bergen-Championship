@@ -70,9 +70,9 @@ public class TGTTOS extends Game {
     private List<TGTTOSMap> maps = new ArrayList<>(
             Arrays.asList(new Pit(), new Meatball(), new Walls(),
                     new Cliffs(), new Elytra(), new Skydive(),
-                    new Boats(), new Glide(), new SquidGame(),
-                    new Trident()
+                    new Boats(), new Glide()
             ));
+    private List<TGTTOSMap> mapsFirst = new ArrayList<>(Arrays.asList(new SquidGame(), new Trident()));
 
     private List<Participant> finishedParticipants;
     private ArrayList<String> deathMessages = new ArrayList<>();
@@ -274,9 +274,16 @@ public class TGTTOS extends Game {
         roundNum++;
 
         finishedParticipants = new ArrayList<>(MBC.getInstance().players.size());
-        //map = maps.get((int) (Math.random() * maps.size()));
-        map = maps.get((int) (maps.size()-1)); // will auto do the newest map first which is prob p cool
-        maps.remove(map);
+        //
+        if (mapsFirst.isEmpty()) {
+            map = maps.get((int) (Math.random() * maps.size()));
+            maps.remove(map);
+        }
+        else {
+            map = mapsFirst.get((int) (Math.random() * maps.size()));
+            mapsFirst.remove(map);
+        }
+        
         map.Barriers(true);
 
         createLineAll(22, ChatColor.AQUA + "" + ChatColor.BOLD + "Map: " + ChatColor.RESET + map.getName());
@@ -341,8 +348,14 @@ public class TGTTOS extends Game {
         secondTeamBonus = false;
 
         finishedParticipants = new ArrayList<>(MBC.getInstance().players.size());
-        map = maps.get((int) (Math.random() * maps.size()));
-        maps.remove(map);
+        if (mapsFirst.isEmpty()) {
+            map = maps.get((int) (Math.random() * maps.size()));
+            maps.remove(map);
+        }
+        else {
+            map = mapsFirst.get((int) (Math.random() * maps.size()));
+            mapsFirst.remove(map);
+        }
         map.Barriers(true);
 
         createLineAll(22, ChatColor.AQUA + "" + ChatColor.BOLD + "Map: " + ChatColor.RESET + map.getName());
