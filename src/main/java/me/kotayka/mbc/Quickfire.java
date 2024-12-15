@@ -3,6 +3,7 @@ package me.kotayka.mbc;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
+import me.kotayka.mbc.gameMaps.quickfireMap.SnowGlobe;
 import me.kotayka.mbc.gameMaps.quickfireMap.Castle;
 import me.kotayka.mbc.gameMaps.quickfireMap.Mansion;
 import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
@@ -33,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class Quickfire extends FinaleGame {
-    private final QuickfireMap map = new Mansion(this);
+    private final QuickfireMap map = new SnowGlobe(this);
     public static final ItemStack CROSSBOW = new ItemStack(Material.CROSSBOW);
     public static final ItemStack BOOTS = new ItemStack(Material.LEATHER_BOOTS);
     public Map<UUID, QuickfirePlayer> quickfirePlayers = new HashMap<>();

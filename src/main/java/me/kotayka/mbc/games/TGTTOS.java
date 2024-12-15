@@ -280,7 +280,7 @@ public class TGTTOS extends Game {
             maps.remove(map);
         }
         else {
-            map = mapsFirst.get((int) (Math.random() * maps.size()));
+            map = mapsFirst.get((int) (Math.random() * mapsFirst.size()));
             mapsFirst.remove(map);
         }
         
@@ -353,7 +353,7 @@ public class TGTTOS extends Game {
             maps.remove(map);
         }
         else {
-            map = mapsFirst.get((int) (Math.random() * maps.size()));
+            map = mapsFirst.get((int) (Math.random() * mapsFirst.size()));
             mapsFirst.remove(map);
         }
         map.Barriers(true);
@@ -390,6 +390,13 @@ public class TGTTOS extends Game {
                     p.getInventory().addItem(i);
                 } else if (i.getType().equals(Material.LEATHER_BOOTS)) {
                     p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(i));
+                } else if (i.getType().equals(Material.TRIDENT)) {
+                    ItemStack trident = new ItemStack(Material.TRIDENT);
+                    ItemMeta itemMeta = trident.getItemMeta();
+                    itemMeta.setUnbreakable(true);
+                    trident.setItemMeta(itemMeta);
+                    trident.addEnchantment(Enchantment.RIPTIDE, 3);
+                    p.getInventory().addItem(trident);
                 } else {
                     p.getInventory().addItem(i);
                 }
@@ -521,7 +528,7 @@ public class TGTTOS extends Game {
             Location to = e.getTo();
             if (player.getGameMode() != GameMode.SURVIVAL) return;
 
-            if (from.getY() < 59) {
+            if (from.getZ() <= 442) {
                 return;
             }
 

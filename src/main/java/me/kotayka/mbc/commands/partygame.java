@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class partygame implements CommandExecutor, TabCompleter {
-    List<String> partyGames = Arrays.asList("DiscoFever", "BeepTest", "Dragons");
+    List<String> partyGames = Arrays.asList("DiscoFever", "BeepTest", "Dragons", "OneShot");
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {

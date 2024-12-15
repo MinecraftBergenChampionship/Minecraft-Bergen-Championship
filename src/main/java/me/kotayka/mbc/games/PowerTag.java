@@ -480,8 +480,8 @@ public class PowerTag extends Game {
         toxic.setItemMeta(toxicMeta);
 
         //ItemStack[] items = {tracker, trident, troll, toxic};
-        ItemStack[] items = {tracker, trident, troll};
-
+        //ItemStack[] items = {tracker, trident, troll};
+        ItemStack[] items = {trident, troll, toxic};
 
         return items;
     }
@@ -491,7 +491,7 @@ public class PowerTag extends Game {
     */
     public void hunterPowerup() {
 
-        hunterPowerup = hunterPowerupList[0];
+        hunterPowerup = hunterPowerupList[1];
 
         hunterSelector = hunters.get((int)(Math.random()*hunters.size()));
 
@@ -502,7 +502,7 @@ public class PowerTag extends Game {
 
         for (PowerTagPlayer p : hunters) {
             p.getPlayer().sendMessage(hunterSelector.getParticipant().getFormattedName() + ChatColor.GREEN + " has been selected to choose a powerup for your team!" + 
-                            ChatColor.LIGHT_PURPLE + " \n" + ChatColor.BOLD + hunterPowerupList[0] + ChatColor.RESET + "" + ChatColor.GREEN + " has been automatically selected.");
+                            ChatColor.BLUE + " \n" + ChatColor.BOLD + hunterPowerupList[1] + ChatColor.RESET + "" + ChatColor.GREEN + " has been automatically selected.");
         }        
     }
 

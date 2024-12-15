@@ -13,11 +13,15 @@ import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.PartyGame;
+import me.kotayka.mbc.gamePlayers.SpleefPlayer;
+
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -300,28 +304,36 @@ public class BeepTest extends PartyGame {
             completedCourse(e);
         }
 
+        if (completedPlayers.contains(par) && !oppositeSide && p.getZ() <= REGULAR_Z) {
+            p.teleport(new Location(Bukkit.getWorld("Party"), -522, -55, -458, 0, 0));
+            p.setVelocity(new Vector(0, 0, 0));
+            return;
+        }
+        if (completedPlayers.contains(par) && oppositeSide && p.getZ() >= OPPOSITE_Z) {
+            p.teleport(new Location(Bukkit.getWorld("Party"), -522, -55, -490, 180, 0));
+            p.setVelocity(new Vector(0, 0, 0));
+            return;
+        }
+
         if (p.getLocation().getY() < -59 && !fallenPlayers.contains(par)) {
             // teleport players who fell back up
             if (completedPlayers.contains(par)) {
                 p.setVelocity(new Vector(0, 0, 0));
-                if (oppositeSide)
+                if (oppositeSide) {
                     p.teleport(SPAWN);
-                else
+                    
+                }
+                else {
                     p.teleport(OPPOSITE_SPAWN);
+                }
+                
                 return;
             }
 
             fallenPlayers.add(par);
             p.setVelocity(new Vector(0, 0, 0));
-            if (completedPlayers.contains(par) && !oppositeSide && p.getZ() <= REGULAR_Z) {
-                p.teleport(new Location(Bukkit.getWorld("Party"), -522, -55, -458, 0, 0));
-            }
-            if (completedPlayers.contains(par) && oppositeSide && p.getZ() >= OPPOSITE_Z) {
-                p.teleport(new Location(Bukkit.getWorld("Party"), -522, -55, -490, 180, 0));
-            }
             p.sendMessage(ChatColor.RED + "You fell!");
             for (Player other : Bukkit.getOnlinePlayers()) {
-
                 other.showPlayer(p);
             }
 
@@ -567,6 +579,40 @@ public class BeepTest extends PartyGame {
             editSession.close();
         } catch (WorldEditException e) {
             e.printStackTrace();
+        }
+    }
+
+    @EventHandler
+    public void onReconnect(PlayerJoinEvent e) {
+        Participant p = Participant.getParticipant(e.getPlayer());
+        if (p == null) {
+            e.getPlayer().teleport(SPAWN);
+            return;
+        }
+        if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+            if (getState().equals(GameState.ACTIVE)) {
+                p.getPlayer().setGameMode(GameMode.SPECTATOR);
+                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 1, false, false));
+                p.getPlayer().sendTitle(" ", ChatColor.RED + "You died!", 0, 60, 20);
+                MBC.getInstance().showPlayers(p);
+            }
+
+        }
+    }
+
+    @EventHandler
+    public void onDisconnect(PlayerQuitEvent e) {
+        if (!e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) return;
+        if (!getState().equals(GameState.ACTIVE)) return;
+
+        Participant p = Participant.getParticipant(e.getPlayer());
+        if (!alivePlayers.contains(p)) return;
+        alivePlayers.remove(p);
+        updatePlayersAlive(p);
+        updatePlayersAliveScoreboard();
+
+        for (Player play : Bukkit.getOnlinePlayers()) {
+            play.sendMessage(p.getFormattedName() + " disconnected!");
         }
     }
 }
