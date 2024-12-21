@@ -370,6 +370,7 @@ public class Skybattle extends Game {
     public void placementPoints() {
         for (MBCTeam t : getValidTeams()) {
             for (Participant p : t.getPlayers()) {
+                if (p.getTeam() == MBC.getInstance().spectator) continue;
                 int placement = teamPlacements.get(t);
                 p.addCurrentScore(TEAM_BONUSES_3[placement-1] / t.getPlayers().size());
                 p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_3[placement-1] / t.getPlayers().size())));
@@ -570,7 +571,7 @@ public class Skybattle extends Game {
             }
         }
 
-        if (count == player.getParticipant().getTeam().teamPlayers.size()) {
+        if (count == player.getParticipant().getTeam().teamPlayers.size() && player.getParticipant().getTeam() != MBC.getInstance().spectator) {
             teamPlacements.put(player.getParticipant().getTeam(), getValidTeams().size() - deadTeams);
             deadTeams++;
         }

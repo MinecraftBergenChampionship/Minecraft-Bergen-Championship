@@ -17,7 +17,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -33,7 +32,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.json.simple.parser.ParseException;
 
@@ -397,6 +395,19 @@ public class SurvivalGames extends Game {
             }
         } else if (getState().equals(GameState.END_ROUND)) {
             if (timeRemaining == 1) {
+                for (Horcrux h : horcruxList) {
+                    h.inUse = false;
+                    h.placed = false;
+                    h.used = false;
+
+                    if (h.armorStand != null) {
+                        h.armorStand.remove();
+                        h.armorStand = null;
+                    }
+                }
+                for (Participant p : MBC.getInstance().getPlayers()) {
+                    p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
+                }
                 map.resetMap();
                 loadPlayers();
                 setGameState(GameState.STARTING);

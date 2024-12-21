@@ -14,7 +14,7 @@ public class skip implements CommandExecutor {
             return false;
         }
 
-        if (sender.getName().equals("rspacerr") && !MBC.getInstance().logStats()) {
+        if (sender.isOp() && !MBC.getInstance().logStats()) {
             MBC.getInstance().getMinigame().timeRemaining = 1;
             return true;
         }
