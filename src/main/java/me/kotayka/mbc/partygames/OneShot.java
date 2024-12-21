@@ -123,7 +123,14 @@ public class OneShot extends PartyGame {
     }
 
     public void playerRespawn(Participant p) {
-        Location l = spawnpoints[(int)(Math.random()*spawnpoints.length)];
+        int randomSpawn = (int)(Math.random()*spawnpoints.length);
+
+        int preventInfiniteCounter = 0;
+        while (playerWithinEight(randomSpawn) && preventInfiniteCounter < spawnpoints.length - 5) {
+            randomSpawn = (int)(Math.random()*spawnpoints.length);
+        }
+
+        Location l = spawnpoints[randomSpawn];
         p.getPlayer().teleport(l);
         p.getPlayer().setGameMode(GameMode.ADVENTURE);
         p.getPlayer().setInvulnerable(true);
@@ -131,7 +138,27 @@ public class OneShot extends PartyGame {
         p.getPlayer().getInventory().clear();
         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 2, false, false));
         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
-        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 2, false, false));
+        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 2, false, false));       
+
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { regainItems(p);}
+          }, 40L);
+    }
+
+    public boolean playerWithinEight(int spawnInt) {
+        if (spawnInt < 0 || spawnInt >= spawnpoints.length) return true;
+        Location l = spawnpoints[spawnInt];
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            if (p.getPlayer().getLocation().distance(l) <=8 && p.getPlayer().getGameMode().equals(GameMode.ADVENTURE)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void regainItems(Participant p) {
+        p.getPlayer().setInvulnerable(false);
 
         switch(teamKills.get(p.getTeam()) / 10) {
             case 0:
@@ -156,15 +183,6 @@ public class OneShot extends PartyGame {
             default:
                 Bukkit.broadcastMessage("This shouldn't be happening.");
         }
-
-        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
-            @Override
-            public void run() { regainItems(p);}
-          }, 40L);
-    }
-
-    public void regainItems(Participant p) {
-        p.getPlayer().setInvulnerable(false);
         
         ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
         ItemStack chestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
@@ -458,17 +476,18 @@ public class OneShot extends PartyGame {
 
     private void nextWeapon(MBCTeam m) {
         BossBar b = teamBossBars.get(m);
+        b.setVisible(false);
         b.removeAll();
         switch (teamKills.get(m)) {
             case 10:
+                b = Bukkit.createBossBar(ChatColor.YELLOW + "" + ChatColor.BOLD + "CURRENT WEAPON: Bow", BarColor.YELLOW, BarStyle.SOLID);
+                b.setProgress(0);
+                teamBossBars.replace(m, b);
                 for (Participant p : m.getPlayers()) {
                     p.getPlayer().activeBossBars();
                     p.getInventory().remove(Material.CROSSBOW);
                     p.getInventory().addItem(BOW);
                     p.addCurrentScore(WEAPON_POINTS);
-                    b = Bukkit.createBossBar(ChatColor.YELLOW + "" + ChatColor.BOLD + "CURRENT WEAPON: Bow", BarColor.YELLOW, BarStyle.SOLID);
-                    b.setProgress(0);
-                    teamBossBars.replace(m, b);
                     b.setVisible(true);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
@@ -477,14 +496,14 @@ public class OneShot extends PartyGame {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "The " +ChatColor.RESET + m.teamNameFormat() + ChatColor.BOLD + "" + ChatColor.RED + " have gotten 10 kills!");
             return;
             case 20:
+                b = Bukkit.createBossBar(ChatColor.GREEN + "" + ChatColor.BOLD + "CURRENT WEAPON: Multishot Crossbow", BarColor.GREEN, BarStyle.SOLID);
+                b.setProgress(0);
+                teamBossBars.replace(m, b);
+                b.setVisible(true);
                 for (Participant p : m.getPlayers()) {
                     p.getInventory().remove(Material.BOW);
                     p.getInventory().addItem(CROSSBOW_MULTISHOT);
                     p.addCurrentScore(WEAPON_POINTS);
-                    b = Bukkit.createBossBar(ChatColor.GREEN + "" + ChatColor.BOLD + "CURRENT WEAPON: Multishot Crossbow", BarColor.GREEN, BarStyle.SOLID);
-                    b.setProgress(0);
-                    teamBossBars.replace(m, b);
-                    b.setVisible(true);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                     p.getPlayer().sendMessage("Your team reached 20 kills and recieved the " + ChatColor.BOLD + "multishot crossbow" + ChatColor.RESET + "!" + MBC.scoreFormatter(WEAPON_POINTS));
@@ -492,15 +511,15 @@ public class OneShot extends PartyGame {
                 Bukkit.broadcastMessage("The " + m.teamNameFormat() + " have gotten 20 kills!");
             return;
             case 30:
+                b = Bukkit.createBossBar(ChatColor.AQUA + "" + ChatColor.BOLD + "CURRENT WEAPON: Trident", BarColor.BLUE, BarStyle.SOLID);
+                b.setProgress(0);
+                teamBossBars.replace(m, b);
+                b.setVisible(true);
                 for (Participant p : m.getPlayers()) {
                     p.getInventory().remove(Material.CROSSBOW);
                     p.getInventory().remove(Material.ARROW);
                     p.getInventory().addItem(TRIDENT);
                     p.addCurrentScore(WEAPON_POINTS);
-                    b = Bukkit.createBossBar(ChatColor.AQUA + "" + ChatColor.BOLD + "CURRENT WEAPON: Trident", BarColor.BLUE, BarStyle.SOLID);
-                    b.setProgress(0);
-                    teamBossBars.replace(m, b);
-                    b.setVisible(true);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                     p.getPlayer().sendMessage("Your team reached 30 kills and recieved the " + ChatColor.BOLD + "trident" + ChatColor.RESET + "!" + MBC.scoreFormatter(WEAPON_POINTS));
@@ -508,15 +527,15 @@ public class OneShot extends PartyGame {
                 Bukkit.broadcastMessage("The " + m.teamNameFormat() + " have gotten 30 kills!");
             return;
             case 40:
+                b = Bukkit.createBossBar(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "CURRENT WEAPON: Sword", BarColor.PURPLE, BarStyle.SOLID);
+                b.setProgress(0);
+                teamBossBars.replace(m, b);
+                b.setVisible(true);
                 for (Participant p : m.getPlayers()) {
                     p.getInventory().remove(Material.TRIDENT);
                     p.getInventory().addItem(SWORD);
                     p.addCurrentScore(WEAPON_POINTS);
                     p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
-                    b = Bukkit.createBossBar(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "CURRENT WEAPON: Sword", BarColor.PURPLE, BarStyle.SOLID);
-                    b.setProgress(0);
-                    teamBossBars.replace(m, b);
-                    b.setVisible(true);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                     p.getPlayer().sendMessage("Your team reached 40 kills and recieved the " + ChatColor.BOLD + "sword" + ChatColor.RESET + "! Get one kill to win!" + MBC.scoreFormatter(WEAPON_POINTS));
@@ -630,9 +649,9 @@ public class OneShot extends PartyGame {
    @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         Material i = e.getCursor().getType();
-        if (i == Material.LEATHER_HELMET) e.setCancelled(true);
-        if (i == Material.LEATHER_CHESTPLATE) e.setCancelled(true);
-        if (i == Material.LEATHER_LEGGINGS) e.setCancelled(true);
-        if (i == Material.LEATHER_BOOTS) e.setCancelled(true);
+        if (i.equals(Material.LEATHER_HELMET)) e.setCancelled(true);
+        if (i.equals(Material.LEATHER_CHESTPLATE)) e.setCancelled(true);
+        if (i.equals(Material.LEATHER_LEGGINGS)) e.setCancelled(true);
+        if (i.equals(Material.LEATHER_BOOTS)) e.setCancelled(true);
     }
 }

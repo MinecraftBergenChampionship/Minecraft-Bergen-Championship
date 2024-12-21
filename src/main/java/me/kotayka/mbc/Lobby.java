@@ -417,7 +417,7 @@ public class Lobby extends Minigame {
                 p.getPlayer().teleport(new Location(world, 49.5, 1, 0.5, 90, 0));
                 p.getPlayer().getInventory().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
             } else {
-                p.getPlayer().teleport(new Location(world, 38.5, -3, 0.5, -90, 0));
+                p.getPlayer().teleport(new Location(world, 38.5, -2, 0.5, -90, 0));
             }
             p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_WARD, SoundCategory.RECORDS, 1, 1);
         }

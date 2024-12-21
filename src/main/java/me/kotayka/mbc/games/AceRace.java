@@ -18,6 +18,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -349,6 +350,12 @@ public class AceRace extends Game {
         if (!e.getPlayer().getLocation().getWorld().equals(map.getWorld())) return;
         e.setCancelled(true);
    }
+
+   @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        Material i = e.getCursor().getType();
+        if (i.equals(Material.LEATHER_BOOTS)) e.setCancelled(true);
+    }
 
        @EventHandler
     public void onInteract(PlayerInteractEvent e) {

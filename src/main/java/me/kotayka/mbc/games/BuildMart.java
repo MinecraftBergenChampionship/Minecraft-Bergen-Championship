@@ -595,7 +595,7 @@ public class BuildMart extends Game {
 
         return items;
     }
-
+    
     public BuildMartTeam getTeam(Participant p) {
         return switch (p.getTeam().getChatColor()) {
             case RED -> red;
