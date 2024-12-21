@@ -48,18 +48,13 @@ public class SurvivalGames extends Game {
     private final SurvivalGamesMap map = new JesuscraftTwo();
     private WorldBorder border = null;
     private List<SurvivalGamesItem> items;
-    //private List<SurvivalGamesItem> supply_items;
 
     // This file must be in /home/MBCAdmin/MBC/ and re-added each time an update is made
     private final File CHEST_FILE = new File("survival_games_items.json");
     private final File SUPPLY_FILE = new File("supply_crate_items.json");
     private SurvivalGamesEvent event = SurvivalGamesEvent.GRACE_OVER;
-    //private final List<Location> chestLocations = new ArrayList<Location>(50);
-    //private final List<SupplyCrate> crates = new ArrayList<SupplyCrate>(3);
     private Map<Player, Integer> playerKills = new HashMap<>();
     private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
-    //private boolean dropLocation = false;
-    //private int crateNum = 0;
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
     private boolean firstRound = true;
     private Map<Player, Double> playerDamage = new HashMap<>();
@@ -116,8 +111,6 @@ public class SurvivalGames extends Game {
         Type listType = new TypeToken<List<SurvivalGamesItem>>() {}.getType();
         Reader reader = new FileReader(CHEST_FILE);
         items = gson.fromJson(reader, listType);
-        //reader = new FileReader(SUPPLY_FILE);
-        //supply_items = gson.fromJson(reader, listType);
         reader.close();
     }
 
@@ -287,8 +280,6 @@ public class SurvivalGames extends Game {
              *  4:00: 2nd supply crate drops, 3rd supply crate announced
              *  3:00: Last supply crate lands; kills worth 5
              */
-            //if (crates.size() > 0) { crateParticles(); }
-
             if (timeRemaining == 0) {
                 if (teamsAlive.size() > 1) {
                     Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Border shrinking!");
@@ -332,7 +323,6 @@ public class SurvivalGames extends Game {
             }
 
             if (timeRemaining == 420) {
-                //event = SurvivalGamesEvent.SUPPLY_CRATE;
                 event = SurvivalGamesEvent.CHEST_REFILL;
                 bossBar.removeAll();
                 bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "MAX KILL POINTS / CHEST REFILL", BarColor.RED, BarStyle.SOLID);
@@ -375,35 +365,8 @@ public class SurvivalGames extends Game {
                 regenChest();
                 getLogger().log(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
-                //event = SurvivalGamesEvent.SUPPLY_CRATE;
                 event = SurvivalGamesEvent.DEATHMATCH;
-                //crateLocation();
-                /*
-            } else if (timeRemaining == 240) {
-                //spawnSupplyCrate();
-            } else if (timeRemaining == 239) {
-                //crateLocation();
             } else if (timeRemaining == 180) {
-                //spawnSupplyCrate();
-
-                //event = SurvivalGamesEvent.DEATHMATCH;
-                 */
-            } else if (timeRemaining == 180) {
-                /*
-                for (Horcrux h : horcruxList) {
-                    h.inUse = false;
-                    h.placed = true;
-                    h.used = true;
-
-                    if (h.armorStand != null) {
-                        h.armorStand.remove();
-                        h.armorStand = null;
-                    }
-                }
-                for (Participant participant : MBC.getInstance().players) {
-                    removeEndCrystal(participant.getPlayer());
-                }
-                 */
                 killPoints -= 5;
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (10 -> 5)");
                 bossBar.removeAll();
@@ -465,15 +428,6 @@ public class SurvivalGames extends Game {
      */
     private void UpdateEvent() {
         for (Participant p : MBC.getInstance().getPlayers()) {
-            // display coordinates of each drop separately
-            /*
-            if (dropLocation && crates.size() > 0) {
-                Location l = crates.get(crateNum).getLocation();
-                createLine(22, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Supply drop: " + ChatColor.RESET + "(" + l.getX() + ", " + l.getY() + ", " + l.getZ() + ")", p);
-                dropLocation = false;
-            }
-             */
-
             switch (event) {
                 case GRACE_OVER ->
                         createLineAll(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Grace ends in: " + ChatColor.RESET + getFormattedTime(timeRemaining - 420));
@@ -490,73 +444,6 @@ public class SurvivalGames extends Game {
         }
     }
 
-    /**
-     * Generate location of supply crate
-     */
-    /*
-    public void crateLocation() {
-        int index = (int) (Math.random()*chestLocations.size());
-
-        Location l = (chestLocations.get(index));
-        chestLocations.remove(l);
-        dropLocation = true;
-        crates.add(new SupplyCrate(l, false));
-        String s = ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"Supply crate spawning at " + ChatColor.RESET+"("+l.getX()+", "+l.getY()+", "+l.getZ()+")";
-        getLogger().log(s);
-        Bukkit.broadcastMessage(s);
-    }
-     */
-
-    /**
-     * Given the location of the crate is predetermined, replace the block
-     * with the crate block and generate loot
-     * @see SurvivalGames crateLocation()
-     * TODO: Improve implementation of crates
-     */
-    /*
-    public void spawnSupplyCrate() {
-        double totalWeight = 42;
-        // delete this once it is final
-        /*for (SurvivalGamesItem item : supply_items) {
-            totalWeight += item.getWeight();
-        }
-        Bukkit.broadcastMessage("[Debug] Total Supply Weight == " + totalWeight);
-         */
-
-            /*
-        Location l = crates.get(crateNum).getLocation();
-        l.getBlock().setType(Material.BLACK_SHULKER_BOX);
-        ShulkerBox crate = (ShulkerBox) map.getWorld().getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()).getState();
-
-        int chestItems = (int) (Math.random()*6+5);
-        for (int b = 0; b < chestItems; b++) {
-            // Now choose a random item.
-            int idx = 0;
-            for (double r = Math.random() * totalWeight; idx < supply_items.size() - 1; ++idx) {
-                r -= supply_items.get(idx).getWeight();
-                if (r <= 0.0) break;
-            }
-
-            crate.getInventory().setItem((int) (Math.random()*27), supply_items.get(idx).getItem());
-        }
-    }
-    */
-
-    /**
-     * Spawn particles at super chest spawning location
-     */
-    /*
-    private void crateParticles() {
-        for (SupplyCrate crate : crates) {
-            if (!crate.beenOpened()) {
-                // TODO ? the particles are kind of bad looking LOL
-                Location l = crate.getLocation();
-                map.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, l.getX() + Math.random()*0.5-0.5, l.getBlockY() + 1, l.getZ() + Math.random()*0.5-0.5, 5);
-                map.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, l.getX() + Math.random()*0.5-0.5, l.getBlockY() + Math.random(), l.getZ() + Math.random()*0.5-0.5, 5);
-            }
-        }
-    }
-     */
 
     /**
      * Regenerates the loot within every chest in the map.
@@ -564,15 +451,6 @@ public class SurvivalGames extends Game {
      */
     public void regenChest() {
         double totalWeight = 115.5;
-        /*
-        //double totalWeight = 0;
-        // delete when final.
-        for (SurvivalGamesItem item : items) {
-            totalWeight += item.getWeight();
-        }
-        Bukkit.broadcastMessage("[Debug] Total Weight == " + totalWeight);
-         */
-
 
         Random rand = new Random();
         Chunk[] c = map.getWorld().getLoadedChunks();
@@ -580,12 +458,6 @@ public class SurvivalGames extends Game {
             for (int x = 0; x < chunk.getTileEntities().length; x++) {//loop through tile entities within loaded chunks
                 if (chunk.getTileEntities()[x] instanceof Chest) {
                     Chest chest = (Chest) chunk.getTileEntities()[x];
-
-                    /*
-                    if (crates.size() < 1 && map.checkChest(chest)) {
-                        chestLocations.add(chest.getLocation());
-                    }
-                     */
 
                     chest.getInventory().clear();
                     int chestItems = rand.nextInt(2) + 5;
@@ -738,64 +610,6 @@ public class SurvivalGames extends Game {
                 }
             }
         }
-
-        /*
-        if (e.getClickedBlock() != null && e.getClickedBlock() instanceof Container &&
-                (!e.getClickedBlock().getType().equals(Material.CHEST) && !e.getClickedBlock().getType().equals(Material.CRAFTING_TABLE))) {
-           e.setCancelled(true);
-           return;
-        }
-
-        if (p.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW)) {
-            CrossbowMeta cb1 = (CrossbowMeta) p.getInventory().getItemInMainHand().getItemMeta();
-            if (!cb1.getChargedProjectiles().isEmpty()) {
-                return;
-            }
-            // check if there exists another crossbow loaded in inventory
-            for (ItemStack i : p.getInventory()) {
-                if (i != null && i.getType().equals(Material.CROSSBOW)) {
-                    CrossbowMeta cb2 = (CrossbowMeta) i.getItemMeta();
-                    if (!cb2.getChargedProjectiles().isEmpty()) {
-                        p.sendMessage(ChatColor.RED+"You cannot load more than one crossbow!");
-                        e.setCancelled(true);
-                        return;
-                    }
-                }
-            }
-        }
-
-        if (p.getInventory().getItemInOffHand().getType().equals(Material.CROSSBOW)) {
-            CrossbowMeta cb1 = (CrossbowMeta) p.getInventory().getItemInOffHand().getItemMeta();
-            if (!cb1.getChargedProjectiles().isEmpty()) {
-                return;
-            }
-
-            // check if there exists another crossbow loaded in inventory
-            for (ItemStack i : p.getInventory()) {
-                if (i != null && i.getType().equals(Material.CROSSBOW)) {
-                    CrossbowMeta cb2 = (CrossbowMeta) i.getItemMeta();
-                    if (!cb2.getChargedProjectiles().isEmpty()) {
-                        p.sendMessage(ChatColor.RED+"You cannot load more than one crossbow!");
-                        e.setCancelled(true);
-                        return;
-                    }
-                }
-            }
-        }
-
-        // Track opened crates
-        /*
-        if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.BLACK_SHULKER_BOX)) {
-            if (crates.size() < 1) {
-                return;
-            }
-            crates.get(crateNum).setOpened(true);
-            dropLocation = false;
-            createLineAll(22, "");
-            crateNum++;
-            return;
-        }
-         */
 
         // prevent stripping trees :p
         if (e.getClickedBlock() != null && e.getClickedBlock().getType().toString().endsWith("SIGN")) {
@@ -1007,31 +821,6 @@ public class SurvivalGames extends Game {
         }
     }
 
-    /*
-    // Prevent players from picking up crossbows that are loaded
-    @EventHandler
-    public void PickupItem(EntityPickupItemEvent e) {
-        if (!(e.getEntity() instanceof Player)) return;
-        if (!(e.getItem().getItemStack().getType().equals(Material.CROSSBOW))) return;
-
-        CrossbowMeta cbm = (CrossbowMeta) e.getItem().getItemStack().getItemMeta();
-        // if loaded crossbow
-        if (!cbm.getChargedProjectiles().isEmpty()) {
-            Player p = (Player) e.getEntity();
-            for (ItemStack i : p.getInventory()) {
-                if (i != null && i.getType().equals(Material.CROSSBOW)) {
-                    CrossbowMeta cbm2 = (CrossbowMeta) i.getItemMeta();
-                    if (!cbm2.getChargedProjectiles().isEmpty()) {
-                        p.sendMessage(ChatColor.RED + "You cannot have more than one charged crossbow!");
-                        e.setCancelled(true);
-                        return;
-                    }
-                }
-            }
-        }
-    }
-     */
-
     private void decrementBossBar() {
         if (timeRemaining <= 180) return;
 
@@ -1142,29 +931,6 @@ public class SurvivalGames extends Game {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        /*
-        if (e.getView().getType().equals(InventoryType.CHEST)) {
-            Player p = (Player) e.getWhoClicked();
-            ItemStack crossbow = e.getCursor();
-            if (crossbow == null || !crossbow.getType().equals(Material.CROSSBOW)) return;
-            CrossbowMeta cbm1 = (CrossbowMeta) crossbow.getItemMeta();
-            // check if player has another charged crossbow
-            if (!cbm1.getChargedProjectiles().isEmpty()) {
-                for (ItemStack i : p.getInventory()) {
-                    if (i != null && i.getType().equals(Material.CROSSBOW)) {
-                        CrossbowMeta cbm2 = (CrossbowMeta) i.getItemMeta();
-                        if (!cbm2.getChargedProjectiles().isEmpty()) {
-                            p.sendMessage(ChatColor.RED + "You cannot have more than one charged crossbow!");
-                            e.setCancelled(true);
-                            return;
-                        }
-                    }
-                }
-            }
-            return;
-        }
-         */
-
         if (e.getView().getTitle().equals("Enchanting")) {
             // handle custom enchants;
             handleEnchantGUI(e);
@@ -1375,18 +1141,6 @@ public class SurvivalGames extends Game {
             }
         }
     }
-
-    /**
-     * Reset all transformed crates
-     */
-    /*
-    public void resetCrates() {
-        for (SupplyCrate crate : crates) {
-            crate.getLocation().getBlock().setType(Material.CHEST);
-        }
-        crates.clear();
-    }
-     */
 }
 
 class SurvivalGamesItem {
