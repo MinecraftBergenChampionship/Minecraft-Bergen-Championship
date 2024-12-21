@@ -941,6 +941,14 @@ public class SurvivalGames extends Game {
     }
 
     @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        if (!e.getPlayer().getLocation().getWorld().equals(map.getWorld())) return;
+        Material i = e.getItemDrop().getItemStack().getType();
+        if (i == Material.ELYTRA) e.setCancelled(true);
+        else return;
+   }
+
+    @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         if (e.getView().getTitle().equals("Enchanting")) {
             // handle custom enchants;

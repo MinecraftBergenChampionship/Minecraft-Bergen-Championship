@@ -22,6 +22,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -619,6 +620,11 @@ public class DiscoFever extends PartyGame {
         e.setCancelled(true);
     }
 
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        Material i = e.getCursor().getType();
+        if (i == Material.LEATHER_BOOTS) e.setCancelled(true);
+    }
 
     /**
      * Determine whether or not to put up barrier walls for start of game.

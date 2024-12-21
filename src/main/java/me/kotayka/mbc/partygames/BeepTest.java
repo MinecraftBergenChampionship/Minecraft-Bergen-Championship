@@ -19,6 +19,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -614,5 +616,16 @@ public class BeepTest extends PartyGame {
         for (Player play : Bukkit.getOnlinePlayers()) {
             play.sendMessage(p.getFormattedName() + " disconnected!");
         }
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        e.setCancelled(true);
+   }
+
+   @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        Material i = e.getCursor().getType();
+        if (i == Material.LEATHER_BOOTS) e.setCancelled(true);
     }
 }

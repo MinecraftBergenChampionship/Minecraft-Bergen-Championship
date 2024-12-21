@@ -52,8 +52,8 @@ public class Skybattle extends Game {
                                 "⑫ +10 points for winning\n" +
                                 "⑫ +1 points for every player outlived\n" +
                                 "⑫ Team Bonuses (split amongst team):\n" +
-                                "     ⑬ 1st: +7 points, 2nd: +6 points, 3rd: +5 points\n" +
-                                "     ⑬ 4th: +4 points, 5th: +3 points, 6th: +3 points"
+                                "     ⑫ 1st: +7 points, 2nd: +6 points, 3rd: +5 points\n" +
+                                "     ⑫ 4th: +4 points, 5th: +3 points, 6th: +3 points"
         });
     }
     private int roundNum = 1;

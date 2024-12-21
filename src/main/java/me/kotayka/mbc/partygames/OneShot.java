@@ -15,6 +15,8 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
@@ -618,5 +620,19 @@ public class OneShot extends PartyGame {
             @Override
             public void run() { playerRespawn(died);}
           }, 60L);
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        e.setCancelled(true);
+   }
+
+   @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        Material i = e.getCursor().getType();
+        if (i == Material.LEATHER_HELMET) e.setCancelled(true);
+        if (i == Material.LEATHER_CHESTPLATE) e.setCancelled(true);
+        if (i == Material.LEATHER_LEGGINGS) e.setCancelled(true);
+        if (i == Material.LEATHER_BOOTS) e.setCancelled(true);
     }
 }

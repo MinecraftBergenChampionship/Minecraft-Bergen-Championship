@@ -17,9 +17,11 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -232,12 +234,16 @@ public class PowerTag extends Game {
             else if (timeRemaining == 90)  {
                 removeHunterPowerups();
                 barrierHunters(false);
-                speed();
+                speed(1);
             }
             else if (timeRemaining < 90 && timeRemaining > 0) {
                 if (timeRemaining % 10 == 0) incrementPoints(90-timeRemaining);
-                if (timeRemaining == 20 && hunterPowerup.equals(hunterPowerupList[3])) {
+                if (timeRemaining == 30 && hunterPowerup.equals(hunterPowerupList[3])) {
                     infectedReveal();
+                }
+                if (timeRemaining == 20) {
+                    speed(2);
+                    Bukkit.broadcastMessage(ChatColor.GREEN + "Hunters have been given speed 2!");
                 }
             }
             else if (timeRemaining == 0) {
@@ -868,11 +874,11 @@ public class PowerTag extends Game {
     }
 
     /**
-     * Hunters have speed 2 for the remainder of the round.
+     * Hunters have speed i for the remainder of the round.
      */
-    private void speed() {
+    private void speed(int i) {
         for (PowerTagPlayer p : hunters) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20*timeRemaining, 0, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20*timeRemaining, i-1, false, false));
         }
     }
 
@@ -1172,5 +1178,23 @@ public class PowerTag extends Game {
                 }
             }
         }
+    }
+
+    /**
+     * Ensures nothing is dropped.
+     */
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        if (!e.getPlayer().getLocation().getWorld().equals(TAG_WORLD)) return;
+        e.setCancelled(true);
+   }
+
+   /**
+     * Ensures boots are not taken off.
+     */
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        Material i = e.getCursor().getType();
+        if (i == Material.LEATHER_BOOTS) e.setCancelled(true);
     }
 }

@@ -32,6 +32,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -153,6 +154,7 @@ public class TGTTOS extends Game {
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
+                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
                 }
                 setGameState(GameState.STARTING);
                 timeRemaining = 15;
@@ -762,6 +764,12 @@ public class TGTTOS extends Game {
                 p.getInventory().setItem(40, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
             }
         }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        Material i = e.getCursor().getType();
+        if (i == Material.LEATHER_BOOTS) e.setCancelled(true);
     }
 
     @EventHandler
