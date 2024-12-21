@@ -187,6 +187,11 @@ public class PowerTag extends Game {
             }
             //otherwise: business as usual
             else {
+                if (timeRemaining == 5) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS, 1, 1);
+                    }
+                }
                 if(timeRemaining == 24) {
                     removeHuntersAndHiders();
                     assignHuntersAndHiders();
@@ -213,9 +218,6 @@ public class PowerTag extends Game {
                     removeHiderPowerups();
                     barrierHiders(false);
                     blindness();
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS, 1, 1);
-                    }
                     setPVP(true);
                     for (PowerTagPlayer p : powerTagPlayerMap.values()) {
                         p.getPlayer().setInvulnerable(false);
@@ -1164,7 +1166,7 @@ public class PowerTag extends Game {
         if (timeRemaining > 20 && timeRemaining <= 90 && hunterPowerup.equals(hunterPowerupList[3]) && p.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
             if (infected.contains(p)) {
                 for (PowerTagPlayer runner : aliveHiders) {
-                    if (runner.getPlayer().getLocation().distance(p.getPlayer().getLocation()) <= 2 && runner.getPlayer().getGameMode().equals(GameMode.SURVIVAL) && !infected.contains(runner)) {
+                    if (runner.getPlayer().getLocation().distance(p.getPlayer().getLocation()) <= 3 && runner.getPlayer().getGameMode().equals(GameMode.SURVIVAL) && !infected.contains(runner)) {
                         infected.add(runner);
                     }
                 }

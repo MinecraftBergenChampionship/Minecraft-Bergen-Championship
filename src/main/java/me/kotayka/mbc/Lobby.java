@@ -299,13 +299,13 @@ public class Lobby extends Minigame {
     }
 
     public void end() {
-        stopTimer();
         MBC.getInstance().setCurrentGame(this);
         setGameState(GameState.END_GAME);
         world.setTime(18000);
         createScoreboardEnd();
         loadPlayersEnd();
         MBC.getInstance().lobby.populatePodium();
+        stopTimer();
         setTimer(28);
     }
 
