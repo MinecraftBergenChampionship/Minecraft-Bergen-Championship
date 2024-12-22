@@ -630,7 +630,7 @@ public class Lobby extends Minigame {
 
             //MBC.npcManager.showAll(npc1);
             //MBC.npcManager.showAll(npc2);
-            //podiumNPCS.add(npc1);
+            podiumNPCS.add(npc1);
             //podiumNPCS.add(npc2);
         }
     }

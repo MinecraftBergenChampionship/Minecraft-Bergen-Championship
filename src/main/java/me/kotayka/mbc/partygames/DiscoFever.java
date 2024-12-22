@@ -578,6 +578,11 @@ public class DiscoFever extends PartyGame {
 
     @EventHandler
     public void onPlayerFall(PlayerMoveEvent e) {
+        if (e.getPlayer().getGameMode() == GameMode.SPECTATOR && e.getTo().getY() < -100)  {
+            e.getPlayer().teleport(SPAWN);
+            return;
+        }
+
         if (e.getPlayer().getGameMode() != GameMode.ADVENTURE) return;
         if (e.getTo().getY() > DEATH_Y) return;
 

@@ -510,7 +510,13 @@ public class TGTTOS extends Game {
 
     @EventHandler
     public void PlayerMoveEvent(PlayerMoveEvent e) {
-        if (!isGameActive()) return;
+        if (!isGameActive()) {
+            if (map != null && e.getPlayer().getLocation().getY() < map.getDeathY()) {
+                e.getPlayer().teleport(map.getSpawnLocation(MBC.getInstance().teams.indexOf(Participant.getParticipant(e.getPlayer()).getTeam())));
+            }
+            return;
+        }
+
         if (map == null) return;
 
         if (e.getPlayer().getLocation().getY() < map.getDeathY()) {

@@ -300,6 +300,12 @@ public class BeepTest extends PartyGame {
         if (!getState().equals(GameState.ACTIVE)) return;
         Player p = e.getPlayer();
         Participant par = Participant.getParticipant(p);
+
+        if (e.getTo().getY() < -100) {
+            p.teleport(SPAWN);
+            return;
+        }
+
         if (p.getGameMode() != GameMode.ADVENTURE) return;
 
         if (!completedPlayers.contains(par)) {

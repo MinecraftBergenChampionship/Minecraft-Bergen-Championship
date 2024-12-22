@@ -299,12 +299,12 @@ public class OneShot extends PartyGame {
             }
             
             e.getPlayer().setVelocity(new Vector(0, 0, 0));
-            OneShotPlayer s = oneShotPlayerMap.get(((Entity)e.getPlayer()).getUniqueId());
+            OneShotPlayer s = oneShotPlayerMap.get((e.getPlayer()).getUniqueId());
             if (s.streak >= 3) {
-                Bukkit.broadcastMessage(Participant.getParticipant((Player) e.getPlayer()).getFormattedName() + ChatColor.BOLD + "'s streak of " + s.streak + " has been lost due to falling!");
+                Bukkit.broadcastMessage(Participant.getParticipant(e.getPlayer()).getFormattedName() + ChatColor.BOLD + "'s streak of " + s.streak + " has been lost due to falling!");
             }
             s.streak = 0;
-            Death(Participant.getParticipant((Player) e.getPlayer()));
+            Death(Participant.getParticipant(e.getPlayer()));
         }
     }
 

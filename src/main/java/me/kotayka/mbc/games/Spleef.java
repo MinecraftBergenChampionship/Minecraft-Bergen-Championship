@@ -396,7 +396,15 @@ public class Spleef extends Game {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (!(getState().equals(GameState.ACTIVE))) return;
+        if (!(getState().equals(GameState.ACTIVE))) {
+            Player p = e.getPlayer();
+            if (p.getGameMode() != GameMode.SURVIVAL && p.getLocation().getY() < map.getDeathY()) {
+                p.teleport(spawnpoint);
+                p.setVelocity(new Vector(0, 0, 0));
+                p.setFlying(true);
+                return;
+            }
+        }
 
         Player p = e.getPlayer();
         SpleefPlayer sp = getSpleefPlayer(p);

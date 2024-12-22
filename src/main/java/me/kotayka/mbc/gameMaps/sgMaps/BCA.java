@@ -1,6 +1,5 @@
 package me.kotayka.mbc.gameMaps.sgMaps;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
@@ -30,6 +29,7 @@ public class BCA extends SurvivalGamesMap {
         super.mapName = "BCA";
         super.type = "Cornucopia";
         super.CENTER = new Location(getWorld(), 0, 10, 0);
+        super.hasElevationBorder = false;
         //super.airdrops = false;
 
         resetBorder();
@@ -115,4 +115,7 @@ public class BCA extends SurvivalGamesMap {
     public void Overtime() {
         border.setSize(8, 15);
     }
+
+    // not implemented because super.hasElevationBorder is false.
+    public void Border() {};
 }

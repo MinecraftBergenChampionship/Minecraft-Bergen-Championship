@@ -232,7 +232,7 @@ public class AceRace extends Game {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if (e.getPlayer().getGameMode() == GameMode.SPECTATOR && map.checkDeath(e.getPlayer().getLocation())) {
-            e.getPlayer().teleport(map.respawns.get(0));
+            e.getPlayer().teleport(map.respawns.getFirst());
             return;
         }
 

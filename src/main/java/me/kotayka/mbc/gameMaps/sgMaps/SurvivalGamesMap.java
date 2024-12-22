@@ -1,5 +1,6 @@
 package me.kotayka.mbc.gameMaps.sgMaps;
 
+import com.ibm.icu.impl.Pair;
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.MBCTeam;
@@ -21,6 +22,8 @@ public abstract class SurvivalGamesMap extends MBCMap {
     public Location[] middleChests;
     public int spawnY;
     public java.util.Map<Location, Material> brokenBlocks = new HashMap<Location, Material>();
+    public boolean hasElevationBorder;
+    public int borderHeight = -128; // if used (indicated by hasElevationBorder), should be reset in map.resetBorder()
 
     protected WorldBorder border = getWorld().getWorldBorder();
     //public boolean airdrops; // incase future maps may require airdrops: not implemented yet
@@ -83,4 +86,6 @@ public abstract class SurvivalGamesMap extends MBCMap {
     public abstract void startBorder();
 
     public abstract void Overtime();
+
+    public abstract void Border();
 }

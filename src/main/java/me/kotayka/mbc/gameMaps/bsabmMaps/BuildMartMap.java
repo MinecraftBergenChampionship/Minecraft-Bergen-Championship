@@ -139,10 +139,9 @@ public class BuildMartMap extends AbstractBuildMartMap {
                 Location l = e.getPlayer().getLocation();
                 l.add(0, 120, 0);
                 e.getPlayer().teleport(l);
-                return;
+            } else {
+                BUILD_MART.getBuildMartPlayer(e.getPlayer()).respawn();
             }
-            BUILD_MART.getBuildMartPlayer(e.getPlayer()).respawn();
-            return;
         }
 
         // Cause player to fly when they are close to the central fan

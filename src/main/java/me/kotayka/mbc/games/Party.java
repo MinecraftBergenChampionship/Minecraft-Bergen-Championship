@@ -152,14 +152,6 @@ public class Party extends Game {
     }
 
     public void startPartyGame() {
-        /*
-        //Debug
-        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-        StackTraceElement e = stacktrace[2];//maybe this number needs to be corrected
-        String methodName = e.getMethodName();
-        Bukkit.broadcastMessage("In " + this.name() + ".startPartyGame(), called by " + methodName);
-         */
-
         setGameState(GameState.INACTIVE);
         HandlerList.unregisterAll(this);
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
@@ -179,13 +171,6 @@ public class Party extends Game {
     }
 
     public void next() {
-        /*
-        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-        StackTraceElement e = stacktrace[2];//maybe this number needs to be corrected
-        String methodName = e.getMethodName();
-        Bukkit.broadcastMessage("In " + name() + ".next(), called by " + methodName);
-         */
-
         stopTimer();
         setGameState(GameState.INACTIVE);
         MBC.getInstance().setCurrentGame(this);

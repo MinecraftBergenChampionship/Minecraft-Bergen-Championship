@@ -610,6 +610,9 @@ public abstract class Game extends Minigame {
         setGameState(GameState.INACTIVE);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(MBC.getInstance().lobby, MBC.getInstance().plugin);
         for (Participant p : MBC.getInstance().getPlayers()) {
+            for (Participant p2 : MBC.getInstance().getPlayers()) {
+                p2.getPlayer().showPlayer(p.getPlayer());
+            }
             if (p.getPlayer().getAllowFlight()) {
                 removeWinEffect(p);
             }

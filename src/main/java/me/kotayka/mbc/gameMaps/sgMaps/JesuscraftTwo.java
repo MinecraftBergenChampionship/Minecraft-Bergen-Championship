@@ -1,22 +1,27 @@
 package me.kotayka.mbc.gameMaps.sgMaps;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import me.kotayka.mbc.MBC;
+import me.kotayka.mbc.Participant;
+import org.bukkit.*;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Player;
 
 public class JesuscraftTwo extends SurvivalGamesMap {
     int[][] spawns = {{9996,10005},{9996,9998},{10003,9998},{10003,10005},{10001,10003},{9998,10003},{9998,10000},{10001,10000}};
 
     Location[] middleChests = {};
+    public final Particle.DustOptions HEIGHT_BORDER_PARTICLE = new Particle.DustOptions(Color.ORANGE, 3);
 
     public JesuscraftTwo() {
+        //super("Jesuscraft2");
         super.spawns = this.spawns;
         super.middleChests = this.middleChests;
         super.spawnY = 151;
         super.mapName = "Jesuscraft II";
         super.type = "Elytra";
-        super.CENTER = new Location(getWorld(), 10000, 63, 10001);
+        super.CENTER = new Location(Bukkit.getWorld("Survival_Games"), 10000, 63, 10001);
+        super.hasElevationBorder = true;
+        super.borderHeight = 40;
         //super.airdrops = false;
 
         resetBorder();
@@ -40,6 +45,28 @@ public class JesuscraftTwo extends SurvivalGamesMap {
         }
     }
 
+    public void Border() {
+        borderHeight++;
+        Bukkit.broadcastMessage("World: " + getWorld());
+        Bukkit.broadcastMessage("borderHeight == " + borderHeight);
+        for (int x = 38; x <= 175; x+=2) {
+            for (int z = 107; z <= 231; z+=2) {
+                //getWorld().spawnParticle(Particle.DUST, x, borderHeight, z, 1, HEIGHT_BORDER_PARTICLE);
+                getWorld().spawnParticle(Particle.ANGRY_VILLAGER, x, borderHeight, z, 10);
+            }
+        }
+
+        // the lazy way
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            if (p.getPlayer().getGameMode() != GameMode.SURVIVAL || p.getPlayer().getWorld() != getWorld()) continue;
+
+            Player player = p.getPlayer();
+            if (player.getLocation().getY() <= borderHeight) {
+                player.damage(0.5*Math.abs(player.getLocation().getY()-borderHeight+0.5));
+            }
+        }
+    }
+
     @Override
     public boolean checkChest(Chest chest) {
         Location l = chest.getLocation();
@@ -50,6 +77,7 @@ public class JesuscraftTwo extends SurvivalGamesMap {
 
     @Override
     public void resetBorder() {
+        borderHeight = 40;
         border.setCenter(10000, 10001);
         border.setSize(400);
     }
