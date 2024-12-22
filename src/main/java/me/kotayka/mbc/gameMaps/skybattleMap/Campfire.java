@@ -4,6 +4,8 @@ import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.MBCTeam;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.games.Skybattle;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BrewingStand;
@@ -104,12 +106,15 @@ public class Campfire extends SkybattleMap {
             boolean aboveBorder = player.getLocation().getY() >= getBorderHeight();
             boolean outsideBorder = distance < 0;
 
-            if (aboveBorder && outsideBorder) {
-                player.damage(0.5*Math.abs(player.getLocation().getY()-getBorderHeight()+0.5 + 0.009*Math.abs(distance)+0.5));
-            } else if (aboveBorder) {
-                player.damage(0.5*Math.abs(player.getLocation().getY()-getBorderHeight()+0.5));
-            } else if (outsideBorder) {
-                player.damage(0.009*Math.abs(distance)+0.5);
+            if (aboveBorder || outsideBorder) {
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_RED + "You're in the border!"));
+                if (aboveBorder && outsideBorder) {
+                    player.damage(0.5*Math.abs(player.getLocation().getY()-getBorderHeight()+0.5 + 0.009*Math.abs(distance)+0.5));
+                } else if (aboveBorder) {
+                    player.damage(0.5*Math.abs(player.getLocation().getY()-getBorderHeight()+0.5));
+                } else {
+                    player.damage(0.009*Math.abs(distance)+0.5);
+                }
             }
         }
 

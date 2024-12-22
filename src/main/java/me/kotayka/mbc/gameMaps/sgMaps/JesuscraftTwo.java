@@ -2,7 +2,10 @@ package me.kotayka.mbc.gameMaps.sgMaps;
 
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
+import org.bukkit.Color;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 
@@ -21,7 +24,7 @@ public class JesuscraftTwo extends SurvivalGamesMap {
         super.type = "Elytra";
         super.CENTER = new Location(Bukkit.getWorld("Survival_Games"), 10000, 63, 10001);
         super.hasElevationBorder = true;
-        super.borderHeight = 40;
+        super.borderHeight = 45;
         //super.airdrops = false;
 
         resetBorder();
@@ -47,12 +50,9 @@ public class JesuscraftTwo extends SurvivalGamesMap {
 
     public void Border() {
         borderHeight++;
-        Bukkit.broadcastMessage("World: " + getWorld());
-        Bukkit.broadcastMessage("borderHeight == " + borderHeight);
-        for (int x = 38; x <= 175; x+=2) {
-            for (int z = 107; z <= 231; z+=2) {
-                //getWorld().spawnParticle(Particle.DUST, x, borderHeight, z, 1, HEIGHT_BORDER_PARTICLE);
-                getWorld().spawnParticle(Particle.ANGRY_VILLAGER, x, borderHeight, z, 10);
+        for (int x = 9986; x <= 10016; x+=3) {
+            for (int z = 9986; z <= 10016; z+=3) {
+                getWorld().spawnParticle(Particle.DUST, x, borderHeight, z, 1, HEIGHT_BORDER_PARTICLE);
             }
         }
 
@@ -62,6 +62,7 @@ public class JesuscraftTwo extends SurvivalGamesMap {
 
             Player player = p.getPlayer();
             if (player.getLocation().getY() <= borderHeight) {
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_RED + "You're in the border!"));
                 player.damage(0.5*Math.abs(player.getLocation().getY()-borderHeight+0.5));
             }
         }

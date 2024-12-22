@@ -7,6 +7,7 @@ import me.kotayka.mbc.gameMaps.sgMaps.JesuscraftTwo;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -267,7 +268,7 @@ public class SurvivalGames extends Game {
                 timeRemaining = 450;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
-            if (map.hasElevationBorder && timeRemaining <= 180 && timeRemaining % 3 == 0) {
+            if (map.hasElevationBorder && timeRemaining < 25 && timeRemaining % 2 == 0) {
                 map.Border();
             }
             decrementBossBar();
@@ -328,6 +329,16 @@ public class SurvivalGames extends Game {
                 bossBar.removeAll();
                 bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "MAX KILL POINTS / CHEST REFILL", BarColor.RED, BarStyle.SOLID);
                 bossBar.setVisible(true);
+                setPVP(true);
+                getLogger().log(ChatColor.DARK_RED+"Grace period is now over.");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED+"Grace period is now over.");
+                if (map.type.equals("Elytra")) {
+                    Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED+"Elytras have been removed.");
+                }
+                map.startBorder();
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Border will continue to shrink!");
+
+                // double check elytras are gone
                 for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
                     bossBar.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
@@ -340,14 +351,6 @@ public class SurvivalGames extends Game {
                         }
                     }
                 }
-                setPVP(true);
-                getLogger().log(ChatColor.DARK_RED+"Grace period is now over.");
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED+"Grace period is now over.");
-                if (map.type.equals("Elytra")) {
-                    Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED+"Elytras have been removed.");
-                }
-                map.startBorder();
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+"Border will continue to shrink!");
             } else if (timeRemaining == 360) {
                 event = SurvivalGamesEvent.CHEST_REFILL;
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED+""+ChatColor.BOLD+"Chests will refill in one minute!");
@@ -371,14 +374,20 @@ public class SurvivalGames extends Game {
             } else if (timeRemaining == 180) {
                 killPoints -= 5;
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED.toString() + ChatColor.BOLD + "Kill points are decreasing! (10 -> 5)");
+                bossBar.removeAll();
+                bossBar.setVisible(false);
+            } else if (timeRemaining == 25) {
                 if (map.hasElevationBorder) {
                     Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED.toString() + ChatColor.BOLD + "The border is rising!");
                 }
-                bossBar.removeAll();
-                bossBar.setVisible(false);
             }
             UpdateEvent();
         } else if (getState().equals(GameState.OVERTIME)) {
+            if (map.hasElevationBorder && timeRemaining % 2 == 0) {
+                map.Border();
+            }
+            checkHorcruxes();
+
             if (timeRemaining == 0) {
                 createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD+"Round Over!");
                 for (Participant p : playersAlive) {
@@ -448,15 +457,15 @@ public class SurvivalGames extends Game {
         for (Participant p : MBC.getInstance().getPlayers()) {
             switch (event) {
                 case GRACE_OVER ->
-                        createLineAll(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Grace ends in: " + ChatColor.RESET + getFormattedTime(timeRemaining - 420));
+                        createLine(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Grace ends in: " + ChatColor.RESET + getFormattedTime(timeRemaining - 420), p);
                 case CHEST_REFILL ->
-                        createLineAll(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Chest refill: " + ChatColor.RESET + getFormattedTime(timeRemaining - 300));
+                        createLine(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Chest refill: " + ChatColor.RESET + getFormattedTime(timeRemaining - 300), p);
                 case DEATHMATCH ->
-                        createLineAll(23, ChatColor.RED + "" + ChatColor.BOLD + "Deathmatch: " + ChatColor.WHITE + "Active");
+                        createLine(23, ChatColor.RED + "" + ChatColor.BOLD + "Deathmatch: " + ChatColor.WHITE + "Active", p);
                 case SUPPLY_CRATE -> {
                     // hard coded times; the 2nd supply drop coincides with chest refill
                     int nextTime = (timeRemaining > 240) ? timeRemaining - 240 : timeRemaining - 180;
-                    createLineAll(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Next supply crate: " + ChatColor.RESET + getFormattedTime(nextTime));
+                    createLine(23, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Next supply crate: " + ChatColor.RESET + getFormattedTime(nextTime), p);
                 }
             }
         }
@@ -807,8 +816,24 @@ public class SurvivalGames extends Game {
                 public void run() {
                     victim.getInventory().clear();
                     victim.teleport(horcrux.location);
+                    victim.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
+                    victim.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS,100, 255, false, true));
+                    victim.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION,100, 3, false, false));
+                    victim.setInvulnerable(true);
                     victim.setGameMode(GameMode.SURVIVAL);
+                    map.getWorld().spawnParticle(Particle.EXPLOSION, horcrux.location, 10);
+                    map.getWorld().playSound(horcrux.location, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1, 1);
+                    victim.sendMessage(MBC.MBC_STRING_PREFIX + "You have been respawned and are invulnerable! Run!");
                     horcrux.armorStand.remove();
+
+                    // not sure if this is good practice or not.
+                    Bukkit.getScheduler().runTaskLater(MBC.getInstance().plugin, new Runnable() {
+                        @Override
+                        public void run() {
+                            victim.setInvulnerable(false);
+                            victim.sendMessage(MBC.MBC_STRING_PREFIX + "You are no longer invulnerable.");
+                        }
+                    }, 100L);
                 }
             }, 100L);
         }
@@ -916,9 +941,19 @@ public class SurvivalGames extends Game {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (e.getPlayer().getLocation().getY() <= -25) {
-            e.getPlayer().teleport(map.Center());
+        Player p = e.getPlayer();
+        if (p.getLocation().getY() <= -25) {
+            p.teleport(map.Center());
+            return;
         }
+
+        if(map.type.equals("Elytra") && getState() == GameState.ACTIVE && p.getGameMode() == GameMode.SURVIVAL && p.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
+            if (p.getInventory().getChestplate().getType().equals(Material.ELYTRA)) {
+                p.getInventory().setChestplate(new ItemStack(Material.AIR));
+            }
+            p.getInventory().remove(Material.ELYTRA);
+        }
+
     }
 
     @EventHandler
