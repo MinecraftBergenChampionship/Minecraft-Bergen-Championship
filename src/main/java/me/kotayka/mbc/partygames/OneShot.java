@@ -648,7 +648,7 @@ public class OneShot extends PartyGame {
 
    @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        Material i = e.getCursor().getType();
+        Material i = e.getCurrentItem().getType();
         if (i.equals(Material.LEATHER_HELMET)) e.setCancelled(true);
         if (i.equals(Material.LEATHER_CHESTPLATE)) e.setCancelled(true);
         if (i.equals(Material.LEATHER_LEGGINGS)) e.setCancelled(true);

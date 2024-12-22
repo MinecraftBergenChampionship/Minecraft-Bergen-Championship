@@ -1194,7 +1194,7 @@ public class PowerTag extends Game {
      */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        Material i = e.getCursor().getType();
+        Material i = e.getCurrentItem().getType();
         if (i.equals(Material.LEATHER_BOOTS)) e.setCancelled(true);
     }
 }
