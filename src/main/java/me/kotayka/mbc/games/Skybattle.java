@@ -202,7 +202,7 @@ public class Skybattle extends Game {
                             teamPlacements.put(t, 1);
                         }
                         placementPoints();
-                        roundWinners(WIN_POINTS);
+                        roundWinners(WIN_POINTS, SURVIVAL_POINTS);
                         timeRemaining = 10;
                         setGameState(GameState.END_ROUND);
                     } else {
@@ -211,7 +211,7 @@ public class Skybattle extends Game {
                             p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
                         }
                         placementPoints();
-                        roundWinners(WIN_POINTS);
+                        roundWinners(WIN_POINTS, SURVIVAL_POINTS);
                         timeRemaining = 38;
                         setGameState(GameState.END_GAME);
                     }
@@ -242,7 +242,7 @@ public class Skybattle extends Game {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
                 }
-                roundWinners(WIN_POINTS);
+                roundWinners(WIN_POINTS, SURVIVAL_POINTS);
                 for (Participant p : playersAlive) {
                     MBCTeam t = p.getTeam();
                     teamPlacements.put(t, 1);
@@ -255,7 +255,7 @@ public class Skybattle extends Game {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
                 }
-                roundWinners(WIN_POINTS);
+                roundWinners(WIN_POINTS, SURVIVAL_POINTS);
                 placementPoints();
                 timeRemaining = 38;
                 setGameState(GameState.END_GAME);

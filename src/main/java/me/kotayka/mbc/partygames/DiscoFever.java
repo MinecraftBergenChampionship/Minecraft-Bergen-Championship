@@ -503,7 +503,7 @@ public class DiscoFever extends PartyGame {
         }
 
         if (getState() != GameState.TUTORIAL) {
-            roundWinners(WIN_POINTS);
+            roundWinners(WIN_POINTS, SURVIVAL_POINTS);
 
             gameOver();
         }

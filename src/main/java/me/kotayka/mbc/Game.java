@@ -337,18 +337,33 @@ public abstract class Game extends Minigame {
     /**
      * General formatting function to get winners of a round and broadcast text.
      * Adds scoring if specified.
-     * @param points Amount of points to give. Specify 0 for no points.
+     * @param winPoints Amount of win points to give. Specify 0 if none.
+     * @param survivalPoints Amount of survival points to give, which are awarded based on teammate survival. Specify 0 if none or N/A.
      */
-    public void roundWinners(int points) {
+    public void roundWinners(int winPoints, int survivalPoints) {
         String s;
         if (playersAlive.size() > 1) {
             StringBuilder survivors = new StringBuilder("The winners of this round are: ");
             for (int i = 0; i < playersAlive.size(); i++) {
                 Participant p = playersAlive.get(i);
                 winEffects(p);
-                p.getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
-                if (points > 0) {
-                    p.addCurrentScore(points);
+                if (winPoints > 0) {
+                    p.getPlayer().sendMessage(ChatColor.GREEN + "You survived the round!" + MBC.scoreFormatter(winPoints));
+                    p.addCurrentScore(winPoints);
+                } else {
+                    p.getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
+                }
+
+                // check number of alive teammates
+                int count = 0;
+                for (Participant teammate : p.getTeam().getPlayers()) {
+                    if (teammate.getPlayer().getGameMode() != GameMode.SPECTATOR)
+                        count++;
+                }
+
+                if (count > 1) {
+                    p.getPlayer().sendMessage(ChatColor.GREEN + "You've earned bonus survival points from your teammates!" + MBC.scoreFormatter(survivalPoints * (count-1)));
+                    p.addCurrentScore(survivalPoints * (count-1));
                 }
 
                 if (i == playersAlive.size()-1) {
@@ -359,10 +374,14 @@ public abstract class Game extends Minigame {
             }
             s = survivors.toString()+ChatColor.WHITE+"!";
         } else if (playersAlive.size() == 1) {
-            playersAlive.get(0).getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
-            playersAlive.get(0).addCurrentScore(points);
-            winEffects(playersAlive.get(0));
-            s = "The winner of this round is " + playersAlive.get(0).getFormattedName()+"!";
+            if (winPoints > 0) {
+                playersAlive.getFirst().getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!" + MBC.scoreFormatter(winPoints));
+                playersAlive.getFirst().addCurrentScore(winPoints);
+            } else {
+                playersAlive.getFirst().getPlayer().sendMessage(ChatColor.GREEN+"You survived the round!");
+            }
+            winEffects(playersAlive.getFirst());
+            s = "The winner of this round is " + playersAlive.getFirst().getFormattedName()+"!";
         } else {
             s = "Nobody survived the round.";
         }

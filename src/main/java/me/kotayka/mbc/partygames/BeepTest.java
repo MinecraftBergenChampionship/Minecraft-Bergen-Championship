@@ -138,7 +138,7 @@ public class BeepTest extends PartyGame {
             p.getPlayer().setMaxHealth(20);
             p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
         }
-        roundWinners(STAGE_POINTS);
+        roundWinners(STAGE_POINTS, 0);
         if (MBC.getInstance().party == null) {
             for (Participant p : MBC.getInstance().getPlayers()) {
                 p.addCurrentScoreToTotal();

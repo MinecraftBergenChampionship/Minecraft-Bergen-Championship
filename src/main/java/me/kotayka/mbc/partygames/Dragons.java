@@ -173,41 +173,8 @@ public class Dragons extends PartyGame {
     }
 
     @Override
-    public void roundWinners(int points) {
-        String s;
-        if (playersAlive.size() > 1) {
-            StringBuilder survivors = new StringBuilder("The winners of this round are: ");
-            for (int i = 0; i < playersAlive.size(); i++) {
-                Participant p = playersAlive.get(i);
-                winEffects(p);
-                p.getPlayer().sendMessage(ChatColor.GREEN+"You survived the dragon rampage!" + ChatColor.WHITE + "[+" + (remaining_spawns+WIN_POINTS) + "]");
-                if (points > 0) {
-                    p.addCurrentScore(points);
-                }
-
-                if (i == playersAlive.size()-1) {
-                    survivors.append("and ").append(p.getFormattedName());
-                } else {
-                    survivors.append(p.getFormattedName()).append(", ");
-                }
-            }
-            s = survivors.toString()+ChatColor.WHITE+"!";
-        } else if (playersAlive.size() == 1) {
-            playersAlive.get(0).getPlayer().sendMessage(ChatColor.GREEN+"You survived the dragon rampage!" + MBC.scoreFormatter(remaining_spawns+WIN_POINTS));
-            playersAlive.get(0).addCurrentScore(points);
-            winEffects(playersAlive.get(0));
-            s = playersAlive.get(0).getFormattedName()+" survived the dragons!";
-        } else {
-            s = "Nobody survived the round.";
-        }
-        logger.log(s+"\n");
-        Bukkit.broadcastMessage(s);
-
-    }
-
-    @Override
     public void endEvents() {
-        roundWinners(WIN_POINTS);
+        roundWinners(WIN_POINTS, SURVIVAL_POINTS);
         removeDragons();
 
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {

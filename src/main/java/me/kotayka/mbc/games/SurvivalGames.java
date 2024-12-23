@@ -307,7 +307,7 @@ public class SurvivalGames extends Game {
                         }
                         bossBar.setVisible(false);
                         gameOverGraphics();
-                        roundWinners(0);
+                        roundWinners(0, SURVIVAL_POINTS);
                         setGameState(GameState.END_GAME);
                         timeRemaining = 37;
                     } else {
@@ -315,7 +315,7 @@ public class SurvivalGames extends Game {
                             p.stopSound(Sound.MUSIC_DISC_FAR, SoundCategory.RECORDS);
                         }
                         roundOverGraphics();
-                        roundWinners(0);
+                        roundWinners(0, SURVIVAL_POINTS);
                         setGameState(GameState.END_ROUND);
                         bossBar.setVisible(false);
                         firstRound = false;
@@ -398,12 +398,12 @@ public class SurvivalGames extends Game {
                 placementPoints();
                 if (!firstRound) {
                     gameOverGraphics();
-                    roundWinners(0);
+                    roundWinners(0, SURVIVAL_POINTS);
                     setGameState(GameState.END_GAME);
                     timeRemaining = 37;
                 } else {
                     roundOverGraphics();
-                    roundWinners(0);
+                    roundWinners(0, SURVIVAL_POINTS);
                     setGameState(GameState.END_ROUND);
                     firstRound = false;
                     timeRemaining = 10;

@@ -270,7 +270,7 @@ public class Spleef extends Game {
                         }
                     }
                     roundOverGraphics();
-                    roundWinners(0);
+                    roundWinners(0, SURVIVAL_POINTS);
                     placementPoints();
                     setGameState(GameState.END_ROUND);
                     timeRemaining = 9;
@@ -285,7 +285,7 @@ public class Spleef extends Game {
                         }
                     }
                     gameOverGraphics();
-                    roundWinners(0);
+                    roundWinners(0, SURVIVAL_POINTS);
                     placementPoints();
                     setGameState(GameState.END_GAME);
                     timeRemaining = 37;
