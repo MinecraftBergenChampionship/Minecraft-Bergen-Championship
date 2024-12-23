@@ -526,6 +526,8 @@ public class PowerTag extends Game {
         for (PowerTagPlayer p : hunters) {
             p.getPlayer().sendMessage(ChatColor.GREEN + "Your powerup is: " + ChatColor.BOLD + hunterPowerup);
             giveHunterPowerups(p);
+            // also adds night vision
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
         }   
 
         for (PowerTagPlayer p : powerTagPlayerMap.values()) {
@@ -888,6 +890,7 @@ public class PowerTag extends Game {
     private void blindness() {
         for (PowerTagPlayer p : hunters) {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 320, 1, false, false));
+            p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
         }
     }
 

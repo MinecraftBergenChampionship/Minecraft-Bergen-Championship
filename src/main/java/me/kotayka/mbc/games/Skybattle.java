@@ -35,9 +35,9 @@ public class Skybattle extends Game {
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
     private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
     private final int SURVIVAL_POINTS = 1;
-    private final int WIN_POINTS = 10;
+    private final int WIN_POINTS = 0;
     // Team bonuses split among team
-    private final int[] TEAM_BONUSES_3 = {21, 18, 15, 12, 9, 9};
+    private final int[] TEAM_BONUSES_3 = {30, 21, 18, 15, 12, 9};
 
     public Skybattle() {
         super("Skybattle", new String[] {
