@@ -534,6 +534,11 @@ public class MBC implements Listener {
         if (!(e.getEntity() instanceof Player)) return;
         if (e.getCause() == EntityDamageEvent.DamageCause.DROWNING) {
             e.setCancelled(true);
+            return;
+        }
+
+        if (e.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            e.setCancelled(true);
         }
     }
 

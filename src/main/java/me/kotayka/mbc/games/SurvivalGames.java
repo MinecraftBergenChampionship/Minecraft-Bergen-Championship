@@ -158,9 +158,6 @@ public class SurvivalGames extends Game {
             }
 
             p.getInventory().setItem(8, endCrystal);
-            if (map.type.equals("Elytra")) {
-                p.getInventory().setChestplate(new ItemStack(Material.ELYTRA));
-            }
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().setAllowFlight(false);
             p.getPlayer().setExp(0);
@@ -169,6 +166,9 @@ public class SurvivalGames extends Game {
             p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            if (map.type.equals("Elytra")) {
+                p.getInventory().setChestplate(new ItemStack(Material.ELYTRA));
+            }
         }
         updatePlayersAliveScoreboard();
         regenChest();
@@ -268,7 +268,7 @@ public class SurvivalGames extends Game {
                 timeRemaining = 450;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
-            if (map.hasElevationBorder && timeRemaining < 25 && timeRemaining % 2 == 0) {
+            if (map.hasElevationBorder && timeRemaining < 50 && timeRemaining % 2 == 0) {
                 map.Border();
             }
             decrementBossBar();
@@ -346,6 +346,7 @@ public class SurvivalGames extends Game {
                     p.getPlayer().setInvulnerable(false);
                     if (map.type.equals("Elytra")) {
                         p.getPlayer().getInventory().remove(Material.ELYTRA);
+                        if (p.getPlayer().getInventory().getChestplate() == null) continue;
                         if (p.getPlayer().getInventory().getChestplate().getType().equals(Material.ELYTRA)) {
                             p.getPlayer().getInventory().setChestplate(new ItemStack(Material.AIR));
                         }
@@ -376,7 +377,7 @@ public class SurvivalGames extends Game {
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED.toString() + ChatColor.BOLD + "Kill points are decreasing! (10 -> 5)");
                 bossBar.removeAll();
                 bossBar.setVisible(false);
-            } else if (timeRemaining == 25) {
+            } else if (timeRemaining == 50) {
                 if (map.hasElevationBorder) {
                     Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED.toString() + ChatColor.BOLD + "The border is rising!");
                 }
@@ -948,6 +949,7 @@ public class SurvivalGames extends Game {
         }
 
         if(map.type.equals("Elytra") && getState() == GameState.ACTIVE && p.getGameMode() == GameMode.SURVIVAL && p.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
+            if (p.getInventory().getChestplate() == null) return;
             if (p.getInventory().getChestplate().getType().equals(Material.ELYTRA)) {
                 p.getInventory().setChestplate(new ItemStack(Material.AIR));
             }
@@ -1092,6 +1094,7 @@ public class SurvivalGames extends Game {
 
     // TODO
     private void handleEnchantGUI(InventoryClickEvent e) {
+        if (e.getCurrentItem() == null) return;
         Material type = e.getCurrentItem().getType();
         //if (type == null) return;
 
