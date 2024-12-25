@@ -1172,10 +1172,10 @@ public class PowerTag extends Game {
         if (map == null) return;
 
         PowerTagPlayer p = powerTagPlayerMap.get(e.getPlayer().getUniqueId());
-        if (timeRemaining > 20 && timeRemaining <= 90 && hunterPowerup.equals(hunterPowerupList[3]) && p.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+        if (timeRemaining > 30 && timeRemaining <= 90 && hunterPowerup.equals(hunterPowerupList[3]) && p.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
             if (infected.contains(p)) {
                 for (PowerTagPlayer runner : aliveHiders) {
-                    if (runner.getPlayer().getLocation().distance(p.getPlayer().getLocation()) <= 3 && runner.getPlayer().getGameMode().equals(GameMode.SURVIVAL) && !infected.contains(runner)) {
+                    if (runner.getPlayer().getLocation().distance(p.getPlayer().getLocation()) <= 4 && runner.getPlayer().getGameMode().equals(GameMode.SURVIVAL) && !infected.contains(runner)) {
                         infected.add(runner);
                     }
                 }
