@@ -19,6 +19,12 @@ public class playMusicTabCompletion implements TabCompleter {
             for (String s : MBC.partyGameNameList) games.add(s);
             games.remove("Party");
             return games;
+        } else if (args.length == 2) {
+            List<String> playerNames = new ArrayList<>();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                playerNames.add(p.getName());
+            }
+            return playerNames;
         }
         List<String> x = new ArrayList<>();
         return x;
