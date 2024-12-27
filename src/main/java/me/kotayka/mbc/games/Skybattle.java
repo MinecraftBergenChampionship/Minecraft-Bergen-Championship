@@ -49,11 +49,10 @@ public class Skybattle extends Game {
                 "⑫ There's also a " + ChatColor.BOLD + "height border" + ChatColor.RESET + " that lowers over time!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                                 "⑫ +9 points for eliminations\n" +
-                                "⑫ +10 points for winning\n" +
                                 "⑫ +1 points for every player outlived\n" +
                                 "⑫ Team Bonuses (split amongst team):\n" +
-                                "     ⑫ 1st: +7 points, 2nd: +6 points, 3rd: +5 points\n" +
-                                "     ⑫ 4th: +4 points, 5th: +3 points, 6th: +3 points"
+                                "     ⑫ 1st: +10 points, 2nd: +7 points, 3rd: +6 points\n" +
+                                "     ⑫ 4th: +5 points, 5th: +4 points, 6th: +3 points"
         });
     }
     private int roundNum = 1;
