@@ -870,7 +870,7 @@ public class MBC implements Listener {
     public void showPlayers(Participant p) {
         for (Participant p2 : getPlayers()) {
             if (p.getPlayer().getUniqueId().equals(p2.getPlayer().getUniqueId())) continue;
-            p.getPlayer().showPlayer(p2.getPlayer());
+            p.getPlayer().showPlayer(plugin, p2.getPlayer());
         }
     }
 
