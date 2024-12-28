@@ -751,11 +751,15 @@ public class PowerTag extends Game {
      */
     private void barrierHunters(boolean b) {
         Material colorGlass = Material.WHITE_STAINED_GLASS_PANE;
+        Material colorConcrete = Material.WHITE_CONCRETE;
         if (roundNum >= 1) colorGlass = huntOrder.get(roundNum-1).getGlass().getType();
+        if (roundNum >= 1) colorConcrete = huntOrder.get(roundNum-1).getConcrete().getType();
         
         Material m = b ? colorGlass : Material.AIR;
 
         for (int y = -58; y <=-52; y++) {
+            if (y % 2 == 0) m = b ? colorGlass : Material.AIR;
+            else m = b ? colorConcrete : Material.AIR;
             for (int z = -5; z <= -1; z++) {
                 for (int x = 1; x <= 5; x++) {
                     if (x == 1 || x == 5 || z == -1 || z== -5) {
