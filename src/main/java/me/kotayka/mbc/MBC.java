@@ -1,6 +1,7 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.NPCs.NPCManager;
+import me.kotayka.mbc.commands.loadPlayers;
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
 import me.kotayka.mbc.games.*;
@@ -337,13 +338,26 @@ public class MBC implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!Participant.contains(event.getPlayer())) { // new login this instance
-            Participant newPlayer = new Participant(event.getPlayer());
+            Participant newPlayer = null;
+            if (!started) {
+                String team = loadPlayers.playerTeams.getOrDefault(event.getPlayer().getName(), null);
+
+                if (team != null) {
+                    newPlayer = new Participant(event.getPlayer(), MBCTeam.getTeam(team));
+                }
+            }
+
+            if (newPlayer == null) {
+                newPlayer = new Participant(event.getPlayer());
+            }
             players.add(newPlayer);
 
             if (newPlayer.objective == null || !Objects.equals(newPlayer.gameObjective, currentGame.name())) {
                 currentGame.createScoreboard(newPlayer);
                 newPlayer.gameObjective = currentGame.name();
             }
+
+
         } else { // relog
             Participant p = Participant.getParticipant(event.getPlayer());
             p.setPlayer(event.getPlayer());

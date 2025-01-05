@@ -86,3 +86,6 @@ commands:
   nick:
     description: nick
     permisison: minecraft.command.op
+  loadPlayers:
+    description: Loads players into preregistered teams
+    permission: minecraft.command.op

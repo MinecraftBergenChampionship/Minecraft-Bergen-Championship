@@ -1,5 +1,6 @@
 package me.kotayka.mbc;
 
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
@@ -11,18 +12,23 @@ import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_21_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R1.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -97,7 +103,6 @@ public class Quickfire extends FinaleGame {
         CROSSBOW.setItemMeta(bowMeta);
         CROSSBOW.addEnchantment(Enchantment.QUICK_CHARGE, 3);
 
-
         playersAlive = new int[]{firstPlace.teamPlayers.size(), secondPlace.teamPlayers.size()};
     }
 
@@ -130,9 +135,11 @@ public class Quickfire extends FinaleGame {
             p.getPlayer().getInventory().clear();
             p.getPlayer().teleport(SPAWN);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
-            p.board.getTeam(firstPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
-            p.board.getTeam(secondPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
-            if (p.getTeam().equals(firstPlace) || p.getTeam().equals(secondPlace)) { quickfirePlayers.put(p.getPlayer().getUniqueId(), new QuickfirePlayer(p)); }
+            if (p.getTeam().equals(firstPlace) || p.getTeam().equals(secondPlace)) {
+                quickfirePlayers.put(p.getPlayer().getUniqueId(), new QuickfirePlayer(p));
+                p.board.getTeam(firstPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+                p.board.getTeam(secondPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+            }
         }
     }
 
@@ -253,6 +260,24 @@ public class Quickfire extends FinaleGame {
             setGameState(GameState.END_ROUND);
             setTimer(6);
         }
+    }
+
+    @EventHandler
+    public void onArrowShoot(EntityShootBowEvent event) {
+        Entity shooter = event.getEntity();
+
+        if (shooter instanceof Player) {
+            Player player = (Player) shooter;
+
+            ItemStack arrow = new ItemStack(Material.ARROW);
+            player.getInventory().addItem(arrow);
+        }
+    }
+
+    @EventHandler
+    public void onArrowPickup(PlayerPickupArrowEvent event) {
+        event.getArrow().remove();
+        event.setCancelled(true);
     }
 
     @EventHandler

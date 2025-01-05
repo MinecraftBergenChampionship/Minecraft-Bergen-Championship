@@ -45,6 +45,14 @@ public class Participant {
         MBC.getInstance().participants.add(this);
     }
 
+    public Participant(Player p, MBCTeam team) {
+        player=p;
+        p.setScoreboard(board);
+
+        changeTeam(team);
+        MBC.getInstance().participants.add(this);
+    }
+
     public void changeTeam(MBCTeam t) {
         if (t==null) {return;}
         if (team != null) {
