@@ -94,15 +94,15 @@ public class BuildMart extends Game {
         //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -195, 185, -58))); //black cat
 
         //christmas
-        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -321, 185, 2))); //reindeer
-        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -330, 185, 2))); //baby penguins
-        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -339, 185, 2))); //candy canes
-        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -186, 185, -28))); // milk and cookies
-        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -28))); // christmas tree
-        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -303, 185, -28))); // snowman
-        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -15, 185, -58))); // chimney
-        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -204, 185, -58))); // snow globe
-        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -213, 185, -58))); // sleigh
+        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -321, 185, 2))); //reindeer
+        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -330, 185, 2))); //baby penguins
+        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -339, 185, 2))); //candy canes
+        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -186, 185, -28))); // milk and cookies
+        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -28))); // christmas tree
+        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -303, 185, -28))); // snowman
+        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -15, 185, -58))); // chimney
+        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -204, 185, -58))); // snow globe
+        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -213, 185, -58))); // sleigh
 
     }
 

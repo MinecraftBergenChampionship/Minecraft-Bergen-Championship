@@ -63,12 +63,12 @@ public class HotSprings extends SpleefMap {
 
     @Override
     public void Border(int timeRemaining) {
-        if ((timeRemaining <= 225 && timeRemaining % 30 == 0 || timeRemaining <= 120 && timeRemaining % 15 == 0) && maxErosionLayer < 12) {
+        if ((timeRemaining <= 150 && timeRemaining % 30 == 0 || timeRemaining <= 105 && timeRemaining % 15 == 0) && maxErosionLayer < 12) {
             Bukkit.broadcastMessage(ChatColor.RED + "The decay is rising!");
             maxErosionLayer++;
         }
 
-        if (timeRemaining <= 225) {
+        if (timeRemaining <= 150) {
             erodeMap();
         }
     }
@@ -93,7 +93,7 @@ public class HotSprings extends SpleefMap {
                 }
             }, 40, 40);
         }
-        for (int i = 0; i < 25 && blocks.size() > 1; i++) {
+        for (int i = 0; i < 30 && blocks.size() > 1; i++) {
             int rand2 = (int) (Math.random() * maxErosionLayer); // which layer to erode
             int rand1 = (int) (Math.random() * blocks.get(rand2).size()); // which block to erode
             decaying.add(blocks.get(rand2).get(rand1));

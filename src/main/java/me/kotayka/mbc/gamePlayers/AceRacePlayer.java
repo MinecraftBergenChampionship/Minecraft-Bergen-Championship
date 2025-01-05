@@ -8,6 +8,7 @@ import me.kotayka.mbc.games.AceRace;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,6 +27,8 @@ public class AceRacePlayer extends GamePlayer {
     public boolean completedFirstLap = false;
     public boolean fastestLapsContainsPlayer;
     public long fastestLap;
+    public ArrayList<Player> hiddenPlayers = new ArrayList<Player>();
+    public int cooldownTimer = 240;
 
     public AceRacePlayer(Participant p, AceRace ar) {
         super(p);
@@ -183,6 +186,23 @@ public class AceRacePlayer extends GamePlayer {
                 p.addCurrentScore(AceRace.PLACEMENT_BONUSES[placement-1]);
             }
         }
+    }
+
+    public boolean addHiddenPlayer(Player p) {
+        if (hiddenPlayers.contains(p)) return false;
+        hiddenPlayers.add(p);
+        return true;
+    }
+
+    public boolean checkHiddenPlayer(Player p) {
+        if (hiddenPlayers.contains(p)) return true;
+        return false;
+    }
+
+    public boolean removeHiddenPlayer(Player p) {
+        if (!hiddenPlayers.contains(p)) return false;
+        hiddenPlayers.remove(p);
+        return true;
     }
 
     /**

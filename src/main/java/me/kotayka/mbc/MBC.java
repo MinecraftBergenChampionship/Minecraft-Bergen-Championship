@@ -64,7 +64,7 @@ public class MBC implements Listener {
     //public List<MBCTeam> validTeams = new ArrayList<>();
     //regular
     //public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Rabbits", "Yellow Yaks", "Green Guardians", "Blue Bats", "Purple Pandas", "Pink Piglets", "Spectator"));
-    //public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets", "Spectator"));
+    public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedRabbits", "YellowYaks", "GreenGuardians", "BlueBats", "PurplePandas", "PinkPiglets", "Spectator"));
 
     // halloween
     //public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Ravens", "Mustard Mummies", "Green Goblins", "Blue Banshees", "Violet Vampires", "Fuchsia Frankensteins", "Spectator"));
@@ -72,7 +72,7 @@ public class MBC implements Listener {
 
     //christmas
     //public List<String> teamNamesFull = new ArrayList<>(Arrays.asList("Red Reindeer", "Yellow Yetis", "Emerald Elves", "Sapphire Santas", "Purple Penguins", "Pink Presents", "Spectator"));
-    public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedReindeer", "YellowYetis", "EmeraldElves", "SapphireSantas", "PurplePenguins", "PinkPresents", "Spectator"));
+    //public static List<String> teamNames = new ArrayList<>(Arrays.asList("RedReindeer", "YellowYetis", "EmeraldElves", "SapphireSantas", "PurplePenguins", "PinkPresents", "Spectator"));
     public ScoreboardManager manager =  Bukkit.getScoreboardManager();
     public final Scoreboard board = manager.getNewScoreboard();
 

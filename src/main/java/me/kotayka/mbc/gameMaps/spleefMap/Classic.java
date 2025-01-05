@@ -102,17 +102,17 @@ public class Classic extends SpleefMap {
     @Override
     public void Border(int timeRemaining) {
         switch (timeRemaining) {
-            case 210 -> Bukkit.broadcastMessage(ChatColor.RED + "First layer is starting to erode!");
-            case 150 -> Bukkit.broadcastMessage(ChatColor.RED + "Second layer is starting to erode!");
+            case 150 -> Bukkit.broadcastMessage(ChatColor.RED + "First layer is starting to erode!");
+            case 120 -> Bukkit.broadcastMessage(ChatColor.RED + "Second layer is starting to erode!");
             case 90 -> Bukkit.broadcastMessage(ChatColor.RED + "Third layer is starting to erode!");
             case 60 -> Bukkit.broadcastMessage(ChatColor.RED + "Last layer is starting to erode!");
         }
 
-        if (timeRemaining <= 210 && timeRemaining % 2 == 0 && !firstLayerDecayingBlocks.isEmpty()) {
+        if (timeRemaining <= 150 && timeRemaining % 2 == 0 && !firstLayerDecayingBlocks.isEmpty()) {
             erodeLayer(1);
         }
 
-        if (timeRemaining <= 150 && timeRemaining % 2 == 0 && !secondLayerDecayingBlocks.isEmpty()) {
+        if (timeRemaining <= 120 && timeRemaining % 2 == 0 && !secondLayerDecayingBlocks.isEmpty()) {
             erodeLayer(2);
         }
 

@@ -34,7 +34,7 @@ public class OneShot extends PartyGame {
     private Map<MBCTeam, Integer> teamKills = new HashMap<>();
     public Map<UUID, OneShotPlayer> oneShotPlayerMap = new HashMap<>();
     public Location[] spawnpoints = map.spawnpoints;
-    private final int WIN_POINTS = 10;
+    private final int WIN_POINTS = 5;
     private final int KILL_POINTS = 1;
     private final int STREAK_POINTS = 1;
     private final int STREAK_KILL_POINTS = 1;
@@ -59,9 +59,9 @@ public class OneShot extends PartyGame {
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "⑰ +1 point per kill\n" +
                         "⑰ +5 points for each player on a team for getting a new weapon\n" +
-                        "⑰ +10 points for each player on a team for winning\n" +
-                        "⑰ +1 extra point for kills with a 3 kill streak or more\n" +
-                        "⑰ +1 extra point for killing a player with a 3 kill streak or more"
+                        "⑰ +5 points for each player on a team for winning\n" +
+                        "⑰ +1 extra point for kills with a 5 kill streak or more\n" +
+                        "⑰ +1 extra point for killing a player with a 5 kill streak or more"
         });
 
         CrossbowMeta quickchargeMeta = (CrossbowMeta) CROSSBOW_QUICK_CHARGE.getItemMeta();
@@ -80,6 +80,7 @@ public class OneShot extends PartyGame {
         multishotMeta.setUnbreakable(true);
         CROSSBOW_MULTISHOT.setItemMeta(multishotMeta);
         CROSSBOW_MULTISHOT.addEnchantment(Enchantment.MULTISHOT, 1);
+        CROSSBOW_MULTISHOT.addEnchantment(Enchantment.QUICK_CHARGE, 1);
 
         ItemMeta tridentMeta = TRIDENT.getItemMeta();
         tridentMeta.setUnbreakable(true);
@@ -126,7 +127,7 @@ public class OneShot extends PartyGame {
         int randomSpawn = (int)(Math.random()*spawnpoints.length);
 
         int preventInfiniteCounter = 0;
-        while (playerWithinEight(randomSpawn) && preventInfiniteCounter < spawnpoints.length - 5) {
+        while (playerWithinFifteen(randomSpawn) && preventInfiniteCounter < spawnpoints.length - 5) {
             randomSpawn = (int)(Math.random()*spawnpoints.length);
         }
 
@@ -146,11 +147,11 @@ public class OneShot extends PartyGame {
           }, 40L);
     }
 
-    public boolean playerWithinEight(int spawnInt) {
+    public boolean playerWithinFifteen(int spawnInt) {
         if (spawnInt < 0 || spawnInt >= spawnpoints.length) return true;
         Location l = spawnpoints[spawnInt];
         for (Participant p : MBC.getInstance().getPlayers()) {
-            if (p.getPlayer().getLocation().distance(l) <=8 && p.getPlayer().getGameMode().equals(GameMode.ADVENTURE)) {
+            if (p.getPlayer().getLocation().distance(l) <=15 && p.getPlayer().getGameMode().equals(GameMode.ADVENTURE)) {
                 return true;
             }
         }
@@ -372,9 +373,9 @@ public class OneShot extends PartyGame {
                 createLine(3, ChatColor.YELLOW+""+ChatColor.BOLD+"Kills: "+ChatColor.RESET+d.kills, damager);
 
                 OneShotPlayer s = oneShotPlayerMap.get(e.getHitEntity().getUniqueId());
-                if (s.streak >=3) {
-                    Bukkit.broadcastMessage(damager.getFormattedName() + "" + ChatColor.BOLD + " has broke " + ChatColor.RESET + "" +
-                        shot.getFormattedName() + ChatColor.BOLD + "'s streak of " + s.streak + "!");
+                if (s.streak >=5) {
+                    Bukkit.broadcastMessage(damager.getFormattedName() + " has broken " +
+                        shot.getFormattedName() + "'s streak of " + s.streak + "!");
                     damager.getPlayer().sendMessage(ChatColor.GREEN + "You broke a streak of " + s.streak + "!" + MBC.scoreFormatter(STREAK_KILL_POINTS));
                     damager.addCurrentScore(STREAK_KILL_POINTS);
 
@@ -382,11 +383,12 @@ public class OneShot extends PartyGame {
                 s.streak = 0;
 
                 damager.addCurrentScore(KILL_POINTS);
-                if (d.streak >=3) {
+                if (d.streak >=5) {
                     damager.addCurrentScore(STREAK_POINTS);
                     damager.getPlayer().sendMessage(ChatColor.GREEN + "You have a streak of " + d.streak + "!" + MBC.scoreFormatter(STREAK_POINTS));
-                    if (d.streak == 3) {
-                        Bukkit.broadcastMessage(damager.getFormattedName() + "" + ChatColor.BOLD + " has reached a streak of 3!");
+                    if (d.streak == 5) {
+                        Bukkit.broadcastMessage(damager.getFormattedName() + " has reached a streak of 5, and is now glowing!");
+                        damager.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, PotionEffect.INFINITE_DURATION, 255, false, false));
                     }
                 }
                 arrow.remove();
@@ -418,9 +420,9 @@ public class OneShot extends PartyGame {
                 createLine(3, ChatColor.YELLOW+""+ChatColor.BOLD+"Kills: "+ChatColor.RESET+d.kills, damager);
 
                 OneShotPlayer s = oneShotPlayerMap.get(e.getHitEntity().getUniqueId());
-                if (s.streak >=3) {
-                    Bukkit.broadcastMessage(damager.getFormattedName() + "" + ChatColor.BOLD + " has broken " + ChatColor.RESET + "" +
-                        shot.getFormattedName() + ChatColor.BOLD + "'s streak of " + s.streak + "!");
+                if (s.streak >=5) {
+                    Bukkit.broadcastMessage(damager.getFormattedName() + " has broken " +
+                        shot.getFormattedName() + "'s streak of " + s.streak + "!");
                     damager.getPlayer().sendMessage(ChatColor.GREEN + "You broke a streak of " + s.streak + "!" + MBC.scoreFormatter(STREAK_KILL_POINTS));
                     damager.addCurrentScore(STREAK_KILL_POINTS);
 
@@ -428,11 +430,12 @@ public class OneShot extends PartyGame {
                 s.streak = 0;
 
                 damager.addCurrentScore(KILL_POINTS);
-                if (d.streak >=3) {
+                if (d.streak >=5) {
                     damager.addCurrentScore(STREAK_POINTS);
                     damager.getPlayer().sendMessage(ChatColor.GREEN + "You have a streak of " + d.streak + "!" + MBC.scoreFormatter(STREAK_POINTS));
-                    if (d.streak == 3) {
-                        Bukkit.broadcastMessage(damager.getFormattedName() + "" + ChatColor.BOLD + " has reached a streak of 3!");
+                    if (d.streak == 5) {
+                        Bukkit.broadcastMessage(damager.getFormattedName() + " has reached a streak of 5, and is now glowing!");
+                        damager.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, PotionEffect.INFINITE_DURATION, 255, false, false));
                     }
                 }
                 trident.remove();
@@ -491,9 +494,9 @@ public class OneShot extends PartyGame {
                     b.setVisible(true);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                    p.getPlayer().sendMessage(ChatColor.YELLOW +"Your team reached 10 kills and recieved the " + ChatColor.BOLD + "bow" + ChatColor.RESET + ChatColor.YELLOW +"!" + MBC.scoreFormatter(WEAPON_POINTS));
+                    p.getPlayer().sendMessage(ChatColor.YELLOW +"Your team reached 10 kills and recieved the " + ChatColor.BOLD + "bow" + ChatColor.RESET + "" + ChatColor.YELLOW +"!" + MBC.scoreFormatter(WEAPON_POINTS));
                 }
-                Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "The " +ChatColor.RESET + m.teamNameFormat() + ChatColor.BOLD + "" + ChatColor.RED + " have gotten 10 kills!");
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " +ChatColor.RESET + m.teamNameFormat() + ChatColor.RED + "" + ChatColor.BOLD + " have gotten 10 kills!");
             return;
             case 20:
                 b = Bukkit.createBossBar(ChatColor.GREEN + "" + ChatColor.BOLD + "CURRENT WEAPON: Multishot Crossbow", BarColor.GREEN, BarStyle.SOLID);
@@ -506,9 +509,9 @@ public class OneShot extends PartyGame {
                     p.addCurrentScore(WEAPON_POINTS);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                    p.getPlayer().sendMessage("Your team reached 20 kills and recieved the " + ChatColor.BOLD + "multishot crossbow" + ChatColor.RESET + "!" + MBC.scoreFormatter(WEAPON_POINTS));
+                    p.getPlayer().sendMessage(ChatColor.GREEN +"Your team reached 20 kills and recieved the " + ChatColor.BOLD + "multishot crossbow" + ChatColor.RESET + "" + ChatColor.GREEN +"!" + MBC.scoreFormatter(WEAPON_POINTS));
                 }
-                Bukkit.broadcastMessage("The " + m.teamNameFormat() + " have gotten 20 kills!");
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " +ChatColor.RESET + m.teamNameFormat() + ChatColor.RED + "" + ChatColor.BOLD + " have gotten 20 kills!");
             return;
             case 30:
                 b = Bukkit.createBossBar(ChatColor.AQUA + "" + ChatColor.BOLD + "CURRENT WEAPON: Trident", BarColor.BLUE, BarStyle.SOLID);
@@ -522,9 +525,9 @@ public class OneShot extends PartyGame {
                     p.addCurrentScore(WEAPON_POINTS);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                    p.getPlayer().sendMessage("Your team reached 30 kills and recieved the " + ChatColor.BOLD + "trident" + ChatColor.RESET + "!" + MBC.scoreFormatter(WEAPON_POINTS));
+                    p.getPlayer().sendMessage(ChatColor.AQUA +"Your team reached 30 kills and recieved the " + ChatColor.BOLD + "trident" + ChatColor.RESET + "" + ChatColor.AQUA +"!" + MBC.scoreFormatter(WEAPON_POINTS));
                 }
-                Bukkit.broadcastMessage("The " + m.teamNameFormat() + " have gotten 30 kills!");
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " +ChatColor.RESET + m.teamNameFormat() + ChatColor.RED + "" + ChatColor.BOLD + " have gotten 30 kills!");
             return;
             case 40:
                 b = Bukkit.createBossBar(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "CURRENT WEAPON: Sword", BarColor.PURPLE, BarStyle.SOLID);
@@ -538,9 +541,9 @@ public class OneShot extends PartyGame {
                     p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                    p.getPlayer().sendMessage("Your team reached 40 kills and recieved the " + ChatColor.BOLD + "sword" + ChatColor.RESET + "! Get one kill to win!" + MBC.scoreFormatter(WEAPON_POINTS));
+                    p.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + "Your team reached 40 kills and recieved the " + ChatColor.BOLD + "sword" + ChatColor.RESET + "" + ChatColor.LIGHT_PURPLE + "! Get one kill to win!" + MBC.scoreFormatter(WEAPON_POINTS));
                 }
-                Bukkit.broadcastMessage("The " + m.teamNameFormat() + " have gotten 40 kills, " + ChatColor.BOLD + "and need one more to win the game!");
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " +ChatColor.RESET + m.teamNameFormat() + ChatColor.RED + "" + ChatColor.BOLD + " have gotten 40 kills, and need one more to win the game!");
             return;
             default:
                 Bukkit.broadcastMessage("This shouldn't be happening.");
@@ -564,6 +567,7 @@ public class OneShot extends PartyGame {
         Bukkit.broadcastMessage(ChatColor.BOLD + "The " + ChatColor.RESET + m.teamNameFormat() + " have won!");
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.stopSound(Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS);
+            p.removePotionEffect(PotionEffectType.GLOWING);
         }
         for (MBCTeam mt : MBC.getInstance().getValidTeams()) {
             BossBar b = teamBossBars.get(mt);
@@ -609,6 +613,7 @@ public class OneShot extends PartyGame {
         MBC.spawnFirework(shot);
 
         shot.getPlayer().setInvulnerable(true);
+        shot.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
         shot.getInventory().remove(Material.CROSSBOW);
         shot.getInventory().remove(Material.TRIDENT);
         shot.getInventory().remove(Material.BOW);
@@ -628,6 +633,7 @@ public class OneShot extends PartyGame {
 
 
         died.getPlayer().setInvulnerable(true);
+        died.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
         died.getInventory().remove(Material.CROSSBOW);
         died.getInventory().remove(Material.TRIDENT);
         died.getInventory().remove(Material.BOW);

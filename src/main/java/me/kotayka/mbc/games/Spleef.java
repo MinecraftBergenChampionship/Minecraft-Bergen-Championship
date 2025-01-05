@@ -38,19 +38,19 @@ public class Spleef extends Game {
     private Map<UUID, Long> damageMap = new HashMap<>();
     private List<MBCTeam> fullyAliveTeams = getValidTeams();
 
-    private int blindnessTime = 240;
+    private int blindnessTime = 180;
     private boolean isBlind = false;
 
     // scoring
     private final int SURVIVAL_POINTS = 2;
-    private final int KILL_POINTS = 2;
-    private final int LAST_TEAM_BONUS = 3;
+    private final int KILL_POINTS = 3;
+    private final int LAST_TEAM_BONUS = 2;
 
     // Misc
     private Map<Location, SpleefBlock> brokenBlocks = new HashMap<>();
     private final long DAMAGE_COOLDOWN = 850;
     //private final int[] BONUS_POINTS = {20, 15, 15, 10, 10, 8, 8, 8, 5, 5, 3, 3}; // 24 player; these numbers are arbitrary
-    private final int[] BONUS_POINTS = {10, 8, 8, 5, 5, 3, 3, 3};
+    private final int[] BONUS_POINTS = {10, 7, 6, 5, 4, 3, 2, 1};
     // NOTE: 16 player bonus is probably different
 
     public Spleef() {
@@ -207,11 +207,11 @@ public class Spleef extends Game {
                     }
                 }
                 if (timeRemaining == 5 && map.getMapType().equals("Blind")) {
-                    blindnessTime = 240 - (int)(5*Math.random() + 10);
+                    blindnessTime = 180 - (int)(5*Math.random() + 10);
                     Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The lights are dimming, and soon will go out...\n");
                 }
                 if (timeRemaining == 5 && map.getMapType().equals("Regular")) {
-                    blindnessTime = 240 - (int)(5*Math.random() + 10);
+                    blindnessTime = 180 - (int)(5*Math.random() + 10);
                     Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "No effects are present for this map!\n");
                 }
             } else {
@@ -224,7 +224,7 @@ public class Spleef extends Game {
                     p.playSound(p, Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS, 1, 1);
                 }
                 setGameState(GameState.ACTIVE);
-                timeRemaining = 240;
+                timeRemaining = 180;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             if (map.getMapType().equals("Blind") && timeRemaining == blindnessTime) {
@@ -239,7 +239,7 @@ public class Spleef extends Game {
                 }
                 else {
                     isBlind = true;
-                    if (timeRemaining > 220) {
+                    if (timeRemaining > 160) {
                         Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "Power going out!\n");
                     }
                     blindnessTime = timeRemaining - (int)(5*Math.random() + 10);

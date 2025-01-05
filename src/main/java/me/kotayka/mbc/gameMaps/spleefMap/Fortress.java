@@ -60,10 +60,10 @@ public class Fortress extends SpleefMap {
 
     @Override
     public void Border(int timeRemaining) {
-        if (timeRemaining == 210) {
+        if (timeRemaining == 160) {
             Bukkit.broadcastMessage(ChatColor.RED+"The map is decaying!");
         }
-        if (timeRemaining < 210) {
+        if (timeRemaining < 160) {
             erodeMap();
         }
     }
@@ -88,7 +88,7 @@ public class Fortress extends SpleefMap {
                 }
             }, 40, 40);
         }
-        for (int i = 0; i < 15 && blocks.size() > 1; i++) {
+        for (int i = 0; i < 25 && blocks.size() > 1; i++) {
             int rand = (int) (Math.random() * blocks.size());
             decaying.add(blocks.get(rand));
         }

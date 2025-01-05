@@ -241,15 +241,22 @@ public class AceRace extends Game {
             Player mover = e.getPlayer();
             for (Participant p : MBC.getInstance().getPlayers()) {
                 Player player = p.getPlayer();
+                AceRacePlayer checker = getGamePlayer(player);
                 if (mover != player && player.getGameMode() != GameMode.SPECTATOR && (getState().equals(GameState.TUTORIAL) || getState().equals(GameState.ACTIVE))) {
                     double diffX = player.getX() - mover.getX();
                     double diffY = player.getY() - mover.getY();
                     double diffZ = player.getZ() - mover.getZ();
                     if (Math.sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ) <= 5) {
+                        checker.addHiddenPlayer(mover);
+                        player.hidePlayer(mover);
+                        mover.hidePlayer(player);
+                    }
+                    else if(checker.checkHiddenPlayer(mover) && Math.sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ) <= 8) {
                         player.hidePlayer(mover);
                         mover.hidePlayer(player);
                     }
                     else {
+                        checker.removeHiddenPlayer(mover);
                         mover.showPlayer(player);
                         player.showPlayer(mover);
                     }
@@ -360,10 +367,28 @@ public class AceRace extends Game {
        @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
+
+            AceRacePlayer p = getGamePlayer(e.getPlayer());
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RED_DYE 
+            || e.getPlayer().getInventory().getItemInMainHand().getType() == Material.YELLOW_DYE 
+            || e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE) {
+                int time = p.cooldownTimer;
+                if (time < timeRemaining) {
+                    p.getPlayer().sendMessage(ChatColor.RED + "Please wait a moment before using an item again!");
+                    e.setCancelled(true);
+                    return;
+                }
+                else {
+                    p.cooldownTimer = timeRemaining - 2;
+                }
+            }
+
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RED_DYE) firstCheckpoint(e.getPlayer());
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.YELLOW_DYE) lastCheckpoint(e.getPlayer());
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE) nextCheckpoint(e.getPlayer());
+            
         }
+
         if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Set<Material> trapdoorList = Set.of(Material.OAK_TRAPDOOR, Material.DARK_OAK_TRAPDOOR, Material.SPRUCE_TRAPDOOR, Material.BIRCH_TRAPDOOR,
                                         Material.ACACIA_TRAPDOOR, Material.CHERRY_TRAPDOOR, Material.MANGROVE_TRAPDOOR, Material.JUNGLE_TRAPDOOR,
