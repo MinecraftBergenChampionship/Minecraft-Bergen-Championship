@@ -12,4 +12,8 @@ public class OneShotPlayer extends GamePlayer{
     public OneShotPlayer(Participant p) {
         super(p);
     }
+
+    public int getKills() {
+        return kills;
+    }
 }

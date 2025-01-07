@@ -63,9 +63,9 @@ public class Spleef extends Game {
                 "⑯ Bonus points are awarded to the highest placing players and the longest lasting full team.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "⑯ +2 points for outliving another player\n" +
-                        "⑯ +2 points for spleefing another player\n" +
-                        "⑯ +3 points for every player on the last fully alive team\n" +
-                        "⑯ Placement Bonuses - 1st: +10, 2nd,3rd: +8, 4th,5th: +5, 6th,7th,8th: +3"
+                        "⑯ +3 points for spleefing another player\n" +
+                        "⑯ +2 points for every player on the last fully alive team\n" +
+                        "⑯ +1-10 points for placing top 8"
         });
         lobby = new Location(Bukkit.getWorld("spleef"), 0, 126, 0);
         spawnpoint = new Location(Bukkit.getWorld("spleef"), 0, 115, 0);

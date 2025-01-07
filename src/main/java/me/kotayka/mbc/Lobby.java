@@ -588,14 +588,14 @@ public class Lobby extends Minigame {
 
         podiumNPCS = new ArrayList<>();
         Location[] locs = {
-                new Location(this.world, -9.5, 3, -33.5, -0, 0),
-                new Location(this.world, -7.5, 2, -36.5, -0, 0),
-                 new Location(this.world, -4.5, 1, -38.5, -0, 0),
-                 new Location(this.world, -1.5, 0, -39.5, -0, 0),
-                new Location(this.world, 2.5, 0, -39.5, -0, 0),
-                new Location(this.world, 5.5, 0, -38.5, -0, 0),
-                new Location(this.world, 8.5, 0, -36.5, -0, 0),
-                new Location(this.world, 10.5, 0, -33.5, -0, 0),
+                new Location(this.world, -13.5, 5, -58.5, -0, 0),
+                new Location(this.world, -9.5, 4, -60.5, -0, 0),
+                 new Location(this.world, -5.5, 3, -61.5, -0, 0),
+                 new Location(this.world, -1.5, 2, -62.5, -0, 0),
+                new Location(this.world, 2.5, 1, -62.5, -0, 0),
+                new Location(this.world, 6.5, 0, -61.5, -0, 0),
+                new Location(this.world, 10.5, -1, -60.5, -0, 0),
+                new Location(this.world, 14.5, -2, -58.5, -0, 0),
         };
 
         /*
@@ -638,49 +638,49 @@ public class Lobby extends Minigame {
     private void colorPodium(int place, Material m) {
         switch (place) {
             case 6 -> {
-                world.getBlockAt(-18, -2, -24).setType(m);
-                world.getBlockAt(-18, -2, -25).setType(m);
-                world.getBlockAt(-19, -2, -24).setType(m);
-                world.getBlockAt(-19, -2, -25).setType(m);
+                world.getBlockAt(-26, 0, -30).setType(m);
+                world.getBlockAt(-25, 0, -30).setType(m);
+                world.getBlockAt(-26, 0, -29).setType(m);
+                world.getBlockAt(-25, 0, -29).setType(m);
             }
             case 5 -> {
-                for (int y = -2; y <= -1; y++) {
-                    world.getBlockAt(-17, y, -28).setType(m);
-                    world.getBlockAt(-17, y, -29).setType(m);
-                    world.getBlockAt(-18, y, -28).setType(m);
-                    world.getBlockAt(-18, y, -29).setType(m);
+                for (int y = 0; y <= 1; y++) {
+                    world.getBlockAt(-27, y, -33).setType(m);
+                    world.getBlockAt(-27, y, -32).setType(m);
+                    world.getBlockAt(-26, y, -33).setType(m);
+                    world.getBlockAt(-26, y, -32).setType(m);
                 }
             }
             case 4 -> {
-                for (int y = -3; y <= 0; y++) {
-                    world.getBlockAt(-18, y, -32).setType(m);
-                    world.getBlockAt(-18, y, -33).setType(m);
-                    world.getBlockAt(-19, y, -32).setType(m);
-                    world.getBlockAt(-19, y, -33).setType(m);
+                for (int y = 0; y <= 2; y++) {
+                    world.getBlockAt(-28, y, -39).setType(m);
+                    world.getBlockAt(-28, y, -38).setType(m);
+                    world.getBlockAt(-27, y, -39).setType(m);
+                    world.getBlockAt(-27, y, -38).setType(m);
                 }
             }
             case 3 -> {
-                for (int y = -2; y <= 1; y++) {
-                    world.getBlockAt(-20, y, -29).setType(m);
-                    world.getBlockAt(-20, y, -30).setType(m);
-                    world.getBlockAt(-21, y, -29).setType(m);
-                    world.getBlockAt(-21, y, -30).setType(m);
+                for (int y = 0; y <= 3; y++) {
+                    world.getBlockAt(-28, y, -36).setType(m);
+                    world.getBlockAt(-28, y, -35).setType(m);
+                    world.getBlockAt(-27, y, -36).setType(m);
+                    world.getBlockAt(-27, y, -35).setType(m);
                 }
             }
             case 2 -> {
-                for (int y = -3; y <= 2; y++) {
-                    world.getBlockAt(-24, y, -27).setType(m);
-                    world.getBlockAt(-24, y, -28).setType(m);
-                    world.getBlockAt(-25, y, -27).setType(m);
-                    world.getBlockAt(-25, y, -28).setType(m);
+                for (int y = 0; y <= 4; y++) {
+                    world.getBlockAt(-27, y, -41).setType(m);
+                    world.getBlockAt(-27, y, -40).setType(m);
+                    world.getBlockAt(-26, y, -41).setType(m);
+                    world.getBlockAt(-26, y, -40).setType(m);
                 }
             }
             case 1 -> {
-                for (int y = -6; y <= 3; y++) {
-                    world.getBlockAt(-25, y, -31).setType(m);
-                    world.getBlockAt(-25, y, -32).setType(m);
-                    world.getBlockAt(-26, y, -31).setType(m);
-                    world.getBlockAt(-26, y, -32).setType(m);
+                for (int y = 0; y <= 5; y++) {
+                    world.getBlockAt(-26, 0, -45).setType(m);
+                    world.getBlockAt(-25, 0, -45).setType(m);
+                    world.getBlockAt(-26, 0, -44).setType(m);
+                    world.getBlockAt(-25, 0, -44).setType(m);
                 }
             }
         }

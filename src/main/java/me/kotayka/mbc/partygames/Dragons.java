@@ -312,7 +312,7 @@ public class Dragons extends PartyGame {
 
                     for (Player play : Bukkit.getOnlinePlayers()) {
                         if (playersAlive.contains(Participant.getParticipant(play))) {
-                            play.sendMessage(ChatColor.GOLD+"" + ChatColor.BOLD + "Ender Dragon Spawning!" + MBC.scoreFormatter(SURVIVAL_POINTS));
+                            play.sendMessage(ChatColor.GOLD+"" + ChatColor.BOLD + "Ender Dragon Spawning!" + MBC.scoreFormatter(SPAWN_POINTS));
                         }
                         else {
                             play.sendMessage(ChatColor.GOLD+"" + ChatColor.BOLD + "Ender Dragon Spawning!");
