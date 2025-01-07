@@ -500,7 +500,7 @@ public class PowerTag extends Game {
         ItemMeta toxicMeta = toxic.getItemMeta();
         toxicMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "TOXIC");
         ArrayList<String> toxicLore = new ArrayList();
-        toxicLore.add(ChatColor.YELLOW + "A player starts infected and spreads disease - everyone infected gets revealed!");
+        toxicLore.add(ChatColor.GREEN + "A player starts infected and spreads disease - everyone infected gets revealed!");
         toxicMeta.setLore(toxicLore);
         toxicMeta.setUnbreakable(true);
         toxic.setItemMeta(toxicMeta);
@@ -669,19 +669,22 @@ public class PowerTag extends Game {
         for (PowerTagPlayer hider : aliveHiders) {
             double currentDistance = hider.getPlayer().getLocation().distance(p.getPlayer().getLocation());
 
-            if (currentDistance < 8) {
-                hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 60, 2, false, false));
-                hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 255, false, false));
+            if (currentDistance < 10) {
+                hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 80, 3, false, false));
+                hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 80, 255, false, false));
                 hider.getPlayer().sendMessage(ChatColor.RED + "You were stunned by " + ChatColor.RESET + p.getParticipant().getFormattedName() + ChatColor.RED + "!");
-                hider.getPlayer().playSound(hider.getPlayer(), Sound.ENTITY_GENERIC_EXPLODE, 1, 2);
-                hider.getPlayer().sendTitle(ChatColor.RED + "" +ChatColor.BOLD + "STUNNED!", "", 0, 40, 20);
+                hider.getPlayer().playSound(hider.getPlayer(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+                hider.getPlayer().sendTitle(ChatColor.RED + "" +ChatColor.BOLD + "STUNNED!", "", 0, 60, 20);
                 stunCount++;
             }
             
         }
 
-        p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You found " + stunCount + " hiders, who have all been stunned!");
-        TAG_WORLD.playSound(p.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 2);
+        if (stunCount == 1) p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You found 1 hider, who has been stunned!");
+        else if (stunCount == 0) p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You found no hiders... who has been stunned!");
+        else p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You found " + stunCount + " hiders, who have all been stunned!");
+        
+        TAG_WORLD.playSound(p.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
         p.getPlayer().getInventory().removeItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
@@ -694,7 +697,7 @@ public class PowerTag extends Game {
     */
     public void postTremorUse(PowerTagPlayer p) {
         giveHunterPowerups(p);
-        p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BREWING_STAND_BREW, 1, 2);
+        p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BREWING_STAND_BREW, 1, 1);
     }
 
     public void troll(PowerTagPlayer hitter, PowerTagPlayer hider) {
@@ -983,7 +986,7 @@ public class PowerTag extends Game {
 
         hunter.incrementKills();
         hunter.getParticipant().addCurrentScore(FIND_POINTS);
-        hunter.getPlayer().playSound(hunter.getPlayer(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
+        hunter.getPlayer().playSound(hunter.getPlayer(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
         hunter.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + hider.getParticipant().getFormattedName(), 0, 60, 20);
         hunter.getPlayer().sendMessage(ChatColor.RED+"You found " + ChatColor.RESET + hider.getParticipant().getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + "!" + MBC.scoreFormatter(FIND_POINTS));
         createLine(2, ChatColor.YELLOW+"Players Found: "+ChatColor.RESET+hunter.getKills(), hunter.getParticipant());

@@ -676,34 +676,34 @@ public class Lobby extends Minigame {
             }
             case 4 -> {
                 for (int y = 0; y <= 2; y++) {
-                    world.getBlockAt(-28, y, -39).setType(m);
-                    world.getBlockAt(-28, y, -38).setType(m);
-                    world.getBlockAt(-27, y, -39).setType(m);
-                    world.getBlockAt(-27, y, -38).setType(m);
-                }
-            }
-            case 3 -> {
-                for (int y = 0; y <= 3; y++) {
                     world.getBlockAt(-28, y, -36).setType(m);
                     world.getBlockAt(-28, y, -35).setType(m);
                     world.getBlockAt(-27, y, -36).setType(m);
                     world.getBlockAt(-27, y, -35).setType(m);
                 }
             }
+            case 3 -> {
+                for (int y = 0; y <= 3; y++) {
+                    world.getBlockAt(-28, y, -39).setType(m);
+                    world.getBlockAt(-28, y, -38).setType(m);
+                    world.getBlockAt(-27, y, -39).setType(m);
+                    world.getBlockAt(-27, y, -38).setType(m);
+                }
+            }
             case 2 -> {
                 for (int y = 0; y <= 4; y++) {
                     world.getBlockAt(-27, y, -41).setType(m);
-                    world.getBlockAt(-27, y, -40).setType(m);
+                    world.getBlockAt(-27, y, -42).setType(m);
                     world.getBlockAt(-26, y, -41).setType(m);
-                    world.getBlockAt(-26, y, -40).setType(m);
+                    world.getBlockAt(-26, y, -42).setType(m);
                 }
             }
             case 1 -> {
                 for (int y = 0; y <= 5; y++) {
-                    world.getBlockAt(-26, 0, -45).setType(m);
-                    world.getBlockAt(-25, 0, -45).setType(m);
-                    world.getBlockAt(-26, 0, -44).setType(m);
-                    world.getBlockAt(-25, 0, -44).setType(m);
+                    world.getBlockAt(-26, y, -45).setType(m);
+                    world.getBlockAt(-25, y, -45).setType(m);
+                    world.getBlockAt(-26, y, -44).setType(m);
+                    world.getBlockAt(-25, y, -44).setType(m);
                 }
             }
         }
