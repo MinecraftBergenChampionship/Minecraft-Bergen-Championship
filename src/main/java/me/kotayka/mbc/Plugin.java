@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.boss.BossBar;
 import org.bukkit.boss.KeyedBossBar;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Recipe;
@@ -13,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
+import java.util.List;
 
 public class Plugin extends JavaPlugin implements Listener {
 
@@ -88,6 +90,7 @@ public class Plugin extends JavaPlugin implements Listener {
 
         getCommand("skip").setExecutor(new skip());
 
+        getCommand("loadPlayers").setExecutor(new loadPlayers());
 
         // prevent crafting wooden axes (worldedit)
         Iterator<Recipe> it = getServer().recipeIterator();
@@ -112,6 +115,10 @@ public class Plugin extends JavaPlugin implements Listener {
             BossBar b = it.next();
             b.removeAll();
             b.setVisible(false);
+        }
+
+        for (Leaderboard leaderboards : Lobby.individualLeaderboards) {
+            leaderboards.RemoveStands();
         }
     }
 }

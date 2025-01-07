@@ -35,6 +35,7 @@ public class Lobby extends Minigame {
     private int revealCounter = 0;
     private int introCounter = 0;
     private List<Participant> lastIntro = new LinkedList<>();
+    public static List<Leaderboard> individualLeaderboards = new ArrayList<>();
 
     private List<NPC> podiumNPCS = new ArrayList<>();
 
@@ -613,6 +614,28 @@ public class Lobby extends Minigame {
 
         List<Participant> individual = MBC.getInstance().getPlayers();
         individual.sort(new TotalIndividualComparator());
+
+        Leaderboard gameLeaderboard;
+
+        if (individualLeaderboards.isEmpty()) {
+            gameLeaderboard = new Leaderboard(individual, 1);
+        }
+        else {
+            Leaderboard lastBoard = individualLeaderboards.getFirst();
+
+            lastBoard.RemoveStands();
+
+            gameLeaderboard = new Leaderboard(individual, lastBoard, individualLeaderboards.size());
+
+            individualLeaderboards.removeFirst();
+        }
+
+        Leaderboard individualLeaderboard = new Leaderboard(individual, 0);
+        individualLeaderboards.addFirst(individualLeaderboard);
+        individualLeaderboards.add(gameLeaderboard);
+
+        gameLeaderboard.spawnLeaderboard();
+        individualLeaderboard.spawnLeaderboard();
 
         for (int i = 0; i < 8; i++) {
             Player p;

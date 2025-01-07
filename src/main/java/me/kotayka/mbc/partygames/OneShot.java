@@ -32,7 +32,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.enchantments.Enchantment;
 
 public class OneShot extends PartyGame {
-    private OneShotMap map = new Meltdown(this);
+    private OneShotMap map = new Ascent(this);
     private Map<MBCTeam, Integer> teamKills = new HashMap<>();
     public Map<UUID, OneShotPlayer> oneShotPlayerMap = new HashMap<>();
     public Location[] spawnpoints = map.spawnpoints;
@@ -249,6 +249,7 @@ public class OneShot extends PartyGame {
             p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
 
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, PotionEffect.INFINITE_DURATION, 2, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 2, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 2, false, false));
