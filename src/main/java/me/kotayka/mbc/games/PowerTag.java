@@ -469,7 +469,7 @@ public class PowerTag extends Game {
     * Returns a list of all possible hunter powerups.
     */
     public static ItemStack[] getHunterPowerupSelectors() {
-        ItemStack tremor = new ItemStack(Material.BLAZE_POWDER);
+        ItemStack tremor = new ItemStack(Material.GUNPOWDER);
         ItemMeta tremorMeta = tremor.getItemMeta();
         tremorMeta.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "TREMOR");
         ArrayList<String> tremorLore = new ArrayList();
@@ -1065,7 +1065,7 @@ public class PowerTag extends Game {
             }
 
 
-            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.BLAZE_POWDER && hunterSelector.equals(p) && hunterPowerup != hunterPowerupList[0]) {
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.GUNPOWDER && hunterSelector.equals(p) && hunterPowerup != hunterPowerupList[0]) {
                 hunterPowerup = hunterPowerupList[0];
                 p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.GOLD +""+ ChatColor.BOLD + "TREMOR");
                 e.setCancelled(true);

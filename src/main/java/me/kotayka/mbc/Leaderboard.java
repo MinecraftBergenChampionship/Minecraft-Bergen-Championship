@@ -13,13 +13,13 @@ public class Leaderboard {
     private List<Participant> participants;
     private List<ArmorStand> leaderboardStands = new ArrayList<>();
     private static Location[] INDIVIDUAL_LEADERBOARDS = new Location[]{
-            new Location(MBC.getInstance().lobby.world, 6, 2, 0),
-            new Location(MBC.getInstance().lobby.world, 9, 2, 0),
-            new Location(MBC.getInstance().lobby.world, 12, 2, 0),
-            new Location(MBC.getInstance().lobby.world, 15, 2, 0),
-            new Location(MBC.getInstance().lobby.world, 18, 2, 0),
-            new Location(MBC.getInstance().lobby.world, 21, 2, 0),
-            new Location(MBC.getInstance().lobby.world, 24, 2, 0),
+            new Location(MBC.getInstance().lobby.world, -3.5, -1, 51.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -1, 75.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -1, 71.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -1, 67.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -1, 63.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -1, 59.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -1, 55.5),
     };
 
     private int index;
@@ -59,7 +59,7 @@ public class Leaderboard {
                 Bukkit.broadcastMessage("Returning: "+i);
                 break;
             }
-            leaderboardLines.add(""+i+". "+p.getFormattedName()+" - "+scores.get(p));
+            leaderboardLines.add(""+(i+1)+". "+p.getFormattedName()+" - "+scores.get(p));
             Bukkit.broadcastMessage(leaderboardLines.getLast());
         }
 

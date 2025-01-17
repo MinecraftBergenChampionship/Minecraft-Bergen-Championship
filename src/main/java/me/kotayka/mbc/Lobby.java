@@ -386,7 +386,7 @@ public class Lobby extends Minigame {
     }
 
     public void loadPlayersScoreReveal() {
-        cameraman = (ArmorStand) world.spawnEntity(new Location(world, -14.5, -1, -21.5, 140, 0), EntityType.ARMOR_STAND);
+        cameraman = (ArmorStand) world.spawnEntity(new Location(world, -15.5, 0, -36.5, 90, -10), EntityType.ARMOR_STAND);
         cameraman.setInvisible(true);
         for (Player p : Bukkit.getOnlinePlayers()) {
             // probably better to have a global but doesn't matter for rn
@@ -481,7 +481,8 @@ public class Lobby extends Minigame {
                 p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 110, 1, false, false));
             }
         } else if (timeRemaining == 60) {
-            cameraman = (ArmorStand) world.spawnEntity(new Location(world, -8.5, 0, 0.5, -90, -11), EntityType.ARMOR_STAND);
+            cameraman = (ArmorStand) world.spawnEntity(new Location(world, 0.5, 0, 8.5, 180, -11), EntityType.ARMOR_STAND);
+            cameraman.setInvisible(true);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p, Sound.MUSIC_DISC_STRAD, SoundCategory.RECORDS, 1, 1);
                 p.removePotionEffect(PotionEffectType.BLINDNESS);
