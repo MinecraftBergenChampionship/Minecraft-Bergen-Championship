@@ -373,6 +373,7 @@ public class Spleef extends Game {
             else {
                 play.sendMessage(deathMessage);
             }
+            play.playSound(play, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE,1,1);
         }
 
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");

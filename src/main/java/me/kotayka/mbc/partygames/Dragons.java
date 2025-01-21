@@ -247,6 +247,7 @@ public class Dragons extends PartyGame {
             else {
                 play.sendMessage(deathMessage);
             }
+            play.playSound(play, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE,1,1);
         }
         logger.log(deathMessage);
 

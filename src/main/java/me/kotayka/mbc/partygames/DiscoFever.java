@@ -608,6 +608,7 @@ public class DiscoFever extends PartyGame {
                 else {
                     person.sendMessage(part.getFormattedName() + " was eliminated!");
                 }
+                person.playSound(person, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE,1,1);
             }
             logger.log(p.getName() + " fell into the void at delay " + delay);
             MBC.getInstance().showPlayers(part);

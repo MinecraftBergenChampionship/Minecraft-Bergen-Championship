@@ -71,9 +71,9 @@ public class TGTTOS extends Game {
     private List<TGTTOSMap> maps = new ArrayList<>(
             Arrays.asList(new Pit(), new Meatball(), new Walls(),
                     new Cliffs(), new Elytra(), new Skydive(),
-                    new Boats(), new Glide()
+                    new Boats(), new Glide(), new SquidGame(), new Trident()
             ));
-    private List<TGTTOSMap> mapsFirst = new ArrayList<>(Arrays.asList(new SquidGame(), new Trident()));
+    private List<TGTTOSMap> mapsFirst = new ArrayList<>(Arrays.asList());
 
     private List<Participant> finishedParticipants;
     private ArrayList<String> deathMessages = new ArrayList<>();

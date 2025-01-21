@@ -270,6 +270,10 @@ public class PowerTag extends Game {
                     setGameState(GameState.END_GAME);
                     gameOverGraphics();
                     timeRemaining = 45;
+
+                    for (PowerTagPlayer p : powerTagPlayerMap.values()) {
+                        logger.log(p.getParticipant().getFormattedName() + ": " + p.getSurvivals() + "rounds survived, " + p.getKills() + " tags, " + p.getTimeSurvived() + "seconds survived");
+                    }
                 }
                 else {
                     setGameState(GameState.END_ROUND);
@@ -505,8 +509,8 @@ public class PowerTag extends Game {
         toxicMeta.setUnbreakable(true);
         toxic.setItemMeta(toxicMeta);
 
-        ItemStack[] items = {trident, troll, toxic, tremor};
-        //ItemStack[] items = {trident, troll, toxic};
+        //ItemStack[] items = {trident, troll, toxic, tremor};
+        ItemStack[] items = {tremor, trident, toxic};
 
         return items;
     }
@@ -562,26 +566,29 @@ public class PowerTag extends Game {
     */
     public void hunterPowerupTitles(PowerTagPlayer p) {
         p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+        String message = "";
         if (hunterPowerup.equals(hunterPowerupList[0])) {
-            p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
-                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the tremor powerup!");
+            message = ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
+                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the tremor powerup!";
             p.getPlayer().sendTitle(ChatColor.BOLD + "TREMOR TAG!", "The ground beneath the hiders has began to shake...", 0, 60, 20);
         }
         if (hunterPowerup.equals(hunterPowerupList[1])) {
-            p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
-                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the trident powerup!");
+            message = ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
+                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the trident powerup!";
             p.getPlayer().sendTitle(ChatColor.BOLD + "TRIDENT TAG!", "The hunters have been given extra range...", 0, 60, 20);
         }
         if (hunterPowerup.equals(hunterPowerupList[2])) {
-            p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
-                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the troll powerup!");
+            message = ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
+                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the troll powerup!";
             p.getPlayer().sendTitle(ChatColor.BOLD + "TROLL TAG!", "The power is in the hands of the players...", 0, 60, 20);
         }
         if (hunterPowerup.equals(hunterPowerupList[3])) {
-            p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
-                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the toxic powerup!");
+            message = ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
+                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the toxic powerup!";
             p.getPlayer().sendTitle(ChatColor.BOLD + "TOXIC TAG!", "Be careful who you're near...", 0, 60, 20);
         }
+        p.getPlayer().sendMessage(message);
+        logger.log(message);
     }
 
 
@@ -614,14 +621,17 @@ public class PowerTag extends Game {
             int count = 0;
             for (int i = 0; i < infected.size(); i++) {
                 PowerTagPlayer p = infected.get(i);
+                String message = "";
                 if (p.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
-                    Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + ChatColor.RED + "" + ChatColor.BOLD + " was infected, and has been revealed...");
+                    message = p.getParticipant().getFormattedName() + ChatColor.RED + "" + ChatColor.BOLD + " was infected, and has been revealed...";
                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*timeRemaining, 255, false, false));
                     count++;
                 }
                 else if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
-                    Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + ChatColor.RED + "" + ChatColor.BOLD + " was infected, but has already been found...");
+                    message = p.getParticipant().getFormattedName() + ChatColor.RED + "" + ChatColor.BOLD + " was infected, but has already been found...";
                 }
+                Bukkit.broadcastMessage(message);
+                logger.log(message);
             }
             //Bukkit.broadcastMessage(ChatColor.RED + "In total, " + ChatColor.BOLD + count + ChatColor.RESET + "" + ChatColor.RED + 
                                         //" players were revealed! The player who began infected was " + infected.get(0).getParticipant().getFormattedName() + ".");
@@ -887,6 +897,7 @@ public class PowerTag extends Game {
         }
 
         Bukkit.broadcastMessage(survivorDisplay);
+        logger.log(survivorDisplay);
     }
 
     /**
@@ -976,8 +987,10 @@ public class PowerTag extends Game {
 
         hider.getPlayer().sendMessage(ChatColor.RED+"You died!");
         hider.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
-        Bukkit.broadcastMessage(hider.getParticipant().getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + " was found by " + 
-                                    ChatColor.RESET + hunter.getParticipant().getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + "!");
+        String message = hider.getParticipant().getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + " was found by " + 
+                                    ChatColor.RESET + hunter.getParticipant().getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + "!";
+        Bukkit.broadcastMessage(message);
+        logger.log(message);
 
         MBC.spawnFirework(hider.getParticipant());
         hider.getPlayer().setGameMode(GameMode.SPECTATOR);
