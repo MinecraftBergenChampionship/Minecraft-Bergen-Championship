@@ -55,6 +55,7 @@ public class Plugin extends JavaPlugin implements Listener {
         getCommand("start").setTabCompleter(new startTabCompletion());
 
         getCommand("pause").setExecutor(new pause());
+        getCommand("minibeepstop").setExecutor(new minibeepstop());
         getCommand("unpause").setExecutor(new unpause());
         getCommand("gamenum").setExecutor(new gamenum());
 

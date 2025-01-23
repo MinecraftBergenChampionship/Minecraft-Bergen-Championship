@@ -10,8 +10,11 @@ commands:
     description: list all commands
   changeTeam:
     description: Changing a team
-  playMusic:
+  playmusic:
     description: Playing music
+    permission: minecraft.command.op
+  minibeepstop:
+    description: Stop mini beep in lobby
     permission: minecraft.command.op
   start:
     description: start a game

@@ -2,6 +2,9 @@ package me.kotayka.mbc;
 
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
+import me.kotayka.mbc.partygames.BeepTestLevel;
+import me.kotayka.mbc.partygames.BeepTestLevelLoader;
+
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -17,11 +20,25 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.world.World;
+
 import net.citizensnpcs.api.npc.NPC;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -29,13 +46,33 @@ import java.util.List;
 
 public class Lobby extends Minigame {
     public static final Location LOBBY = new Location(Bukkit.getWorld("world"), 0.5, 1, 0.5, 180, 0);
-    public final World world = Bukkit.getWorld("world");
+    public final org.bukkit.World world = Bukkit.getWorld("world");
     public ArmorStand cameraman;
     private List<MBCTeam> reveal;
     private int revealCounter = 0;
     private int introCounter = 0;
     private List<Participant> lastIntro = new LinkedList<>();
     public static List<Leaderboard> individualLeaderboards = new ArrayList<>();
+
+    private static final Location MINI_BEEP_SE = new Location(Bukkit.getWorld("world"), 94.5, 8, 80.5);
+    private static final Location MINI_BEEP_NW = new Location(Bukkit.getWorld("world"), 68.5, -10, 46.5);
+    public List<Participant> miniBeepers = new ArrayList<>(); 
+    public int beepTestTimeRemaining = -1;
+    public int taskBeepID = -1;
+    private final Location BEEP_SPAWN = new Location(Bukkit.getWorld("Party"), -522, -55, -458, 180, 0);
+    private final Location BEEP_OPPOSITE_SPAWN = new Location(Bukkit.getWorld("Party"), -522, -55, -490);
+    private List<BeepTestLevel> easyLevels = null;
+    private List<BeepTestLevel> regularLevels = null;
+    private List<BeepTestLevel> mediumLevels = null;
+    private List<BeepTestLevel> hardLevels = null;
+    private BeepTestLevel currentLevel = null;
+    private int beepRound = 0;
+    private boolean activeBeep = false;
+    private final int BEEP_DEATH_Y = -6;
+    private final int BEEP_NORMAL_Z = 76;
+    private final int BEEP_OPPOSITE_Z = 50;
+    private final World WorldEditWorld = BukkitAdapter.adapt(Bukkit.getWorld("world"));
+    private String lastLevelName = "";
 
     private List<NPC> podiumNPCS = new ArrayList<>();
 
@@ -45,7 +82,7 @@ public class Lobby extends Minigame {
         colorPodiumsWhite();
         teamBarriers(false);
     }
-
+    
     public void createScoreboard(Participant p) {
         newObjective(p);
         createLine(18, ChatColor.GREEN+""+ChatColor.BOLD + "Your Team: " + p.getTeam().teamNameFormat(), p);
@@ -233,6 +270,7 @@ public class Lobby extends Minigame {
 
     public void toVoting() {
         HandlerList.unregisterAll(this);
+        miniBeepEnd("Mini Beep has ended due to voting!");
         setGameState(GameState.INACTIVE);
         if (MBC.getInstance().decisionDome == null) {
             MBC.getInstance().startGame(0);
@@ -251,6 +289,16 @@ public class Lobby extends Minigame {
         if (e.getPlayer().getLocation().getY() < -45){
             e.getPlayer().teleport(LOBBY);
         }
+
+        if (!activeBeep && e.getPlayer().getGameMode().equals(GameMode.ADVENTURE) && inBeepArea(e.getPlayer()) && !miniBeepers.contains(Participant.getParticipant(e.getPlayer()))) addBeepPlayer(e.getPlayer());
+        if (activeBeep && inBeepArea(e.getPlayer()) && !miniBeepers.contains(Participant.getParticipant(e.getPlayer()))) e.getPlayer().teleport(new Location(world, 81.5, -4, 38.5, -180, 0));
+        if (!inBeepArea(e.getPlayer()) && miniBeepers.contains(Participant.getParticipant(e.getPlayer()))) removeBeepPlayer(e.getPlayer());
+        if (activeBeep && miniBeepers.contains(Participant.getParticipant(e.getPlayer())) && e.getPlayer().getY() <= BEEP_DEATH_Y) beepPlayerEliminated(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent e) {
+        if (getState().equals(GameState.TUTORIAL) && e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) { e.setCancelled(true); }
     }
 
     @EventHandler
@@ -284,6 +332,7 @@ public class Lobby extends Minigame {
         stopTimer();
         setGameState(GameState.ACTIVE);
         createScoreboard();
+        beepBorders(false);
         loadPlayers();
         updateTeamStandings();
         if (MBC.getInstance().gameNum == 4) {
@@ -433,7 +482,7 @@ public class Lobby extends Minigame {
     public void toFinale() {
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
         setGameState(GameState.INACTIVE);
-
+        miniBeepEnd("Mini Beep has ended due to quickfire!");
         toQuickfire();
         // toDodgebolt();
     }
@@ -476,6 +525,7 @@ public class Lobby extends Minigame {
             cameraman.remove();
         } else if (timeRemaining == 63) {
             world.setTime(23225);
+            miniBeepEnd("Mini beep has ended due to the event beginning!");
             createLineAll(21, ChatColor.RED+""+ChatColor.BOLD + "Event begins in: ");
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 110, 1, false, false));
@@ -708,6 +758,305 @@ public class Lobby extends Minigame {
                 }
             }
         }
+    }
+
+    public boolean inBeepArea(Player p) {
+        Location l = p.getLocation();
+        return l.getY() >= MINI_BEEP_NW.getY() && l.getY() <= MINI_BEEP_SE.getY()
+            && l.getX() >= MINI_BEEP_NW.getX() && l.getX() <= MINI_BEEP_SE.getX()
+            && l.getZ() >= MINI_BEEP_NW.getZ() && l.getZ() <= MINI_BEEP_SE.getZ();
+    }
+
+    // true -> game active, false -> game inactive
+    public void beepBorders(boolean b) {
+        Material m = b ? Material.BARRIER : Material.AIR;
+        Material m2 = b ? Material.AIR : Material.BARRIER;
+
+        for (int y =  -2; y < 8; y++) {
+            for (int z = 46; z <= 80; z++) {
+                world.getBlockAt(94, y, z).setType(m);
+                world.getBlockAt(68, y, z).setType(m);
+            }
+            for (int z = 50; z <= 76; z++) {
+                world.getBlockAt(94, y, z).setType(Material.BARRIER);
+                world.getBlockAt(68, y, z).setType(Material.BARRIER);
+            }
+            for (int x = 69; x < 94; x++) {
+                world.getBlockAt(x, y, 46).setType(m);
+                world.getBlockAt(x, y, 80).setType(m);
+                world.getBlockAt(x, y, 50).setType(m2);
+                world.getBlockAt(x, y, 76).setType(m2);
+            }
+        }
+    }
+
+    private void loadCourses() {
+        easyLevels = BeepTestLevelLoader.loadEasyLevels();
+        regularLevels = BeepTestLevelLoader.loadRegularLevels();
+        mediumLevels = BeepTestLevelLoader.loadMediumLevels();
+        hardLevels = BeepTestLevelLoader.loadHardLevels();
+    }
+
+    public void addBeepPlayer(Player p) {
+        if (activeBeep) return;
+
+        if (miniBeepers.isEmpty()) {
+            miniBeepStart();
+        }
+        p.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "Joined Mini Beep!"));
+        miniBeepers.add(Participant.getParticipant(p));
+        p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
+    }
+
+    public void removeBeepPlayer(Player p) {
+        p.teleport(new Location(world, 81.5, -4, 38.5, -180, 0));
+        miniBeepers.remove(Participant.getParticipant(p));
+        if (miniBeepers.isEmpty()) {
+            miniBeepEnd();
+        }
+    }
+
+    public void beepPlayerEliminated(Player p) {
+        if (!activeBeep) return;
+
+        p.playSound(p, Sound.ENTITY_BAT_DEATH, 1, 1);
+        if (beepRound == 1) {
+            p.sendMessage("You were eliminated by " + ChatColor.AQUA + currentLevel.getName() + "!");
+        } else if (beepRound == 2) {
+            p.sendMessage("You were eliminated by " + ChatColor.GREEN + currentLevel.getName() + "!");
+        } else if (beepRound == 3) {
+            p.sendMessage("You were eliminated by " + ChatColor.YELLOW + currentLevel.getName() + "!");
+        } else {
+            p.sendMessage("You were eliminated by " + ChatColor.RED + currentLevel.getName() + "!");
+        }
+        removeBeepPlayer(p);
+
+        for (Participant part : miniBeepers) {
+            part.getPlayer().sendMessage(part.getFormattedName() + "was eliminated.");
+        }
+    }
+
+    public void setBeepTimer(int time) {
+        if (beepTestTimeRemaining != -1) {
+            stopBeepTimer();
+        }
+
+        beepTestTimeRemaining = time;
+
+        taskBeepID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
+            --beepTestTimeRemaining;
+            
+            miniBeepEvents();
+            if (beepTestTimeRemaining < 0) {
+                stopBeepTimer();
+            }
+        }, 20, 20);
+    }
+
+    public void stopBeepTimer() {
+        MBC.getInstance().cancelEvent(taskBeepID);
+    }
+
+    private void chooseLevel() {
+        List<BeepTestLevel> chooseFrom = null;
+        if (beepRound < 1) {
+            chooseFrom = easyLevels;
+        } else if (beepRound < 2) {
+            chooseFrom = regularLevels;
+        } else if (beepRound < 3) {
+            chooseFrom = mediumLevels;
+        } else {
+            chooseFrom = hardLevels;
+        }
+
+        // select random level
+        int rand = (int) (Math.random() * chooseFrom.size());
+        currentLevel = chooseFrom.get(rand);
+        chooseFrom.remove(rand);
+        beepRound++;
+
+        changeBeepMap();
+    }
+
+    public void changeBeepMap() {
+
+        for (int x = 69; x <= 93; x++) {
+            for (int y = -6; y <= 7; y++) {
+                for (int z = 51; z <= 75; z++) {
+                    world.getBlockAt(x, y, z).setType(Material.AIR);
+                }
+            }
+        }
+
+        if (beepRound % 2 == 1) {
+            EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(Bukkit.getWorld("world")));
+            ForwardExtentCopy copy = new ForwardExtentCopy(BukkitAdapter.adapt(Bukkit.getWorld("Party")), currentLevel.getReversedRegion(), BukkitAdapter.asBlockVector(currentLevel.getPasteReversed()), editSession, BukkitAdapter.asBlockVector(new Location(Bukkit.getWorld("world"), 69, -6, 75)));
+            try {
+                Operations.complete(copy);
+                editSession.close();
+            } catch (WorldEditException e) {
+                e.printStackTrace();
+            }
+        } else {
+            EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(Bukkit.getWorld("world")));
+            ForwardExtentCopy copy = new ForwardExtentCopy(BukkitAdapter.adapt(Bukkit.getWorld("Party")), currentLevel.getRegion(), BukkitAdapter.asBlockVector(currentLevel.getPasteFrom()), editSession, BukkitAdapter.asBlockVector(new Location(Bukkit.getWorld("world"), 69, -6, 75)));
+            try {
+                Operations.complete(copy);
+                editSession.close();
+            } catch (WorldEditException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void miniBeepStart() {
+        loadCourses();
+        setBeepTimer(75);
+    }
+
+    public void miniBeepEnd() {
+        for (int x = 69; x <= 93; x++) {
+            for (int y = -6; y <= 7; y++) {
+                for (int z = 51; z <= 75; z++) {
+                    world.getBlockAt(x, y, z).setType(Material.AIR);
+                }
+            }
+        }
+
+        beepBorders(false);
+        beepTestTimeRemaining = -1;
+        beepRound = 0;
+        activeBeep = false;
+        lastLevelName = "";
+        stopBeepTimer();
+        currentLevel = null;
+        easyLevels = null;
+        regularLevels = null;
+        mediumLevels = null;
+        hardLevels = null;
+        for (int i = miniBeepers.size() -1; i >= 0; i--) {
+            removeBeepPlayer(miniBeepers.get(i).getPlayer());
+        }
+    }
+
+    public void miniBeepEnd(String s) {
+        for (Participant p : miniBeepers) { 
+            p.getPlayer().sendMessage(ChatColor.RED + "" + s);
+        }
+        miniBeepEnd();
+    }
+
+    public void miniBeepEvents() {
+
+        switch(beepTestTimeRemaining) {
+            case 65 -> {
+                for (Participant p : miniBeepers) {
+                    p.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + "Mini Beep starts in 5 seconds!");
+                }
+            }  
+            case 60 -> {
+                beepBorders(true);
+                chooseLevel();
+                activeBeep = true;
+
+                for (int i = miniBeepers.size() -1; i >= 0; i--) {
+                    Player player = miniBeepers.get(i).getPlayer();
+                    if (miniBeepers.size() == 1) player.sendMessage(ChatColor.LIGHT_PURPLE + "Mini Beep has begun with 1 player!");
+                    else player.sendMessage(ChatColor.LIGHT_PURPLE + "Mini Beep has begun with " + miniBeepers.size() + " players!");
+                    player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.AQUA + "" + currentLevel.getName()));
+                }
+            }
+            case 48 -> {
+                for (Participant p : miniBeepers) {
+                    Player player = p.getPlayer();
+                    player.sendMessage(ChatColor.LIGHT_PURPLE + "3 seconds remain!");
+                }
+            }
+            case 45 -> {
+                lastLevelName = currentLevel.getName();
+                chooseLevel();
+
+                for (int i = miniBeepers.size() -1; i >= 0; i--) {
+                    if (checkPlayerDeath(miniBeepers.get(i))) continue;
+                    Player player = miniBeepers.get(i).getPlayer();
+                    player.sendMessage("You completed " + ChatColor.AQUA + lastLevelName + "!");
+                    player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "" + currentLevel.getName()));
+                }                
+            }
+            case 33 -> {
+                for (Participant p : miniBeepers) {
+                    Player player = p.getPlayer();
+                    player.sendMessage(ChatColor.LIGHT_PURPLE + "3 seconds remain!");
+                }
+            }
+            case 30 -> {
+                lastLevelName = currentLevel.getName();
+                chooseLevel();
+
+                for (int i = miniBeepers.size() -1; i >= 0; i--) {
+                    if (checkPlayerDeath(miniBeepers.get(i))) continue;
+                    Player player = miniBeepers.get(i).getPlayer();
+                    player.sendMessage("You completed " + ChatColor.GREEN + lastLevelName + "!");
+                    player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.YELLOW + "" + currentLevel.getName()));
+                }  
+               
+            }
+            case 18 -> {
+                for (Participant p : miniBeepers) {
+                    Player player = p.getPlayer();
+                    player.sendMessage(ChatColor.LIGHT_PURPLE + "3 seconds remain!");
+                }
+            }
+            case 15 -> {
+                lastLevelName = currentLevel.getName();
+                chooseLevel();
+
+                for (int i = miniBeepers.size() -1; i >= 0; i--) {
+                    if (checkPlayerDeath(miniBeepers.get(i))) continue;
+                    Player player = miniBeepers.get(i).getPlayer();
+                    player.sendMessage("You completed " + ChatColor.YELLOW + lastLevelName + "!");
+                    player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "" + currentLevel.getName()));
+                }  
+                
+            }
+            case 3 -> {
+                for (Participant p : miniBeepers) {
+                    Player player = p.getPlayer();
+                    player.sendMessage(ChatColor.LIGHT_PURPLE + "3 seconds remain!");
+                }
+            }
+            case 0 -> {
+                beepRound++;
+
+                for (int i = miniBeepers.size() -1; i >= 0; i--) {
+                    if (checkPlayerDeath(miniBeepers.get(i))) continue;
+                    Player player = miniBeepers.get(i).getPlayer();
+                    player.sendMessage("You completed " + ChatColor.RED + currentLevel.getName() + "!");
+                }  
+                
+                miniBeepEnd(ChatColor.BOLD + "You made it to the end!");
+            }
+                
+        }
+
+        
+    }
+
+    public boolean checkPlayerDeath(Participant p) {
+        if (beepRound % 2 == 0) {
+            if (p.getPlayer().getZ() < BEEP_NORMAL_Z) {
+                beepPlayerEliminated(p.getPlayer());
+                return true;
+            }
+        }
+        else {
+            if (p.getPlayer().getZ() > BEEP_OPPOSITE_Z) {
+                beepPlayerEliminated(p.getPlayer());
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void teamBarriers(boolean barriers) {

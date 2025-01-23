@@ -609,7 +609,6 @@ public class MBC implements Listener {
             Bukkit.broadcastMessage(ChatColor.RED+"ERROR: " + currentGame.name()+ " is in progress!");
             return;
         }
-
         Bukkit.broadcastMessage(ChatColor.GOLD + game.name()+ ChatColor.WHITE + " has started");
         setCurrentGame(game);
         currentGame.start();
@@ -619,6 +618,10 @@ public class MBC implements Listener {
         // prevent another game from starting if a non-lobby game is active
         if (currentGame instanceof Game) {
             Bukkit.broadcastMessage(ChatColor.RED+"ERROR: " + currentGame.name()+ " is in progress!");
+            return;
+        }
+        if (!lobby.miniBeepers.isEmpty()) {
+            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: In-lobby game is in progress!");
             return;
         }
 
@@ -743,6 +746,18 @@ public class MBC implements Listener {
             } else {
                 break;
             }
+        }
+        sender.sendMessage(msg.toString());
+    }
+
+    public void getAllIndividual(Player sender) {
+        List<Participant> individual = getPlayers();
+        individual.sort(new TotalIndividualComparator());
+        int placement;
+        StringBuilder msg = new StringBuilder(ChatColor.AQUA.toString()+ChatColor.BOLD+"Player scores: \n"+ChatColor.RESET);
+        for (Participant p : individual) {
+            placement = p.getPlacement();
+            msg.append(placement).append(". ").append(p.getFormattedName()).append(": ").append(p.getRawTotalScore()).append("\n");
         }
         sender.sendMessage(msg.toString());
     }
