@@ -627,8 +627,10 @@ public class OneShot extends PartyGame {
             b.setVisible(false);
         }
 
-        timeRemaining = 10;
-        setGameState(GameState.END_ROUND);
+        //timeRemaining = 10;
+        //setGameState(GameState.END_ROUND);
+        // not sure if this work rn
+        endEvents();
     }
 
     private void Death(Participant shot, Participant damager) {
