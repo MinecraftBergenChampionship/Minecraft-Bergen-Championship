@@ -1,5 +1,9 @@
 package me.kotayka.mbc.gameMaps.bsabmMaps;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -11,11 +15,14 @@ import org.bukkit.block.data.type.Slab;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.Player;
 
+import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
+
 public class Build {
     private Block[][][] blocks = new Block[6][7][7];
     private final String NAME;
     private final String AUTHOR;
     private final World WORLD;
+    public Map<Material, Integer> blockList = new HashMap<>();
 
     public Build(Location diamondBlock) {
         WORLD = diamondBlock.getWorld();
@@ -54,6 +61,9 @@ public class Build {
             for (int x = startBlock.getBlockX(); x >= startBlock.getBlockX()-6; x--) {
                 for (int z = startBlock.getBlockZ(); z >= startBlock.getBlockZ()-6; z--) {
                     blocks[y- startBlock.getBlockY()][startBlock.getBlockX()-x][startBlock.getBlockZ()-z] = WORLD.getBlockAt(x,y,z);
+
+                    if (!blockList.containsKey(WORLD.getBlockAt(x,y,z).getType())) blockList.put(WORLD.getBlockAt(x,y,z).getType(), 1);
+                    else blockList.replace(WORLD.getBlockAt(x,y,z).getType(), blockList.get(WORLD.getBlockAt(x,y,z).getType()));
                 }
             }
         }

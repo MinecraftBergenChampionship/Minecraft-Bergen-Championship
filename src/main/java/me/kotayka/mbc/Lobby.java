@@ -588,14 +588,17 @@ public class Lobby extends Minigame {
                 lastIntro.clear();
             }
             lastIntro.addAll(intro.getPlayers());
+            String introPlayers = "";
             for (Participant p : intro.getPlayers()) {
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
                 p.getPlayer().getInventory().clear();
                 MBC.spawnFirework(new Location(world, 0.5, 2, 0.5), p.getTeam().getColor());
                 p.getPlayer().teleport(new Location(world, 0, 1, 0, 90, 0));
+                introPlayers += p.getFormattedName() + ", ";
             }
+            introPlayers = introPlayers.substring(0, introPlayers.length()-2);
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.getPlayer().sendTitle(intro.teamNameFormat(), " ", 20, 60, 20);
+                p.getPlayer().sendTitle(intro.teamNameFormat(), introPlayers, 20, 60, 20);
             }
         }
     }
@@ -837,11 +840,11 @@ public class Lobby extends Minigame {
             }
         }
         else {
-            if (beepRound == 1) {
+            if (beepRound == 0) {
                 p.sendMessage("You were eliminated by " + ChatColor.AQUA + lastLevelName + "!");
-            } else if (beepRound == 2) {
+            } else if (beepRound == 1) {
                 p.sendMessage("You were eliminated by " + ChatColor.GREEN + lastLevelName + "!");
-            } else if (beepRound == 3) {
+            } else if (beepRound == 2) {
                 p.sendMessage("You were eliminated by " + ChatColor.YELLOW + lastLevelName + "!");
             } else {
                 p.sendMessage("You were eliminated by " + ChatColor.RED + lastLevelName + "!");
@@ -941,7 +944,10 @@ public class Lobby extends Minigame {
                 }
             }
         }
-
+        if (activeBeep) {
+            Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Mini Beep has ended!");
+        }
+        
         beepBorders(false);
         beepTestTimeRemaining = -1;
         beepRound = 0;
@@ -1047,7 +1053,7 @@ public class Lobby extends Minigame {
             case 0 -> {
                 beepRound++;
 
-                String survivors = ChatColor.BOLD + "Survivors:\n";
+                String survivors = ChatColor.BOLD + "Players have survived Mini Beep!\n";
 
                 for (int i = miniBeepers.size() -1; i >= 0; i--) {
                     if (checkPlayerDeath(miniBeepers.get(i))) continue;
@@ -1061,9 +1067,8 @@ public class Lobby extends Minigame {
                     survivors = survivors.substring(0, survivors.length()-2);
                 }
 
-                for (Participant p : miniBeepers) {
-                    p.getPlayer().sendMessage(survivors);
-                }
+                Bukkit.broadcastMessage(survivors);
+
                 miniBeepEnd(ChatColor.BOLD + "You made it to the end!");
 
                 

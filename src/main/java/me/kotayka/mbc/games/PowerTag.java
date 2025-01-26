@@ -936,14 +936,24 @@ public class PowerTag extends Game {
     }
 
     /**
-     * Loads all rooms into rooms arraylist.
+     * Loads all rooms into rooms arraylist - chooses randomly between room variants. Will now run once every round.
      */
     public void loadBuilds() {
+        ROOMS.clear();
         Block diamondBlock = TAG_WORLD.getBlockAt(new Location(TAG_WORLD, 500, -60, 500));
 
         while (diamondBlock.getType() == Material.DIAMOND_BLOCK) {
+            Block variantChecker = TAG_WORLD.getBlockAt(new Location(TAG_WORLD, diamondBlock.getX(), diamondBlock.getY(), diamondBlock.getZ()+30));
+            int count = 1;
+            while (variantChecker.getType() == Material.DIAMOND_BLOCK) {
+                count++;
+                variantChecker= TAG_WORLD.getBlockAt(new Location(TAG_WORLD, variantChecker.getX(), variantChecker.getY(), variantChecker.getZ()+30));
+            }
+            Bukkit.broadcastMessage("" + count);
+            int buildChosen = (int)(count*Math.random());
+            diamondBlock = TAG_WORLD.getBlockAt(new Location(TAG_WORLD, diamondBlock.getX(), diamondBlock.getY(), diamondBlock.getZ()+30*buildChosen));
             ROOMS.add(new Room(diamondBlock.getLocation()));
-            diamondBlock = TAG_WORLD.getBlockAt(diamondBlock.getX() - 30, diamondBlock.getY(), diamondBlock.getZ());
+            diamondBlock = TAG_WORLD.getBlockAt(diamondBlock.getX() - 30, diamondBlock.getY(), 500);
             while (diamondBlock.getType() == Material.GOLD_BLOCK) {
                 diamondBlock = TAG_WORLD.getBlockAt(diamondBlock.getX() - 30, diamondBlock.getY(), diamondBlock.getZ());
             }
@@ -954,6 +964,7 @@ public class PowerTag extends Game {
      * Shuffles all rooms in rooms arraylist. Then places into map array and adds the room.
      */
     public void fillMap() {
+        loadBuilds();
         Collections.shuffle(ROOMS);
 
         for (int i = 0; i < map.length; i++) {
