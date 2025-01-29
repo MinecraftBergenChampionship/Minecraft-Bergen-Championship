@@ -40,7 +40,7 @@ public class Build {
                     str.append(s.trim()).append(" ");
                 }
                 str.replace(str.length()-1, str.length(), "");
-                NAME = str.toString();
+                NAME = str.toString().trim();
             }
         } else {
             Bukkit.broadcastMessage("[Debug] No build name! Sign (XYZ):" + ChatColor.LIGHT_PURPLE+"X: "+sign.getLocation().getX()+", Y: "+sign.getLocation().getY()+", Z: "+sign.getLocation().getZ());

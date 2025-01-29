@@ -494,6 +494,7 @@ public class MBC implements Listener {
                     Location l = p.getLocation();
                     l.setPitch(-30);
                     p.setVelocity(p.getVelocity().add(l.getDirection().multiply(4.0).setY(1.25)));
+                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_4, SoundCategory.BLOCKS, 1, 1);
                 }
             }, 1);
             return;
@@ -507,6 +508,7 @@ public class MBC implements Listener {
                     Location l = p.getLocation();
                     l.setPitch(-30);
                     p.setVelocity(p.getVelocity().add(l.getDirection().multiply(2.0)));
+                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_4, SoundCategory.BLOCKS, 1, 1);
                 }
             }, 1);
             return;
@@ -518,6 +520,7 @@ public class MBC implements Listener {
                 public void run() {
                     Player p = e.getPlayer();
                     p.setVelocity(p.getVelocity().add(new Vector(p.getVelocity().getX(), p.getVelocity().getY()*1.75, p.getVelocity().getZ())));
+                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_5, SoundCategory.BLOCKS, 1, 1);
                 }
             }, 1);
         }
@@ -526,7 +529,12 @@ public class MBC implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
+            PotionEffect s = e.getPlayer().getPotionEffect(PotionEffectType.SPEED);
+
+            if (s == null) e.getPlayer().playSound(e.getPlayer(), Sound.ITEM_GOAT_HORN_SOUND_3, SoundCategory.BLOCKS, 1, 1);
+            else if (s.isShorterThan(new PotionEffect(PotionEffectType.SPEED, 70, 3, false, false))) e.getPlayer().playSound(e.getPlayer(), Sound.ITEM_GOAT_HORN_SOUND_3, SoundCategory.BLOCKS, 1, 1);
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
+            
         }
     }
 

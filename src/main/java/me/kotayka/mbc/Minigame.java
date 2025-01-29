@@ -3,6 +3,8 @@ package me.kotayka.mbc;
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -156,6 +158,30 @@ public abstract class Minigame implements Scoreboard, Listener {
             } else if (timeRemaining == 2) {
                 p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + ChatColor.YELLOW + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             } else if (timeRemaining == 1) {
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + ChatColor.GREEN + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
+            }
+        }
+    }
+
+    /**
+     * Graphics for counting down when a game is about to start.
+     * Includes Sound s.
+     * Should only be called when gameState() is GameState.STARTING
+     * since it directly uses timeRemaining
+     * Does not handle events for when timer hits 0 (countdown finishes).
+     */
+    public void startingCountdown(Sound s) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (timeRemaining <= 10 && timeRemaining > 3) {
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + timeRemaining + "<", 0, 20, 0);
+            } else if (timeRemaining == 3) {
+                p.playSound(p, s, SoundCategory.RECORDS, 1, 1);
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + ChatColor.RED + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
+            } else if (timeRemaining == 2) {
+                p.playSound(p, s, SoundCategory.RECORDS, 1, 1);
+                p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + ChatColor.YELLOW + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
+            } else if (timeRemaining == 1) {
+                p.playSound(p, s, SoundCategory.RECORDS, 1, 1);
                 p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + ChatColor.GREEN + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             }
         }

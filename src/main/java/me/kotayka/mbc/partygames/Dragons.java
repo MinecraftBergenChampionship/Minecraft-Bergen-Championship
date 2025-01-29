@@ -247,7 +247,6 @@ public class Dragons extends PartyGame {
             else {
                 play.sendMessage(deathMessage);
             }
-            play.playSound(play, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE,1,1);
         }
         logger.log(deathMessage);
 
@@ -276,7 +275,12 @@ public class Dragons extends PartyGame {
                 }
                 break;
             case STARTING:
-                startingCountdown();
+                startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                if (timeRemaining == 9) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);
+                    }
+                }
                 if (timeRemaining == 0) {
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS,1,1);

@@ -327,10 +327,16 @@ public class OneShot extends PartyGame {
             }
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
-                startingCountdown();
+                startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                if (timeRemaining == 9) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);
+                    }
+                }
             } else {
                 setGameState(GameState.ACTIVE);
                 for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 0.75f, 1);
                     p.playSound(p, Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS, 1, 1);
                 }
                 setPVP(true);

@@ -159,6 +159,9 @@ public class BuildMart extends Game {
                     bmp.spawn();
                 }
                 setGameState(GameState.STARTING);
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS, 1, 1);
+                }
                 timeRemaining = 30;
             } else if (timeRemaining % 7 == 0) {
                 Introduction();
@@ -171,10 +174,6 @@ public class BuildMart extends Game {
                 }
                 setGameState(GameState.ACTIVE);
                 timeRemaining = 720;
-            } else if (timeRemaining == 25) {
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.playSound(p, Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS, 1, 1);
-                }
             } else {
                 startingCountdown();
             }
@@ -233,6 +232,12 @@ public class BuildMart extends Game {
                 }
                 setGameState(GameState.END_GAME);
                 timeRemaining = 23;
+            }
+            else if (timeRemaining == 250 || timeRemaining == 500) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.stopSound(Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS);
+                    p.playSound(p, Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS, 1, 1);
+                }
             }
         } else if (getState().equals(GameState.END_GAME)) {
             teamGameEndEvents();

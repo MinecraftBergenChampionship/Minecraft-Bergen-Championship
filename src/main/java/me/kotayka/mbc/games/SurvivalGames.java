@@ -745,6 +745,8 @@ public class SurvivalGames extends Game {
                 createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
             }
             deathEffectsWithHealthSG(e, horcrux, e.getPlayer().getLastDamageCause().getCause());
+            killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
+    
         } else {
             Participant p = Participant.getParticipant(victim);
             if (p == null) return;

@@ -196,7 +196,7 @@ public class Spleef extends Game {
             }
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
-                startingCountdown();
+                startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
                 if (timeRemaining == 5 && map.getMapType().equals("Gravity")) {
                     Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "Prepare for an antigravity experience!\n");
                     for (Participant p : MBC.getInstance().getPlayers()) {
@@ -204,6 +204,11 @@ public class Spleef extends Game {
                         p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.RECORDS, 1, 1);
                         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, PotionEffect.INFINITE_DURATION, 3, false, false));
                         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, PotionEffect.INFINITE_DURATION, 1, false, false));
+                    }
+                }
+                if (timeRemaining == 9) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);
                     }
                 }
                 if (timeRemaining == 5 && map.getMapType().equals("Blind")) {
@@ -221,6 +226,7 @@ public class Spleef extends Game {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
                 for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 0.75f, 1);
                     p.playSound(p, Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS, 1, 1);
                 }
                 setGameState(GameState.ACTIVE);
@@ -356,7 +362,7 @@ public class Spleef extends Game {
                 killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + victim.getPlayer().getName() + "!" + MBC.scoreFormatter(KILL_POINTS));
                 killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
                 createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+killer.getKills(), killer.getParticipant());
-
+                killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
                 deathMessage = victim.getParticipant().getFormattedName()+" was spleefed by " + killer.getParticipant().getFormattedName();
             } else {
                 deathMessage = victim.getParticipant().getFormattedName() + " fell into the void";
@@ -373,7 +379,6 @@ public class Spleef extends Game {
             else {
                 play.sendMessage(deathMessage);
             }
-            play.playSound(play, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE,1,1);
         }
 
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");

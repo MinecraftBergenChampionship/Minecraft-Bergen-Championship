@@ -144,9 +144,9 @@ public class AceRace extends Game {
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
                 startingCountdown();
-                if (timeRemaining == 10) {
+                if (timeRemaining == 11) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_11, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_0, SoundCategory.RECORDS, 0.75f, 1);
                     }
                 }
             } else {
@@ -155,6 +155,10 @@ public class AceRace extends Game {
                 //setPVP(true);
                 timeRemaining = 720;
                 startingTime = System.currentTimeMillis();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.RECORDS, 0.75f, 1);
+                    p.playSound(p, Sound.MUSIC_DISC_11, SoundCategory.RECORDS, 1, 1);
+                }
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             if (timeRemaining == 30) {
@@ -173,6 +177,12 @@ public class AceRace extends Game {
                 }
                 setGameState(GameState.END_GAME);
                 timeRemaining = 42;
+            }
+            else if (timeRemaining % 157 == 92) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.stopSound(Sound.MUSIC_DISC_11, SoundCategory.RECORDS);
+                    p.playSound(p, Sound.MUSIC_DISC_11, SoundCategory.RECORDS, 1, 1);
+                }
             }
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 41) {

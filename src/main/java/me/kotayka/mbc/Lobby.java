@@ -140,7 +140,7 @@ public class Lobby extends Minigame {
                 toVoting();
             }
         } else if (getState().equals(GameState.ACTIVE)) {
-            if (MBC.getInstance().gameNum == 4 && (timeRemaining == 278 || timeRemaining == 139)) {
+            if (MBC.getInstance().gameNum == 4 && (timeRemaining == 260 || timeRemaining == 130)) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
                     p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
@@ -339,12 +339,12 @@ public class Lobby extends Minigame {
         loadPlayers();
         updateTeamStandings();
         if (MBC.getInstance().gameNum == 4) {
-            setTimer(417);
+            setTimer(390);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
             }
         } else {
-            setTimer(139);
+            setTimer(130);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
             }
@@ -983,8 +983,9 @@ public class Lobby extends Minigame {
                 activeBeep = true;
 
                 for (int i = miniBeepers.size() -1; i >= 0; i--) {
+                    
                     Player player = miniBeepers.get(i).getPlayer();
-                    player.playSound(player, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1, 1);
+                    player.playSound(player, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 1, 1);
                     if (miniBeepers.size() == 1) player.sendMessage(ChatColor.LIGHT_PURPLE + "Mini Beep has begun with 1 player!");
                     else player.sendMessage(ChatColor.LIGHT_PURPLE + "Mini Beep has begun with " + miniBeepers.size() + " players!");
                     player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.AQUA + "" + currentLevel.getName().trim()));
@@ -1065,9 +1066,8 @@ public class Lobby extends Minigame {
                 
                 if (miniBeepers.size() > 0) {
                     survivors = survivors.substring(0, survivors.length()-2);
+                    Bukkit.broadcastMessage(survivors);
                 }
-
-                Bukkit.broadcastMessage(survivors);
 
                 miniBeepEnd(ChatColor.BOLD + "You made it to the end!");
 

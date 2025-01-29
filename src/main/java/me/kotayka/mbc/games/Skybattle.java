@@ -167,10 +167,16 @@ public class Skybattle extends Game {
             }
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
-                startingCountdown();
+                startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                if (timeRemaining == 9) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);
+                    }
+                }
             } else {
                 setGameState(GameState.ACTIVE);
                 for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.RECORDS, 0.75f, 1);
                     p.playSound(p, Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS, 1, 1);
                 }
                 map.removeBarriers();
@@ -561,6 +567,10 @@ public class Skybattle extends Game {
             updatePlayersAlive(player.getParticipant());
         } else {
             skybattleDeathGraphics(e, damageEvent.getCause());
+        }
+
+        if (killer!=null) {
+            killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
         }
 
         int count = 0;

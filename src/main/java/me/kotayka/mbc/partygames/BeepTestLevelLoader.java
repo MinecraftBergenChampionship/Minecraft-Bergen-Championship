@@ -54,7 +54,7 @@ public final class BeepTestLevelLoader {
                 BukkitAdapter.asBlockVector(new Location(world, 24+offset, MAX_Y, 0)
             ));
             offset+=OFFSET_AMT;
-            easyLevels.add(new BeepTestLevel(level, name, levelInitial));
+            easyLevels.add(new BeepTestLevel(level, name.trim(), levelInitial));
             sign = new Location(world, X_INITIAL + offset, -56, 25).getBlock();
         }
         //return List.copyOf(easyLevels);
