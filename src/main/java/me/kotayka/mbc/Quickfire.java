@@ -1,6 +1,5 @@
 package me.kotayka.mbc;
 
-import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
@@ -13,12 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
-import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_21_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_21_R1.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;

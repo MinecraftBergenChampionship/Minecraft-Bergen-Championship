@@ -2,7 +2,6 @@ package me.kotayka.mbc;
 
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
-import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
 import me.kotayka.mbc.partygames.BeepTestLevel;
 import me.kotayka.mbc.partygames.BeepTestLevelLoader;
 
@@ -12,13 +11,11 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.SkeletonHorse;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -36,8 +33,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 
 import net.citizensnpcs.api.npc.NPC;
@@ -45,7 +40,6 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -1209,11 +1203,12 @@ public class Lobby extends Minigame {
 
     public void addPvpPlayer(Player p) {
         p.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "Joined PVP!"));
+        //MBC.getInstance().board.getTeam(Participant.getParticipant(p).getTeam().fullName).setAllowFriendlyFire(true);
         pvpers.add(Participant.getParticipant(p));
         addPvpItems(p);
         p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
+        p.removePotionEffect(PotionEffectType.SPEED);
         p.removePotionEffect(PotionEffectType.RESISTANCE);
-        p.removePotionEffect(PotionEffectType.WEAKNESS);
         p.removePotionEffect(PotionEffectType.SATURATION);
     }
 
@@ -1232,7 +1227,6 @@ public class Lobby extends Minigame {
         p.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 255));
         p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
         p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
-        p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, PotionEffect.INFINITE_DURATION, 255, false, false));
         pvpers.remove(Participant.getParticipant(p));
     }
 
@@ -1271,15 +1265,16 @@ public class Lobby extends Minigame {
      
     @EventHandler
     public void onEntityDamageEntity(EntityDamageByEntityEvent e) {
-        if (!isGameActive()) return;
-        if (!(e.getDamager() instanceof Player)) return;
-        if (!(e.getDamager() instanceof Player)) return;
+        if (!(e.getDamager() instanceof Player) || !(e.getEntity() instanceof Player)) {
+            e.setCancelled(true);
+            return;
+        }
 
         Player damager = (Player)(e.getDamager());
         Player damaged = (Player)(e.getEntity());
 
-        if (pvpers.contains(Participant.getParticipant(damager)) && pvpers.contains(Participant.getParticipant(damaged))) {
-            return;
+        if (!(pvpers.contains(Participant.getParticipant(damager)) && pvpers.contains(Participant.getParticipant(damaged)))) {
+            e.setCancelled(true);
         }
     }
 
