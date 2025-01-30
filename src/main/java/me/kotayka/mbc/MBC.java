@@ -576,6 +576,7 @@ public class MBC implements Listener {
         }
 
         if (!(e.getEntity() instanceof Player)) return;
+        if (currentGame instanceof Lobby) {return; }
         if (!(currentGame instanceof Game)) { e.setCancelled(true); return; }
         if (getGame().PVP()) {
             // I'm not sure if Team Attack was on before, but just in case

@@ -2,6 +2,7 @@ package me.kotayka.mbc;
 
 import me.kotayka.mbc.comparators.TeamScoreSorter;
 import me.kotayka.mbc.comparators.TotalIndividualComparator;
+import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
 import me.kotayka.mbc.partygames.BeepTestLevel;
 import me.kotayka.mbc.partygames.BeepTestLevelLoader;
 
@@ -17,6 +18,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -41,6 +45,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,8 +64,6 @@ public class Lobby extends Minigame {
     public List<Participant> miniBeepers = new ArrayList<>(); 
     public int beepTestTimeRemaining = -1;
     public int taskBeepID = -1;
-    private final Location BEEP_SPAWN = new Location(Bukkit.getWorld("Party"), -522, -55, -458, 180, 0);
-    private final Location BEEP_OPPOSITE_SPAWN = new Location(Bukkit.getWorld("Party"), -522, -55, -490);
     private List<BeepTestLevel> easyLevels = null;
     private List<BeepTestLevel> regularLevels = null;
     private List<BeepTestLevel> mediumLevels = null;
@@ -73,6 +76,11 @@ public class Lobby extends Minigame {
     private final int BEEP_OPPOSITE_Z = 50;
     private final World WorldEditWorld = BukkitAdapter.adapt(Bukkit.getWorld("world"));
     private String lastLevelName = "";
+    private boolean miniBeepStartable = true;
+
+    private List<Participant> pvpers = new ArrayList<>();
+    private boolean pvpStartable = true;
+    private List<Player> pvpDead = new ArrayList<>();;
 
     private List<NPC> podiumNPCS = new ArrayList<>();
 
@@ -264,6 +272,8 @@ public class Lobby extends Minigame {
                     createLineAll(21, ChatColor.GREEN.toString()+ChatColor.BOLD+"Event Over!");
                     createLineAll(20, "Thanks for playing!");
                 }
+                miniBeepStartable = true;
+                pvpStartable = true;
             }
         }
     }
@@ -271,6 +281,9 @@ public class Lobby extends Minigame {
     public void toVoting() {
         HandlerList.unregisterAll(this);
         miniBeepEnd("Mini Beep has ended due to voting!");
+        endPvp();
+        miniBeepStartable = false;
+        pvpStartable = false;
         setGameState(GameState.INACTIVE);
         if (MBC.getInstance().decisionDome == null) {
             MBC.getInstance().startGame(0);
@@ -290,13 +303,23 @@ public class Lobby extends Minigame {
             e.getPlayer().teleport(LOBBY);
         }
 
-        if (!activeBeep && e.getPlayer().getGameMode().equals(GameMode.ADVENTURE) && inBeepArea(e.getPlayer()) && !miniBeepers.contains(Participant.getParticipant(e.getPlayer()))) addBeepPlayer(e.getPlayer());
+        if (miniBeepStartable && !activeBeep && e.getPlayer().getGameMode().equals(GameMode.ADVENTURE) && inBeepArea(e.getPlayer()) && !miniBeepers.contains(Participant.getParticipant(e.getPlayer()))) addBeepPlayer(e.getPlayer());
         if (activeBeep && inBeepArea(e.getPlayer()) && !miniBeepers.contains(Participant.getParticipant(e.getPlayer()))) e.getPlayer().teleport(new Location(world, 81.5, -4, 38.5, -180, 0));
         if (!inBeepArea(e.getPlayer()) && miniBeepers.contains(Participant.getParticipant(e.getPlayer()))) {
             removeBeepPlayer(e.getPlayer());
             e.getPlayer().playSound(e.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 1);
         }
         if (activeBeep && miniBeepers.contains(Participant.getParticipant(e.getPlayer())) && e.getPlayer().getY() <= BEEP_DEATH_Y) beepPlayerEliminated(e.getPlayer(), true);
+    
+        if (!pvpDead.contains(e.getPlayer()) && pvpStartable && e.getPlayer().getGameMode().equals(GameMode.ADVENTURE) && inPVPArea(e.getPlayer()) && !pvpers.contains(Participant.getParticipant(e.getPlayer()))) addPvpPlayer(e.getPlayer());
+        if (!inPVPArea(e.getPlayer()) && pvpers.contains(Participant.getParticipant(e.getPlayer()))) {
+            removePvpPlayer(e.getPlayer());
+            e.getPlayer().playSound(e.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 1);
+        }
+        if(pvpDead.contains(e.getPlayer())) {
+            e.getPlayer().teleport(new Location(world, 109.5, -4, -59.5, -90, 0));
+            pvpDead.remove(e.getPlayer());
+        }
     }
 
     @EventHandler
@@ -338,6 +361,8 @@ public class Lobby extends Minigame {
         beepBorders(false);
         loadPlayers();
         updateTeamStandings();
+        miniBeepStartable = true;
+        pvpStartable = true;
         if (MBC.getInstance().gameNum == 4) {
             setTimer(390);
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -400,7 +425,7 @@ public class Lobby extends Minigame {
         }
         updateTeamStandings();
     }
-
+    /*
     @EventHandler
     public void onPunch(EntityDamageByEntityEvent e) {
         if (e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
@@ -409,6 +434,7 @@ public class Lobby extends Minigame {
             e.setCancelled(true);
         }
     }
+         */
 
     // prevent leaving cutscenes
     @EventHandler
@@ -486,6 +512,9 @@ public class Lobby extends Minigame {
         HandlerList.unregisterAll(this);    // game specific listeners are only active when game is
         setGameState(GameState.INACTIVE);
         miniBeepEnd("Mini Beep has ended due to quickfire!");
+        endPvp();
+        miniBeepStartable = false;
+        pvpStartable = false;
         toQuickfire();
         // toDodgebolt();
     }
@@ -509,6 +538,7 @@ public class Lobby extends Minigame {
             p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, PotionEffect.INFINITE_DURATION, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().getInventory().clear();
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
@@ -529,6 +559,9 @@ public class Lobby extends Minigame {
         } else if (timeRemaining == 63) {
             world.setTime(23225);
             miniBeepEnd("Mini beep has ended due to the event beginning!");
+            endPvp();
+            miniBeepStartable = false;
+            pvpStartable = false;
             createLineAll(21, ChatColor.RED+""+ChatColor.BOLD + "Event begins in: ");
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 110, 1, false, false));
@@ -840,11 +873,11 @@ public class Lobby extends Minigame {
             }
         }
         else {
-            if (beepRound == 0) {
+            if (beepRound == 2) {
                 p.sendMessage("You were eliminated by " + ChatColor.AQUA + lastLevelName + "!");
-            } else if (beepRound == 1) {
+            } else if (beepRound == 3) {
                 p.sendMessage("You were eliminated by " + ChatColor.GREEN + lastLevelName + "!");
-            } else if (beepRound == 2) {
+            } else if (beepRound == 4) {
                 p.sendMessage("You were eliminated by " + ChatColor.YELLOW + lastLevelName + "!");
             } else {
                 p.sendMessage("You were eliminated by " + ChatColor.RED + lastLevelName + "!");
@@ -1163,6 +1196,93 @@ public class Lobby extends Minigame {
         world.getBlockAt(-19, 0, -23).setType(m);
     }
 
+    public boolean inPVPArea(Player p) {
+        Location l = p.getLocation();
+        int x = (int)(l.getX());
+        int z = (int)(l.getZ()) - 1;
+        Block check = new Location(world, x, -6, z).getBlock();
+        if (check.getType() == Material.WAXED_OXIDIZED_COPPER_BULB) {
+            return true;
+        }
+        return false;
+    }
+
+    public void addPvpPlayer(Player p) {
+        p.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "Joined PVP!"));
+        pvpers.add(Participant.getParticipant(p));
+        addPvpItems(p);
+        p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
+        p.removePotionEffect(PotionEffectType.RESISTANCE);
+        p.removePotionEffect(PotionEffectType.WEAKNESS);
+        p.removePotionEffect(PotionEffectType.SATURATION);
+    }
+
+    public void addPvpItems(Player p) {
+        p.getInventory().setHelmet(new ItemStack(Material.IRON_HELMET));
+        p.getInventory().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+        p.getInventory().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+        p.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
+        p.getPlayer().getInventory().addItem(new ItemStack(Material.STONE_SWORD));
+        p.getPlayer().getInventory().addItem(new ItemStack(Material.STONE_AXE));
+    }
+
+    public void removePvpPlayer(Player p) {
+        p.teleport(new Location(world, 109.5, -4, -59.5, -90, 0));
+        p.getInventory().clear();
+        p.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 255));
+        p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
+        p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
+        p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, PotionEffect.INFINITE_DURATION, 255, false, false));
+        pvpers.remove(Participant.getParticipant(p));
+    }
+
+    public void endPvp() {
+        for (Participant p : pvpers) {
+            Player player = p.getPlayer();
+            removePvpPlayer(player);
+        }
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        e.setCancelled(true);
+        Player killer = e.getPlayer().getKiller();
+        if (killer == null) e.getPlayer().teleport(LOBBY);
+        else {
+            removePvpPlayer(e.getPlayer());
+            pvpDead.add(e.getPlayer());
+            Participant killed = Participant.getParticipant(e.getPlayer());
+            Participant k = Participant.getParticipant(killer);
+            killer.setHealth(20);
+            killer.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 1, 255));
+            for (Participant p : pvpers) {
+                p.getPlayer().sendMessage(new TextComponent(killed.getFormattedName() + " was killed by " + k.getFormattedName() + "!"));
+            }
+            e.getPlayer().sendMessage(new TextComponent(killed.getFormattedName() + " was killed by " + k.getFormattedName() + "!"));
+            killer.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Killed " + killed.getFormattedName()));
+            killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
+        }
+        
+        
+    }
+
+    
+     //Ensure player to player damage is by pvpers
+     
+    @EventHandler
+    public void onEntityDamageEntity(EntityDamageByEntityEvent e) {
+        if (!isGameActive()) return;
+        if (!(e.getDamager() instanceof Player)) return;
+        if (!(e.getDamager() instanceof Player)) return;
+
+        Player damager = (Player)(e.getDamager());
+        Player damaged = (Player)(e.getEntity());
+
+        if (pvpers.contains(Participant.getParticipant(damager)) && pvpers.contains(Participant.getParticipant(damaged))) {
+            return;
+        }
+    }
+
     @EventHandler
     public void onReconnect(PlayerJoinEvent e) {
         if (getState().equals(GameState.END_ROUND) && timeRemaining > 60 || getState().equals(GameState.TUTORIAL) && timeRemaining > 20) {
@@ -1178,4 +1298,14 @@ public class Lobby extends Minigame {
             p.addPotionEffect(MBC.SATURATION);
         }
     }
+
+    /**
+     * Ensures nothing is dropped by pvpers
+     */
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        Participant p = Participant.getParticipant(e.getPlayer());
+        if (pvpers.contains(p)) e.setCancelled(true);
+        return;
+   }
 }
