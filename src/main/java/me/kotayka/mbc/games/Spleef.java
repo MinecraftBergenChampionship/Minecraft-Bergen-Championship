@@ -203,7 +203,6 @@ public class Spleef extends Game {
                         if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
                         p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.RECORDS, 1, 1);
                         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, PotionEffect.INFINITE_DURATION, 3, false, false));
-                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, PotionEffect.INFINITE_DURATION, 1, false, false));
                     }
                 }
                 if (timeRemaining == 9) {
@@ -270,7 +269,6 @@ public class Spleef extends Game {
                         p.stopSound(Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS);
                         if (map.getMapType().equals("Gravity")) {
                             p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
-                            p.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
                         } else if (map.getMapType().equals("Blind")) {
                             p.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
                         }
@@ -285,7 +283,6 @@ public class Spleef extends Game {
                         p.stopSound(Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS);
                         if (map.getMapType().equals("Gravity")) {
                             p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
-                            p.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
                         } else if (map.getMapType().equals("Blind")) {
                             p.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
                         }
@@ -385,7 +382,6 @@ public class Spleef extends Game {
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 20);
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
         victim.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
-        victim.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
         victim.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
         MBC.spawnFirework(victim.getParticipant());
         victim.getPlayer().teleport(spawnpoint);

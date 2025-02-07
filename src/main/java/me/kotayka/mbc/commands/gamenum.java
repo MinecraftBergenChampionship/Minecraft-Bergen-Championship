@@ -31,8 +31,8 @@ public class gamenum implements CommandExecutor {
             return false;
         }
 
-        if (!(n >= 0 && n < MBC.GAME_COUNT)) {
-            sender.sendMessage(ChatColor.RED+"Invalid number! Use a number 0-5 inclusive!");
+        if (!(n >= 0 && n <= MBC.GAME_COUNT)) {
+            sender.sendMessage(ChatColor.RED+"Invalid number! Use a number 0-6 inclusive!");
             return false;
         }
 

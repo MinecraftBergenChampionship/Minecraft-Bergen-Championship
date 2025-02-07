@@ -7,8 +7,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -38,13 +40,18 @@ public class DecisionDome extends Minigame {
 
     private List<MBCTeam> powerupTeams = new ArrayList<>();
     private final Map<VotePowerup, Integer> weights = Map.ofEntries(
-            entry(VotePowerup.DUNK, 4), entry(VotePowerup.MEGA_COW, 4), entry(VotePowerup.EGGSTRA_VOTES, 4), entry(VotePowerup.CROSSBOWS, 4),
-            entry(VotePowerup.CHICKEN_SWAP, 3)
+            entry(VotePowerup.DUNK, 4), entry(VotePowerup.MEGA_COW, 4), entry(VotePowerup.CROSSBOWS, 4),
+            entry(VotePowerup.CHICKEN_SWAP, 3), entry(VotePowerup.HIDDEN, 3)
     );
+    //removed eggstra votes for now bc it lame
     private Participant mega_cow_shooter = null;
     private Player dunker = null;
     private Player swapper = null;
+    private Player hider = null;
     private ChatColor dunked_team = null;
+    private boolean hidden = false;
+
+    private Participant chooser = null;
 
     private final Location BOTTOM_CORNER = new Location(world, -17, -31, -16);
     private final Location TOP_CORNER = new Location(world, 18, -24, 16);
@@ -86,6 +93,60 @@ public class DecisionDome extends Minigame {
         if (!powerupTeams.isEmpty()) powerupTeams.clear();
         if (dunker != null) dunker = null;
         if (swapper != null) swapper = null;
+        if (hider != null) hider = null;
+        if (hidden == true) hidden = false;
+        if (mega_cow_shooter != null) mega_cow_shooter = null;
+
+        if (chooser != null) chooser = null;
+
+        // Deal with players
+        loadPlayers();
+        createScoreboard();
+
+        if (sections.size() == 1) {
+            // start only game
+            for (Section s : sections.values()) {
+                winner = s;
+            }
+            MBC.getInstance().incrementMultiplier();
+            createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Warping to game: ");
+            setGameState(GameState.END_GAME);
+            setTimer(13);
+        } else {
+            setGameState(GameState.STARTING);
+            stopTimer();
+            if (revealedGames) {
+                setTimer(10);
+            } else {
+                setSectionsRed();
+                setTimer(48);
+            }
+        }
+    }
+
+    // decision dome with winner of sumo / other minigame. no other players recieve chickens and player stands in 
+    public void start(Participant p) {
+        chooser = p;
+
+        MBC.getInstance().setCurrentGame(this);
+        MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);
+
+        // Initialize variables and map
+        removeEntities();
+        if (!revealedGames) {
+            initSections();
+        }
+        chickens.clear();
+        tie = false;
+        doubled = false;
+        winner = null;
+
+        // Powerups
+        if (!powerupTeams.isEmpty()) powerupTeams.clear();
+        if (dunker != null) dunker = null;
+        if (swapper != null) swapper = null;
+        if (hider != null) hider = null;
+        if (hidden == true) hidden = false;
         if (mega_cow_shooter != null) mega_cow_shooter = null;
 
         // Deal with players
@@ -131,6 +192,8 @@ public class DecisionDome extends Minigame {
                 p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_CAT,SoundCategory.RECORDS, 1, 1);
             }
         }
+
+        if (chooser != null) chooser.getPlayer().teleport(new Location(world, 0, -34.5, 0));
     }
 
     private Location getTeleportLocation(ChatColor color) {
@@ -200,7 +263,7 @@ public class DecisionDome extends Minigame {
                 }
             }
         } else if (getState().equals(GameState.ACTIVE)) {
-            if (timeRemaining == doubleTime) {
+            if (timeRemaining == doubleTime && chooser == null) {
                 doubled = false;
                 Bukkit.broadcastMessage(ChatColor.GREEN+"Double Chicken Time has ended!");
             }
@@ -236,7 +299,10 @@ public class DecisionDome extends Minigame {
                     if (tie) {
                         Bukkit.broadcastMessage("If that is still tied, the chosen game is random...");
                     } else {
-                        if (winner.votes.size() == 1) {
+                        if(chooser != null) {
+                            Bukkit.broadcastMessage("chosen by " + chooser.getFormattedName() + "...");
+                        }
+                        else if (winner.votes.size() == 1) {
                             Bukkit.broadcastMessage("with 1 vote...");
                         } else {
                             Bukkit.broadcastMessage("with " + winner.votes.size() + " votes...");
@@ -319,6 +385,15 @@ public class DecisionDome extends Minigame {
      * Provides graphics
      */
     public void startVoting() {
+        if (chooser != null) {
+            Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Because " + ChatColor.RESET + "" + chooser.getFormattedName() + ChatColor.GOLD + "" + ChatColor.BOLD +  " won, they get to select the next game!");
+            createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Voting ends:");
+            for (Participant p : MBC.getInstance().getPlayers()) {
+                p.getPlayer().sendTitle(chooser.getFormattedName() + "" + ChatColor.BOLD + " is selecting...", "", 20, 60, 20);
+            }
+            chooser.getPlayer().sendMessage(ChatColor.BOLD + "Select a game by standing in the section.");
+            return;
+        } 
         Bukkit.broadcastMessage(ChatColor.GREEN+"Time to vote!");
         createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Voting ends:");
         for (Participant p : MBC.getInstance().getPlayers()) {
@@ -395,6 +470,10 @@ public class DecisionDome extends Minigame {
                 p.getPlayer().getInventory().addItem(new ItemStack(Material.BOW, 1));
                 p.getPlayer().getInventory().addItem(new ItemStack(Material.TIPPED_ARROW, 1));
             }
+            case HIDDEN -> {
+                hider = p.getPlayer();
+                p.getPlayer().getInventory().addItem(new ItemStack(Material.ENDER_EYE, 1));
+            }
         }
     }
 
@@ -402,6 +481,7 @@ public class DecisionDome extends Minigame {
      * TODO: make this less uggers holy
      */
     public void Powerups() {
+        if (chooser != null) return;
         // TODO: make this look better/more efficient (maybe assign when game scores are given in previous game)
         List<MBCTeam> teams = MBC.getInstance().getValidTeams();
         if (teams.size() <= 4) {
@@ -507,6 +587,23 @@ public class DecisionDome extends Minigame {
         // count votes
         int currentMax = 0;
 
+        if (chooser != null) {
+            Location chooserLoc = chooser.getPlayer().getLocation();
+            Location matLoc = new Location(world, chooserLoc.getBlockX(), -37, chooserLoc.getBlockZ());
+            Location secLoc = new Location(world, chooserLoc.getBlockX(), -36, chooserLoc.getBlockZ());
+            if (!matLoc.getBlock().getType().toString().endsWith("WOOL") || !secLoc.getBlock().getType().equals(Material.WHITE_GLAZED_TERRACOTTA)) {
+                List<Section> mostVotes = new ArrayList<>(1);
+                for (Section s : sections.values()) {
+                    mostVotes.add(s);
+                }
+                tie = true;
+                return Tiebreaker(mostVotes);
+            }
+            else {
+                return sections.get(matLoc.getBlock().getType());
+            }
+        }
+
         if (swapper != null) {
             chickens.add(new VoteChicken(Participant.getParticipant(swapper).getTeam(), swapper.getLocation()));
             chickens.add(new VoteChicken(Participant.getParticipant(swapper).getTeam(), swapper.getLocation()));
@@ -517,9 +614,23 @@ public class DecisionDome extends Minigame {
             Location chickenLoc = chicken.getLocation();
             Location matLoc = new Location(world, chickenLoc.getBlockX(), chickenLoc.getBlockY()-2, chickenLoc.getBlockZ());
             Location secLoc = new Location(world, chickenLoc.getBlockX(), chickenLoc.getBlockY()-1, chickenLoc.getBlockZ());
+            if (chicken.chicken != null) {
+                chicken.chicken.removePotionEffect(PotionEffectType.INVISIBILITY);
+            }
+            else if (chicken.cow != null) {
+                chicken.cow.removePotionEffect(PotionEffectType.INVISIBILITY);
+            }
 
-            // if the chicken is not on a section or the section is red, ignore
-            if (!matLoc.getBlock().getType().toString().endsWith("WOOL") || !secLoc.getBlock().getType().equals(Material.WHITE_GLAZED_TERRACOTTA)) continue;
+            // if the chicken is not on a section or the section is red, kill and ignore
+            if (!matLoc.getBlock().getType().toString().endsWith("WOOL") || !secLoc.getBlock().getType().equals(Material.WHITE_GLAZED_TERRACOTTA)) {
+                if (chicken.chicken != null) {
+                    chicken.chicken.setHealth(0);
+                }
+                else if (chicken.cow != null) {
+                    chicken.cow.setHealth(0);
+                }
+                continue;
+            }
             Section s = sections.get(matLoc.getBlock().getType());
             s.votes.add(chicken);
             currentMax = Math.max(currentMax, s.votes.size());
@@ -671,6 +782,9 @@ public class DecisionDome extends Minigame {
                 Bukkit.broadcastMessage(mega_cow_shooter.getFormattedName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " unleashed the mega cow!");
                 Cow cow = (Cow) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.COW);
                 cow.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
+                if (hidden) {
+                    cow.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 2, false, false));
+                }
                 VoteChicken mega_cow = new VoteChicken(p.getTeam(), cow);
                 chickens.add(mega_cow);
                 chickens.add(mega_cow);
@@ -680,10 +794,16 @@ public class DecisionDome extends Minigame {
 
             Chicken chicken = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
             chicken.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
+            if (hidden) {
+                chicken.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 2, false, false));
+            }
             chickens.add(new VoteChicken(p.getTeam(), chicken));
             if(doubled) {
                 Chicken chickenTwo = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
                 chickenTwo.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
+                if (hidden) {
+                    chickenTwo.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 2, false, false));
+                }
                 chickens.add(new VoteChicken(p.getTeam(), chickenTwo));
             }
             
@@ -962,6 +1082,23 @@ public class DecisionDome extends Minigame {
     public void deleteOldNames() {
         for (ArmorStand a : world.getEntitiesByClass(ArmorStand.class)) {
             a.remove();
+        }
+    }
+
+    @EventHandler
+    public void onInteract(PlayerInteractEvent e) {
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.ENDER_EYE && !hidden && e.getPlayer().equals(hider)) {
+                hidden = true;
+                Bukkit.broadcastMessage(Participant.getParticipant(hider).getFormattedName() + ChatColor.BOLD + " has obscured the arena - chickens now used will be hidden from view!");
+                e.getPlayer().getInventory().remove(Material.ENDER_EYE);
+                e.setCancelled(true);
+
+            }
+            else if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.ENDER_EYE) {
+                e.getPlayer().getInventory().remove(Material.ENDER_EYE);
+                e.setCancelled(true);
+            }
         }
     }
 }

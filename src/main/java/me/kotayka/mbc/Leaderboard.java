@@ -45,29 +45,29 @@ public class Leaderboard {
     }
 
     public void spawnLeaderboard() {
-        Bukkit.broadcastMessage("Spawning Leaderboard");
+        //Bukkit.broadcastMessage("Spawning Leaderboard");
         List<String> leaderboardLines = new ArrayList<>();
 
         leaderboardLines.add(ChatColor.AQUA + "Individual Leaderboard");
-        Bukkit.broadcastMessage(""+participants.size());
+        //Bukkit.broadcastMessage(""+participants.size());
         for (int i = 0; i < 8; i++) {
             Participant p;
 
             if (i < participants.size()) {
                 p = participants.get(i);
             } else {
-                Bukkit.broadcastMessage("Returning: "+i);
+                //Bukkit.broadcastMessage("Returning: "+i);
                 break;
             }
             leaderboardLines.add(""+(i+1)+". "+p.getFormattedName()+" - "+scores.get(p));
-            Bukkit.broadcastMessage(leaderboardLines.getLast());
+            //Bukkit.broadcastMessage(leaderboardLines.getLast());
         }
 
         Location loc = INDIVIDUAL_LEADERBOARDS[index];
 
         double yOffset = 0;
         for (String line : leaderboardLines) {
-            Bukkit.broadcastMessage(line);
+            //Bukkit.broadcastMessage(line);
             spawnFloatingText(loc.clone().add(0, yOffset, 0), line);
             yOffset -= 0.3;
         }

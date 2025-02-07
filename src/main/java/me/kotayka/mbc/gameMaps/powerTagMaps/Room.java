@@ -25,6 +25,7 @@ public class Room {
             for (int x = diamondBlock.getBlockX(); x >= diamondBlock.getBlockX()-28; x--) {
                 for (int z = diamondBlock.getBlockZ(); z <= diamondBlock.getBlockZ()+28; z++) {
                     blocks[y- diamondBlock.getBlockY()-1][diamondBlock.getBlockX()-x][z-diamondBlock.getBlockZ()] = WORLD.getBlockAt(x,y,z);
+
                 }
             }
         }

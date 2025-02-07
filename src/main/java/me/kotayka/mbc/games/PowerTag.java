@@ -56,7 +56,7 @@ public class PowerTag extends Game {
     public PowerTagPlayer hunterSelector;
     public String[] hunterPowerupList = {"TREMOR", "TRIDENT", "TROLL", "TOXIC"};
     public ChatColor[] hunterPowerupColorList = {ChatColor.GOLD, ChatColor.BLUE, ChatColor.YELLOW, ChatColor.GREEN};
-    public String[] hiderPowerupList = {"SPEED", "INVISIBILITY"};
+    public String[] hiderPowerupList = {"SPEED", "INVISIBILITY", "SNOWBALL"};
     public ChatColor[] hiderPowerupColorList = {ChatColor.BLUE, ChatColor.LIGHT_PURPLE};
 
     public ArrayList<PowerTagPlayer> infected = new ArrayList<>();
@@ -392,7 +392,13 @@ public class PowerTag extends Game {
         invisMeta.setUnbreakable(true);
         invisPowerup.setItemMeta(invisMeta);
 
-        ItemStack[] items = {speedPowerup, invisPowerup};
+        ItemStack snowPowerup = new ItemStack(Material.SNOW_BLOCK);
+        ItemMeta snowMeta = snowPowerup.getItemMeta();
+        snowMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "SNOWBALL");
+        snowMeta.setUnbreakable(true);
+        snowPowerup.setItemMeta(snowMeta);
+
+        ItemStack[] items = {speedPowerup, invisPowerup, snowPowerup};
 
         return items;
     }
@@ -439,7 +445,8 @@ public class PowerTag extends Game {
             for (ItemStack i : items) {
                 p.getPlayer().getInventory().removeItem(i);
             }
-            p.getPlayer().getInventory().addItem(getHiderPowerupTool());
+            if (hiderPowerupMap.get(p).equals(hiderPowerupList[0]) || hiderPowerupMap.get(p).equals(hiderPowerupList[1])) p.getPlayer().getInventory().addItem(getHiderPowerupTool());
+            if (hiderPowerupMap.get(p).equals(hiderPowerupList[2])) p.getPlayer().getInventory().addItem(new ItemStack(Material.SNOWBALL, 5));
         }   
     }
 
@@ -520,7 +527,7 @@ public class PowerTag extends Game {
     */
     public void hunterPowerup() {
 
-        hunterPowerup = hunterPowerupList[1];
+        hunterPowerup = hunterPowerupList[0];
 
         hunterSelector = hunters.get((int)(Math.random()*hunters.size()));
 
@@ -691,7 +698,7 @@ public class PowerTag extends Game {
         }
 
         if (stunCount == 1) p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You found 1 hider, who has been stunned!");
-        else if (stunCount == 0) p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You found no hiders... who has been stunned!");
+        else if (stunCount == 0) p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You found no hiders...");
         else p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You found " + stunCount + " hiders, who have all been stunned!");
         
         TAG_WORLD.playSound(p.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
@@ -707,7 +714,9 @@ public class PowerTag extends Game {
     */
     public void postTremorUse(PowerTagPlayer p) {
         giveHunterPowerups(p);
-        p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BREWING_STAND_BREW, 1, 1);
+        if (getState().equals(GameState.ACTIVE)) {
+            p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BREWING_STAND_BREW, 1, 1);
+        }
     }
 
     public void troll(PowerTagPlayer hitter, PowerTagPlayer hider) {
@@ -949,7 +958,6 @@ public class PowerTag extends Game {
                 count++;
                 variantChecker= TAG_WORLD.getBlockAt(new Location(TAG_WORLD, variantChecker.getX(), variantChecker.getY(), variantChecker.getZ()+30));
             }
-            Bukkit.broadcastMessage("" + count);
             int buildChosen = (int)(count*Math.random());
             diamondBlock = TAG_WORLD.getBlockAt(new Location(TAG_WORLD, diamondBlock.getX(), diamondBlock.getY(), diamondBlock.getZ()+30*buildChosen));
             ROOMS.add(new Room(diamondBlock.getLocation()));
@@ -1083,6 +1091,14 @@ public class PowerTag extends Game {
                 p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.RESET + "" + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "INVISIBILITY");
                 e.setCancelled(true);
             }
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.SNOW_BLOCK && hiders.contains(p) && !hiderPowerupMap.get(p).equals(hiderPowerupList[2])) {
+                hiderPowerupMap.replace(p, hiderPowerupList[2]);
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.RESET + "" + ChatColor.AQUA + "" + ChatColor.BOLD + "SNOWBALL");
+                e.setCancelled(true);
+            }
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.SNOW_BLOCK) {
+                e.setCancelled(true);
+            }
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE && hiders.contains(p)) {
                 hiderUsePowerup(p);
                 e.setCancelled(true);
@@ -1157,6 +1173,16 @@ public class PowerTag extends Game {
                 trident.remove();
                 ((Player) trident.getShooter()).getInventory().addItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
             }
+        } else if (e.getEntity() instanceof Snowball) {
+            if (e.getHitEntity() != null && e.getHitEntity() instanceof Player && e.getEntity().getShooter() instanceof Player) {
+                snowballHit((Snowball) e.getEntity(), (Player)e.getHitEntity());
+                Player shooter = (Player) e.getEntity().getShooter();
+                Player hit = (Player) e.getHitEntity();
+                hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20, 1, false, false));
+                shooter.sendMessage(ChatColor.RED+"You hit " + ChatColor.RESET + Participant.getParticipant((Player)e.getHitEntity()).getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + " with a snowball!");
+                return;
+            }
+            
         }
     }
 

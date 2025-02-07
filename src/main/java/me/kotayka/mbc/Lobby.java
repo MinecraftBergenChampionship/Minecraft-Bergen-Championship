@@ -40,15 +40,19 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Lobby extends Minigame {
     public static final Location LOBBY = new Location(Bukkit.getWorld("world"), 0.5, 1, 0.5, 180, 0);
     public final org.bukkit.World world = Bukkit.getWorld("world");
     public ArmorStand cameraman;
     private List<MBCTeam> reveal;
+    private List<Participant> revealIndiv;
     private int revealCounter = 0;
+    private int revealIndivCounter = 0;
     private int introCounter = 0;
     private List<Participant> lastIntro = new LinkedList<>();
     public static List<Leaderboard> individualLeaderboards = new ArrayList<>();
@@ -72,7 +76,7 @@ public class Lobby extends Minigame {
     private String lastLevelName = "";
     private boolean miniBeepStartable = true;
 
-    private List<Participant> pvpers = new ArrayList<>();
+    private Map<Participant, Integer> pvpers = new HashMap<>();
     private boolean pvpStartable = true;
     private List<Player> pvpDead = new ArrayList<>();;
 
@@ -159,7 +163,7 @@ public class Lobby extends Minigame {
             if (timeRemaining == 0) {
                 toFinale();
             }
-            if (revealCounter < 3) {
+            if (revealCounter < 3 && timeRemaining < 127) {
                 if (timeRemaining % 10 == 0) {
                     if (reveal.size() < (MBC.MAX_TEAMS - revealCounter)) {
                         String title = ChatColor.BOLD+"Nobody!";
@@ -175,7 +179,33 @@ public class Lobby extends Minigame {
                     Bukkit.broadcastMessage("\n"+title+"...\n");
                 }
             }
+            if (timeRemaining > 135) {
+                if (timeRemaining % 10 == 0) {
+                    if (revealIndiv.size() < (8 - revealIndivCounter)) {
+                        String title = ChatColor.BOLD+"Nobody!";
+                        Bukkit.broadcastMessage(title);
+                        MBC.sendTitle(title, " ", 0, 80, 20);
+                    } else {
+                        revealIndiv(revealIndiv.get(7 - revealIndivCounter), 8 - revealIndivCounter);
+                    }
+                    revealIndivCounter++;
+                } else if (timeRemaining % 5 == 0) {
+                    String title = ChatColor.BOLD+"In " + Game.getPlace(8 - revealIndivCounter);
+                    MBC.sendTitle(title," ", 20, 140, 20);
+                    Bukkit.broadcastMessage("\n"+title+"...\n");
+                }
+            }
             switch (timeRemaining) {
+                case 217 -> {
+                    revealIndiv = MBC.getInstance().getPlayers();
+                    revealIndiv.sort(new TotalIndividualComparator());
+                    while(revealIndiv.size() > 8) {
+                        revealIndiv.remove(revealIndiv.size()-1);
+                    }
+                }
+                case 130 -> {
+                    loadPlayersScoreReveal();
+                }
                 case 127 -> {
                     reveal = getValidTeams();
                     reveal.sort(new TeamScoreSorter());
@@ -305,8 +335,8 @@ public class Lobby extends Minigame {
         }
         if (activeBeep && miniBeepers.contains(Participant.getParticipant(e.getPlayer())) && e.getPlayer().getY() <= BEEP_DEATH_Y) beepPlayerEliminated(e.getPlayer(), true);
     
-        if (!pvpDead.contains(e.getPlayer()) && pvpStartable && e.getPlayer().getGameMode().equals(GameMode.ADVENTURE) && inPVPArea(e.getPlayer()) && !pvpers.contains(Participant.getParticipant(e.getPlayer()))) addPvpPlayer(e.getPlayer());
-        if (!inPVPArea(e.getPlayer()) && pvpers.contains(Participant.getParticipant(e.getPlayer()))) {
+        if (!pvpDead.contains(e.getPlayer()) && pvpStartable && e.getPlayer().getGameMode().equals(GameMode.ADVENTURE) && inPVPArea(e.getPlayer()) && !pvpers.keySet().contains(Participant.getParticipant(e.getPlayer()))) addPvpPlayer(e.getPlayer());
+        if (!inPVPArea(e.getPlayer()) && pvpers.keySet().contains(Participant.getParticipant(e.getPlayer()))) {
             removePvpPlayer(e.getPlayer());
             e.getPlayer().playSound(e.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 1);
         }
@@ -395,6 +425,25 @@ public class Lobby extends Minigame {
         }
     }
 
+    public void revealIndiv(Participant p, int place) {
+        Location[] locs = {
+            new Location(this.world, -13.5, 5, -58.5, -0, 0),
+            new Location(this.world, -9.5, 4, -60.5, -0, 0),
+             new Location(this.world, -5.5, 3, -61.5, -0, 0),
+             new Location(this.world, -1.5, 2, -62.5, -0, 0),
+            new Location(this.world, 2.5, 1, -62.5, -0, 0),
+            new Location(this.world, 6.5, 0, -61.5, -0, 0),
+            new Location(this.world, 10.5, -1, -60.5, -0, 0),
+            new Location(this.world, 14.5, -2, -58.5, -0, 0),
+        };
+
+        MBC.sendTitle(p.getFormattedName(), "with " + p.getRawTotalScore() + " points", 20, 90, 20);
+        Bukkit.broadcastMessage("\n" + p.getFormattedName()+ " with " + p.getRawTotalScore() + " points!\n");
+        MBC.spawnFirework(locs[place], p.getTeam().getColor());
+        p.getPlayer().setGameMode(GameMode.ADVENTURE);
+        p.getPlayer().teleport(locs[place-1]);
+    }
+
     // lol
     private int teamScoreForDisplay(int place) {
         return switch (place) {
@@ -462,7 +511,18 @@ public class Lobby extends Minigame {
         cameraman.setInvisible(true);
         for (Player p : Bukkit.getOnlinePlayers()) {
             // probably better to have a global but doesn't matter for rn
-            p.teleport(new Location(world, -14.5, -1, -21.5, 140, 0));
+            p.teleport(new Location(world, -15.5, 0, -36.5, 90, -10));
+            p.setGameMode(GameMode.SPECTATOR);
+            p.setSpectatorTarget(cameraman);
+        }
+    }
+
+    public void loadPlayersIndivReveal() {
+        cameraman = (ArmorStand) world.spawnEntity(new Location(world, 0.5, 0, -44, -180, 0), EntityType.ARMOR_STAND);
+        cameraman.setInvisible(true);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            // probably better to have a global but doesn't matter for rn
+            p.teleport(new Location(world, 0.5, 0, -44, -180, 0));
             p.setGameMode(GameMode.SPECTATOR);
             p.setSpectatorTarget(cameraman);
         }
@@ -476,9 +536,9 @@ public class Lobby extends Minigame {
         colorPodiumsWhite();
         createScoreboardTeamReveal();
         teamBarriers(true);
-        loadPlayersScoreReveal();
+        loadPlayersIndivReveal();
         stopTimer();
-        setTimer(130);
+        setTimer(220);
     }
 
     public void loadPlayersEnd() {
@@ -487,10 +547,10 @@ public class Lobby extends Minigame {
             p.getPlayer().addPotionEffect(MBC.SATURATION);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
             if (p.winner) {
-                p.getPlayer().teleport(new Location(world, 49.5, 1, 0.5, 90, 0));
+                p.getPlayer().teleport(new Location(world, 76.5, 11, -20.5, 90, 0));
                 p.getPlayer().getInventory().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
             } else {
-                p.getPlayer().teleport(new Location(world, 38.5, -2, 0.5, -90, 0));
+                p.getPlayer().teleport(new Location(world, 62.5, 4, -20.5, -90, -25));
             }
             p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_WARD, SoundCategory.RECORDS, 1, 1);
         }
@@ -562,6 +622,7 @@ public class Lobby extends Minigame {
             }
         } else if (timeRemaining == 60) {
             cameraman = (ArmorStand) world.spawnEntity(new Location(world, 0.5, 0, 8.5, 180, -11), EntityType.ARMOR_STAND);
+            cameraman.setCustomName(ChatColor.RED + "" + ChatColor.BOLD + "Camera here!");
             cameraman.setInvisible(true);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p, Sound.MUSIC_DISC_STRAD, SoundCategory.RECORDS, 1, 1);
@@ -620,7 +681,7 @@ public class Lobby extends Minigame {
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
                 p.getPlayer().getInventory().clear();
                 MBC.spawnFirework(new Location(world, 0.5, 2, 0.5), p.getTeam().getColor());
-                p.getPlayer().teleport(new Location(world, 0, 1, 0, 90, 0));
+                p.getPlayer().teleport(new Location(world, 0, 1, 0, 0, 0));
                 introPlayers += p.getFormattedName() + ", ";
             }
             introPlayers = introPlayers.substring(0, introPlayers.length()-2);
@@ -643,22 +704,22 @@ public class Lobby extends Minigame {
     private Location placeLocation(int place) {
         switch(place) {
             case 6 -> {
-                return new Location(world, -18, -0.5, -24);
+                return new Location(world, -25, 1.5, -29);
             }
             case 5 -> {
-                return new Location(world, -17, 0.5, -28);
+                return new Location(world, -26, 2.5, -32);
             }
             case 4 -> {
-                return new Location(world, -18, 1.5, -32);
+                return new Location(world, -27, 3.5, -35);
             }
             case 3 -> {
-                return new Location(world, -20, 2.5, -29);
+                return new Location(world, -27, 4.5, -38);
             }
             case 2 -> {
-                return new Location(world, -24, 3.5, -27);
+                return new Location(world, -26, 5.5, -41);
             }
             case 1 -> {
-                return new Location(world, -25, 4.5, -31);
+                return new Location(world, -25, 6.5, -44);
             }
             default -> {
                 return null;
@@ -857,24 +918,24 @@ public class Lobby extends Minigame {
         p.playSound(p, Sound.ENTITY_BAT_DEATH, 1, 1);
         if (b) {
             if (beepRound == 1) {
-                p.sendMessage("You were eliminated by " + ChatColor.AQUA + currentLevel.getName() + "!");
+                p.sendMessage("You were eliminated by " + ChatColor.AQUA + currentLevel.getName().trim() + "!");
             } else if (beepRound == 2) {
-                p.sendMessage("You were eliminated by " + ChatColor.GREEN + currentLevel.getName() + "!");
+                p.sendMessage("You were eliminated by " + ChatColor.GREEN + currentLevel.getName().trim() + "!");
             } else if (beepRound == 3) {
-                p.sendMessage("You were eliminated by " + ChatColor.YELLOW + currentLevel.getName() + "!");
+                p.sendMessage("You were eliminated by " + ChatColor.YELLOW + currentLevel.getName().trim() + "!");
             } else {
-                p.sendMessage("You were eliminated by " + ChatColor.RED + currentLevel.getName() + "!");
+                p.sendMessage("You were eliminated by " + ChatColor.RED + currentLevel.getName().trim() + "!");
             }
         }
         else {
             if (beepRound == 2) {
-                p.sendMessage("You were eliminated by " + ChatColor.AQUA + lastLevelName + "!");
+                p.sendMessage("You were eliminated by " + ChatColor.AQUA + lastLevelName.trim() + "!");
             } else if (beepRound == 3) {
-                p.sendMessage("You were eliminated by " + ChatColor.GREEN + lastLevelName + "!");
+                p.sendMessage("You were eliminated by " + ChatColor.GREEN + lastLevelName.trim() + "!");
             } else if (beepRound == 4) {
-                p.sendMessage("You were eliminated by " + ChatColor.YELLOW + lastLevelName + "!");
+                p.sendMessage("You were eliminated by " + ChatColor.YELLOW + lastLevelName.trim() + "!");
             } else {
-                p.sendMessage("You were eliminated by " + ChatColor.RED + lastLevelName + "!");
+                p.sendMessage("You were eliminated by " + ChatColor.RED + lastLevelName.trim() + "!");
             }
         }
         
@@ -1096,7 +1157,7 @@ public class Lobby extends Minigame {
                     Bukkit.broadcastMessage(survivors);
                 }
 
-                miniBeepEnd(ChatColor.BOLD + "You made it to the end!");
+                miniBeepEnd();
 
                 
 
@@ -1130,64 +1191,64 @@ public class Lobby extends Minigame {
         Material m = barriers ? Material.BARRIER : Material.AIR;
 
         // first place
-        world.getBlockAt(-27, 5, -31).setType(m);
-        world.getBlockAt(-27, 5, -32).setType(m);
-        world.getBlockAt(-26, 5, -33).setType(m);
-        world.getBlockAt(-25, 5, -33).setType(m);
-        world.getBlockAt(-24, 5, -32).setType(m);
-        world.getBlockAt(-24, 5, -31).setType(m);
-        world.getBlockAt(-25, 5, -30).setType(m);
-        world.getBlockAt(-26, 5, -30).setType(m);
+        world.getBlockAt(-27, 7, -44).setType(m);
+        world.getBlockAt(-27, 7, -45).setType(m);
+        world.getBlockAt(-26, 7, -46).setType(m);
+        world.getBlockAt(-25, 7, -46).setType(m);
+        world.getBlockAt(-24, 7, -45).setType(m);
+        world.getBlockAt(-24, 7, -44).setType(m);
+        world.getBlockAt(-25, 7, -43).setType(m);
+        world.getBlockAt(-26, 7, -43).setType(m);
 
         // second place
-        world.getBlockAt(-26, 4, -27).setType(m);
-        world.getBlockAt(-26, 4, -28).setType(m);
-        world.getBlockAt(-25, 4, -29).setType(m);
-        world.getBlockAt(-24, 4, -29).setType(m);
-        world.getBlockAt(-23, 4, -28).setType(m);
-        world.getBlockAt(-23, 4, -27).setType(m);
-        world.getBlockAt(-24, 4, -26).setType(m);
-        world.getBlockAt(-25, 4, -26).setType(m);
+        world.getBlockAt(-26, 6, -40).setType(m);
+        world.getBlockAt(-27, 6, -40).setType(m);
+        world.getBlockAt(-28, 6, -41).setType(m);
+        world.getBlockAt(-28, 6, -42).setType(m);
+        world.getBlockAt(-27, 6, -43).setType(m);
+        world.getBlockAt(-26, 6, -43).setType(m);
+        world.getBlockAt(-25, 6, -42).setType(m);
+        world.getBlockAt(-25, 6, -41).setType(m);
 
         // third place
-        world.getBlockAt(-22, 3, -29).setType(m);
-        world.getBlockAt(-22, 3, -30).setType(m);
-        world.getBlockAt(-21, 3, -31).setType(m);
-        world.getBlockAt(-20, 3, -31).setType(m);
-        world.getBlockAt(-19, 3, -30).setType(m);
-        world.getBlockAt(-19, 3, -29).setType(m);
-        world.getBlockAt(-20, 3, -28).setType(m);
-        world.getBlockAt(-21, 3, -28).setType(m);
+        world.getBlockAt(-28, 5, -37).setType(m);
+        world.getBlockAt(-27, 5, -37).setType(m);
+        world.getBlockAt(-26, 5, -38).setType(m);
+        world.getBlockAt(-26, 5, -39).setType(m);
+        world.getBlockAt(-27, 5, -40).setType(m);
+        world.getBlockAt(-28, 5, -40).setType(m);
+        world.getBlockAt(-29, 5, -39).setType(m);
+        world.getBlockAt(-29, 5, -38).setType(m);
 
         // fourth place
-        world.getBlockAt(-20, 2, -32).setType(m);
-        world.getBlockAt(-20, 2, -33).setType(m);
-        world.getBlockAt(-19, 2, -34).setType(m);
-        world.getBlockAt(-18, 2, -34).setType(m);
-        world.getBlockAt(-17, 2, -33).setType(m);
-        world.getBlockAt(-17, 2, -32).setType(m);
-        world.getBlockAt(-18, 2, -31).setType(m);
-        world.getBlockAt(-19, 2, -31).setType(m);
+        world.getBlockAt(-27, 4, -34).setType(m);
+        world.getBlockAt(-28, 4, -34).setType(m);
+        world.getBlockAt(-29, 4, -35).setType(m);
+        world.getBlockAt(-29, 4, -36).setType(m);
+        world.getBlockAt(-28, 4, -37).setType(m);
+        world.getBlockAt(-27, 4, -37).setType(m);
+        world.getBlockAt(-26, 4, -36).setType(m);
+        world.getBlockAt(-26, 4, -35).setType(m);
 
         // fifth place
-        world.getBlockAt(-19, 1, -28).setType(m);
-        world.getBlockAt(-19, 1, -29).setType(m);
-        world.getBlockAt(-18, 1, -30).setType(m);
-        world.getBlockAt(-17, 1, -30).setType(m);
-        world.getBlockAt(-16, 1, -29).setType(m);
-        world.getBlockAt(-16, 1, -28).setType(m);
-        world.getBlockAt(-17, 1, -27).setType(m);
-        world.getBlockAt(-18, 1, -27).setType(m);
+        world.getBlockAt(-27, 3, -31).setType(m);
+        world.getBlockAt(-26, 3, -31).setType(m);
+        world.getBlockAt(-25, 3, -32).setType(m);
+        world.getBlockAt(-25, 3, -33).setType(m);
+        world.getBlockAt(-26, 3, -34).setType(m);
+        world.getBlockAt(-27, 3, -34).setType(m);
+        world.getBlockAt(-28, 3, -33).setType(m);
+        world.getBlockAt(-28, 3, -32).setType(m);
 
         // sixth place
-        world.getBlockAt(-20, 0, -24).setType(m);
-        world.getBlockAt(-20, 0, -25).setType(m);
-        world.getBlockAt(-19, 0, -26).setType(m);
-        world.getBlockAt(-18, 0, -26).setType(m);
-        world.getBlockAt(-17, 0, -25).setType(m);
-        world.getBlockAt(-17, 0, -24).setType(m);
-        world.getBlockAt(-18, 0, -23).setType(m);
-        world.getBlockAt(-19, 0, -23).setType(m);
+        world.getBlockAt(-24, 2, -30).setType(m);
+        world.getBlockAt(-24, 2, -29).setType(m);
+        world.getBlockAt(-25, 2, -31).setType(m);
+        world.getBlockAt(-25, 2, -28).setType(m);
+        world.getBlockAt(-26, 2, -31).setType(m);
+        world.getBlockAt(-26, 2, -28).setType(m);
+        world.getBlockAt(-27, 2, -30).setType(m);
+        world.getBlockAt(-27, 2, -29).setType(m);
     }
 
     public boolean inPVPArea(Player p) {
@@ -1204,7 +1265,7 @@ public class Lobby extends Minigame {
     public void addPvpPlayer(Player p) {
         p.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "Joined PVP!"));
         //MBC.getInstance().board.getTeam(Participant.getParticipant(p).getTeam().fullName).setAllowFriendlyFire(true);
-        pvpers.add(Participant.getParticipant(p));
+        pvpers.put(Participant.getParticipant(p), 0);
         addPvpItems(p);
         p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
         p.removePotionEffect(PotionEffectType.SPEED);
@@ -1231,7 +1292,7 @@ public class Lobby extends Minigame {
     }
 
     public void endPvp() {
-        for (Participant p : pvpers) {
+        for (Participant p : pvpers.keySet()) {
             Player player = p.getPlayer();
             removePvpPlayer(player);
         }
@@ -1243,16 +1304,28 @@ public class Lobby extends Minigame {
         Player killer = e.getPlayer().getKiller();
         if (killer == null) e.getPlayer().teleport(LOBBY);
         else {
-            removePvpPlayer(e.getPlayer());
-            pvpDead.add(e.getPlayer());
             Participant killed = Participant.getParticipant(e.getPlayer());
             Participant k = Participant.getParticipant(killer);
+            pvpers.replace(k, pvpers.get(k)+1);
+            int streakKiller = pvpers.get(k);
+            int streakKilled = pvpers.get(killed);
+            removePvpPlayer(e.getPlayer());
+            pvpDead.add(e.getPlayer());
             killer.setHealth(20);
             killer.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 1, 255));
-            for (Participant p : pvpers) {
-                p.getPlayer().sendMessage(new TextComponent(killed.getFormattedName() + " was killed by " + k.getFormattedName() + "!"));
+
+            if (streakKiller >= 3) {
+                killer.sendMessage(new TextComponent(ChatColor.RED + "You are on a streak of " + pvpers.get(k) + "!"));
             }
-            e.getPlayer().sendMessage(new TextComponent(killed.getFormattedName() + " was killed by " + k.getFormattedName() + "!"));
+            
+            
+            for (Participant p : pvpers.keySet()) {
+                if (streakKilled >= 3) p.getPlayer().sendMessage(new TextComponent(killed.getFormattedName() + " was killed by " + k.getFormattedName() + ", breaking a streak of " + streakKilled + "!"));
+                else p.getPlayer().sendMessage(new TextComponent(killed.getFormattedName() + " was killed by " + k.getFormattedName() + "!"));
+            }
+            if (streakKilled >= 3) e.getPlayer().sendMessage(new TextComponent(killed.getFormattedName() + " was killed by " + k.getFormattedName() + ", breaking a streak of " + streakKilled + "!"));
+            else e.getPlayer().sendMessage(new TextComponent(killed.getFormattedName() + " was killed by " + k.getFormattedName() + "!"));
+
             killer.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Killed " + killed.getFormattedName()));
             killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
         }
@@ -1273,7 +1346,7 @@ public class Lobby extends Minigame {
         Player damager = (Player)(e.getDamager());
         Player damaged = (Player)(e.getEntity());
 
-        if (!(pvpers.contains(Participant.getParticipant(damager)) && pvpers.contains(Participant.getParticipant(damaged)))) {
+        if (!(pvpers.keySet().contains(Participant.getParticipant(damager)) && pvpers.keySet().contains(Participant.getParticipant(damaged)))) {
             e.setCancelled(true);
         }
     }
@@ -1300,7 +1373,7 @@ public class Lobby extends Minigame {
     @EventHandler
     public void onDrop(PlayerDropItemEvent e) {
         Participant p = Participant.getParticipant(e.getPlayer());
-        if (pvpers.contains(p)) e.setCancelled(true);
+        if (pvpers.keySet().contains(p)) e.setCancelled(true);
         return;
    }
 }

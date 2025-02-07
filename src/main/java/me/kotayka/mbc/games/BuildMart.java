@@ -154,15 +154,13 @@ public class BuildMart extends Game {
         if (getState().equals(GameState.TUTORIAL)) {
             if (timeRemaining == 0) {
                 MBC.getInstance().sendMutedMessages();
-                Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
-                for (BuildMartPlayer bmp : buildMartPlayers) {
-                    bmp.spawn();
+                Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "You have 60 seconds to review locations of blocks on the map!\n");
+                for (Participant p : MBC.getInstance().getPlayers()) {
+                    p.getPlayer().setGameMode(GameMode.SPECTATOR);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                 }
                 setGameState(GameState.STARTING);
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.playSound(p, Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS, 1, 1);
-                }
-                timeRemaining = 30;
+                timeRemaining = 90;
             } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
@@ -175,6 +173,21 @@ public class BuildMart extends Game {
                 setGameState(GameState.ACTIVE);
                 timeRemaining = 720;
             } else {
+                if (timeRemaining == 30) {
+                    Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
+                    for (BuildMartPlayer bmp : buildMartPlayers) {
+                        bmp.spawn();
+                    }
+                    for (Participant p : MBC.getInstance().getPlayers()) {
+                        p.getPlayer().setGameMode(GameMode.ADVENTURE);
+                    }
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS, 1, 1);
+                    }
+                }
+                if (timeRemaining == 40) {
+                    Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "10 seconds of review remain!\n");
+                }
                 startingCountdown();
             }
         } else if (getState().equals(GameState.ACTIVE)) {
@@ -516,6 +529,9 @@ public class BuildMart extends Game {
     public void onMove(PlayerMoveEvent e) {
         if (!(e.getPlayer().getLocation().getWorld().equals(map.getWorld()))) return;
         map.onMove(e);
+        if (getState().equals(GameState.STARTING) && e.getPlayer().getGameMode().equals(GameMode.SPECTATOR) && timeRemaining > 25) {
+            if (e.getPlayer().getX() > 120 || e.getPlayer().getX() < -120 || e.getPlayer().getZ() > 120 || e.getPlayer().getZ() < -120) e.getPlayer().teleport(new Location(map.getWorld(), 0, 100, 0));
+        }
         Participant p = Participant.getParticipant(e.getPlayer());
         if (hotbarSelector.containsKey(p)) {
             if (e.getPlayer().getTargetBlock(null, 5).getType() != hotbarSelector.get(p)) {
