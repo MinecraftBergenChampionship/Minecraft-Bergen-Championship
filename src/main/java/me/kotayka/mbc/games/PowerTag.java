@@ -56,7 +56,7 @@ public class PowerTag extends Game {
     public PowerTagPlayer hunterSelector;
     public String[] hunterPowerupList = {"TREMOR", "TRIDENT", "TROLL", "TOXIC"};
     public ChatColor[] hunterPowerupColorList = {ChatColor.GOLD, ChatColor.BLUE, ChatColor.YELLOW, ChatColor.GREEN};
-    public String[] hiderPowerupList = {"SPEED", "INVISIBILITY", "SNOWBALL"};
+    public String[] hiderPowerupList = {"SPEED", "INVISIBILITY", "SLOWBALL"};
     public ChatColor[] hiderPowerupColorList = {ChatColor.BLUE, ChatColor.LIGHT_PURPLE};
 
     public ArrayList<PowerTagPlayer> infected = new ArrayList<>();
@@ -368,6 +368,7 @@ public class PowerTag extends Game {
     public void revealTeamOrder(int i) {
         MBCTeam t = huntOrder.get(i);
         MBC.sendTitle(t.teamNameFormat(), "hunt " + getPlace(i+1), 0, 40, 20);
+        //Bukkit.broadcastMessage("The " + t.teamNameFormat() + " will hunt " + getPlace(i+1) + "!");
         for (Participant p : t.getPlayers()) {
             MBC.spawnFirework(p.getPlayer().getLocation(), t.getColor());
         }
@@ -383,18 +384,27 @@ public class PowerTag extends Game {
         ItemStack speedPowerup = new ItemStack(Material.SUGAR);
         ItemMeta speedMeta = speedPowerup.getItemMeta();
         speedMeta.setDisplayName(ChatColor.BLUE + "" + ChatColor.BOLD + "SPEED");
+        ArrayList<String> speedLore = new ArrayList();
+        speedLore.add(ChatColor.AQUA + "Gain temporary speed 3!");
+        speedMeta.setLore(speedLore);
         speedMeta.setUnbreakable(true);
         speedPowerup.setItemMeta(speedMeta);
 
         ItemStack invisPowerup = new ItemStack(Material.DRAGON_BREATH);
         ItemMeta invisMeta = invisPowerup.getItemMeta();
         invisMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "INVISIBILITY");
+        ArrayList<String> invisLore = new ArrayList();
+        invisLore.add(ChatColor.AQUA + "Gain temporary invisibility (note: your boots are still visible)!");
+        invisMeta.setLore(invisLore);
         invisMeta.setUnbreakable(true);
         invisPowerup.setItemMeta(invisMeta);
 
         ItemStack snowPowerup = new ItemStack(Material.SNOW_BLOCK);
         ItemMeta snowMeta = snowPowerup.getItemMeta();
-        snowMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "SNOWBALL");
+        snowMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "SLOWBALL");
+        ArrayList<String> slowLore = new ArrayList();
+        slowLore.add(ChatColor.AQUA + "Throw at a hunter (or a hider...) to temporarily slow them!");
+        snowMeta.setLore(slowLore);
         snowMeta.setUnbreakable(true);
         snowPowerup.setItemMeta(snowMeta);
 
@@ -446,7 +456,7 @@ public class PowerTag extends Game {
                 p.getPlayer().getInventory().removeItem(i);
             }
             if (hiderPowerupMap.get(p).equals(hiderPowerupList[0]) || hiderPowerupMap.get(p).equals(hiderPowerupList[1])) p.getPlayer().getInventory().addItem(getHiderPowerupTool());
-            if (hiderPowerupMap.get(p).equals(hiderPowerupList[2])) p.getPlayer().getInventory().addItem(new ItemStack(Material.SNOWBALL, 5));
+            if (hiderPowerupMap.get(p).equals(hiderPowerupList[2])) p.getPlayer().getInventory().addItem(new ItemStack(Material.SNOWBALL, 3));
         }   
     }
 
@@ -1093,7 +1103,7 @@ public class PowerTag extends Game {
             }
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.SNOW_BLOCK && hiders.contains(p) && !hiderPowerupMap.get(p).equals(hiderPowerupList[2])) {
                 hiderPowerupMap.replace(p, hiderPowerupList[2]);
-                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.RESET + "" + ChatColor.AQUA + "" + ChatColor.BOLD + "SNOWBALL");
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.RESET + "" + ChatColor.AQUA + "" + ChatColor.BOLD + "SLOWBALL");
                 e.setCancelled(true);
             }
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.SNOW_BLOCK) {
@@ -1178,8 +1188,8 @@ public class PowerTag extends Game {
                 snowballHit((Snowball) e.getEntity(), (Player)e.getHitEntity());
                 Player shooter = (Player) e.getEntity().getShooter();
                 Player hit = (Player) e.getHitEntity();
-                hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20, 1, false, false));
-                shooter.sendMessage(ChatColor.RED+"You hit " + ChatColor.RESET + Participant.getParticipant((Player)e.getHitEntity()).getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + " with a snowball!");
+                hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20, 2, false, false));
+                shooter.sendMessage(ChatColor.RED+"You hit " + ChatColor.RESET + Participant.getParticipant((Player)e.getHitEntity()).getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + " with a slowball!");
                 return;
             }
             
