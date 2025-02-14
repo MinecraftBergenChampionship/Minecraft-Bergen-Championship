@@ -25,7 +25,7 @@ import java.util.*;
 public class Spleef extends Game {
     private SpleefMap map = null;
     private List<SpleefMap> maps = new ArrayList<>(
-            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress())
+            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
     );
     //private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
     //public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
@@ -173,6 +173,14 @@ public class Spleef extends Game {
     }
 
     private void loadMap() {
+        for (SpleefMap m : maps) {
+            if (m.Name().equals("Colosseum")) {
+                map = m;
+                maps.remove(map);
+                map.resetMap();
+                return;
+            }
+        }
         map = maps.get((int) (Math.random()*maps.size()));
         maps.remove(map);
         map.resetMap();
@@ -438,7 +446,20 @@ public class Spleef extends Game {
         if (!e.getBlock().getLocation().getWorld().equals(map.getWorld())) return;
 
         Block b = e.getBlock();
-        if (b.getType().equals(Material.PACKED_ICE)) return;
+
+        List<Material> noBreakList = new ArrayList<Material>();
+        noBreakList.add(Material.PACKED_ICE);
+        noBreakList.add(Material.BARRIER);
+        noBreakList.add(Material.POLISHED_BLACKSTONE);
+        noBreakList.add(Material.POLISHED_BLACKSTONE_SLAB);
+        noBreakList.add(Material.RED_TERRACOTTA);
+        noBreakList.add(Material.POLISHED_BLACKSTONE_STAIRS);
+        noBreakList.add(Material.POLISHED_BLACKSTONE_BRICKS);
+        noBreakList.add(Material.POLISHED_BLACKSTONE_BRICK_STAIRS);
+        noBreakList.add(Material.POLISHED_BLACKSTONE_WALL);
+        noBreakList.add(Material.LANTERN);
+
+        if (noBreakList.contains(b.getType())) return;
         b.breakNaturally();
         map.getWorld().playSound(b.getLocation(), b.getBlockSoundGroup().getBreakSound(), 1, 1);
         e.getPlayer().getInventory().addItem(new ItemStack(Material.SNOWBALL));
@@ -469,7 +490,19 @@ public class Spleef extends Game {
             // destroy map blocks (not gold blocks) in contact with snowballs
             if (e.getHitBlock() != null) {
                 Block b = e.getHitBlock();
-                if (b.getType().equals(Material.GOLD_BLOCK) || b.getType().equals(Material.PACKED_ICE) || b.getType().equals(Material.BARRIER)) return;
+                List<Material> noBreakList = new ArrayList<Material>();
+                noBreakList.add(Material.PACKED_ICE);
+                noBreakList.add(Material.BARRIER);
+                noBreakList.add(Material.POLISHED_BLACKSTONE);
+                noBreakList.add(Material.POLISHED_BLACKSTONE_SLAB);
+                noBreakList.add(Material.RED_TERRACOTTA);
+                noBreakList.add(Material.POLISHED_BLACKSTONE_STAIRS);
+                noBreakList.add(Material.POLISHED_BLACKSTONE_BRICKS);
+                noBreakList.add(Material.POLISHED_BLACKSTONE_BRICK_STAIRS);
+                noBreakList.add(Material.POLISHED_BLACKSTONE_WALL);
+                noBreakList.add(Material.LANTERN);
+
+                if (noBreakList.contains(b.getType())) return;
 
                 b.breakNaturally();
                 map.getWorld().playSound(b.getLocation(), b.getBlockSoundGroup().getBreakSound(), 1, 1);
