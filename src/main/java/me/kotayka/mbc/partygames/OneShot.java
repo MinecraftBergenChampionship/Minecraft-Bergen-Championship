@@ -355,9 +355,9 @@ public class OneShot extends PartyGame {
                 }
             } else {
                 setGameState(GameState.ACTIVE);
+                replayMusic();
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 0.75f, 1);
-                    replayMusic();
                 }
                 setPVP(true);
                        
@@ -557,12 +557,12 @@ public class OneShot extends PartyGame {
         String message = "";
         switch (teamKills.get(m)) {
             case 10:
-                b = Bukkit.createBossBar(ChatColor.YELLOW + "" + ChatColor.BOLD + "CURRENT WEAPON: Multishot Crossbow", BarColor.GREEN, BarStyle.SOLID);
+                b = Bukkit.createBossBar(ChatColor.YELLOW + "" + ChatColor.BOLD + "CURRENT WEAPON: Multishot Crossbow", BarColor.YELLOW, BarStyle.SOLID);
                 b.setProgress(0);
                 teamBossBars.replace(m, b);
                 b.setVisible(true);
                 for (Participant p : m.getPlayers()) {
-                    p.getInventory().remove(Material.BOW);
+                    p.getInventory().remove(Material.CROSSBOW);
                     p.getInventory().addItem(CROSSBOW_MULTISHOT);
                     p.addCurrentScore(WEAPON_POINTS);
                     b.addPlayer(p.getPlayer());
@@ -572,7 +572,7 @@ public class OneShot extends PartyGame {
                 message = ChatColor.YELLOW + "" + ChatColor.BOLD + "The " +ChatColor.RESET + "" + ChatColor.BOLD + m.teamNameFormat() + ChatColor.YELLOW + "" + ChatColor.BOLD + " have gotten 10 kills!";
             return;
             case 20:
-                b = Bukkit.createBossBar(ChatColor.GREEN + "" + ChatColor.BOLD + "CURRENT WEAPON: Bow", BarColor.YELLOW, BarStyle.SOLID);
+                b = Bukkit.createBossBar(ChatColor.GREEN + "" + ChatColor.BOLD + "CURRENT WEAPON: Bow", BarColor.GREEN, BarStyle.SOLID);
                 b.setProgress(0);
                 teamBossBars.replace(m, b);
                 for (Participant p : m.getPlayers()) {
@@ -593,7 +593,7 @@ public class OneShot extends PartyGame {
                 teamBossBars.replace(m, b);
                 b.setVisible(true);
                 for (Participant p : m.getPlayers()) {
-                    p.getInventory().remove(Material.CROSSBOW);
+                    p.getInventory().remove(Material.BOW);
                     p.getInventory().remove(Material.ARROW);
                     p.getInventory().addItem(TRIDENT);
                     p.addCurrentScore(WEAPON_POINTS);

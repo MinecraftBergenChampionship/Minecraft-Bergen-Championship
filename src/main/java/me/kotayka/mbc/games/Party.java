@@ -172,7 +172,6 @@ public class Party extends Game {
 
     public void next() {
         stopTimer();
-        Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "is it you?????");
         setGameState(GameState.INACTIVE);
         MBC.getInstance().setCurrentGame(this);
         MBC.getInstance().plugin.getServer().getPluginManager().registerEvents(this, MBC.getInstance().plugin);

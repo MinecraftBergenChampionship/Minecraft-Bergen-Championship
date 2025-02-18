@@ -213,22 +213,22 @@ public class BeepSwitch extends PartyGame {
                         randomTeamOrder(t);
                         initializeProgress(t);
                     }
-                    setTimer(90);
+                    setTimer(70);
                 } else if (timeRemaining % 7 == 0) {
                     Introduction();
                 }
                 break;
             case STARTING:
                 startingCountdown();
-                if (timeRemaining == 88) {
+                if (timeRemaining == 69) {
                     Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "You will soon be given your placement of when you will be parkouring...\n");
                 }
-                if (timeRemaining == 80) {
+                if (timeRemaining == 65) {
                     for (Participant p : MBC.getInstance().getPlayers()) displaySpot(p.getPlayer());
                 }
-                if (timeRemaining == 75) { 
+                if (timeRemaining == 60) { 
                     placeCourses();
-                    Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "You have 60 seconds to review the beep courses on the map!\n");
+                    Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "You have 45 seconds to review the beep courses on the map!\n");
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         p.getPlayer().setGameMode(GameMode.SPECTATOR);
                         p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
@@ -260,6 +260,7 @@ public class BeepSwitch extends PartyGame {
                     }
                 }
                 if (timeRemaining == 2) {
+                    roundsLeftDisplay();
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, .75f,1);
                     }
@@ -288,6 +289,7 @@ public class BeepSwitch extends PartyGame {
                     }
 
                     roundNum++;
+                    roundsLeftDisplay();
                     if (rounds == roundNum && !gameOver) {
                         timeRemaining = 5;
                         setGameState(GameState.END_GAME);
@@ -316,7 +318,7 @@ public class BeepSwitch extends PartyGame {
                     }
                     
                 }
-                if (timeRemaining == 5) {
+                else if (timeRemaining == 5) {
                     if (futurePlayers() != null) {
                         List<Player> futurePlayers = futurePlayers();
                         for (Player p : futurePlayers) {
@@ -355,6 +357,8 @@ public class BeepSwitch extends PartyGame {
         if (!getState().equals(GameState.ACTIVE)) return;
         Player p = e.getPlayer();
         Participant par = Participant.getParticipant(p);
+
+        currentCourseDisplay(par.getTeam());
 
         if (!currentPlayers().contains(e.getPlayer())) return;
         
@@ -421,6 +425,60 @@ public class BeepSwitch extends PartyGame {
         }
     }
 
+    /*
+     * Display the amount of cycles left on the scoreboard.
+     */
+    private void roundsLeftDisplay() {
+        ChatColor color = null;
+        if (roundNum < rounds/4) {
+            color = ChatColor.AQUA;
+        } else if (roundNum < rounds/2) {
+            color = ChatColor.GREEN;
+        } else if (roundNum < 3*rounds/4) {
+            color = ChatColor.YELLOW;
+        } else {
+            color = ChatColor.RED;
+        }
+
+        createLineAll(21, ChatColor.BOLD + "Cycles Left: " + ChatColor.RESET + "" + color + (rounds - roundNum));
+    }
+
+    /*
+     * Display the course current on on the scoreboard.
+     */
+    private void currentCourseDisplay(MBCTeam t) {
+        List<Player> currentPlayers = currentPlayers();
+        Player player = null;
+        for (Player p : currentPlayers) {
+            if (Participant.getParticipant(p).getTeam().equals(t)) {
+                player = p;
+            }
+        }
+        if (player == null) return;
+
+        int path = sectionLoc(player.getLocation())+1;
+        int level = progress.get(t)[sectionLoc(player.getLocation())]+1;
+        ChatColor color = ChatColor.WHITE;
+
+        switch(path){
+            case 1: 
+                color = ChatColor.BLUE;
+                break;
+            case 2: 
+                color = ChatColor.GREEN;
+                break;
+            case 3: 
+                color = ChatColor.YELLOW;
+                break;
+            case 4: 
+                color = ChatColor.RED;
+                break;
+        }
+
+        for (Participant p : t.getPlayers())
+        createLine(22, ChatColor.BOLD + "Course at: " + ChatColor.RESET + color + path + "-" + level, p);
+    }
+
     /**
      * Runs if a participant p has completed 
      */
@@ -449,10 +507,22 @@ public class BeepSwitch extends PartyGame {
         if(teamProgress[path] == 3) {
             String name = "";
             switch(path){
-                case 0: name = "Easy"; break;
-                case 1: name = "Medium"; break;
-                case 2: name = "Hard"; break;
-                case 3: name = "Extreme"; break;
+                case 0: 
+                    name = "Easy"; 
+                    p.getPlayer().getInventory().remove(Material.BLUE_DYE);   
+                    break;
+                case 1: 
+                    name = "Medium"; 
+                    p.getPlayer().getInventory().remove(Material.LIME_DYE);
+                    break;
+                case 2: 
+                    name = "Hard"; 
+                    p.getPlayer().getInventory().remove(Material.YELLOW_DYE);
+                    break;
+                case 3: 
+                    name = "Extreme"; 
+                    p.getPlayer().getInventory().remove(Material.RED_DYE);
+                    break;
             }
             String pathCompleteMessage = p.getTeam().getChatColor() + "" + ChatColor.BOLD + "The " + p.getTeam().teamNameFormat() + p.getTeam().getChatColor() + 
                         "" + ChatColor.BOLD + " have completed the " + ChatColor.GOLD + "" + ChatColor.BOLD + name + p.getTeam().getChatColor() + "" + ChatColor.BOLD + 
@@ -679,10 +749,12 @@ public class BeepSwitch extends PartyGame {
         blueMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.BLUE + "Easy Path");
         blueDye.setItemMeta(blueMeta);
 
-        p.getInventory().addItem(blueDye);
-        p.getInventory().addItem(limeDye);
-        p.getInventory().addItem(yellowDye);
-        p.getInventory().addItem(redDye);
+        int[] teamProgress = progress.get(Participant.getParticipant(p).getTeam());
+
+        if (teamProgress[0] < 4) p.getInventory().addItem(blueDye);
+        if (teamProgress[1] < 4) p.getInventory().addItem(limeDye);
+        if (teamProgress[2] < 4) p.getInventory().addItem(yellowDye);
+        if (teamProgress[3] < 4) p.getInventory().addItem(redDye);
     }
 
     /**
