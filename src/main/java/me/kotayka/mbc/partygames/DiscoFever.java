@@ -230,7 +230,9 @@ public class DiscoFever extends PartyGame {
                         for (Participant p : MBC.getInstance().getPlayers()) {
                             p.addCurrentScoreToTotal();
                         }
-                        MBC.getInstance().updatePlacings();
+                        if (MBC.getInstance().gameNum != 6) {
+                            MBC.getInstance().updatePlacings();
+                        }
                         logger.logStats();
                         returnToLobby();
                     } else {

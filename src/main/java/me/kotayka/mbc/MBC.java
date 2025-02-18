@@ -100,7 +100,7 @@ public class MBC implements Listener {
 
     //public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt","Quickfire"));
     public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire","Party","PowerTag"));
-    public static final List<String> partyGameNameList = new ArrayList<>(Arrays.asList("Dragons", "BeepTest","DiscoFever","OneShot"));
+    public static final List<String> partyGameNameList = new ArrayList<>(Arrays.asList("Dragons", "BeepSwitch","DiscoFever","OneShot"));
     //public final List<Game> gameList = new ArrayList<Game>(6);
     public static final String MBC_STRING_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "MBC" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: " + ChatColor.RESET;
     public static final String ADMIN_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "ADMIN" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: " + ChatColor.RESET;

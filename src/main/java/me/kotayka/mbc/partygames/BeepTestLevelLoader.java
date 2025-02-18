@@ -15,7 +15,7 @@ import java.util.List;
 public final class BeepTestLevelLoader {
     private static final int X_INITIAL = -1;
     private static final int OFFSET_AMT = 28;
-    private static final int MAX_Y = -50;
+    private static final int MAX_Y = -45;
     private static final int MIN_Y = -60;
     private static final World world = Bukkit.getWorld("Party");
     private BeepTestLevelLoader() {}

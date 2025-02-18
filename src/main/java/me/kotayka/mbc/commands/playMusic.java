@@ -46,7 +46,7 @@ public class playMusic implements CommandExecutor {
                         case ("Party") -> {send.sendMessage("No valid music - please select a specific party game");}
                         case ("PowerTag") -> {p.playSound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS, 1, 1);}
                         case ("OneShot") -> {p.playSound(p, Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS, 1, 1);}
-                        case ("BeepTest") -> {p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, .75f, 1);}
+                        case ("BeepSwitch") -> {p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, .75f, 1);}
                         case ("DiscoFever") -> {p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS, 1, 1);}
                         case ("Dragons") -> {p.playSound(p, Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS, 1, 1);}
                     }
@@ -71,7 +71,7 @@ public class playMusic implements CommandExecutor {
                     case ("Party") -> {send.sendMessage("No valid music - please select a specific party game");}
                     case ("PowerTag") -> {p.playSound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS, 1, 1);}
                     case ("OneShot") -> {p.playSound(p, Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS, 1, 1);}
-                    case ("BeepTest") -> {p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, 1, 1);}
+                    case ("BeepSwitch") -> {p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, 1, 1);}
                     case ("DiscoFever") -> {p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS, 1, 1);}
                     case ("Dragons") -> {p.playSound(p, Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS, 1, 1);}
                 }

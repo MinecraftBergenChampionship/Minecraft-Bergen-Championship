@@ -93,7 +93,7 @@ public abstract class MBCTeam {
 
     public Color getColor() { return color; }
 
-    public List<Participant> getPlayers() { return teamPlayers; }
+    public List<Participant> getPlayers() { return new ArrayList<>(teamPlayers); }
     public void addPlayer(Participant p) {
         teamPlayers.add(p);
 

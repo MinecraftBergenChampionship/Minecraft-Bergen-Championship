@@ -191,7 +191,9 @@ public class Dragons extends PartyGame {
             for (Participant p : MBC.getInstance().getPlayers()) {
                 p.addCurrentScoreToTotal();
             }
-            MBC.getInstance().updatePlacings();
+            if (MBC.getInstance().gameNum != 6) {
+                MBC.getInstance().updatePlacings();
+            }
             returnToLobby();
         } else {
             // start next game

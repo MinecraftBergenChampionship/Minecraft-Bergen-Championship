@@ -61,7 +61,7 @@ public class Room {
                 if(sourceState instanceof Banner && targetState instanceof Banner) {
                     Banner sourceBanner = (Banner) sourceState;
                     Banner targetBanner = (Banner) targetState;
-                    Bukkit.broadcastMessage("banner at "+ (diamondBlock.getBlockX()-x) + ", " + (diamondBlock.getBlockY()+y+1) + ", " + (diamondBlock.getBlockZ()+z));
+                    //Bukkit.broadcastMessage("banner at "+ (diamondBlock.getBlockX()-x) + ", " + (diamondBlock.getBlockY()+y+1) + ", " + (diamondBlock.getBlockZ()+z));
                     targetBanner.setBaseColor(sourceBanner.getBaseColor());
                     targetBanner.setPatterns(sourceBanner.getPatterns());
                     targetBanner.setBlockData(sourceBanner.getBlockData());
@@ -70,8 +70,10 @@ public class Room {
                 else if(sourceState instanceof Skull && targetState instanceof Skull) {
                     Skull sourceSkull = (Skull) sourceState;
                     Skull targetSkull = (Skull) targetState;
-                    Bukkit.broadcastMessage("skull at "+ (diamondBlock.getBlockX()-x) + ", " + (diamondBlock.getBlockY()+y+1) + ", " + (diamondBlock.getBlockZ()+z));
-                    if (sourceSkull.getOwningPlayer() != null) targetSkull.setOwningPlayer(sourceSkull.getOwningPlayer());
+                    Bukkit.broadcastMessage("skull at "+ (diamondBlock.getBlockX()-x) + ", " + (diamondBlock.getBlockY()+y+1) + ", " + (diamondBlock.getBlockZ()+z) + ": " + sourceSkull.getOwnerProfile().getName());
+                    if (sourceSkull.getOwnerProfile() != null) targetSkull.setOwnerProfile(sourceSkull.getOwnerProfile());
+                    Bukkit.broadcastMessage("" + targetSkull.getOwnerProfile().getName());
+                    
                     targetSkull.setBlockData(sourceSkull.getBlockData());
                     targetSkull.update();
                 }

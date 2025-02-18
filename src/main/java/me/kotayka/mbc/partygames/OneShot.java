@@ -43,6 +43,8 @@ public class OneShot extends PartyGame {
     private final int STREAK_KILL_POINTS = 1;
     private final int WEAPON_POINTS = 3;
     private Map<MBCTeam, BossBar> teamBossBars = new HashMap<>();
+    
+    private boolean playMusic = true;
 
     private static OneShot instance = null;
     public static final ItemStack CROSSBOW_QUICK_CHARGE = new ItemStack(Material.CROSSBOW);
@@ -113,11 +115,15 @@ public class OneShot extends PartyGame {
         }
         logger.logStats();
 
+        playMusic = false;
+
         if (MBC.getInstance().party == null) {
             for (Participant p : MBC.getInstance().getPlayers()) {
                 p.addCurrentScoreToTotal();
             }
-            MBC.getInstance().updatePlacings();
+            if (MBC.getInstance().gameNum != 6) {
+                MBC.getInstance().updatePlacings();
+            }
             returnToLobby();
         } else {
             // start next game
@@ -141,7 +147,8 @@ public class OneShot extends PartyGame {
         p.getPlayer().getInventory().clear();
         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 2, false, false));
         p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
-        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 2, false, false));       
+        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 2, false, false));
+        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 40, 2, false, false));            
 
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
@@ -158,6 +165,19 @@ public class OneShot extends PartyGame {
             }
         }
         return false;
+    }
+
+    public void replayMusic() {
+        if (!playMusic) return;
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.playSound(p, Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS, 1, 1);
+        }
+
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { replayMusic();}
+          }, 3940L);
     }
 
     public void regainItems(Participant p) {
@@ -337,7 +357,7 @@ public class OneShot extends PartyGame {
                 setGameState(GameState.ACTIVE);
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 0.75f, 1);
-                    p.playSound(p, Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS, 1, 1);
+                    replayMusic();
                 }
                 setPVP(true);
                        
