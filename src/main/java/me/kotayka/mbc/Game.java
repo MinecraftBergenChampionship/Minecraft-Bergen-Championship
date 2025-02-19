@@ -549,16 +549,21 @@ public abstract class Game extends Minigame {
             String score = String.format(
                     (num) + ". %s: %.1f (%d x %.1f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier
             );
+
+
             logger.logIndividual(score);
             individual.put(p, p.getRawCurrentScore());
+            MBC.getInstance().addMapScore(p, p.getRawCurrentScore());
             if (num <= 5) {
                 topFive.append(score);
             }
             lastScore = p.getRawCurrentScore();
             p.addCurrentScoreToTotal();
         }
+        MBC.getInstance().finalMapScores(this.name());
         return topFive.toString();
     }
+    
 
     public String printEventScores() {
         // each player's scores are added to event total in
@@ -600,10 +605,13 @@ public abstract class Game extends Minigame {
             String score = String.format(
                     "%s: %.1f (%d x %.1f)\n", p.getFormattedName(), p.getMultipliedCurrentScore(), p.getRawCurrentScore(), MBC.getInstance().multiplier
             );
+            MBC.getInstance().addMapScore(p, p.getRawCurrentScore());
+
             logger.logIndividual(score);
 
             p.addCurrentScoreToTotal();
         }
+        MBC.getInstance().finalMapScores(this.name());
     }
 
     public void getTeamScoresNoPrint() {

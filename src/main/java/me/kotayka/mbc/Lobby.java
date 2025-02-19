@@ -763,14 +763,16 @@ public class Lobby extends Minigame {
         Leaderboard gameLeaderboard;
 
         if (individualLeaderboards.isEmpty()) {
-            gameLeaderboard = new Leaderboard(individual, 1);
+            //gameLeaderboard = new Leaderboard(individual, 1);
+            gameLeaderboard = new Leaderboard(MBC.getInstance().gameScores.getRecentMap(), MBC.getInstance().gameScores.getRecentString(), individualLeaderboards.size()+1);
         }
         else {
             Leaderboard lastBoard = individualLeaderboards.getFirst();
 
             lastBoard.RemoveStands();
 
-            gameLeaderboard = new Leaderboard(individual, lastBoard, individualLeaderboards.size());
+            //gameLeaderboard = new Leaderboard(individual, lastBoard, individualLeaderboards.size());
+            gameLeaderboard = new Leaderboard(MBC.getInstance().gameScores.getRecentMap(), MBC.getInstance().gameScores.getRecentString(), individualLeaderboards.size());
 
             individualLeaderboards.removeFirst();
         }

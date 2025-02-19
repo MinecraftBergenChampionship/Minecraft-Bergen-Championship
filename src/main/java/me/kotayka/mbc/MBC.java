@@ -98,6 +98,10 @@ public class MBC implements Listener {
     public boolean started = false;
     private String STAT_DIRECTORY = "MBC_EVENT";
 
+    public final GameScores gameScores = new GameScores();
+
+    public Map<Participant, Integer> currentGameScores = null;
+
     //public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt","Quickfire"));
     public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire","Party","PowerTag"));
     public static final List<String> partyGameNameList = new ArrayList<>(Arrays.asList("Dragons", "BeepSwitch","DiscoFever","OneShot"));
@@ -444,6 +448,70 @@ public class MBC implements Listener {
             player.sendMessage(ChatColor.RED + "Chat is currently muted, your message will send after!");
             e.setCancelled(true);
         }
+    }
+
+    public void addMapScore(Participant p, int i) {
+        if (currentGameScores == null) {
+            currentGameScores = new HashMap<Participant, Integer>();
+        }
+        currentGameScores.put(p, i);
+    }
+
+    public void finalMapScores(String name) {
+        gameScores.inputGame(name, currentGameScores);
+
+        currentGameScores = null;
+    }
+
+    public void gameResults(int game, Player sender) {
+        Map<Participant, Integer> gameResults;
+        switch (game) {
+            case 1:
+                gameResults = gameScores.gameOneScores;
+                break;
+            case 2:
+                gameResults = gameScores.gameTwoScores;
+                break;
+            case 3:
+                gameResults = gameScores.gameThreeScores;
+                break;
+            case 4:
+                gameResults = gameScores.gameFourScores;
+                break;
+            case 5:
+                gameResults = gameScores.gameFiveScores;
+                break;
+            case 6:
+                gameResults = gameScores.gameSixScores;
+                break;
+            default:
+                return;
+        }
+        if (gameResults == null) return;
+        StringBuilder msg = new StringBuilder(ChatColor.AQUA.toString()+ChatColor.BOLD+"Player scores: \n"+ChatColor.RESET);
+        StringBuilder yourPlace = new StringBuilder(ChatColor.AQUA+"+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n"+ChatColor.RESET);
+        int placement = 0;
+        while (!gameResults.isEmpty()) {
+            Participant p = null;
+            for (Participant part: gameResults.keySet()) {
+                if (p == null)  {
+                    p = part; 
+                }
+                else if (gameResults.get(part) < gameResults.get(p)) {
+                    p = part;
+                }
+            }
+            if (p == null) {
+                
+            }
+            else {
+                msg.append((placement+1)).append(". ").append(p.getFormattedName()).append(": ").append(gameResults.get(p)).append("\n");
+                gameResults.remove(p);
+                placement++;
+            }
+
+        }
+        sender.sendMessage(msg + "");
     }
 
 

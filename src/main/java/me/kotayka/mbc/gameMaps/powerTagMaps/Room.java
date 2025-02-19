@@ -70,9 +70,8 @@ public class Room {
                 else if(sourceState instanceof Skull && targetState instanceof Skull) {
                     Skull sourceSkull = (Skull) sourceState;
                     Skull targetSkull = (Skull) targetState;
-                    Bukkit.broadcastMessage("skull at "+ (diamondBlock.getBlockX()-x) + ", " + (diamondBlock.getBlockY()+y+1) + ", " + (diamondBlock.getBlockZ()+z) + ": " + sourceSkull.getOwnerProfile().getName());
+            
                     if (sourceSkull.getOwnerProfile() != null) targetSkull.setOwnerProfile(sourceSkull.getOwnerProfile());
-                    Bukkit.broadcastMessage("" + targetSkull.getOwnerProfile().getName());
                     
                     targetSkull.setBlockData(sourceSkull.getBlockData());
                     targetSkull.update();

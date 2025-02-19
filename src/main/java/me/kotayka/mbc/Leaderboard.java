@@ -9,6 +9,7 @@ import org.bukkit.entity.EntityType;
 import java.util.*;
 
 public class Leaderboard {
+    public String name = null;
     public Map<Participant, Integer> scores = new HashMap<>();
     private List<Participant> participants;
     private List<ArmorStand> leaderboardStands = new ArrayList<>();
@@ -23,6 +24,17 @@ public class Leaderboard {
     };
 
     private int index;
+
+    public Leaderboard(Map<Participant, Integer> scoreMap, String name, int index) {
+        scores = scoreMap;
+        this.index = index;
+        this.name = name;
+
+        participants = new ArrayList<>();
+        for (Participant p : scoreMap.keySet()) {
+            participants.add(p);
+        }
+    }
 
     public Leaderboard(List<Participant> participants, int index) {
         this.participants = participants;
@@ -48,29 +60,64 @@ public class Leaderboard {
         //Bukkit.broadcastMessage("Spawning Leaderboard");
         List<String> leaderboardLines = new ArrayList<>();
 
-        leaderboardLines.add(ChatColor.AQUA + "Individual Leaderboard");
-        //Bukkit.broadcastMessage(""+participants.size());
-        for (int i = 0; i < 8; i++) {
-            Participant p;
+        if (name == null) {
+            leaderboardLines.add(ChatColor.AQUA + "Individual Leaderboard");
+            //Bukkit.broadcastMessage(""+participants.size());
+            for (int i = 0; i < 8; i++) {
+                Participant p;
 
-            if (i < participants.size()) {
-                p = participants.get(i);
-            } else {
-                //Bukkit.broadcastMessage("Returning: "+i);
-                break;
-            }
-            leaderboardLines.add(""+(i+1)+". "+p.getFormattedName()+" - "+scores.get(p));
+                if (i < participants.size()) {
+                    p = participants.get(i);
+                } else {
+                    //Bukkit.broadcastMessage("Returning: "+i);
+                    break;
+                }
+                leaderboardLines.add(""+(i+1)+". "+p.getFormattedName()+" - "+scores.get(p));
             //Bukkit.broadcastMessage(leaderboardLines.getLast());
-        }
+            }
 
-        Location loc = INDIVIDUAL_LEADERBOARDS[index];
+            Location loc = INDIVIDUAL_LEADERBOARDS[index];
 
-        double yOffset = 0;
-        for (String line : leaderboardLines) {
-            //Bukkit.broadcastMessage(line);
-            spawnFloatingText(loc.clone().add(0, yOffset, 0), line);
-            yOffset -= 0.3;
+            double yOffset = 0;
+            for (String line : leaderboardLines) {
+                //Bukkit.broadcastMessage(line);
+                spawnFloatingText(loc.clone().add(0, yOffset, 0), line);
+                yOffset -= 0.3;
+            }
         }
+        else {
+            leaderboardLines.add(ChatColor.AQUA + name);
+            
+            for (int i = 0; i < 8; i++) {
+                Participant p = null;
+                for (Participant part: scores.keySet()) {
+                    if (p == null)  {
+                        p = part; 
+                    }
+                    else if (scores.get(part) > scores.get(p)) {
+                        p = part;
+                    }
+                }
+                if (p == null) {
+                    
+                }
+                else {
+                    leaderboardLines.add(""+(i+1)+". "+p.getFormattedName()+" - "+scores.get(p));
+                    scores.remove(p);
+                }
+
+            }
+
+            Location loc = INDIVIDUAL_LEADERBOARDS[index];
+
+            double yOffset = 0;
+            for (String line : leaderboardLines) {
+                //Bukkit.broadcastMessage(line);
+                spawnFloatingText(loc.clone().add(0, yOffset, 0), line);
+                yOffset -= 0.3;
+            }
+        }
+        
     }
 
     private void spawnFloatingText(Location location, String text) {

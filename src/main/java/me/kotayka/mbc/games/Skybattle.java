@@ -215,6 +215,10 @@ public class Skybattle extends Game {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
                         }
+                        for (Participant p : playersAlive) {
+                            MBCTeam t = p.getTeam();
+                            teamPlacements.put(t, 1);
+                        }
                         placementPoints();
                         roundWinners(WIN_POINTS, SURVIVAL_POINTS);
                         timeRemaining = 38;
@@ -569,7 +573,7 @@ public class Skybattle extends Game {
             skybattleDeathGraphics(e, damageEvent.getCause());
         }
 
-        if (killer!=null) {
+        if (killer!=null && !killer.equals(player)) {
             killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
         }
 
@@ -634,7 +638,7 @@ public class Skybattle extends Game {
         MBC.spawnFirework(victim.getParticipant());
         deathMessage = deathMessage.replace(victim.getPlayer().getName(), victim.getParticipant().getFormattedName());
 
-        if (victim.lastDamager != null) {
+        if (victim.lastDamager != null && !skybattlePlayerMap.get(victim.lastDamager.getUniqueId()).equals(victim)) {
             SkybattlePlayer killer = skybattlePlayerMap.get(victim.lastDamager.getUniqueId());
             killer.kills++;
 

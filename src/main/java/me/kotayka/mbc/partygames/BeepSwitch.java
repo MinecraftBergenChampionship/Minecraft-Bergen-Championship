@@ -556,6 +556,7 @@ public class BeepSwitch extends PartyGame {
         }
         
         p.getPlayer().sendMessage("You fell!");
+        p.getPlayer().setVelocity(new Vector(0, 0, 0));
         p.getPlayer().teleport(respawn);
     }
 
@@ -714,6 +715,7 @@ public class BeepSwitch extends PartyGame {
         
         p.getPlayer().sendMessage("Teleporting you to path...");
         p.getPlayer().teleport(respawn);
+        p.getPlayer().setVelocity(new Vector(0, 0, 0));
 
         p.getPlayer().getInventory().remove(Material.RED_DYE);
         p.getPlayer().getInventory().remove(Material.YELLOW_DYE);
