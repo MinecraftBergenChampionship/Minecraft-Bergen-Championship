@@ -9,6 +9,8 @@ import org.bukkit.entity.Item;
 public class Classic extends DragonsMap {
     public Classic(Dragons dragons) {
         super(dragons);
+        super.mapName = "Classic";
+        super.creatorName = "kotayka_";
         minX = 972;
         maxX = 1013;
         minY = 50;

@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Boats extends TGTTOSMap {
     public Boats() {
-        super("Boats", new ItemStack[]{new ItemStack(Material.OAK_BOAT), new ItemStack(Material.SNOWBALL, 10), new ItemStack(Material.LEATHER_BOOTS)});
+        super("Boats", "Noxcrew (MCC)", new ItemStack[]{new ItemStack(Material.OAK_BOAT), new ItemStack(Material.SNOWBALL, 10), new ItemStack(Material.LEATHER_BOOTS)});
         super.loadMap(
             new Location[]{new Location(getWorld(), 300, 70, -305, -90, 0), new Location(getWorld(), 300, 70, -303, -90, 0), new Location(getWorld(), 300, 70, -301, -90, 0), new Location(getWorld(), 300, 70, -299, -90, 0), new Location(getWorld(), 300, 70, -297, -90, 0), new Location(getWorld(), 300, 70, -295, -90, 0)},
              new Location[]{new Location(getWorld(), 462, 65, -262), new Location(getWorld(), 467, 65, -269)},

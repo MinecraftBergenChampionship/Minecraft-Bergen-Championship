@@ -97,6 +97,11 @@ public class Leaderboard {
                     else if (scores.get(part) > scores.get(p)) {
                         p = part;
                     }
+                    else if (scores.get(part) == scores.get(p)) {
+                        if (part.getRawTotalScore() < p.getRawTotalScore()) {
+                            p = part;
+                        }
+                    }
                 }
                 if (p == null) {
                     

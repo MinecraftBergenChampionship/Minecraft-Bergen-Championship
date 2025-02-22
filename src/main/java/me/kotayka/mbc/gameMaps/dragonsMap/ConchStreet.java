@@ -9,6 +9,8 @@ import org.bukkit.entity.Item;
 public class ConchStreet extends DragonsMap {
     public ConchStreet(Dragons dragons) {
         super(dragons);
+        super.mapName = "Conch Street";
+        super.creatorName = "iDrg";
         minX = 972;
         maxX = 1048;
         minY = 50;

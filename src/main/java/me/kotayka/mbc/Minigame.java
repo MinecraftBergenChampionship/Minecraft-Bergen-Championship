@@ -144,6 +144,21 @@ public abstract class Minigame implements Scoreboard, Listener {
     }
 
     /**
+     * Graphics for showing a map name + the creator of the map.
+     * Should only be called when gameState() is GameState.STARTING
+     * since it directly uses timeRemaining
+     */
+    public void mapCreator(String name, String creator) {
+        if (name == null || creator == null) return;
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (timeRemaining == 15) {
+                p.playSound(p, Sound.ENTITY_CHICKEN_EGG, 1, 1);
+                p.sendTitle("Map: " + ChatColor.GOLD + "" + ChatColor.BOLD + name,"Made by " + ChatColor.GOLD + "" + ChatColor.BOLD + creator, 0, 40,40);
+            }
+        }
+    }
+
+    /**
      * Graphics for counting down when a game is about to start.
      * Should only be called when gameState() is GameState.STARTING
      * since it directly uses timeRemaining

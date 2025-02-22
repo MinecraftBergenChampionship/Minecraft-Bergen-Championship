@@ -18,10 +18,8 @@ public abstract class SkybattleMap extends MBCMap {
 
     public Location[] spawns;
 
-
     public SkybattleMap(Skybattle skb) {
         super(Bukkit.getWorld("Skybattle"));
-
         this.SKYBATTLE = skb;
     }
 

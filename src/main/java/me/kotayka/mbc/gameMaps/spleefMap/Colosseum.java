@@ -23,7 +23,7 @@ public class Colosseum extends SpleefMap {
     int erosion = -1;
     int[] layerRadius = new int[]{6, 20, 20, 20};
     public Colosseum() {
-        super("Colosseum", 60, "Regular");
+        super("Colosseum", 60, "Regular", "BappleBusiness");
     }
 
     @Override

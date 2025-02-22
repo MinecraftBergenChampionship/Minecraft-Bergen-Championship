@@ -27,6 +27,7 @@ public class BCA extends SurvivalGamesMap {
         super.middleChests = this.middleChests;
         super.spawnY = 2;
         super.mapName = "BCA";
+        super.creatorName = "BappleBusiness, iDrg & Others";
         super.type = "Cornucopia";
         super.CENTER = new Location(getWorld(), 0, 10, 0);
         super.hasElevationBorder = false;

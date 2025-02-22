@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Skydive extends TGTTOSMap {
     public Skydive() {
-        super("Skydive", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.SHEARS), new ItemStack(Material.SNOWBALL, 6), new ItemStack(Material.LEATHER_BOOTS)});
+        super("Skydive", "Noxcrew (MCC)", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.SHEARS), new ItemStack(Material.SNOWBALL, 6), new ItemStack(Material.LEATHER_BOOTS)});
         super.loadMap(
             new Location[]{new Location(getWorld(), -300, 120, 295, 90, 0), new Location(getWorld(), -300, 120, 297, 90, 0), new Location(getWorld(), -300, 120, 299, 90, 0), new Location(getWorld(), -300, 120, 300, 90, 0), new Location(getWorld(), -300, 120, 302, 90, 0), new Location(getWorld(), -300, 120, 304, 90, 0)}, 
             new Location[]{new Location(getWorld(), -399, 50, 297), new Location(getWorld(), -394, 50, 302)},

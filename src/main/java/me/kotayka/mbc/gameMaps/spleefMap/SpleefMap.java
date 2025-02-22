@@ -5,21 +5,27 @@ import org.bukkit.World;
 
 public abstract class SpleefMap {
     private final String name;
+    private final String creator;
     private final int deathY;
     private final World world = Bukkit.getWorld("spleef");
     private final String mapType;
 
 
-    public SpleefMap(String name, int deathY, String mapType) {
+    public SpleefMap(String name, int deathY, String mapType, String creator) {
         this.name = name;
         this.deathY = deathY;
         this.mapType = mapType;
+        this.creator = creator;
     }
 
     public World getWorld() { return world; }
 
     public String Name() {
         return name;
+    }
+
+    public String Creator() {
+        return creator;
     }
 
     public String getMapType() {

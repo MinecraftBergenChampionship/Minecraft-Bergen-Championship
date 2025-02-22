@@ -5,7 +5,6 @@ import me.kotayka.mbc.Participant;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
-import org.bukkit.Color;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 
@@ -21,6 +20,7 @@ public class JesuscraftTwo extends SurvivalGamesMap {
         super.middleChests = this.middleChests;
         super.spawnY = 151;
         super.mapName = "Jesuscraft II";
+        super.creatorName = "BappleBusiness, bigkirbypuff_ & Others";
         super.type = "Elytra";
         super.CENTER = new Location(Bukkit.getWorld("Survival_Games"), 10000, 63, 10001);
         super.hasElevationBorder = true;

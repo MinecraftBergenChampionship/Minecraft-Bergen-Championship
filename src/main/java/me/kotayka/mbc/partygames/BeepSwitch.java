@@ -220,6 +220,7 @@ public class BeepSwitch extends PartyGame {
                 break;
             case STARTING:
                 startingCountdown();
+                mapCreator("Beep Switch", "Grassy311");
                 if (timeRemaining == 69) {
                     Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "You will soon be given your placement of when you will be parkouring...\n");
                 }

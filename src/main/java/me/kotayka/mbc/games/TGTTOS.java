@@ -157,7 +157,7 @@ public class TGTTOS extends Game {
                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
                 }
                 setGameState(GameState.STARTING);
-                timeRemaining = 15;
+                timeRemaining = 16;
             } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
@@ -179,6 +179,7 @@ public class TGTTOS extends Game {
                 }
             } else {
                 Countdown();
+                mapCreator(map.getName(), map.getCreator());
                 if (timeRemaining == 9) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);

@@ -347,7 +347,7 @@ public class Quickfire extends FinaleGame {
             createScoreboard();
             p.sendTitle(t.teamNameFormat() + " win MBC!", " ", 0, 100, 20);
             p.stopSound(Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS);
-            p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_6, SoundCategory.RECORDS, 1, 1);
+            p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_6, SoundCategory.BLOCKS, 1, 1);
             p.setInvulnerable(true);
         }
 

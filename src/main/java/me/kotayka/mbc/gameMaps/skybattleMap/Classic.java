@@ -38,6 +38,8 @@ public class Classic extends SkybattleMap {
 
     public Classic(Skybattle skybattle) {
         super(skybattle);
+        super.mapName = "Classic";
+        super.creatorName = "Noxcrew (MCC)";
         int topBorder = 120;
         int voidHeight = 30;
         loadWorld(CENTER, voidHeight, topBorder, borderRadius, RADIUS_SHRINK_AMOUNT, HEIGHT_SHRINK_AMOUNT);

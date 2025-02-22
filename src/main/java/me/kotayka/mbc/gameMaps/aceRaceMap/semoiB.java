@@ -34,6 +34,7 @@ public class semoiB extends AceRaceMap {
     public semoiB() {
         super(0, new Location(Bukkit.getWorld("AceRace"), -2160, 31, -2271), "Lava");
         mapName = "semoiB";
+        creatorName = "rspacerr & bigkirbypuff_";
         loadCheckpoints(respawns, checkpoints);
     }
 

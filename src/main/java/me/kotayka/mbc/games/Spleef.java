@@ -169,7 +169,7 @@ public class Spleef extends Game {
         }
 
         setGameState(GameState.STARTING);
-        setTimer(15);
+        setTimer(16);
     }
 
     private void loadMap() {
@@ -205,6 +205,7 @@ public class Spleef extends Game {
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
                 startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                mapCreator(map.Name(), map.Creator());
                 if (timeRemaining == 5 && map.getMapType().equals("Gravity")) {
                     Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "Prepare for an antigravity experience!\n");
                     for (Participant p : MBC.getInstance().getPlayers()) {

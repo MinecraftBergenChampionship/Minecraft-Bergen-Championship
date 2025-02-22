@@ -270,8 +270,9 @@ public class OneShot extends PartyGame {
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
+            p.getPlayer().removePotionEffect(PotionEffectType.SPEED);
 
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, PotionEffect.INFINITE_DURATION, 2, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, PotionEffect.INFINITE_DURATION, 1, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 2, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 2, false, false));
@@ -341,13 +342,14 @@ public class OneShot extends PartyGame {
                 MBC.getInstance().sendMutedMessages();
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
                 setGameState(GameState.STARTING);
-                timeRemaining = 15;
+                timeRemaining = 16;
             } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
                 startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                mapCreator(map.mapName, map.creatorName);
                 if (timeRemaining == 9) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);
@@ -635,6 +637,12 @@ public class OneShot extends PartyGame {
             p.getPlayer().sendTitle(ChatColor.BOLD + "Game Over!", "", 0, 15, 15);
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().getInventory().clear();
+            p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
+            p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
+            p.getPlayer().removePotionEffect(PotionEffectType.SPEED);
             flightEffects(p);
             teamBossBars.get(p.getTeam()).setVisible(false);
         }
@@ -646,6 +654,7 @@ public class OneShot extends PartyGame {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.stopSound(Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS);
             p.removePotionEffect(PotionEffectType.GLOWING);
+            
         }
         for (MBCTeam mt : MBC.getInstance().getValidTeams()) {
             BossBar b = teamBossBars.get(mt);

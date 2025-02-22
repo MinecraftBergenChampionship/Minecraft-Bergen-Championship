@@ -34,6 +34,7 @@ public class iDrgCity extends AceRaceMap {
     public iDrgCity() {
         super(5, new Location(Bukkit.getWorld("AceRace"), -926, 42, -1080, -45, 0), "Lava");
         mapName = "iDrg City";
+        creatorName = "iDrg";
         loadCheckpoints(respawns, checkpoints);
     }
 

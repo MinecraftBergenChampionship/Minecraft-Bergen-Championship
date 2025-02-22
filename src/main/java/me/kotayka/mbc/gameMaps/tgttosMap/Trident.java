@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Trident extends TGTTOSMap {
     public Trident() {
-        super("Trident", new ItemStack[]{new ItemStack(Material.LEATHER_BOOTS), new ItemStack(Material.TRIDENT)});
+        super("Trident", "Noxcrew (MCC)", new ItemStack[]{new ItemStack(Material.LEATHER_BOOTS), new ItemStack(Material.TRIDENT)});
         super.loadMap(
             new Location[]{new Location(getWorld(), -490, 65, 503), new Location(getWorld(), -494, 65, 503), new Location(getWorld(), -498, 65, 503), new Location(getWorld(), -502, 65, 503), new Location(getWorld(), -506, 65, 503), new Location(getWorld(), -510, 65, 503)}, 
             new Location[]{new Location(getWorld(), -508, 65, 668), new Location(getWorld(), -493, 65, 668)},

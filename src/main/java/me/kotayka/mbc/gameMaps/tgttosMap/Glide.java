@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Glide extends TGTTOSMap {
     public Glide() {
-        super("Glide", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.ELYTRA), new ItemStack(Material.SHEARS), new ItemStack(Material.SNOWBALL, 6), new ItemStack(Material.LEATHER_BOOTS)});
+        super("Glide", "Noxcrew (MCC)", new ItemStack[]{new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.ELYTRA), new ItemStack(Material.SHEARS), new ItemStack(Material.SNOWBALL, 6), new ItemStack(Material.LEATHER_BOOTS)});
         super.loadMap(
             new Location[]{new Location(getWorld(), 204, 70, 200), new Location(getWorld(), 202, 70, 200), new Location(getWorld(), 200, 70, 200), new Location(getWorld(), 198, 70, 200), new Location(getWorld(), 196, 70, 200), new Location(getWorld(), 194, 70, 200)},
                 new Location[]{new Location(getWorld(), 193, 87, 277), new Location(getWorld(), 203, 87, 272)},

@@ -7,6 +7,8 @@ import org.bukkit.Location;
 public class Ascent extends OneShotMap {
     public Ascent(OneShot oneshot) {
         super(oneshot);
+        super.mapName = "Ascent";
+        super.creatorName = "Glenview";
         spawnpoints = new Location[48];
         addSpawnpoints();
         DEATH_Y = -20;

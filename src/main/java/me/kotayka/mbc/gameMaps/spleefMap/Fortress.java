@@ -18,7 +18,7 @@ public class Fortress extends SpleefMap {
     int erosion = -1;
 
     public Fortress() {
-        super("Fortress", 65, "Blind");
+        super("Fortress", 65, "Blind", "bigkirbypuff_");
     }
 
     @Override

@@ -271,13 +271,14 @@ public class Dragons extends PartyGame {
             case TUTORIAL:
                 if (timeRemaining == 0) {
                     setGameState(GameState.STARTING);
-                    setTimer(15);
+                    setTimer(16);
                 } else if (timeRemaining % 7 == 0) {
                     Introduction();
                 }
                 break;
             case STARTING:
                 startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                mapCreator(map.mapName, map.creatorName);
                 if (timeRemaining == 9) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);

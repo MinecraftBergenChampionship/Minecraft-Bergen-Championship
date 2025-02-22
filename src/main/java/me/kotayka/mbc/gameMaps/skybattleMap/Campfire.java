@@ -36,6 +36,8 @@ public class Campfire extends SkybattleMap {
     };
     public Campfire(Skybattle skb) {
         super(skb);
+        super.mapName = "Campfire";
+        super.creatorName = "bigkirbypuff_";
         int topBorder = 120;
         int voidHeight = 25;
         loadWorld(CENTER, voidHeight, topBorder, borderRadius, RADIUS_SHRINK_AMOUNT, HEIGHT_SHRINK_AMOUNT);

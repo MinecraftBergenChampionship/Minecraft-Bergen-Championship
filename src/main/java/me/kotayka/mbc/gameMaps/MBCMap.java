@@ -9,6 +9,7 @@ public abstract class MBCMap {
     private final World world;
     private final Location INTRO_LOCATION; // may be null if map doesn't have one
     public String mapName;
+    public String creatorName;
 
     protected MBCMap(World world, @Nullable Location INTRO_LOCATION) {
         this.INTRO_LOCATION = INTRO_LOCATION;

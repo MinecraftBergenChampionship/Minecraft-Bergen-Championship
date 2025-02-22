@@ -144,6 +144,7 @@ public class AceRace extends Game {
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
                 startingCountdown();
+                mapCreator(map.mapName, map.creatorName);
                 if (timeRemaining == 11) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_0, SoundCategory.RECORDS, 0.75f, 1);

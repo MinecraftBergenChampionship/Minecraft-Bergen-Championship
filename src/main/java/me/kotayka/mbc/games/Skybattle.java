@@ -161,12 +161,13 @@ public class Skybattle extends Game {
                 MBC.getInstance().sendMutedMessages();
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
                 setGameState(GameState.STARTING);
-                timeRemaining = 15;
+                timeRemaining = 16;
             } else if (timeRemaining % 7 == 0) {
                 Introduction();
             }
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
+                if (roundNum == 1) mapCreator(map.mapName, map.creatorName);
                 startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
                 if (timeRemaining == 9) {
                     for (Player p : Bukkit.getOnlinePlayers()) {

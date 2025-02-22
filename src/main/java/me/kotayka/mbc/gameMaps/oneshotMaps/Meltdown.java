@@ -9,6 +9,8 @@ public class Meltdown extends OneShotMap {
     
     public Meltdown(OneShot oneshot) {
         super(oneshot);
+        super.mapName = "Meltdown";
+        super.creatorName = "bigkirbypuff_";
         spawnpoints = new Location[31];
         addSpawnpoints();
         DEATH_Y = -20;

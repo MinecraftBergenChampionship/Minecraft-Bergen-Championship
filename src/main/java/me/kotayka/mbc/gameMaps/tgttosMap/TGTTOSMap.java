@@ -17,11 +17,13 @@ public abstract class TGTTOSMap {
     private Location[] end;
     private int deathY;
     private final String name;
+    private final String creator;
     private List<ItemStack> items = null;
     private final World world = Bukkit.getWorld("TGTTOSAWAP");
 
-    public TGTTOSMap(String name, @Nullable ItemStack[] i) {
+    public TGTTOSMap(String name, String creator, @Nullable ItemStack[] i) {
         this.name = name;
+        this.creator = creator;
         if (i != null)
             items = new ArrayList<>(Arrays.asList(i));
     }
@@ -82,6 +84,10 @@ public abstract class TGTTOSMap {
 
     public String getName() {
         return name;
+    }
+
+    public String getCreator() {
+        return creator;
     }
 
 }
