@@ -17,6 +17,8 @@ public class Castle extends QuickfireMap {
     public Castle(Quickfire qf) {
         super(qf);
         loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, SPAWN, timeUntilGlowing);
+        super.mapName = "Castle";
+        super.creatorName = "bigkirbypuff_";
     }
 
     public void resetBarriers(boolean b) {

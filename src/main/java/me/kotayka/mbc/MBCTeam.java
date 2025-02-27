@@ -171,7 +171,7 @@ public abstract class MBCTeam {
         };
     }
 
-    public ItemStack getGlass() {
+    public ItemStack getGlassPane() {
         return switch (getChatColor()) {
             case RED -> new ItemStack(Material.RED_STAINED_GLASS_PANE);
             case YELLOW -> new ItemStack(Material.YELLOW_STAINED_GLASS_PANE);
@@ -180,6 +180,18 @@ public abstract class MBCTeam {
             case DARK_PURPLE -> new ItemStack(Material.PURPLE_STAINED_GLASS_PANE);
             case LIGHT_PURPLE -> new ItemStack(Material.PINK_STAINED_GLASS_PANE);
             default -> new ItemStack(Material.GLASS_PANE);
+        };
+    }
+
+    public ItemStack getGlass() {
+        return switch (getChatColor()) {
+            case RED -> new ItemStack(Material.RED_STAINED_GLASS);
+            case YELLOW -> new ItemStack(Material.YELLOW_STAINED_GLASS);
+            case GREEN -> new ItemStack(Material.GREEN_STAINED_GLASS);
+            case BLUE -> new ItemStack(Material.BLUE_STAINED_GLASS);
+            case DARK_PURPLE -> new ItemStack(Material.PURPLE_STAINED_GLASS);
+            case LIGHT_PURPLE -> new ItemStack(Material.PINK_STAINED_GLASS);
+            default -> new ItemStack(Material.GLASS);
         };
     }
 

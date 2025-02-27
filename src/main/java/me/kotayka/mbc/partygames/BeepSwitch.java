@@ -723,6 +723,10 @@ public class BeepSwitch extends PartyGame {
         p.getPlayer().getInventory().remove(Material.LIME_DYE);
         p.getPlayer().getInventory().remove(Material.BLUE_DYE);
 
+        for (Participant player : p.getTeam().getPlayers()) {
+            player.getPlayer().teleport(respawn);
+        }
+
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
             public void run() { pathTeleportItems(p.getPlayer());}

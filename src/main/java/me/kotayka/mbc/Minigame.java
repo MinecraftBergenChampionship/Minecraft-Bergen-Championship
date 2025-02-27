@@ -190,13 +190,13 @@ public abstract class Minigame implements Scoreboard, Listener {
             if (timeRemaining <= 10 && timeRemaining > 3) {
                 p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + timeRemaining + "<", 0, 20, 0);
             } else if (timeRemaining == 3) {
-                p.playSound(p, s, SoundCategory.RECORDS, 1, 1);
+                p.playSound(p, s, SoundCategory.BLOCKS, 1, 1);
                 p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + ChatColor.RED + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             } else if (timeRemaining == 2) {
-                p.playSound(p, s, SoundCategory.RECORDS, 1, 1);
+                p.playSound(p, s, SoundCategory.BLOCKS, 1, 1);
                 p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + ChatColor.YELLOW + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             } else if (timeRemaining == 1) {
-                p.playSound(p, s, SoundCategory.RECORDS, 1, 1);
+                p.playSound(p, s, SoundCategory.BLOCKS, 1, 1);
                 p.sendTitle(ChatColor.AQUA + "Starting in:", ChatColor.BOLD + ">" + ChatColor.GREEN + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             }
         }

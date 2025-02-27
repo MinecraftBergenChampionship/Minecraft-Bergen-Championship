@@ -17,6 +17,8 @@ public class SnowGlobe extends QuickfireMap {
     public SnowGlobe(Quickfire qf) {
         super(qf);
         loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, SPAWN, timeUntilGlowing);
+        super.mapName = "Snow Globe";
+        super.creatorName = "bigkirbypuff_";
     }
 
     public void resetBarriers(boolean b) {
@@ -191,7 +193,8 @@ public class SnowGlobe extends QuickfireMap {
                         world.getBlockAt(x, y, z).getType().equals(Material.GREEN_CONCRETE) ||  
                         world.getBlockAt(x, y, z).getType().equals(Material.BLUE_CONCRETE) ||  
                         world.getBlockAt(x, y, z).getType().equals(Material.PURPLE_CONCRETE) ||
-                        world.getBlockAt(x, y, z).getType().equals(Material.PINK_CONCRETE)) world.getBlockAt(x, y, z).setType(second);
+                        world.getBlockAt(x, y, z).getType().equals(Material.PINK_CONCRETE)  ||
+                        world.getBlockAt(x, y, z).getType().equals(Material.WHITE_CONCRETE)) world.getBlockAt(x, y, z).setType(second);
                         else continue;
                     }
                     
@@ -201,7 +204,8 @@ public class SnowGlobe extends QuickfireMap {
                         world.getBlockAt(x, y, z).getType().equals(Material.GREEN_CONCRETE) ||  
                         world.getBlockAt(x, y, z).getType().equals(Material.BLUE_CONCRETE) ||  
                         world.getBlockAt(x, y, z).getType().equals(Material.PURPLE_CONCRETE) ||
-                        world.getBlockAt(x, y, z).getType().equals(Material.PINK_CONCRETE)) world.getBlockAt(x, y, z).setType(first);
+                        world.getBlockAt(x, y, z).getType().equals(Material.PINK_CONCRETE) ||
+                        world.getBlockAt(x, y, z).getType().equals(Material.WHITE_CONCRETE)) world.getBlockAt(x, y, z).setType(first);
                         else continue;
                     }
                 }

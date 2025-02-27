@@ -5,6 +5,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
 import me.kotayka.mbc.gameMaps.quickfireMap.SnowGlobe;
 import me.kotayka.mbc.gameMaps.quickfireMap.Castle;
+import me.kotayka.mbc.gameMaps.quickfireMap.DeepDark;
 import me.kotayka.mbc.gameMaps.quickfireMap.Mansion;
 import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
 
@@ -20,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockReceiveGameEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.*;
@@ -34,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class Quickfire extends FinaleGame {
-    private final QuickfireMap map = new SnowGlobe(this);
+    private final QuickfireMap map = new DeepDark(this);
     public static final ItemStack CROSSBOW = new ItemStack(Material.CROSSBOW);
     public static final ItemStack BOOTS = new ItemStack(Material.LEATHER_BOOTS);
     public Map<UUID, QuickfirePlayer> quickfirePlayers = new HashMap<>();
@@ -152,6 +154,7 @@ public class Quickfire extends FinaleGame {
                 Introduction();
             }
         } else if (getState().equals(GameState.STARTING)) {
+            if (score[0] == 0 && score[1] == 0)mapCreator(map.mapName, map.creatorName);
             if (timeRemaining == 0) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 1, 1);
@@ -215,6 +218,7 @@ public class Quickfire extends FinaleGame {
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
                 p.getPlayer().teleport(TEAM_ONE_SPAWN);
                 p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
+                p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             } else if (p.getTeam().equals(secondPlace)) {
                 p.getPlayer().setMaxHealth(8);
                 p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
@@ -224,6 +228,7 @@ public class Quickfire extends FinaleGame {
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
                 p.getPlayer().teleport(TEAM_TWO_SPAWN);
                 p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
+                p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             } else {
                 p.getPlayer().setGameMode(GameMode.SPECTATOR);
                 p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
@@ -463,4 +468,15 @@ public class Quickfire extends FinaleGame {
     public QuickfirePlayer getQuickfirePlayer(Player p) {
         return quickfirePlayers.get(p.getUniqueId());
     }
+    //*
+    //@EventHandler
+    //public void sculkActivate(BlockReceiveGameEvent e) {
+        //if(e.getEvent().equals(GameEvent.SCULK_SENSOR_TENDRILS_CLICKING) && e.getEntity() instanceof Player && getState().equals(GameState.ACTIVE)) {
+            //Player p = (Player) e.getEntity();
+            //if (getQuickfirePlayer(p) == null) return;
+            //if (p.getPlayer().hasPotionEffect(PotionEffectType.GLOWING)) return;
+            //p.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 2, false, false));
+            //p.sendMessage(ChatColor.RED + "You activated a sculk sensor and are now glowing - be careful!");
+        //}
+    //}
 }

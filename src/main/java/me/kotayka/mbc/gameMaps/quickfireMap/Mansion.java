@@ -17,6 +17,8 @@ public class Mansion extends QuickfireMap {
     public Mansion(Quickfire qf) {
         super(qf);
         loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, SPAWN, timeUntilGlowing);
+        super.mapName = "Mansion";
+        super.creatorName = "bigkirbypuff_";
     }
 
     public void resetBarriers(boolean b) {
@@ -196,8 +198,8 @@ public class Mansion extends QuickfireMap {
             world.getBlockAt(497, 1, 497).setType(second);
 
             // glass panes in mansion windows
-        Material firstGlass = firstPlace.getGlass().getType();
-        Material secondGlass = secondPlace.getGlass().getType();
+        Material firstGlass = firstPlace.getGlassPane().getType();
+        Material secondGlass = secondPlace.getGlassPane().getType();
 
             world.getBlockAt(505, 5, 507).setType(firstGlass);
             world.getBlockAt(509, 4, 507).setType(firstGlass);
