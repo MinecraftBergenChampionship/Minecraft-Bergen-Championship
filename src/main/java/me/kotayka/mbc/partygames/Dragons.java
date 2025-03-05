@@ -1,6 +1,7 @@
 package me.kotayka.mbc.partygames;
 
 import me.kotayka.mbc.*;
+import me.kotayka.mbc.gameMaps.dragonsMap.Arrgh;
 import me.kotayka.mbc.gameMaps.dragonsMap.ConchStreet;
 import me.kotayka.mbc.gameMaps.dragonsMap.DragonsMap;
 import net.md_5.bungee.api.ChatMessageType;
@@ -76,7 +77,7 @@ public class Dragons extends PartyGame {
                         "⑰ +3 points for being alive when a new dragon spawns\n" +
                         "⑰ +5 points for surviving until the end of the round"});
 
-        map = new ConchStreet(this);
+        map = new Arrgh(this);
         map.resetMap();
     }
 
@@ -464,6 +465,10 @@ public class Dragons extends PartyGame {
 
     @EventHandler
     public void onFallDamage(EntityDamageEvent event) {
+        if (!getState().equals(GameState.ACTIVE)) {
+            event.setCancelled(true);
+            return;
+        }
         if (event.getEntity() instanceof Player) {
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 event.setDamage(event.getDamage() * 0.9);

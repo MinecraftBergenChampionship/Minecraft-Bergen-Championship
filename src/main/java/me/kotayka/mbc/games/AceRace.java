@@ -262,7 +262,7 @@ public class AceRace extends Game {
                         player.hidePlayer(mover);
                         mover.hidePlayer(player);
                     }
-                    else if(checker.checkHiddenPlayer(mover) && Math.sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ) <= 8) {
+                    else if(checker.checkHiddenPlayer(mover) && Math.sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ) <= 10) {
                         player.hidePlayer(mover);
                         mover.hidePlayer(player);
                     }
@@ -372,6 +372,7 @@ public class AceRace extends Game {
    @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         Material i = e.getCurrentItem().getType();
+        if (i == null) e.setCancelled(true);
         if (i.equals(Material.LEATHER_BOOTS)) e.setCancelled(true);
     }
 

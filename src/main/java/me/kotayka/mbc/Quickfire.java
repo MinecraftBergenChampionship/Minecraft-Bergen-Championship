@@ -24,6 +24,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockReceiveGameEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -468,6 +469,16 @@ public class Quickfire extends FinaleGame {
     public QuickfirePlayer getQuickfirePlayer(Player p) {
         return quickfirePlayers.get(p.getUniqueId());
     }
+    
+   /**
+     * Ensures boots are not taken off.
+     */
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        Material i = e.getCurrentItem().getType();
+        if (i.equals(Material.LEATHER_BOOTS)) e.setCancelled(true);
+    }
+
     //*
     //@EventHandler
     //public void sculkActivate(BlockReceiveGameEvent e) {

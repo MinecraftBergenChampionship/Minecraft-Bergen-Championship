@@ -93,6 +93,7 @@ public class DecisionDome extends Minigame {
         if (!powerupTeams.isEmpty()) powerupTeams.clear();
         if (dunker != null) dunker = null;
         if (swapper != null) swapper = null;
+        if (dunked_team != null) dunked_team = null;
         if (hider != null) hider = null;
         if (hidden == true) hidden = false;
         if (mega_cow_shooter != null) mega_cow_shooter = null;
@@ -145,6 +146,7 @@ public class DecisionDome extends Minigame {
         if (!powerupTeams.isEmpty()) powerupTeams.clear();
         if (dunker != null) dunker = null;
         if (swapper != null) swapper = null;
+        if (dunked_team != null) dunked_team = null;
         if (hider != null) hider = null;
         if (hidden == true) hidden = false;
         if (mega_cow_shooter != null) mega_cow_shooter = null;

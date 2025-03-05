@@ -206,12 +206,12 @@ public class Lobby extends Minigame {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nOur building team: " + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "BappleBusiness, Grassy311, and _Coookie_!\n");
                     MBC.sendTitle(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Builders", ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "BappleBusiness, Grassy311, _Coookie_", 0, 60, 20);
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 0.8f);
+                        p.playSound(p, Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 0.9f);
                     }
                 }
                 case 230 -> {
-                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nOur admin team: " + ChatColor.GOLD + "" + ChatColor.BOLD + "kotayka_, iDrg, and queakie!\n");
-                    MBC.sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "Admins",ChatColor.GOLD + "" + ChatColor.BOLD + "kotayka_, iDrg, queakie", 0, 60, 20);
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nOur admin team: " + ChatColor.GOLD + "" + ChatColor.BOLD + "Pengu1n__, iDrg, and queakie!\n");
+                    MBC.sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "Admins",ChatColor.GOLD + "" + ChatColor.BOLD + "Pengu1n__, iDrg, queakie", 0, 60, 20);
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
                     }
@@ -221,12 +221,12 @@ public class Lobby extends Minigame {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nOur organizers: " + ChatColor.AQUA + "" + ChatColor.BOLD + "bigkirbypuff_ and rspacerr!\n");
                     MBC.sendTitle(ChatColor.AQUA + "" + ChatColor.BOLD + "Organizers", ChatColor.AQUA + "" + ChatColor.BOLD + "bigkirbypuff_, rspacerr", 0, 60, 20);
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1.2f);
+                        p.playSound(p, Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1.1f);
                     }
                 }
                 case 220 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nSpecial thank you to: " + ChatColor.GREEN + "" + ChatColor.BOLD + "Noxcrew, Capollo Media, and Groink Studios!\n");
-                    MBC.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "Special Thanks:", ChatColor.GREEN + "" + ChatColor.BOLD + "Noxcrew, Capollo Media, Groink Studios", 0, 60, 20);
+                    MBC.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "Special Thanks:", ChatColor.GREEN + "" + ChatColor.BOLD + "Noxcrew (MCC), Capollo Media (Block Wars), Groink Studios (Pandora's Box)", 0, 60, 20);
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
                     }
@@ -238,6 +238,9 @@ public class Lobby extends Minigame {
                         revealIndiv.remove(revealIndiv.size()-1);
                     }
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nNow to our individual standings...\n");
+                }
+                case 132 -> {
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nCongrats to our indivudal winners!\n");
                 }
                 case 130 -> {
                     loadPlayersScoreReveal();
@@ -387,7 +390,7 @@ public class Lobby extends Minigame {
 
     @EventHandler
     public void onTeleport(PlayerTeleportEvent e) {
-        if (getState().equals(GameState.TUTORIAL) && e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) { e.setCancelled(true); }
+        if ((getState().equals(GameState.TUTORIAL) || getState().equals(GameState.END_ROUND)) && e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) { e.setCancelled(true); }
     }
 
     @EventHandler
@@ -478,7 +481,7 @@ public class Lobby extends Minigame {
 
         MBC.sendTitle(p.getFormattedName(), "with " + p.getRawTotalScore() + " points", 20, 90, 20);
         Bukkit.broadcastMessage("\n" + p.getFormattedName()+ " with " + p.getRawTotalScore() + " points!\n");
-        MBC.spawnFirework(locs[place], p.getTeam().getColor());
+        MBC.spawnFirework(locs[place-1], p.getTeam().getColor());
         p.getPlayer().setGameMode(GameMode.ADVENTURE);
         p.getPlayer().teleport(locs[place-1]);
     }
@@ -1329,14 +1332,16 @@ public class Lobby extends Minigame {
         p.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 255));
         p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
         p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
-        pvpers.remove(Participant.getParticipant(p));
     }
 
     public void endPvp() {
         for (Participant p : pvpers.keySet()) {
-            Player player = p.getPlayer();
-            removePvpPlayer(player);
+            if (p != null) {
+                Player player = p.getPlayer();
+                removePvpPlayer(player);
+            }
         }
+        pvpers.clear();
     }
 
     @EventHandler

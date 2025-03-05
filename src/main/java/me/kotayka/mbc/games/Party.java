@@ -15,9 +15,12 @@ import java.util.*;
 public class Party extends Game {
     private final World world = Bukkit.getWorld("Party");
     protected final Location LOBBY = new Location(world, 0.5, -17.5, -999.5);
-    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "Dragons", "OneShot")); // always be beepswitch first
+    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "Dragons", "OneShot", "BeepSwitch")); // always be beepswitch first
+    private Map<String, ChatColor> colorGames = new HashMap<>();
     public static final int GAMES_PLAYED = 3;
     private int gameNum;
+    private boolean[] confirmGameNum = {true, true, true};
+    private int effectTimer = 0;
     private PartyGame partyGame = null;
 
     public Party() {
@@ -56,6 +59,11 @@ public class Party extends Game {
 
         setGameState(GameState.TUTORIAL);
 
+        colorGames.put("BeepSwitch", ChatColor.AQUA);
+        colorGames.put("Dragons", ChatColor.LIGHT_PURPLE);
+        colorGames.put("OneShot", ChatColor.GOLD);
+        colorGames.put("DiscoFever", ChatColor.GREEN);
+
         setTimer(32);
     }
 
@@ -70,8 +78,8 @@ public class Party extends Game {
             if (gameNum == 0) {
                 return PartyGameFactory.getPartyGame("BeepSwitch");
             } else {
-                String randomGame = gameNames.get((int)(Math.random()*gameNames.size()));
-                gameNames.remove(randomGame);
+                int randomNum = (int)(Math.random()*gameNames.size());
+                String randomGame = gameNames.get(randomNum);
                 return PartyGameFactory.getPartyGame(randomGame);
             }
         } else {
@@ -119,19 +127,30 @@ public class Party extends Game {
                 gameNum++;
                 startPartyGame();
             }
-            else if (timeRemaining == 10) {
+            else if (timeRemaining == 10 && confirmGameNum[gameNum]) {
+                confirmGameNum[gameNum] = false;
                 if (gameNames.size() == 0) {
                     return;
                 }
                 Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The next Party Game is...\n");
                 partyGame = getRandomPartyGame();
             }
+            else if (timeRemaining == 9) {
+                randomGameEffect();
+            }
             else if (timeRemaining == 5) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + partyGame.name()+"!");
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.sendTitle(ChatColor.BOLD + "" + partyGame.name() + "!", "", 0, 80, 20);
+                    p.sendTitle(colorGames.get(partyGame.name()) + "" + ChatColor.BOLD + "" + partyGame.name() + "!", "", 0, 80, 20);
+                    gameNames.remove(partyGame.name());
                     p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
                 }
+            }
+
+            if (timeRemaining > 5 && timeRemaining < 10) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    //p.playSound(p, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                }   
             }
         } else if (getState().equals(GameState.END_GAME)) {
             if (timeRemaining == 36) {
@@ -168,6 +187,42 @@ public class Party extends Game {
             p.getPlayer().setInvulnerable(true);
         }
         partyGame.start();
+    }
+
+    public void randomGameEffect() {
+        if (timeRemaining == 5) return;
+
+        if (colorGames.get(gameNames.get(effectTimer%gameNames.size())) != null) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.sendTitle(colorGames.get(gameNames.get(effectTimer%gameNames.size())) + "" + ChatColor.BOLD + gameNames.get(effectTimer%gameNames.size()), "", 0, 20, 0);
+                p.playSound(p, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            }
+        }
+
+        effectTimer++;
+
+        long l;
+        switch (timeRemaining) {
+            case 9:
+                l = 2L;
+                break;
+            case 8:
+                l = 4L;
+                break;
+            case 7:
+                l = 6L;
+                break;
+            case 6:
+                l = 8L;
+                break;
+            default:
+                return;
+        }
+
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { randomGameEffect();}
+          }, l);
     }
 
     public void next() {

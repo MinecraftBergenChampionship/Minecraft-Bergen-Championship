@@ -129,7 +129,6 @@ public class BeepSwitch extends PartyGame {
         });
 
         loadCourses();
-
     }
 
     @Override
@@ -161,8 +160,8 @@ public class BeepSwitch extends PartyGame {
         ended = true;
         
         MBC.getInstance().showAllPlayers();
-        for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().stopSound(Sound.MUSIC_DISC_13);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.stopSound(Sound.MUSIC_DISC_13, SoundCategory.RECORDS);
         }
         if (MBC.getInstance().party == null) {
             for (Participant p : MBC.getInstance().getPlayers()) {
@@ -171,13 +170,10 @@ public class BeepSwitch extends PartyGame {
             if (MBC.getInstance().gameNum != 6) {
                 MBC.getInstance().updatePlacings();
             }
-            logger.logStats();
+            
             returnToLobby();
         } else {
             // start next game
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                p.stopSound(Sound.MUSIC_DISC_13, SoundCategory.RECORDS);
-            }
             setupNext();
         }
         logger.logStats();
@@ -257,7 +253,7 @@ public class BeepSwitch extends PartyGame {
                     }
                     else {
                         timeRemaining = 5;
-                        setGameState(GameState.END_GAME);
+                        setGameState(GameState.END_ROUND);
                     }
                 }
                 if (timeRemaining == 2) {
@@ -293,7 +289,7 @@ public class BeepSwitch extends PartyGame {
                     roundsLeftDisplay();
                     if (rounds == roundNum && !gameOver) {
                         timeRemaining = 5;
-                        setGameState(GameState.END_GAME);
+                        setGameState(GameState.END_ROUND);
                     }
                     else {
                         timeRemaining = 16;
@@ -331,7 +327,7 @@ public class BeepSwitch extends PartyGame {
                     }
                 }
                 break;
-            case END_GAME:
+            case END_ROUND:
                 if (timeRemaining == 4) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.stopSound(Sound.MUSIC_DISC_13, SoundCategory.RECORDS);
@@ -477,7 +473,7 @@ public class BeepSwitch extends PartyGame {
         }
 
         for (Participant p : t.getPlayers())
-        createLine(22, ChatColor.BOLD + "Course at: " + ChatColor.RESET + color + path + "-" + level, p);
+        createLine(22, Participant.getParticipant(player).getFormattedName() + ChatColor.BOLD + " at: " + ChatColor.RESET + color + path + "-" + level, p);
     }
 
     /**

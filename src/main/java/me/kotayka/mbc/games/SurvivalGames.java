@@ -380,7 +380,12 @@ public class SurvivalGames extends Game {
                 bossBar.setVisible(false);
             } else if (timeRemaining == 50) {
                 if (map.hasElevationBorder) {
-                    Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED.toString() + ChatColor.BOLD + "The border is rising!");
+                    Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED.toString() + ChatColor.BOLD + "The border is rising! Get to higher ground!");
+                    for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+                        p.getPlayer().sendTitle("", ChatColor.RED+"BORDER RISING!", 20, 60, 20);
+                        p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.BLOCKS, 1, 1);
+                    }
+                    
                 }
             }
             UpdateEvent();
@@ -595,6 +600,11 @@ public class SurvivalGames extends Game {
         Player p = e.getPlayer();
 
         if (e.getClickedBlock() != null && e.getClickedBlock().getType().equals(Material.ANVIL)) {
+            e.setCancelled(true);
+            return;
+        }
+
+        if (e.getClickedBlock() != null && (e.getClickedBlock().getType().equals(Material.GRASS_BLOCK) || e.getClickedBlock().getType().equals(Material.DIRT))) {
             e.setCancelled(true);
             return;
         }

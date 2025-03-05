@@ -26,7 +26,7 @@ public class iDrgCity extends AceRaceMap {
             new Location(getWorld(), -984, 65, -885),
             new Location(getWorld(), -1031, 35, -897),
             new Location(getWorld(), -1107, 31, -966),
-            new Location(getWorld(), -1097, 35, -1027),
+            new Location(getWorld(), -1097, 34, -1033),
             new Location(getWorld(), -1085, 36, -1053),
             new Location(getWorld(), -975, 37, -1093)
     };
