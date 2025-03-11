@@ -14,13 +14,13 @@ public class Leaderboard {
     private List<Participant> participants;
     private List<ArmorStand> leaderboardStands = new ArrayList<>();
     private static Location[] INDIVIDUAL_LEADERBOARDS = new Location[]{
-            new Location(MBC.getInstance().lobby.world, -3.5, -1, 51.5),
-            new Location(MBC.getInstance().lobby.world, -3.5, -1, 75.5),
-            new Location(MBC.getInstance().lobby.world, -3.5, -1, 71.5),
-            new Location(MBC.getInstance().lobby.world, -3.5, -1, 67.5),
-            new Location(MBC.getInstance().lobby.world, -3.5, -1, 63.5),
-            new Location(MBC.getInstance().lobby.world, -3.5, -1, 59.5),
-            new Location(MBC.getInstance().lobby.world, -3.5, -1, 55.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -0.7, 51.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -0.7, 75.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -0.7, 71.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -0.7, 67.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -0.7, 63.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -0.7, 59.5),
+            new Location(MBC.getInstance().lobby.world, -3.5, -0.7, 55.5),
     };
 
     private int index;

@@ -269,7 +269,7 @@ public class SurvivalGames extends Game {
                 timeRemaining = 450;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
-            if (map.hasElevationBorder && timeRemaining < 50 && timeRemaining % 2 == 0) {
+            if (map.hasElevationBorder && timeRemaining < 60 && timeRemaining % 2 == 0) {
                 map.Border();
             }
             decrementBossBar();
@@ -378,7 +378,7 @@ public class SurvivalGames extends Game {
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED.toString() + ChatColor.BOLD + "Kill points are decreasing! (10 -> 5)");
                 bossBar.removeAll();
                 bossBar.setVisible(false);
-            } else if (timeRemaining == 50) {
+            } else if (timeRemaining == 60) {
                 if (map.hasElevationBorder) {
                     Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.DARK_RED.toString() + ChatColor.BOLD + "The border is rising! Get to higher ground!");
                     for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {

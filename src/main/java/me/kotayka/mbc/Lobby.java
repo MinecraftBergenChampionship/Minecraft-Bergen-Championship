@@ -1327,6 +1327,7 @@ public class Lobby extends Minigame {
     }
 
     public void removePvpPlayer(Player p) {
+        pvpers.remove(Participant.getParticipant(p));
         p.teleport(new Location(world, 109.5, -4, -59.5, -90, 0));
         p.getInventory().clear();
         p.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 255));
@@ -1338,7 +1339,11 @@ public class Lobby extends Minigame {
         for (Participant p : pvpers.keySet()) {
             if (p != null) {
                 Player player = p.getPlayer();
-                removePvpPlayer(player);
+                player.teleport(new Location(world, 109.5, -4, -59.5, -90, 0));
+                player.getInventory().clear();
+                player.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 255));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
             }
         }
         pvpers.clear();

@@ -79,20 +79,20 @@ public class Space extends SpleefMap {
             erodeMap();
         }
 
-        if (timeRemaining == 105) {
+        if (timeRemaining == 120) {
             Bukkit.broadcastMessage(ChatColor.RED+"The outer rings are decaying!");
         }
-        if (timeRemaining < 105) {
+        if (timeRemaining < 120) {
             for (int i = 0; i < 8 && rings.size() > 1; i++) {
                 int rand = (int)(Math.random() * rings.size());
                 decaying.add(rings.get(rand));
                 rings.remove(rand);
             }
         }
-        if (timeRemaining == 75) {
+        if (timeRemaining == 90) {
             Bukkit.broadcastMessage(ChatColor.RED+"The planet is decaying!");
         }
-        if (timeRemaining < 75) {
+        if (timeRemaining < 90) {
             for (int i = 0; i < 10 && planet.size() > 1; i++) {
                 int rand = (int) (Math.random() * planet.size());
                 decaying.add(planet.get(rand));
