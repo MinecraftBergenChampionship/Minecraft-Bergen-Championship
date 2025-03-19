@@ -485,8 +485,8 @@ public class BeepSwitch extends PartyGame {
         MBC.spawnFirework(p.getPlayer().getLocation(), p.getTeam().getColor());
         p.getPlayer().playSound(p.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
 
-        String courseComplete = p.getFormattedName() + p.getTeam().getChatColor() + " has completed " + (path+1) + "-" + (teamProgress[path]+1) + ": " + 
-                            ChatColor.BOLD + "" + ChatColor.GOLD + beepTestMaps.get(path).get(teamProgress[path]).getName().trim() + p.getTeam().getChatColor() + "!";
+        String courseComplete = p.getFormattedName() + " has completed " + (path+1) + "-" + (teamProgress[path]+1) + ": " + 
+                            ChatColor.BOLD + "" + ChatColor.GOLD + beepTestMaps.get(path).get(teamProgress[path]).getName().trim() + "!";
         Bukkit.broadcastMessage(courseComplete);
         logger.log(courseComplete);
 
@@ -521,9 +521,8 @@ public class BeepSwitch extends PartyGame {
                     p.getPlayer().getInventory().remove(Material.RED_DYE);
                     break;
             }
-            String pathCompleteMessage = p.getTeam().getChatColor() + "" + ChatColor.BOLD + "The " + p.getTeam().teamNameFormat() + p.getTeam().getChatColor() + 
-                        "" + ChatColor.BOLD + " have completed the " + ChatColor.GOLD + "" + ChatColor.BOLD + name + p.getTeam().getChatColor() + "" + ChatColor.BOLD + 
-                        " path!";
+            String pathCompleteMessage = p.getTeam().getChatColor() + "" + ChatColor.BOLD + "The " + p.getTeam().teamNameFormat() + ChatColor.BOLD + 
+                        " have completed the " + ChatColor.GOLD + "" + ChatColor.BOLD + name + ChatColor.BOLD + " path!";
             Bukkit.broadcastMessage(pathCompleteMessage);
             logger.log(pathCompleteMessage);
 
