@@ -38,6 +38,7 @@ import com.sk89q.worldedit.world.World;
 import net.citizensnpcs.api.npc.NPC;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1308,7 +1309,11 @@ public class Lobby extends Minigame {
 
     public void addPvpPlayer(Player p) {
         p.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "Joined PVP!"));
-        //MBC.getInstance().board.getTeam(Participant.getParticipant(p).getTeam().fullName).setAllowFriendlyFire(true);
+
+        Participant participant = Participant.getParticipant(p);
+        Team scoreboardTeam = participant.board.getTeam(participant.getTeam().getTeamFullName());
+        scoreboardTeam.setAllowFriendlyFire(true);
+
         pvpers.put(Participant.getParticipant(p), 0);
         addPvpItems(p);
         p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
@@ -1337,14 +1342,19 @@ public class Lobby extends Minigame {
 
     public void endPvp() {
         for (Participant p : pvpers.keySet()) {
-            if (p != null) {
-                Player player = p.getPlayer();
-                player.teleport(new Location(world, 109.5, -4, -59.5, -90, 0));
-                player.getInventory().clear();
-                player.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 255));
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
-                player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
+            if (p == null) continue;
+
+            Team scoreboardTeam = p.board.getTeam(p.getTeam().getTeamFullName());
+            if (p.board.getTeam(p.getTeam().getTeamFullName()) != null) {
+                scoreboardTeam.setAllowFriendlyFire(false);
             }
+
+            Player player = p.getPlayer();
+            player.teleport(new Location(world, 109.5, -4, -59.5, -90, 0));
+            player.getInventory().clear();
+            player.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 255));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
         }
         pvpers.clear();
     }
