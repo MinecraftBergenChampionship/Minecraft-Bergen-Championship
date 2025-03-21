@@ -612,9 +612,9 @@ public class MBC implements Listener {
         Location loc = player.getLocation();
         double radius = BUFFER_ZONE;
 
-        for (double xOffset = -radius; xOffset <= radius; xOffset += 1.0) {
-            for (double zOffset = -radius; zOffset <= radius; zOffset += 1.0) {
-                Location checkLocation = loc.clone().add(xOffset, -1, zOffset);
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                Location checkLocation = loc.clone().add(x*radius, -1, z*radius);
                 Block blockBelow = checkLocation.getBlock();
 
                 if (blockBelow.getType() == padType) {
