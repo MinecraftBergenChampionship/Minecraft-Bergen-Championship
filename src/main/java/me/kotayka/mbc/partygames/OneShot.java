@@ -379,7 +379,6 @@ public class OneShot extends PartyGame {
         } else if (getState().equals(GameState.END_ROUND)) {
             if (timeRemaining == 7) Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Most Individual Kills:");
             if (timeRemaining == 5) topKillers();
-            if (timeRemaining == 0) endEvents();
 
         }
     }
@@ -662,8 +661,7 @@ public class OneShot extends PartyGame {
             b.setVisible(false);
         }
 
-        timeRemaining = 10;
-        setGameState(GameState.END_ROUND);
+        endEvents();
     }
 
     private void Death(Participant shot, Participant damager) {
