@@ -545,7 +545,6 @@ public class OneShot extends PartyGame {
         ((Player)event.getDamager()).getInventory().getItemInOffHand().getType() == Material.DIAMOND_SWORD) {
             if ((Participant.getParticipant(((Player) event.getDamager())).getTeam()).equals((Participant.getParticipant(((Player) event.getEntity())).getTeam()))) return;
             Death(Participant.getParticipant((Player) event.getEntity()), Participant.getParticipant(((Player)event.getDamager())));
-            ((Player)event.getDamager()).sendMessage(ChatColor.RED + "You killed " + ChatColor.RESET + Participant.getParticipant((Player) event.getEntity()).getFormattedName() + "!" + MBC.scoreFormatter(KILL_POINTS));
             //EndGame(Participant.getParticipant(((Player) event.getDamager())).getTeam());
             event.setCancelled(true);
         }
