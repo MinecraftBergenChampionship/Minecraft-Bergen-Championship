@@ -9,6 +9,7 @@ import me.kotayka.mbc.partygames.OneShot;
 import me.kotayka.mbc.teams.*;
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -116,6 +117,7 @@ public class MBC implements Listener {
     public static final Material BOOST_PAD = Material.WAXED_EXPOSED_CUT_COPPER;
     public static final Material MEGA_BOOST_PAD = Material.WAXED_WEATHERED_CUT_COPPER;
     public static final Material JUMP_PAD = Material.WAXED_WEATHERED_COPPER;
+    private static final double BUFFER_ZONE = 0.35;
     public static final PotionEffect SATURATION = new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false);
     public double multiplier = 1;
 
@@ -554,7 +556,7 @@ public class MBC implements Listener {
 
     @EventHandler
     public void onJump(PlayerJumpEvent e) {
-        if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
+        if (isOnBlockWithBuffer(e.getPlayer(), MBC.MEGA_BOOST_PAD)) {
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 @Override
                 public void run() {
@@ -568,7 +570,7 @@ public class MBC implements Listener {
             return;
         }
 
-        if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
+        if (isOnBlockWithBuffer(e.getPlayer(), MBC.BOOST_PAD)) {
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 @Override
                 public void run() {
@@ -582,7 +584,7 @@ public class MBC implements Listener {
             return;
         }
 
-        if (e.getFrom().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
+        if (isOnBlockWithBuffer(e.getPlayer(), MBC.JUMP_PAD)) {
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 @Override
                 public void run() {
@@ -596,7 +598,7 @@ public class MBC implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
+        if (isOnBlockWithBuffer(e.getPlayer(), MBC.SPEED_PAD)) {
             PotionEffect s = e.getPlayer().getPotionEffect(PotionEffectType.SPEED);
 
             if (s == null) e.getPlayer().playSound(e.getPlayer(), Sound.ITEM_GOAT_HORN_SOUND_3, SoundCategory.BLOCKS, 1, 1);
@@ -605,6 +607,24 @@ public class MBC implements Listener {
             
         }
     }
+
+    private boolean isOnBlockWithBuffer(Player player, Material padType) {
+        Location loc = player.getLocation();
+        double radius = BUFFER_ZONE;
+
+        for (double xOffset = -radius; xOffset <= radius; xOffset += 1.0) {
+            for (double zOffset = -radius; zOffset <= radius; zOffset += 1.0) {
+                Location checkLocation = loc.clone().add(xOffset, -1, zOffset);
+                Block blockBelow = checkLocation.getBlock();
+
+                if (blockBelow.getType() == padType) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     // Prevent breaking paintings
     @EventHandler
