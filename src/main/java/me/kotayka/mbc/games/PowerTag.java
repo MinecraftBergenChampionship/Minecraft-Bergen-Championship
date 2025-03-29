@@ -62,9 +62,9 @@ public class PowerTag extends Game {
     public ArrayList<PowerTagPlayer> infected = new ArrayList<>();
 
     // scoring
-    private final int FIND_POINTS = 8;
+    private final int FIND_POINTS = 7;
     private final int INCREMENT_POINTS = 1;
-    private final int SURVIVAL_POINTS = 7;
+    private final int SURVIVAL_POINTS = 8;
 
     public PowerTag() {
         super("PowerTag", new String[] {
@@ -75,7 +75,7 @@ public class PowerTag extends Game {
                 "⑱ Each hider gets a powerup they can use to help escape the hunters.\n\n" +
                 "⑱ However, the hunters will also get to choose a special power to help find the hiders.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑱ +8 points for finding a player as a hunter\n" +
+                                "⑱ +7 points for finding a player as a hunter\n" +
                                 "⑱ +1 point for surviving 10 seconds as a hider\n" +
                                 "⑱ +8 points for surviving an entire round as a hider"
         });
@@ -469,7 +469,13 @@ public class PowerTag extends Game {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 2, false, false));
         }
         if (hiderPowerupMap.get(p).equals(hiderPowerupList[1])) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 80, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 40, 255, false, false));
+            p.getPlayer().getInventory().setBoots(new ItemStack(Material.AIR));
+
+            MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+                @Override
+                public void run() { p.getPlayer().getInventory().setBoots(p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_BOOTS)));}
+              }, 40L);
         }
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
@@ -569,9 +575,11 @@ public class PowerTag extends Game {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
         }   
 
+        String s = "";
         for (PowerTagPlayer p : powerTagPlayerMap.values()) {
-            hunterPowerupTitles(p);
+            s = hunterPowerupTitles(p);
         }   
+        logger.log(s);
 
         if (hunterPowerup.equals(hunterPowerupList[3])) {
             infectedBegin();
@@ -579,9 +587,9 @@ public class PowerTag extends Game {
     }
 
     /**
-    * Sends appropriate hunter powerup titles to powertagplayer p.
+    * Sends appropriate hunter powerup titles to powertagplayer p. Returns message of selected powerup for logger.
     */
-    public void hunterPowerupTitles(PowerTagPlayer p) {
+    public String hunterPowerupTitles(PowerTagPlayer p) {
         p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
         String message = "";
         if (hunterPowerup.equals(hunterPowerupList[0])) {
@@ -605,7 +613,7 @@ public class PowerTag extends Game {
             p.getPlayer().sendTitle(ChatColor.BOLD + "TOXIC TAG!", "Be careful who you're near...", 0, 60, 20);
         }
         p.getPlayer().sendMessage(message);
-        logger.log(message);
+        return message;
     }
 
 
@@ -696,8 +704,9 @@ public class PowerTag extends Game {
         for (PowerTagPlayer hider : aliveHiders) {
             double currentDistance = hider.getPlayer().getLocation().distance(p.getPlayer().getLocation());
 
-            if (currentDistance < 10) {
+            if (currentDistance < 8) {
                 hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 80, 3, false, false));
+                hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 80, 3, false, false));
                 hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 80, 255, false, false));
                 hider.getPlayer().sendMessage(ChatColor.RED + "You were stunned by " + ChatColor.RESET + p.getParticipant().getFormattedName() + ChatColor.RED + "!");
                 hider.getPlayer().playSound(hider.getPlayer(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
@@ -716,7 +725,7 @@ public class PowerTag extends Game {
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
             public void run() { postTremorUse(p);}
-          }, 400L);
+          }, 500L);
     }
 
     /**

@@ -95,19 +95,19 @@ public class Colosseum extends SpleefMap {
             case 40 -> Bukkit.broadcastMessage(ChatColor.RED + "Last layer is starting to erode!");
         }
 
-        if (timeRemaining <= 150 && timeRemaining % 2 == 0 && !stonePillarDecayingBlocks.isEmpty()) {
+        if (timeRemaining <= 145 && timeRemaining % 2 == 0 && !stonePillarDecayingBlocks.isEmpty()) {
             erodeLayer(1);
         }
 
-        if (timeRemaining <= 120 && timeRemaining % 2 == 0 && !firstLayerDecayingBlocks.isEmpty()) {
+        if (timeRemaining <= 110 && timeRemaining % 2 == 0 && !firstLayerDecayingBlocks.isEmpty()) {
             erodeLayer(2);
         }
 
-        if (timeRemaining <= 90 && timeRemaining % 2 == 0 && !secondLayerDecayingBlocks.isEmpty()) {
+        if (timeRemaining <= 75 && timeRemaining % 2 == 0 && !secondLayerDecayingBlocks.isEmpty()) {
             erodeLayer(3);
         }
 
-        if (timeRemaining <= 60 && timeRemaining % 2 == 0 && !thirdLayerDecayingBlocks.isEmpty()) {
+        if (timeRemaining <= 40 && timeRemaining % 2 == 0 && !thirdLayerDecayingBlocks.isEmpty()) {
             erodeLayer(4);
         }
     }

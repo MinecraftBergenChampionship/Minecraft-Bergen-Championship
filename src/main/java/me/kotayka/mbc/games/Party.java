@@ -75,13 +75,9 @@ public class Party extends Game {
      */
     public PartyGame getRandomPartyGame() {
         if (gameNames.size() > 0) {
-            if (gameNum == 0) {
-                return PartyGameFactory.getPartyGame("BeepSwitch");
-            } else {
-                int randomNum = (int)(Math.random()*gameNames.size());
-                String randomGame = gameNames.get(randomNum);
-                return PartyGameFactory.getPartyGame(randomGame);
-            }
+            int randomNum = (int)(Math.random()*gameNames.size());
+            String randomGame = gameNames.get(randomNum);
+            return PartyGameFactory.getPartyGame(randomGame);
         } else {
             Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "Oops, this shouldn't have been sent :(\n");
             return null;

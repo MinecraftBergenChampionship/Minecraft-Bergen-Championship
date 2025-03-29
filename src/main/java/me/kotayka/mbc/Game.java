@@ -511,7 +511,6 @@ public abstract class Game extends Minigame {
                 getIndivScoresNoPrint();
             }
             case 8 -> Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.BOLD+"Check with admins or <implemented command> to find your score post-reveal!");
-            case 5 -> getIndivScoresNoPrint();
             case 2 -> Bukkit.broadcastMessage(ChatColor.RED + "Preparing finale...");
             case 3 -> MBC.getInstance().updatePlacings();
             case 0 -> {

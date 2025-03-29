@@ -100,7 +100,7 @@ public class Spleef extends Game {
         damageMap.clear();
         brokenBlocks.clear();
         maps = new ArrayList<>(
-                Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress())
+            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
         );
         brokenBlocks.clear();
         map.resetMap();
@@ -173,14 +173,6 @@ public class Spleef extends Game {
     }
 
     private void loadMap() {
-        for (SpleefMap m : maps) {
-            if (m.Name().equals("Colosseum")) {
-                map = m;
-                maps.remove(map);
-                map.resetMap();
-                return;
-            }
-        }
         map = maps.get((int) (Math.random()*maps.size()));
         maps.remove(map);
         map.resetMap();

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.sgMaps.JesuscraftTwo;
+import me.kotayka.mbc.gameMaps.sgMaps.BCA;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -44,7 +45,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class SurvivalGames extends Game {
-    private final SurvivalGamesMap map = new JesuscraftTwo();
+    private final SurvivalGamesMap map = new BCA();
     private WorldBorder border = null;
     private List<SurvivalGamesItem> items;
 
@@ -67,9 +68,10 @@ public class SurvivalGames extends Game {
     private BossBar bossBar;
 
     // SCORING
-    public final int KILL_POINTS_INITIAL = 15;
+    public final int KILL_POINTS_INITIAL = 12;
     public int killPoints = KILL_POINTS_INITIAL;
     public final int SURVIVAL_POINTS = 1;
+    public final int HORCRUX_DESTROY_POINTS = 5;
     // Shared amongst each team: 12, 10, 9, 7, 6, 5 points for each player
     public final int[] TEAM_BONUSES_4 = {48, 40, 36, 28, 24, 20};
     public final int[] TEAM_BONUSES_3 = {36, 30, 27, 21, 18, 15};
@@ -359,8 +361,8 @@ public class SurvivalGames extends Game {
                 //crateLocation();
             } else if (timeRemaining == 300) {
                 //spawnSupplyCrate();
-                killPoints -= 5;
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (15 -> 10)");
+                killPoints -= 2;
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (12 -> 10)");
                 bossBar.removeAll();
                 bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "KILL POINTS DECREASE", BarColor.RED, BarStyle.SOLID);
                 bossBar.setVisible(true);
@@ -374,8 +376,8 @@ public class SurvivalGames extends Game {
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 event = SurvivalGamesEvent.DEATHMATCH;
             } else if (timeRemaining == 180) {
-                killPoints -= 5;
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED.toString() + ChatColor.BOLD + "Kill points are decreasing! (10 -> 5)");
+                killPoints -= 2;
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED.toString() + ChatColor.BOLD + "Kill points are decreasing! (10 -> 8)");
                 bossBar.removeAll();
                 bossBar.setVisible(false);
             } else if (timeRemaining == 60) {
@@ -567,14 +569,14 @@ public class SurvivalGames extends Game {
             double percentage = 100 *(playerDamage.get(player) / totalDamage);
             int points = 0;
             if (percentage != 0) {
-                points = (int) (Math.log(Math.pow(150*Math.sqrt(percentage)/sqrtSum, 5.5)/7));
+                points = (int) (2*Math.log(Math.pow(150*Math.sqrt(percentage)/sqrtSum, 5.5)/7));
                 if (points < 0) {
                     points = 0;
                 }
             }
             p.addCurrentScore(points);
             logger.log(String.format("%s dealt %.2f%% of the total damage and earned %d points!", p.getPlayerName(),percentage,points));
-            p.getPlayer().sendMessage(String.format("%sYou dealt %.2f%% of the total damage and earned %d points!", ChatColor.GREEN, percentage, points));
+            p.getPlayer().sendMessage(String.format("%sYou dealt %.2f%% of the total damage!%s", ChatColor.GREEN, percentage, MBC.scoreFormatter(points)));
         }
     }
 
@@ -672,6 +674,9 @@ public class SurvivalGames extends Game {
         }
         else {
             MBC.spawnFirework(a.getLocation().clone().add(0.5, 2, 0.5), horcrux.team.getColor());
+
+            p.sendMessage("You broke " + horcrux.team.getTeamName() + "'s horcrux!" + MBC.scoreFormatter(HORCRUX_DESTROY_POINTS));
+            participant.addCurrentScore(HORCRUX_DESTROY_POINTS);
 
             logger.log(horcrux.team.getTeamName() + "'s Horcrux was destroyed by " + participant.getPlayerName());
             for (Participant par : MBC.getInstance().players) {

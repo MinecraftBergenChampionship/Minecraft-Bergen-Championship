@@ -717,10 +717,8 @@ public class MBC implements Listener {
             Bukkit.broadcastMessage(ChatColor.RED+"ERROR: " + currentGame.name()+ " is in progress!");
             return;
         }
-        if (!lobby.miniBeepers.isEmpty()) {
-            Bukkit.broadcastMessage(ChatColor.RED+"ERROR: In-lobby game is in progress!");
-            return;
-        }
+        lobby.endPvp();
+        lobby.miniBeepEnd();
 
         startGame(gameInstance(game));
     }

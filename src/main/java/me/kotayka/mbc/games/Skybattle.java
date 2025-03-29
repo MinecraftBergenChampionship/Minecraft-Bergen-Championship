@@ -195,7 +195,7 @@ public class Skybattle extends Game {
 
             if (timeRemaining == 0) {
                 if (teamsAlive.size() > 1) {
-                    timeRemaining = 30;
+                    timeRemaining = 45;
                     setGameState(GameState.OVERTIME);
                 } else {
                     if (roundNum < 3) {
@@ -264,6 +264,10 @@ public class Skybattle extends Game {
                 gameOverGraphics();
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
+                }
+                for (Participant p : playersAlive) {
+                    MBCTeam t = p.getTeam();
+                    teamPlacements.put(t, 1);
                 }
                 roundWinners(WIN_POINTS, SURVIVAL_POINTS);
                 placementPoints();
@@ -381,6 +385,7 @@ public class Skybattle extends Game {
         for (MBCTeam t : getValidTeams()) {
             for (Participant p : t.getPlayers()) {
                 if (p.getTeam() == MBC.getInstance().spectator) continue;
+                if (teamPlacements.get(t) == null) continue;
                 int placement = teamPlacements.get(t);
                 p.addCurrentScore(TEAM_BONUSES_3[placement-1] / t.getPlayers().size());
                 p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_3[placement-1] / t.getPlayers().size())));

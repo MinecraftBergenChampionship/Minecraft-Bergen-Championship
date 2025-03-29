@@ -67,7 +67,7 @@ public class Dragons extends PartyGame {
 
     private Dragons() {
         super("Dragons", new String[]{
-                "⑰ A blast from the past back from the grave!",
+                "⑰ Welcome to MBC's legacy game - Dragons!",
                 "⑰ Dragons will spawn and try to destroy the map (and you).\n\n" +
                 "⑰ You can die from the void and fall damage, so watch out!",
                 "⑰ You'll get points for each player you outlive, along with points every time a dragon spawns.\n\n" +
