@@ -606,11 +606,6 @@ public class SurvivalGames extends Game {
             return;
         }
 
-        if (e.getClickedBlock() != null && (e.getClickedBlock().getType().equals(Material.GRASS_BLOCK) || e.getClickedBlock().getType().equals(Material.DIRT))) {
-            e.setCancelled(true);
-            return;
-        }
-
         if (p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW || p.getInventory().getItemInOffHand().getType() == Material.MUSHROOM_STEW) {
             eatMushroomStew(p);
             return;
@@ -654,6 +649,10 @@ public class SurvivalGames extends Game {
 
         // prevent stripping trees :p
         if (e.getClickedBlock() != null && e.getClickedBlock().getType().toString().endsWith("SIGN")) {
+            return;
+        }
+        if (e.getClickedBlock() != null && (e.getClickedBlock().getType().equals(Material.GRASS_BLOCK) || e.getClickedBlock().getType().equals(Material.DIRT))) {
+            e.setCancelled(true);
             return;
         }
         if (e.getClickedBlock() == null) return;

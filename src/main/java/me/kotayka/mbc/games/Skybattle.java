@@ -37,7 +37,7 @@ public class Skybattle extends Game {
     private final int SURVIVAL_POINTS = 1;
     private final int WIN_POINTS = 0;
     // Team bonuses split among team
-    private final int[] TEAM_BONUSES_3 = {30, 21, 18, 15, 12, 9};
+    private final int[] TEAM_BONUSES_3 = {24, 21, 18, 15, 12, 9};
 
     public Skybattle() {
         super("Skybattle", new String[] {
@@ -51,7 +51,7 @@ public class Skybattle extends Game {
                                 "⑫ +9 points for eliminations\n" +
                                 "⑫ +1 points for every player outlived\n" +
                                 "⑫ Team Bonuses (split amongst team):\n" +
-                                "     ⑫ 1st: +10 points, 2nd: +7 points, 3rd: +6 points\n" +
+                                "     ⑫ 1st: +8 points, 2nd: +7 points, 3rd: +6 points\n" +
                                 "     ⑫ 4th: +5 points, 5th: +4 points, 6th: +3 points"
         });
     }
@@ -265,11 +265,11 @@ public class Skybattle extends Game {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
                 }
+                roundWinners(WIN_POINTS, SURVIVAL_POINTS);
                 for (Participant p : playersAlive) {
                     MBCTeam t = p.getTeam();
                     teamPlacements.put(t, 1);
                 }
-                roundWinners(WIN_POINTS, SURVIVAL_POINTS);
                 placementPoints();
                 timeRemaining = 38;
                 setGameState(GameState.END_GAME);

@@ -5,6 +5,8 @@ import me.kotayka.mbc.gameMaps.powerTagMaps.Room;
 import me.kotayka.mbc.gamePlayers.OneShotPlayer;
 import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
 import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -54,7 +56,7 @@ public class PowerTag extends Game {
     public String hunterPowerup;
     public Map<PowerTagPlayer, String> hiderPowerupMap = new HashMap<>();
     public PowerTagPlayer hunterSelector;
-    public String[] hunterPowerupList = {"TREMOR", "TRIDENT", "TROLL", "TOXIC"};
+    public String[] hunterPowerupList = {"TREMOR", "TRIDENT", "TROLL", "TOXIC", "TENSION"};
     public ChatColor[] hunterPowerupColorList = {ChatColor.GOLD, ChatColor.BLUE, ChatColor.YELLOW, ChatColor.GREEN};
     public String[] hiderPowerupList = {"SPEED", "INVISIBILITY", "SLOWBALL"};
     public ChatColor[] hiderPowerupColorList = {ChatColor.BLUE, ChatColor.LIGHT_PURPLE};
@@ -247,7 +249,7 @@ public class PowerTag extends Game {
                     speed(2);
                     Bukkit.broadcastMessage(ChatColor.GREEN + "Hunters have been given speed 2!");
                 }
-                if (timeRemaining == 20) {
+                if (timeRemaining == 10) {
                     speed(3);
                     Bukkit.broadcastMessage(ChatColor.GREEN + "Hunters have been given speed 3!");
                 }
@@ -467,15 +469,16 @@ public class PowerTag extends Game {
         p.getPlayer().getInventory().removeItem(getHiderPowerupTool());
         if (hiderPowerupMap.get(p).equals(hiderPowerupList[0])) {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 2, false, false));
+            p.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(hiderPowerupMap.get(p)));
         }
         if (hiderPowerupMap.get(p).equals(hiderPowerupList[1])) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 40, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20, 255, false, false));
             p.getPlayer().getInventory().setBoots(new ItemStack(Material.AIR));
 
             MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
                 @Override
                 public void run() { p.getPlayer().getInventory().setBoots(p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_BOOTS)));}
-              }, 40L);
+              }, 20L);
         }
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
@@ -532,8 +535,17 @@ public class PowerTag extends Game {
         toxicMeta.setUnbreakable(true);
         toxic.setItemMeta(toxicMeta);
 
+        ItemStack tension = new ItemStack(Material.DISC_FRAGMENT_5);
+        ItemMeta tensionMeta = tension.getItemMeta();
+        tensionMeta.setDisplayName(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "TENSION");
+        ArrayList<String> tensionLore = new ArrayList();
+        tensionLore.add(ChatColor.GREEN + "Make all players in a large radius be forced to move! One time use only.");
+        tensionMeta.setLore(tensionLore);
+        tensionMeta.setUnbreakable(true);
+        tension.setItemMeta(tensionMeta);
+
         //ItemStack[] items = {trident, troll, toxic, tremor};
-        ItemStack[] items = {tremor, trident, toxic};
+        ItemStack[] items = {tremor, trident, troll, toxic, tension};
 
         return items;
     }
@@ -595,22 +607,27 @@ public class PowerTag extends Game {
         if (hunterPowerup.equals(hunterPowerupList[0])) {
             message = ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
                                         ChatColor.RED + "" + ChatColor.BOLD + " have chosen the tremor powerup!";
-            p.getPlayer().sendTitle(ChatColor.BOLD + "TREMOR TAG!", "The ground beneath the hiders has began to shake...", 0, 60, 20);
+            p.getPlayer().sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "TREMOR TAG!", ChatColor.GOLD + "The ground beneath the hiders has began to shake...", 0, 60, 20);
         }
         if (hunterPowerup.equals(hunterPowerupList[1])) {
             message = ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
                                         ChatColor.RED + "" + ChatColor.BOLD + " have chosen the trident powerup!";
-            p.getPlayer().sendTitle(ChatColor.BOLD + "TRIDENT TAG!", "The hunters have been given extra range...", 0, 60, 20);
+            p.getPlayer().sendTitle(ChatColor.BLUE + "" + ChatColor.BOLD + "TRIDENT TAG!", ChatColor.BLUE + "The hunters have been given extra range...", 0, 60, 20);
         }
         if (hunterPowerup.equals(hunterPowerupList[2])) {
             message = ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
                                         ChatColor.RED + "" + ChatColor.BOLD + " have chosen the troll powerup!";
-            p.getPlayer().sendTitle(ChatColor.BOLD + "TROLL TAG!", "The power is in the hands of the players...", 0, 60, 20);
+            p.getPlayer().sendTitle(ChatColor.YELLOW + "" + ChatColor.BOLD + "TROLL TAG!", ChatColor.YELLOW + "The power is in the hands of the players...", 0, 60, 20);
         }
         if (hunterPowerup.equals(hunterPowerupList[3])) {
             message = ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
                                         ChatColor.RED + "" + ChatColor.BOLD + " have chosen the toxic powerup!";
-            p.getPlayer().sendTitle(ChatColor.BOLD + "TOXIC TAG!", "Be careful who you're near...", 0, 60, 20);
+            p.getPlayer().sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "TOXIC TAG!", ChatColor.GREEN + "Be careful who you're near...", 0, 60, 20);
+        }
+        if (hunterPowerup.equals(hunterPowerupList[4])) {
+            message = ChatColor.RED + "" + ChatColor.BOLD + "The " + ChatColor.RESET + "" + ChatColor.BOLD + huntOrder.get(roundNum-1).teamNameFormat() + 
+                                        ChatColor.RED + "" + ChatColor.BOLD + " have chosen the tension powerup!";
+            p.getPlayer().sendTitle(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "TENSION TAG!", ChatColor.DARK_PURPLE + "The hiders are getting nervous about their spots...", 0, 60, 20);
         }
         p.getPlayer().sendMessage(message);
         return message;
@@ -689,6 +706,15 @@ public class PowerTag extends Game {
         }
         if (powerup.equals(powerupList[2])) return null;
         if (powerup.equals(powerupList[3])) return null;
+        if (powerup.equals(powerupList[4])) {
+            ItemStack tension = new ItemStack(Material.ECHO_SHARD);
+            ItemMeta tensionMeta = tension.getItemMeta();
+            tensionMeta.setDisplayName(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "TENSION");
+            tensionMeta.setUnbreakable(true);
+            tension.setItemMeta(tensionMeta);
+            return tension;
+
+        }
 
         return null;
     }
@@ -729,13 +755,75 @@ public class PowerTag extends Game {
     }
 
     /**
-    * Will run 20 seconds after tremor is run. Returns tremor powerup and plays ding noise.
+    * PowerTagPlayer p finds players within certain distance. Players within distance are notified that they have a certain amount of time to move at least 5 blocks
+    * from their original location. If they do not, they are revealed.
+    * Hunter will know how many players were found.
+    */
+    public void tensionUse(PowerTagPlayer p) {
+
+        int tenseCount = 0;
+        Map<PowerTagPlayer, Location> tensedPlayers = new HashMap<>();
+
+        for (PowerTagPlayer hider : aliveHiders) {
+            double currentDistance = hider.getPlayer().getLocation().distance(p.getPlayer().getLocation());
+
+            if (currentDistance < 16) {
+                tensedPlayers.put(hider, hider.getPlayer().getLocation());
+                hider.getPlayer().sendMessage(ChatColor.RED + "You were tensed by " + ChatColor.RESET + p.getParticipant().getFormattedName() + ChatColor.RED + "!" + 
+                                            "You have 10 seconds to move at least 5 blocks or you will be revealed!");
+                hider.getPlayer().playSound(hider.getPlayer(), Sound.ENTITY_WARDEN_DEATH, 1, 1);
+                hider.getPlayer().sendTitle(ChatColor.DARK_PURPLE + "" +ChatColor.BOLD + "TENSED!", ChatColor.DARK_PURPLE + "MOVE FIVE BLOCKS!", 0, 60, 20);
+                tenseCount++;
+            }
+            
+        }
+
+        Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + "" + ChatColor.RED + " has used their tension powerup!");
+
+        if (tenseCount == 1) p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You detected 1 hider!");
+        else if (tenseCount == 0) p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You detected no hiders...");
+        else p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You detected " + tenseCount + " hiders!");
+        
+        TAG_WORLD.playSound(p.getPlayer().getLocation(), Sound.ENTITY_WARDEN_DEATH, 1, 1);
+        p.getPlayer().getInventory().removeItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { postTensionUse(p, tensedPlayers);}
+          }, 200L);
+    }
+
+    /**
+    * Will run 25 seconds after tremor is run. Returns tremor powerup and plays ding noise.
     */
     public void postTremorUse(PowerTagPlayer p) {
         giveHunterPowerups(p);
         if (getState().equals(GameState.ACTIVE)) {
             p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BREWING_STAND_BREW, 1, 1);
         }
+    }
+
+    /**
+    * Will run 10 seconds after tremor is run. Reveals players who did not move 5 blocks.
+    */
+    public void postTensionUse(PowerTagPlayer p, Map<PowerTagPlayer, Location> m) {
+        int revealCount = 0;
+        if (getState().equals(GameState.ACTIVE)) {
+            for(PowerTagPlayer hider : m.keySet()) {
+                Location l = m.get(hider);
+                if (aliveHiders.contains(hider) && l.distance(hider.getPlayer().getLocation()) < 8) {
+                    TAG_WORLD.playSound(p.getPlayer().getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, 1, 1);
+                    hider.getPlayer().playSound(hider.getPlayer(), Sound.ENTITY_WARDEN_SONIC_BOOM, 1, 1);
+                    hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 100, 3, false, false));
+                    hider.getPlayer().sendTitle(ChatColor.DARK_PURPLE + "" +ChatColor.BOLD + "REVEALED!", "", 0, 60, 20);
+                    hider.getPlayer().sendMessage(ChatColor.RED + "You have been revealed. Good luck...");
+                    revealCount++;
+                }
+            }
+        }
+
+        if (revealCount == 1) p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "1 hider has been revealed!");
+        else if (revealCount == 0) p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "No hiders have been revealed.");
+        else p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "" + revealCount + " hiders have been revealed!");
     }
 
     public void troll(PowerTagPlayer hitter, PowerTagPlayer hider) {
@@ -1144,8 +1232,17 @@ public class PowerTag extends Game {
                 p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.GREEN +""+ChatColor.BOLD + "TOXIC");
                 e.setCancelled(true);
             }
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.DISC_FRAGMENT_5 && hunterSelector.equals(p) && hunterPowerup != hunterPowerupList[4]) {
+                hunterPowerup = hunterPowerupList[4];
+                p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.DARK_PURPLE +""+ChatColor.BOLD + "TENSION");
+                e.setCancelled(true);
+            }
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.BLAZE_ROD && hunters.contains(p) && hunterPowerup.equals(hunterPowerupList[0])) {
                 tremorUse(p);
+                e.setCancelled(true);
+            }
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.ECHO_SHARD && hunters.contains(p) && hunterPowerup.equals(hunterPowerupList[4])) {
+                tensionUse(p);
                 e.setCancelled(true);
             }
         }

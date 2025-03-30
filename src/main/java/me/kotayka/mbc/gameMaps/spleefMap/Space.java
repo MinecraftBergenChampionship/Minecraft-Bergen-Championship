@@ -71,7 +71,7 @@ public class Space extends SpleefMap {
             Bukkit.broadcastMessage(ChatColor.RED+"The outside moons are decaying!");
         }
         if (timeRemaining < 150) {
-            for (int i = 0; i < 10 && moons.size() > 1; i++) {
+            for (int i = 0; i < 15 && moons.size() > 1; i++) {
                 int rand = (int)(Math.random()*moons.size());
                 decaying.add(moons.get(rand));
                 moons.remove(rand);
@@ -83,7 +83,7 @@ public class Space extends SpleefMap {
             Bukkit.broadcastMessage(ChatColor.RED+"The outer rings are decaying!");
         }
         if (timeRemaining < 120) {
-            for (int i = 0; i < 8 && rings.size() > 1; i++) {
+            for (int i = 0; i < 12 && rings.size() > 1; i++) {
                 int rand = (int)(Math.random() * rings.size());
                 decaying.add(rings.get(rand));
                 rings.remove(rand);
@@ -93,7 +93,7 @@ public class Space extends SpleefMap {
             Bukkit.broadcastMessage(ChatColor.RED+"The planet is decaying!");
         }
         if (timeRemaining < 90) {
-            for (int i = 0; i < 10 && planet.size() > 1; i++) {
+            for (int i = 0; i < 15 && planet.size() > 1; i++) {
                 int rand = (int) (Math.random() * planet.size());
                 decaying.add(planet.get(rand));
                 planet.remove(rand);
