@@ -87,7 +87,7 @@ public class SurvivalGames extends Game {
                 "⑬ Live as long as you can, and place your teams horcrux for one revive!\n\n" +
                 "⑬ There are two rounds, so remember who killed you...",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "⑬ +5-15 points for eliminations\n" +
+                        "⑬ +8-12 points for eliminations\n" +
                         "⑬ +150 points split based on % of damage dealt\n" +
                         "⑬ +1 points for every player outlived\n" +
                         "⑬ Team Bonuses (split amongst team):\n" +

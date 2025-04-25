@@ -241,7 +241,7 @@ public class Lobby extends Minigame {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nNow to our individual standings...\n");
                 }
                 case 132 -> {
-                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nCongrats to our indivudal winners!\n");
+                    Bukkit.broadcastMessage(ChatColor.BOLD+"\nCongrats to our individual winners!\n");
                 }
                 case 130 -> {
                     loadPlayersScoreReveal();

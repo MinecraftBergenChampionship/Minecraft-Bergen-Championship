@@ -1,0 +1,1113 @@
+package me.kotayka.mbc.games;
+
+import me.kotayka.mbc.*;
+import me.kotayka.mbc.gameMaps.lockdownMaps.*;
+import me.kotayka.mbc.gamePlayers.LockdownPlayer;
+import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
+import me.kotayka.mbc.gamePlayers.LockdownPlayer;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.damage.DamageType;
+import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.*;
+
+public class Lockdown extends Game {
+    public LockdownMap map = new Abandoned(this);
+    public Map<UUID, LockdownPlayer> lockdownPlayerMap = new HashMap<>();
+
+    public HashMap<Participant, Integer> escapeCounter = new HashMap<>();
+
+    private WorldBorder border = null;
+
+    private final int ORIGINAL_KILL_POINTS = 6;
+    private final int TWO_KILL_POINTS = 5;
+    private final int FOUR_KILL_POINTS = 4;
+    private final int SIX_KILL_POINTS = 3;
+
+    private MBCTeam[][] capturedPoints = new MBCTeam[6][6];
+
+    private final int OUTER_CAPTURE_POINTS = 2;
+    private final int INNER_CAPTURE_POINTS = 3;
+    private final int MIDDLE_CAPTURE_POINTS = 4;
+
+    private final int ESCAPE_POINTS = 8;
+
+    public Lockdown() {
+        super("Lockdown", new String[] {
+                "⑫ Make your way to the center of the map, capturing as many zones as possible!\n\n" + 
+                "⑫ Escape using the evacuation point in the middle of the map!",
+                "⑫ Replace the wool at a capture zone in the center of a room to get points.\n\n" + 
+                "⑫ Be careful, other teams want to steal your zones - and PVP is on...",
+                "⑫ The border will shrink as time goes on, so make your way to the center.\n\n" +
+                "⑫ The center room has 4 zones as well as the evacuation point!",
+                ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
+                                "⑫ +2 points per player for capturing a zone in the outer ring\n" +
+                                "⑫ +3 points per player for capturing a zone in the inner ring\n" + 
+                                "⑫ +4 points per player for capturing a zone in the center\n" +
+                                "⑫ +8 points for escaping at the evacuation point\n" +
+                                "⑫ +6 points per kill, decreasing after each kill\n"
+        });
+    }
+    private int roundNum = 1;
+
+    @Override
+    public void createScoreboard(Participant p) {
+        createLine(22, ChatColor.GREEN+""+ChatColor.BOLD+"Round: " + ChatColor.RESET+roundNum+"/3", p);
+        createLine(19, ChatColor.RESET.toString(), p);
+        createLine(4, ChatColor.RESET.toString() + ChatColor.RESET, p);
+        if (lockdownPlayerMap.size() < 1) {
+            createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+"0", p);
+        } else {
+            for (LockdownPlayer x : lockdownPlayerMap.values()) {
+                createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+x.kills, p);
+            }
+        }
+
+        updateInGameTeamScoreboard();
+    }
+
+    @Override
+    public void start() {
+        super.start();
+
+        setGameState(GameState.TUTORIAL);
+        //setGameState(GameState.STARTING);
+        
+
+        setTimer(30);
+    }
+
+    public void loadPlayers() {
+        setPVP(false);
+        if (lockdownPlayerMap != null) {
+            for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                p.lastDamager = null;
+            }
+        }
+        if (border == null) {
+            border = map.getWorld().getWorldBorder();
+        }
+        border.setCenter(64, 64);
+        border.setSize(232);
+        map.addBarriers();
+
+        for (int i = 0; i < capturedPoints.length; i++) {
+            for (int j = 0; j < capturedPoints[i].length; j++) {
+                capturedPoints[i][j] = null;
+            }
+        }
+        if (roundNum == 1)
+            teamsAlive.addAll(getValidTeams());
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            p.getPlayer().setInvulnerable(true);
+            p.getPlayer().getInventory().clear();
+            p.getPlayer().setFlying(false);
+            p.getPlayer().setAllowFlight(false);
+            p.getPlayer().setHealth(20);
+            
+
+            p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
+            p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+            p.getPlayer().removePotionEffect(PotionEffectType.SLOWNESS);
+            p.getPlayer().removePotionEffect(PotionEffectType.POISON);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false));
+            if (roundNum == 1) {
+                lockdownPlayerMap.put(p.getPlayer().getUniqueId(), new LockdownPlayer(p));
+                playersAlive.add(p);
+            } else {
+                resetAliveLists();
+            }
+            // reset scoreboard & variables after each round
+            createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+(Objects.requireNonNull(lockdownPlayerMap.get(p.getPlayer().getUniqueId()))).kills, p);
+        }
+        map.spawnPlayers();
+        updatePlayersAliveScoreboard();
+    }
+
+    /**
+     * 
+     */
+    public void resetMaps() {
+        if (lockdownPlayerMap != null) {
+            for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                p.lastDamager = null;
+            }
+        }
+        
+    }
+
+    @Override
+    public void onRestart() {
+        roundNum = 1;
+        resetPlayers();
+    }
+
+    @Override
+    public void events() {
+        if (getState().equals(GameState.TUTORIAL)) {
+            if (timeRemaining == 0) {
+                MBC.getInstance().sendMutedMessages();
+                Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The game is starting!\n");
+                setGameState(GameState.STARTING);
+                timeRemaining = 30;
+            } else if (timeRemaining % 7 == 0) {
+                Introduction();
+            }
+        } else if (getState().equals(GameState.STARTING)) {
+            if (timeRemaining > 0) {
+                if (roundNum == 1) mapCreator(map.mapName, map.creatorName);
+                startingCountdown();
+                if (timeRemaining == 20) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, Sound.MUSIC_DISC_PRECIPICE, SoundCategory.RECORDS, 1, 1);
+                    }
+                    for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                        switch (roundNum) {
+                            case(2):
+                                giveAxeKit(p);
+                                p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.GREEN+"" + ChatColor.BOLD+"AXES AND BOWS", "", 20, 60, 20);
+                                p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.BLOCKS, 1, 1);
+                                break;
+                            case(3):
+                                giveTridentKit(p);
+                                p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.AQUA+"" + ChatColor.BOLD+"TRIDENTS", "", 20, 60, 20);
+                                p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.BLOCKS, 1, 1);
+                                break;
+                            case(1):
+                            default:
+                                giveSwordKit(p);
+                                p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.RED+"" + ChatColor.BOLD+"SWORDS AND CROSSBOWS", "", 20, 60, 20);
+                                p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WARDEN_DEATH, SoundCategory.BLOCKS, 1, 1);
+                                break;
+                        }
+                    }
+                }
+            } else {
+                setGameState(GameState.ACTIVE);
+                map.removeBarriers();
+                repeatingSneakEvent();
+                setPVP(true);
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().setInvulnerable(false);
+                    p.getPlayer().setGameMode(GameMode.SURVIVAL);
+                    p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+                    p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
+                }
+                updatePlayersAliveScoreboard();
+                timeRemaining = 300;
+            }
+        } else if (getState().equals(GameState.ACTIVE)) {
+            if (timeRemaining == 225) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking! All outer rooms will soon be closed!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING!", "", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+                }
+                border.setSize(154, 45);
+            }
+            if (timeRemaining == 120) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking! All rooms except the middle will soon be closed!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING!", "", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+                }
+                border.setSize(76, 45);
+            }
+            if (timeRemaining == 45) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Final border closing!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING!", "Escape if you can!", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+                }
+                border.setSize(6, 45);
+            }
+            if (timeRemaining == 0) {
+                woolPoints();
+                escapeCounter.clear();
+                if (roundNum < 3) {
+                    roundOverGraphics();
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.stopSound(Sound.MUSIC_DISC_PRECIPICE, SoundCategory.RECORDS);
+                    }
+                    timeRemaining = 10;
+                    setGameState(GameState.END_ROUND);
+                } else {
+                    gameOverGraphics();
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.stopSound(Sound.MUSIC_DISC_PRECIPICE, SoundCategory.RECORDS);
+                    }
+                    timeRemaining = 40;
+                    setGameState(GameState.END_GAME);
+                }
+            }
+
+        } else if (getState().equals(GameState.END_ROUND)) {
+            if (timeRemaining == 1) {
+                roundNum++;
+                map.resetMap();
+                loadPlayers();
+                createLineAll(22, ChatColor.GREEN+""+ChatColor.BOLD+"Round: " + ChatColor.RESET+roundNum+"/3");
+                timeRemaining = 30;
+                setGameState(GameState.STARTING);
+            }
+        } else if (getState().equals(GameState.END_GAME)) {
+            if (timeRemaining <= 35) {
+                gameEndEvents();
+            }
+        }
+    }
+
+    /*
+     * Given LockdownPlayer p, return the correct amount of points they earn for killing a player. Will decrease as # of kills increases
+     */
+    public int killPoints(LockdownPlayer p) {
+        switch(p.kills) {
+            case (0):
+                return ORIGINAL_KILL_POINTS;
+            case (1):
+            case (2):
+                return TWO_KILL_POINTS;
+            case (3):
+            case (4):
+                return FOUR_KILL_POINTS;
+            default:
+                return SIX_KILL_POINTS;
+        }
+    }
+
+    /**
+     * Given location l, returns the middle wool block. Returns null if not part of wool station
+     */
+    public Location checkLocation(Location l) {
+        for (Location potential : map.getWoolLocations()) {
+            for (int x = ((int)potential.getBlockX())-1; x <= ((int)potential.getBlockX())+1; x++) {
+                for (int z = ((int)potential.getBlockZ())-1; z <= ((int)potential.getBlockZ())+1; z++) {
+                    if (l.equals(new Location(map.getWorld(), x, (int)potential.getBlockY(), z))) {
+                        return potential;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Given center block location l, check to see if it is filled by color wool. returns true if so, false if not
+     */
+    public boolean filled(Location l) {
+        Block checkWool = l.getBlock();
+        
+        for (int x = ((int)l.getBlockX())-1; x <= ((int)l.getBlockX())+1; x++) {
+            for (int z = ((int)l.getBlockZ())-1; z <= ((int)l.getBlockZ())+1; z++) {
+                if (!checkWool.getType().equals(map.getWorld().getBlockAt(x, l.getBlockY(), z).getType())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /*
+     * Runs at the end of each round. Checks each location to see if it is captured. Gives points if so.
+     */
+    public void woolPoints() {
+        HashMap<MBCTeam, Integer> woolPoints = new HashMap<>();
+
+        String map = "\n" +ChatColor.GOLD + ""+ ChatColor.BOLD + "Map:\n\n";
+        for (int i = 0; i < capturedPoints.length; i++) {
+            for (int j = 0; j < capturedPoints[i].length; j++) {
+                if (capturedPoints[i][j] != null) {
+                    MBCTeam t = capturedPoints[i][j];
+                    map = map+ t.getChatColor()+""+ChatColor.BOLD+"■";
+                    if (!woolPoints.containsKey(t)) woolPoints.put(t, 0);
+
+                    int pointsEarned = 0;
+                    if (i == 0 || i == 5 || j == 0 || j == 5) {pointsEarned = OUTER_CAPTURE_POINTS;}
+                    else if (i == 1 || i == 4 || j == 1 || j == 4) {pointsEarned = INNER_CAPTURE_POINTS;}
+                    else {pointsEarned = MIDDLE_CAPTURE_POINTS;}
+                    woolPoints.replace(t, woolPoints.get(t)+pointsEarned);
+
+                    
+                }
+                else {
+                    map = map+ChatColor.WHITE +""+ChatColor.BOLD+ "■";
+                }
+            }
+            map = map + "\n";
+        }
+
+        String message = "\n" + ChatColor.BOLD + "Wool Points:\n";
+        for (MBCTeam t : MBC.getInstance().getValidTeams()) {
+            if (!woolPoints.containsKey(t)) woolPoints.put(t, 0);
+            message = message + t.teamNameFormat() + ChatColor.BOLD + ": " + (woolPoints.get(t)*t.getPlayers().size()) + " wool points\n";
+            for (Participant p : t.getPlayers()) {
+                p.addCurrentScore(woolPoints.get(t));
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team earned points for capturing wool points!" + MBC.scoreFormatter(woolPoints.get(t)));
+                p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.BLOCKS, 1, 1);
+            }
+        }
+
+        final String finalMap = map;
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { sendMap(finalMap);}
+          }, 40L);
+    }
+
+    /*
+     * Sends the map in chat.
+     */
+    public void sendMap(String s) {
+        Bukkit.broadcastMessage(s);
+    }
+
+    /**
+     * Check to see if a block is being placed in a wool station, what color it is, and which station its in.
+     */
+    @EventHandler
+    public void blockPlaceEvent(BlockPlaceEvent e) {
+        if (!isGameActive()) return;
+        if (checkWool(e.getBlock().getLocation())) {
+            Player p = e.getPlayer();
+            String wool = e.getBlock().getType().toString();
+            // check item slot
+            if (e.getHand() == EquipmentSlot.HAND) {
+                int index = p.getInventory().getHeldItemSlot();
+                int amt = Objects.requireNonNull(p.getInventory().getItem(index)).getAmount();
+                p.getInventory().setItem(index, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
+            }
+            else if (e.getHand() == EquipmentSlot.OFF_HAND) {
+                int amt = Objects.requireNonNull(p.getInventory().getItem(40)).getAmount();
+                p.getInventory().setItem(40, new ItemStack(Objects.requireNonNull(Material.getMaterial(wool)), amt));
+            }
+
+            Location l = checkLocation(e.getBlock().getLocation());
+            if (l == null) return;
+            if (filled(l)) {
+                MBCTeam t = Participant.getParticipant(p).getTeam();
+                capturePoint(l, t);
+            } else {
+            }
+        }
+        else {
+            e.setCancelled(true);
+            return;
+        }
+
+    }
+
+    @EventHandler
+    public void sneakEvent(PlayerToggleSneakEvent e) {
+        if (!isGameActive()) return;
+        
+        if (e.isSneaking()) {
+            Player p = e.getPlayer();
+            if (p.getGameMode().equals(GameMode.SPECTATOR)) return;
+            Location l = p.getLocation();
+            int x = (l.getBlockX());
+            int z = (l.getBlockZ());
+
+            Block check = new Location(map.getWorld(), x, 1, z).getBlock();
+            if (check.getType().equals(Material.WAXED_EXPOSED_COPPER_BULB) && p.getY() < 4.5) {
+                p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "You are now escaping!" + ChatColor.RESET + "" + ChatColor.RED + 
+                                                " Hold shift and wait 5 seconds.");
+                p.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 100, 1, false, false));
+                escapeCounter.put(Participant.getParticipant(p), 4);
+            }
+            
+        }
+        else {
+            Player p = e.getPlayer();
+            if (p.hasPotionEffect(PotionEffectType.LEVITATION) && escapeCounter.containsKey(Participant.getParticipant(p))) {
+                removeEscapee(Participant.getParticipant(p));
+            }
+            
+        }
+
+    }
+
+    /*
+     * Repeating event. Will recur every second for entirety of game. If player is in escapecounter for 5 seconds, will "escape".
+     */
+    public void repeatingSneakEvent() {
+        if (!isGameActive()) return;
+
+        for (Participant p : escapeCounter.keySet()) {
+            int time = escapeCounter.get(p);
+            if (time == 0) {
+                playerEscape(p);
+                escapeCounter.remove(p);
+            }
+            else {
+                escapeCounter.replace(p, time-1);
+                p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 1, 1);
+                if (time == 1) p.getPlayer().sendTitle(ChatColor.RED+"Hold shift...", "1 second left...", 0, 0, 20);
+                else p.getPlayer().sendTitle(ChatColor.RED+"Hold shift...", time + " seconds left...", 0, 0, 20);
+            }
+        }
+
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { repeatingSneakEvent();}
+          }, 20L);
+
+    }
+
+    /*
+     * Player p escapes! Give points, change playersalive.
+     */
+    public void playerEscape(Participant p) {
+        p.getPlayer().playSound(p.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 1, 1);
+        p.addCurrentScore(ESCAPE_POINTS);
+        p.getPlayer().sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You Escaped!" + MBC.getInstance().scoreFormatter(ESCAPE_POINTS));
+        Bukkit.broadcastMessage(p.getFormattedName() + " escaped the Lockdown!");
+        updatePlayersAlive(p);
+        p.getPlayer().setGameMode(GameMode.SPECTATOR);
+        p.getInventory().clear();
+    }
+
+    /*
+     * Player p fails to escape. Remove from escapeCounter, remove levitation.
+     */
+    public void removeEscapee(Participant p) {
+        p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 1);
+        p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Escape Cancelled!");
+        p.getPlayer().removePotionEffect(PotionEffectType.LEVITATION);
+        escapeCounter.remove(p);
+    }
+
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent e) {
+        if (!isGameActive()) return;
+
+        if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Set<Material> trapdoorList = Set.of(Material.OAK_TRAPDOOR, Material.DARK_OAK_TRAPDOOR, Material.SPRUCE_TRAPDOOR, Material.BIRCH_TRAPDOOR,
+                                        Material.ACACIA_TRAPDOOR, Material.CHERRY_TRAPDOOR, Material.MANGROVE_TRAPDOOR, Material.JUNGLE_TRAPDOOR,
+                                        Material.CRIMSON_TRAPDOOR, Material.WARPED_TRAPDOOR);
+            if(trapdoorList.contains(e.getClickedBlock().getType())) e.setCancelled(true);
+        }
+
+    }
+
+    /**
+     * Overrides checklastteam function from game. Game cannot end from only 1 team remaining.
+     */
+    @Override
+    public void checkLastTeam(MBCTeam t) {
+        if (checkTeamEliminated(t)) {
+            teamsAlive.remove(t);
+        }
+    }
+
+    /**
+     * Check to see if a block is being broken in a wool station, what color it was, and which station its in.
+     */
+    @EventHandler
+    public void blockBreakEvent(BlockBreakEvent e) {
+        if (!isGameActive()) return;
+        if (checkWool(e.getBlock().getLocation())) {
+            Player p = e.getPlayer();
+            Location l = checkLocation(e.getBlock().getLocation());
+            if (l == null) return;
+            if (capturedPoints[map.rowOfLocation(l)][map.columnOfLocation(l)] != null) {
+                lostPoint(l, capturedPoints[map.rowOfLocation(l)][map.columnOfLocation(l)]);
+            }
+        }
+        else {
+            e.setCancelled(true);
+            return;
+        }
+    }
+
+    /*
+     * MBCTeam t has captured the point at middle location l. Note this and make message in chat.
+     */
+    public void capturePoint(Location l, MBCTeam t) {
+        int row = map.rowOfLocation(l);
+        int column = map.columnOfLocation(l);
+
+        capturedPoints[row][column] = t;
+
+        for (Participant p : t.getPlayers()) {
+            p.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Your team captured a point!");
+            MBC.spawnFirework(p);
+        }
+    }
+
+    /*
+     * MBCTeam t has lost the point at middle location l. Note this and make message in chat.
+     */
+    public void lostPoint(Location l, MBCTeam t) {
+        int row = map.rowOfLocation(l);
+        int column = map.columnOfLocation(l);
+
+        capturedPoints[row][column] = null;
+
+        for (Participant p : t.getPlayers()) {
+            p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Another team is breaking one of your points...");
+            p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_ALLAY_DEATH, SoundCategory.BLOCKS, 0.5f, 1);
+        }
+    }
+
+    /**
+     * Check location l to see if its the middle of the map.
+     */
+    public boolean checkMiddle(Location l) {
+        if (map.getWorld().getBlockAt((int)l.getBlockX(), 1, (int)l.getBlockZ()).getType().equals(Material.WAXED_EXPOSED_COPPER_BULB)) return true;
+        return false;
+    }
+
+    /**
+     * Check location l to see if its at a wool station.
+     */
+    public boolean checkWool(Location l) {
+        for (Location potential : map.getWoolLocations()) {
+            for (int x = ((int)potential.getBlockX())-1; x <= ((int)potential.getBlockX())+1; x++) {
+                for (int z = ((int)potential.getBlockZ())-1; z <= ((int)potential.getBlockZ())+1; z++) {
+                    if (l.equals(new Location(map.getWorld(), x, (int)potential.getBlockY(), z))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Gives LockdownPlayer p the axe kit.
+     */
+    public static void giveAxeKit(LockdownPlayer p) {
+        if (p == null) {return;}
+
+        ItemStack stoneAxe = new ItemStack(Material.STONE_AXE);
+        ItemMeta stoneMeta = stoneAxe.getItemMeta();
+        stoneMeta.setUnbreakable(true);
+        stoneAxe.setItemMeta(stoneMeta);
+
+        ItemStack bow = new ItemStack(Material.BOW);
+        ItemMeta bowMeta = bow.getItemMeta();
+        bowMeta.setUnbreakable(true);
+        bow.setItemMeta(bowMeta);
+
+        ItemStack arrow = new ItemStack(Material.ARROW);
+        ItemStack steak = new ItemStack(Material.COOKED_BEEF, 8);
+        ItemStack wool = p.getParticipant().getTeam().getColoredWool();
+        wool.setAmount(64);
+
+        ItemStack shears = new ItemStack(Material.SHEARS);
+        ItemMeta shearsMeta = shears.getItemMeta();
+        shearsMeta.setUnbreakable(true);
+        shears.setItemMeta(shearsMeta);
+
+        ItemStack ironHelmet = new ItemStack(Material.IRON_HELMET);
+        ItemMeta helmetMeta = ironHelmet.getItemMeta();
+        helmetMeta.setUnbreakable(true);
+        ironHelmet.setItemMeta(helmetMeta);
+
+        ItemStack ironBoots = new ItemStack(Material.IRON_BOOTS);
+        ItemMeta bootsMeta = ironBoots.getItemMeta();
+        bootsMeta.setUnbreakable(true);
+        ironBoots.setItemMeta(bootsMeta);
+
+        ItemStack leatherChestplate = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_CHESTPLATE));
+        ItemMeta chestplateMeta = leatherChestplate.getItemMeta();
+        chestplateMeta.setUnbreakable(true);
+        leatherChestplate.setItemMeta(chestplateMeta);
+
+        ItemStack ironPants = new ItemStack(Material.IRON_LEGGINGS);
+        ItemMeta pantsMeta = ironPants.getItemMeta();
+        pantsMeta.setUnbreakable(true);
+        ironPants.setItemMeta(pantsMeta);
+
+        p.getPlayer().getInventory().addItem(stoneAxe);
+        p.getPlayer().getInventory().addItem(bow);
+        p.getPlayer().getInventory().addItem(steak);
+        p.getPlayer().getInventory().addItem(wool);
+        p.getPlayer().getInventory().addItem(shears);
+        p.getPlayer().getInventory().addItem(arrow);
+
+        p.getPlayer().getInventory().setHelmet(ironHelmet);
+        p.getPlayer().getInventory().setChestplate(leatherChestplate);
+        p.getPlayer().getInventory().setLeggings(ironPants);
+        p.getPlayer().getInventory().setBoots(ironBoots);
+    }
+
+    /**
+     * Gives LockdownPlayer p the sword kit (normal one).
+     */
+    public static void giveSwordKit(LockdownPlayer p) {
+        if (p == null) {return;}
+
+        ItemStack stoneSword = new ItemStack(Material.STONE_SWORD);
+        ItemMeta stoneMeta = stoneSword.getItemMeta();
+        stoneMeta.setUnbreakable(true);
+        stoneSword.setItemMeta(stoneMeta);
+
+        ItemStack crossbow = new ItemStack(Material.CROSSBOW);
+        ItemMeta crossbowMeta = crossbow.getItemMeta();
+        crossbowMeta.setUnbreakable(true);
+        crossbow.setItemMeta(crossbowMeta);
+
+        ItemStack arrow = new ItemStack(Material.ARROW);
+        ItemStack steak = new ItemStack(Material.COOKED_BEEF, 8);
+        ItemStack wool = p.getParticipant().getTeam().getColoredWool();
+        wool.setAmount(64);
+
+        ItemStack shears = new ItemStack(Material.SHEARS);
+        ItemMeta shearsMeta = shears.getItemMeta();
+        shearsMeta.setUnbreakable(true);
+        shears.setItemMeta(shearsMeta);
+
+        ItemStack diamondHelmet = new ItemStack(Material.DIAMOND_HELMET);
+        ItemMeta helmetMeta = diamondHelmet.getItemMeta();
+        helmetMeta.setUnbreakable(true);
+        diamondHelmet.setItemMeta(helmetMeta);
+
+        ItemStack diamondBoots = new ItemStack(Material.DIAMOND_BOOTS);
+        ItemMeta bootsMeta = diamondBoots.getItemMeta();
+        bootsMeta.setUnbreakable(true);
+        diamondBoots.setItemMeta(bootsMeta);
+
+        ItemStack leatherChestplate = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_CHESTPLATE));
+        ItemMeta chestplateMeta = leatherChestplate.getItemMeta();
+        chestplateMeta.setUnbreakable(true);
+        leatherChestplate.setItemMeta(chestplateMeta);
+
+        ItemStack leatherPants = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_LEGGINGS));
+        ItemMeta pantsMeta = leatherChestplate.getItemMeta();
+        pantsMeta.setUnbreakable(true);
+        leatherPants.setItemMeta(pantsMeta);
+
+        p.getPlayer().getInventory().addItem(stoneSword);
+        p.getPlayer().getInventory().addItem(crossbow);
+        p.getPlayer().getInventory().addItem(steak);
+        p.getPlayer().getInventory().addItem(wool);
+        p.getPlayer().getInventory().addItem(shears);
+        p.getPlayer().getInventory().addItem(arrow);
+
+        p.getPlayer().getInventory().setHelmet(diamondHelmet);
+        p.getPlayer().getInventory().setChestplate(leatherChestplate);
+        p.getPlayer().getInventory().setLeggings(leatherPants);
+        p.getPlayer().getInventory().setBoots(diamondBoots);
+    }
+
+    /**
+     * Gives LockdownPlayer p the trident kit.
+     */
+    public static void giveTridentKit(LockdownPlayer p) {
+        if (p == null) {return;}
+
+        ItemStack trident = new ItemStack(Material.TRIDENT);
+        ItemMeta tridentMeta = trident.getItemMeta();
+        tridentMeta.setUnbreakable(true);
+        trident.setItemMeta(tridentMeta);
+
+        ItemStack steak = new ItemStack(Material.COOKED_BEEF, 8);
+        ItemStack wool = p.getParticipant().getTeam().getColoredWool();
+        wool.setAmount(64);
+
+        ItemStack shears = new ItemStack(Material.SHEARS);
+        ItemMeta shearsMeta = shears.getItemMeta();
+        shearsMeta.setUnbreakable(true);
+        shears.setItemMeta(shearsMeta);
+
+        ItemStack turtleHelmet = new ItemStack(Material.TURTLE_HELMET);
+        ItemMeta helmetMeta = turtleHelmet.getItemMeta();
+        helmetMeta.setUnbreakable(true);
+        turtleHelmet.setItemMeta(helmetMeta);
+
+        ItemStack leatherBoots = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_BOOTS));
+        ItemMeta chestplateMeta = leatherBoots.getItemMeta();
+        chestplateMeta.setUnbreakable(true);
+        leatherBoots.setItemMeta(chestplateMeta);
+
+        ItemStack leatherChestplate = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_CHESTPLATE));
+        ItemMeta bootsMeta = leatherChestplate.getItemMeta();
+        bootsMeta.setUnbreakable(true);
+        leatherChestplate.setItemMeta(bootsMeta);
+
+        ItemStack diamondPants = new ItemStack(Material.DIAMOND_LEGGINGS);
+        ItemMeta pantsMeta = diamondPants.getItemMeta();
+        pantsMeta.setUnbreakable(true);
+        diamondPants.setItemMeta(pantsMeta);
+
+        p.getPlayer().getInventory().addItem(trident);
+        p.getPlayer().getInventory().addItem(steak);
+        p.getPlayer().getInventory().addItem(wool);
+        p.getPlayer().getInventory().addItem(shears);
+
+        p.getPlayer().getInventory().setHelmet(turtleHelmet);
+        p.getPlayer().getInventory().setChestplate(leatherChestplate);
+        p.getPlayer().getInventory().setLeggings(diamondPants);
+        p.getPlayer().getInventory().setBoots(leatherBoots);
+    }
+
+     /**
+     * Returns the trident from the Trident Kit.
+     */
+    public static ItemStack giveTrident() {
+
+        ItemStack trident = new ItemStack(Material.TRIDENT);
+        ItemMeta tridentMeta = trident.getItemMeta();
+        tridentMeta.setUnbreakable(true);
+        trident.setItemMeta(tridentMeta);
+
+        return trident;
+    }
+
+    /**
+     * Check to see if Player p is in the middle of the map.
+     */
+    public boolean checkMiddle(Player p) {
+        return checkMiddle(p.getLocation());
+    }
+
+    /**
+     * Track damage for appropriate kill credit
+     */
+    @EventHandler
+    public void onEntityDamageEntity(EntityDamageByEntityEvent e) {
+        if (!isGameActive()) return;
+        if (!((e.getEntity()) instanceof Player)) return;
+
+        LockdownPlayer player = lockdownPlayerMap.get(e.getEntity().getUniqueId());
+        
+        if (player == null) return;
+
+        if (e.getDamager() instanceof Player) {
+            Participant damager = Participant.getParticipant((Player) e.getDamager());
+            if (damager.getTeam().equals(player.getParticipant().getTeam())) return;
+        }
+
+        // for any general attack
+        if (e.getDamager() instanceof Player) {
+            player.lastDamager = (Player) e.getDamager();
+        }
+        Participant damaged = Participant.getParticipant((Player) e.getEntity());
+
+        DamageType d = e.getDamageSource().getDamageType();
+
+        if(escapeCounter.containsKey(damaged)) {
+            removeEscapee(damaged);
+        }
+    }
+
+    /**
+     * Track projectile damage for appropriate kill credit
+     */
+    @EventHandler
+    public void onProjectileHit(ProjectileHitEvent e) {
+        // TODO this isn't registering for some reason
+        if (e.getEntity() instanceof Arrow) {
+            Arrow arrow = (Arrow) e.getEntity();
+            if (e.getHitBlock() != null) {
+                arrow.remove();
+                return;
+            }
+        }
+
+        if (e.getEntity() instanceof Trident) {
+            Trident trident = (Trident) e.getEntity();
+            if (!isGameActive()) {
+                trident.remove();
+                e.setCancelled(true);
+                MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+                    @Override
+                    public void run() { ((Player) trident.getShooter()).getInventory().addItem(giveTrident());}
+                  }, 20L);
+                return;
+            }
+            if (!(trident.getShooter() instanceof Player)) {
+                trident.remove();
+                e.setCancelled(true);
+                return;
+            }
+            if (e.getHitBlock() != null) {
+                trident.remove();
+                ((Player) trident.getShooter()).playSound(((Player) trident.getShooter()), Sound.ITEM_TRIDENT_HIT_GROUND, 1, 1);
+                MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+                    @Override
+                    public void run() { ((Player) trident.getShooter()).getInventory().addItem(giveTrident());}
+                  }, 20L);
+                return;
+            }
+            if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
+                trident.remove();
+                MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+                    @Override
+                    public void run() { ((Player) trident.getShooter()).getInventory().addItem(giveTrident());}
+                  }, 20L);
+            }
+        }
+        if (!isGameActive()) return;
+
+        
+        if (e.getHitEntity() == null) return;
+        if (!(e.getEntity().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
+
+
+        LockdownPlayer player = lockdownPlayerMap.get(e.getHitEntity().getUniqueId());
+        Participant damager = Participant.getParticipant((Player) e.getEntity().getShooter());
+        if (player == null || damager == null) return;
+
+        if (player.getParticipant().getTeam().equals(damager.getTeam())) return;
+
+        player.lastDamager = (Player) e.getEntity().getShooter();
+    }
+
+    @EventHandler
+    public void onArrowShoot(EntityShootBowEvent event) {
+        Entity shooter = event.getEntity();
+
+        if (shooter instanceof Player) {
+            Player player = (Player) shooter;
+
+            ItemStack arrow = new ItemStack(Material.ARROW);
+            MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+                @Override
+                public void run() { player.getInventory().addItem(arrow);}
+              }, 20L);
+        }
+    }
+
+    /**
+     * Give kill credit to last damager ONLY if nobody else had hit them between
+     */
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        if (!isGameActive()) return;
+        LockdownPlayer player = lockdownPlayerMap.get(e.getEntity().getUniqueId());
+        if (player == null) return;
+
+
+        LockdownPlayer killer = lockdownPlayerMap.get(e.getEntity().getUniqueId());
+        if (player.lastDamager != null) {
+            killer = lockdownPlayerMap.get(player.lastDamager.getUniqueId());
+        }
+
+        EntityDamageEvent damageEvent = e.getPlayer().getLastDamageCause();
+        if (damageEvent == null) {
+            if (killer == null) {
+                e.setDeathMessage(player.getParticipant().getFormattedName() + " died mysteriously!");
+            } else {
+                e.setDeathMessage(player.getParticipant().getFormattedName() + " mysteriously died to " + killer.getParticipant().getFormattedName());
+                killer.getParticipant().addCurrentScore(killPoints(killer));
+                killer.kills++;
+                createLine(2, ChatColor.YELLOW + "" + ChatColor.BOLD + "Your kills: " + ChatColor.RESET + killer.kills, killer.getParticipant());
+            }
+        } else {
+            skybattleDeathGraphics(e, damageEvent.getCause());
+        }
+        updatePlayersAlive(player.getParticipant());
+
+        if (killer!=null && !killer.equals(player)) {
+            killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
+        }
+
+        int count = 0;
+        for (Participant p : player.getParticipant().getTeam().teamPlayers) {
+            if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
+                count++;
+            }
+        }
+
+        e.setCancelled(true);
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.sendMessage(e.getDeathMessage());
+        }
+
+        getLogger().log(e.getDeathMessage());
+
+        updatePlayersAliveScoreboard();
+
+        if (playersAlive.size() == 0) {
+            timeRemaining = 1;
+        }
+
+    }
+
+    /**
+     * Removes player from playersAlive list
+     * Updates display for players alive
+     * Checks if last team is remaining
+     * @param p Participant to be removed
+     */
+    @Override
+    public void updatePlayersAlive(Participant p) {
+        playersAlive.remove(p);
+        checkLastTeam(p.getTeam());
+        updatePlayersAliveScoreboard();
+        if (playersAlive.size() == 0) {
+        timeRemaining = 1;
+        }
+    }
+
+    /**
+     * Tests to see if a player moves, is infected, and is within 2 blocks of any other player. If so, infects them too.
+     */
+    @EventHandler
+    public void PlayerMoveEvent(PlayerMoveEvent e) {
+        if (!isGameActive()) return;
+        if (map == null) return;
+
+        Player p = e.getPlayer();
+        Location l = p.getLocation();
+        int x = (l.getBlockX());
+        int z = (l.getBlockZ());
+        Block check = new Location(map.getWorld(), x, 1, z).getBlock();
+        if (check.getType() != Material.WAXED_EXPOSED_COPPER_BULB && escapeCounter.containsKey(Participant.getParticipant(p))) {
+            removeEscapee(Participant.getParticipant(p));
+        }
+        
+    }
+
+    /**
+     * Explicitly handles deaths where the player dies indirectly to combat or to
+     * custom damage (border or void).
+     * Checks for last team remaining.
+     * @param e Event thrown when a player dies
+     */
+    public void skybattleDeathGraphics(PlayerDeathEvent e, EntityDamageEvent.DamageCause damageCause) {
+        LockdownPlayer victim = lockdownPlayerMap.get(e.getPlayer().getUniqueId());
+        String deathMessage = e.getDeathMessage();
+
+        victim.getPlayer().setGameMode(GameMode.SPECTATOR);
+        victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
+        victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
+        MBC.spawnFirework(victim.getParticipant());
+        deathMessage = deathMessage.replace(victim.getPlayer().getName(), victim.getParticipant().getFormattedName());
+
+        if (victim.lastDamager != null && !lockdownPlayerMap.get(victim.lastDamager.getUniqueId()).equals(victim)) {
+            
+            LockdownPlayer killer = lockdownPlayerMap.get(victim.lastDamager.getUniqueId());
+            int killPoints = killPoints(killer);
+            killer.kills++;
+
+            createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
+            
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!" + MBC.scoreFormatter(killPoints));
+            killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
+            killer.getParticipant().addCurrentScore(killPoints);
+
+            switch (damageCause) {
+                case ENTITY_ATTACK:
+                case ENTITY_SWEEP_ATTACK:
+                    deathMessage = victim.getParticipant().getFormattedName() + " was slain by " + killer.getParticipant().getFormattedName();
+                    break;
+                case PROJECTILE:
+                    deathMessage = victim.getParticipant().getFormattedName() + " was shot by " + killer.getParticipant().getFormattedName();
+                    break;
+                case CUSTOM:
+                    deathMessage = victim.getParticipant().getFormattedName() + " was killed in the border whilst fighting " + killer.getParticipant().getFormattedName();
+                    break;
+                case ENTITY_EXPLOSION:
+                case BLOCK_EXPLOSION:
+                    deathMessage = victim.getParticipant().getFormattedName() + " was blown up by " + killer.getParticipant().getFormattedName();
+                    break;
+                case FALL:
+                    deathMessage = victim.getParticipant().getFormattedName() + " hit the ground too hard whilst trying to escape from " + killer.getParticipant().getFormattedName();
+                    break;
+                case SUFFOCATION:
+                case FALLING_BLOCK:
+                    deathMessage += " whilst fighting " + killer.getParticipant().getFormattedName();
+                    break;
+                default:
+                    deathMessage = victim.getParticipant().getFormattedName() + " has died to " + killer.getParticipant().getFormattedName();
+                    break;
+            }
+        } else if (victim.getPlayer().getKiller() != null) {
+            LockdownPlayer killer = lockdownPlayerMap.get(victim.getPlayer().getKiller().getUniqueId());
+            int killPoints = killPoints(killer);
+            killer.kills++;
+
+            createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
+            
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!" + MBC.scoreFormatter(killPoints));
+            killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
+            killer.getParticipant().addCurrentScore(killPoints);
+
+            if (!(deathMessage.contains(" " + killer.getPlayer().getName()))) {
+                deathMessage += " whilst fighting " + killer.getParticipant().getFormattedName();
+            }
+        } else {
+            // if no killer, the player killed themselves
+            if (damageCause.equals(EntityDamageEvent.DamageCause.CUSTOM)) {
+                deathMessage = victim.getParticipant().getFormattedName() + " was killed by border damage";
+            }
+        }
+
+        e.setDeathMessage(deathMessage);
+
+    }
+
+    /*
+     * Act as if player is not alive on disconnect.
+     */
+    @EventHandler
+    public void onDisconnect(PlayerQuitEvent e) {
+        if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
+            LockdownPlayer p = lockdownPlayerMap.get(e.getPlayer().getUniqueId());
+
+
+            for (Player play : Bukkit.getOnlinePlayers()) {
+                play.sendMessage(p.getParticipant().getFormattedName() + " disconnected!");
+            }
+
+            if (p.lastDamager != null) {
+                LockdownPlayer killer = lockdownPlayerMap.get(p.lastDamager.getPlayer().getUniqueId());
+                if (killer == null) return;
+                int killPoints = killPoints(killer);
+                killer.getParticipant().addCurrentScore(killPoints);
+                killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + p.getParticipant().getPlayerName() + "!" + MBC.scoreFormatter(killPoints));
+                killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + p.getParticipant().getFormattedName(), 0, 60, 20);
+                killer.kills++;
+            }
+
+        }
+    }
+
+    /*
+     * On reconnect, reset lastdamager and set spectator.
+     */
+    @EventHandler
+    public void onReconnect(PlayerJoinEvent e) {
+        LockdownPlayer p = lockdownPlayerMap.get(e.getPlayer().getUniqueId());
+        if (p == null) return;
+        p.lastDamager = null;
+        p.setPlayer(e.getPlayer());
+
+        // if log back in during paused/starting, manually teleport them
+        if (!(getState().equals(GameState.PAUSED)) && !(getState().equals(GameState.STARTING))) {
+            e.getPlayer().setGameMode(GameMode.SPECTATOR);
+            e.getPlayer().teleport(map.getCenter());
+        }
+    }
+
+    /*
+     * Resets all players to 0 kills and no last damager.
+     */
+    public void resetPlayers() {
+        for (LockdownPlayer p : lockdownPlayerMap.values()) {
+            p.kills = 0;
+            p.lastDamager = null;
+        }
+    }
+}
+

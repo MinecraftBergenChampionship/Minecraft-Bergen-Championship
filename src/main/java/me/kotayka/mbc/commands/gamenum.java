@@ -40,10 +40,11 @@ public class gamenum implements CommandExecutor {
         // This looks messed up but it's to compensate for `incrementMultiplier` being called
         // in decision dome
         double newMult = switch (n) {
-            case 1 -> 1.5;
-            case 2,3 -> 2.0;
-            case 4 -> 2.5;
-            case 5 -> 3.0;
+            case 1 -> 1.0;
+            case 2 -> 1.5;
+            case 3,4 -> 2.0;
+            case 5 -> 2.5;
+            case 6 -> 3.0;
             default -> 1.0;
         };
         MBC.getInstance().setMultiplier(newMult);

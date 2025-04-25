@@ -271,7 +271,7 @@ public class PowerTag extends Game {
                 if (roundNum == MBC.getInstance().getValidTeams().size()) {
                     setGameState(GameState.END_GAME);
                     gameOverGraphics();
-                    timeRemaining = 45;
+                    timeRemaining = 55;
 
                     for (PowerTagPlayer p : powerTagPlayerMap.values()) {
                         logger.log(p.getParticipant().getFormattedName() + ": " + p.getSurvivals() + "rounds survived, " + p.getKills() + " tags, " + p.getTimeSurvived() + "seconds survived");
@@ -297,10 +297,15 @@ public class PowerTag extends Game {
             }
         }
         else if (getState().equals(GameState.END_GAME)) {
-            if (timeRemaining == 40) {
+            if (timeRemaining == 48) {
                 Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Most Total Time Survived: ");
-            } else if (timeRemaining == 36) {
+            } else if (timeRemaining == 44) {
                 timeSurvivedPrint();
+            }
+            if (timeRemaining == 40) {
+                Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Most Total Kills: ");
+            } else if (timeRemaining == 36) {
+                mostKillsPrint();
             }
             if (timeRemaining <= 35) {
                 for (PowerTagPlayer p : powerTagPlayerMap.values()) {
@@ -311,7 +316,7 @@ public class PowerTag extends Game {
                 }
                 gameEndEvents();
             }
-            else if (timeRemaining == 43) {
+            else if (timeRemaining == 52) {
                 displaySurvivors();
             }
         }
@@ -472,13 +477,13 @@ public class PowerTag extends Game {
             p.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(hiderPowerupMap.get(p)));
         }
         if (hiderPowerupMap.get(p).equals(hiderPowerupList[1])) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30, 255, false, true));
             p.getPlayer().getInventory().setBoots(new ItemStack(Material.AIR));
 
             MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
                 @Override
                 public void run() { p.getPlayer().getInventory().setBoots(p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_BOOTS)));}
-              }, 20L);
+              }, 30L);
         }
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
@@ -764,21 +769,21 @@ public class PowerTag extends Game {
         int tenseCount = 0;
         Map<PowerTagPlayer, Location> tensedPlayers = new HashMap<>();
 
+        Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + "" + ChatColor.RED + " has used their tension powerup!");
+
         for (PowerTagPlayer hider : aliveHiders) {
             double currentDistance = hider.getPlayer().getLocation().distance(p.getPlayer().getLocation());
 
             if (currentDistance < 16) {
                 tensedPlayers.put(hider, hider.getPlayer().getLocation());
-                hider.getPlayer().sendMessage(ChatColor.RED + "You were tensed by " + ChatColor.RESET + p.getParticipant().getFormattedName() + ChatColor.RED + "!" + 
-                                            "You have 10 seconds to move at least 5 blocks or you will be revealed!");
+                hider.getPlayer().sendMessage(ChatColor.RED + "You were tensed by " + ChatColor.RESET + p.getParticipant().getFormattedName() + ChatColor.RED + "! " + 
+                                            "You have 10 seconds to move at least 8 blocks or you will be revealed!");
                 hider.getPlayer().playSound(hider.getPlayer(), Sound.ENTITY_WARDEN_DEATH, 1, 1);
-                hider.getPlayer().sendTitle(ChatColor.DARK_PURPLE + "" +ChatColor.BOLD + "TENSED!", ChatColor.DARK_PURPLE + "MOVE FIVE BLOCKS!", 0, 60, 20);
+                hider.getPlayer().sendTitle(ChatColor.DARK_PURPLE + "" +ChatColor.BOLD + "TENSED!", ChatColor.DARK_PURPLE + "MOVE EIGHT BLOCKS!", 0, 60, 20);
                 tenseCount++;
             }
             
         }
-
-        Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + "" + ChatColor.RED + " has used their tension powerup!");
 
         if (tenseCount == 1) p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You detected 1 hider!");
         else if (tenseCount == 0) p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You detected no hiders...");
@@ -976,6 +981,41 @@ public class PowerTag extends Game {
             if (timeSurvivedSorted[i] == null) break;
             if (timeSurvivedSorted[i].getTimeSurvived()%60 < 10) topFive.append(String.format((i+1) + ". %-18s %s:0%-9s\n", timeSurvivedSorted[i].getParticipant().getFormattedName(), (timeSurvivedSorted[i].getTimeSurvived()/60), (timeSurvivedSorted[i].getTimeSurvived()%60)));
             else topFive.append(String.format((i+1) + ". %-18s %s:%-9s\n", timeSurvivedSorted[i].getParticipant().getFormattedName(), (timeSurvivedSorted[i].getTimeSurvived()/60), (timeSurvivedSorted[i].getTimeSurvived()%60)));
+            
+        }
+        Bukkit.broadcastMessage(topFive.toString());
+
+    }
+
+    /**
+     * Displays the top 5 players based off of most kills.
+     */
+    private void mostKillsPrint() {
+        PowerTagPlayer[] killsSorted = new PowerTagPlayer[5];
+
+        ArrayList<PowerTagPlayer> arrayPowerTagPlayers = new ArrayList(powerTagPlayerMap.values());
+        for (int j = 0; j < arrayPowerTagPlayers.size(); j++) {
+            PowerTagPlayer p = arrayPowerTagPlayers.get(j);
+            for (int i = 0; i < killsSorted.length; i++) {
+                if (killsSorted[i] == null) {
+                    killsSorted[i] = p;
+                    break;
+                }
+                if (killsSorted[i].getKills() < p.getKills()) {
+                    PowerTagPlayer q = p;
+                    p = killsSorted[i];
+                    killsSorted[i] = q;
+                }
+            }
+        }
+
+
+        StringBuilder topFive = new StringBuilder();
+        
+        //Bukkit.broadcastMessage("[Debug] fastestLaps.keySet().size() == " + fastestLaps.keySet().size());
+        for (int i = 0; i < killsSorted.length; i++) {
+            if (killsSorted[i] == null) break;
+            topFive.append(String.format((i+1) + ". %-18s %-9s\n", killsSorted[i].getParticipant().getFormattedName(), (killsSorted[i].getKills())));
             
         }
         Bukkit.broadcastMessage(topFive.toString());

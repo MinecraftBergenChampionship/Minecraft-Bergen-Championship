@@ -92,6 +92,7 @@ public class MBC implements Listener {
     public Spleef spleef = null;
     public Party party = null;
     public PowerTag powertag = null;
+    public Lockdown lockdown = null;
     //public Dodgebolt dodgebolt = null;
     public Quickfire quickfire = null;
     public boolean finalGame = false;
@@ -104,7 +105,7 @@ public class MBC implements Listener {
     public Map<Participant, Integer> currentGameScores = null;
 
     //public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Dodgebolt","Quickfire"));
-    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire","Party","PowerTag"));
+    public static final List<String> gameNameList = new ArrayList<>(Arrays.asList("DecisionDome","AceRace","TGTTOS","BuildMart","Skybattle", "SurvivalGames", "Spleef","Quickfire","Party","PowerTag","Lockdown"));
     public static final List<String> partyGameNameList = new ArrayList<>(Arrays.asList("Dragons", "BeepSwitch","DiscoFever","OneShot"));
     //public final List<Game> gameList = new ArrayList<Game>(6);
     public static final String MBC_STRING_PREFIX = ChatColor.BOLD + "[" + ChatColor.GOLD + "" + ChatColor.BOLD + "MBC" + ChatColor.WHITE + "" + ChatColor.BOLD + "]: " + ChatColor.RESET;
@@ -197,6 +198,11 @@ public class MBC implements Listener {
                     powertag = new PowerTag();
                 }
                 return powertag;
+            case "Lockdown":
+                if (lockdown == null) {
+                    lockdown = new Lockdown();
+                }
+                return lockdown;
                 /*
             case "Dodgebolt":
                 if (dodgebolt == null) {

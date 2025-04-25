@@ -3,6 +3,7 @@ package me.kotayka.mbc.games;
 import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.skybattleMap.Campfire;
 import me.kotayka.mbc.gameMaps.skybattleMap.SkybattleMap;
+import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
 import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -222,7 +223,7 @@ public class Skybattle extends Game {
                         }
                         placementPoints();
                         roundWinners(WIN_POINTS, SURVIVAL_POINTS);
-                        timeRemaining = 38;
+                        timeRemaining = 43;
                         setGameState(GameState.END_GAME);
                     }
                 }
@@ -271,7 +272,7 @@ public class Skybattle extends Game {
                     teamPlacements.put(t, 1);
                 }
                 placementPoints();
-                timeRemaining = 38;
+                timeRemaining = 43;
                 setGameState(GameState.END_GAME);
             }
         } else if (getState().equals(GameState.END_ROUND)) {
@@ -284,6 +285,11 @@ public class Skybattle extends Game {
                 setGameState(GameState.STARTING);
             }
         } else if (getState().equals(GameState.END_GAME)) {
+            if (timeRemaining == 40) {
+                Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Most Total Kills: ");
+            } else if (timeRemaining == 36) {
+                mostKillsPrint();
+            }
             if (timeRemaining <= 35) {
                 gameEndEvents();
             }
@@ -391,6 +397,42 @@ public class Skybattle extends Game {
                 p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_3[placement-1] / t.getPlayers().size())));
             }
         }
+    }
+
+    
+    /**
+     * Displays the top 5 players based off of most kills.
+     */
+    private void mostKillsPrint() {
+        SkybattlePlayer[] killsSorted = new SkybattlePlayer[5];
+
+        ArrayList<SkybattlePlayer> arraySkybattlePlayers = new ArrayList(skybattlePlayerMap.values());
+        for (int j = 0; j < arraySkybattlePlayers.size(); j++) {
+            SkybattlePlayer p = arraySkybattlePlayers.get(j);
+            for (int i = 0; i < killsSorted.length; i++) {
+                if (killsSorted[i] == null) {
+                    killsSorted[i] = p;
+                    break;
+                }
+                if (killsSorted[i].kills < p.kills) {
+                    SkybattlePlayer q = p;
+                    p = killsSorted[i];
+                    killsSorted[i] = q;
+                }
+            }
+        }
+
+
+        StringBuilder topFive = new StringBuilder();
+        
+        //Bukkit.broadcastMessage("[Debug] fastestLaps.keySet().size() == " + fastestLaps.keySet().size());
+        for (int i = 0; i < killsSorted.length; i++) {
+            if (killsSorted[i] == null) break;
+            topFive.append(String.format((i+1) + ". %-18s %-9s\n", killsSorted[i].getParticipant().getFormattedName(), (killsSorted[i].kills)));
+            
+        }
+        Bukkit.broadcastMessage(topFive.toString());
+
     }
 
     /**

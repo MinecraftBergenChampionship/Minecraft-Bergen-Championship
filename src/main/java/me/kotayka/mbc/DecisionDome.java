@@ -65,8 +65,8 @@ public class DecisionDome extends Minigame {
     private int currentSection = (int)(Math.random()*gameNames.size());
     private Section winner;
     private boolean tie = false;
-    private int doubleTime = (int)(Math.random()*20) + 10;
-    private boolean doubled = true;
+    private int tripleTime = (int)(Math.random()*20) + 10;
+    private boolean tripled = true;
 
     public DecisionDome(boolean revealedGames) {
         super("DecisionDome");
@@ -86,7 +86,7 @@ public class DecisionDome extends Minigame {
         }
         chickens.clear();
         tie = false;
-        doubled = true;
+        tripled = true;
         winner = null;
 
         // Powerups
@@ -139,7 +139,7 @@ public class DecisionDome extends Minigame {
         }
         chickens.clear();
         tie = false;
-        doubled = false;
+        tripled = false;
         winner = null;
 
         // Powerups
@@ -265,9 +265,9 @@ public class DecisionDome extends Minigame {
                 }
             }
         } else if (getState().equals(GameState.ACTIVE)) {
-            if (timeRemaining == doubleTime && chooser == null) {
-                doubled = false;
-                Bukkit.broadcastMessage(ChatColor.GREEN+"Double Chicken Time has ended!");
+            if (timeRemaining == tripleTime && chooser == null) {
+                tripled = false;
+                Bukkit.broadcastMessage(ChatColor.GREEN+"Tripled Chicken Time has ended!");
             }
             switch (timeRemaining) {
                 case 0 -> {
@@ -335,6 +335,7 @@ public class DecisionDome extends Minigame {
                     setGameState(GameState.END_GAME);
                     HandlerList.unregisterAll(this);
                     timeRemaining = 13;
+                    tripleTime = (int)(Math.random()*20) + 10;
                 }
             }
 
@@ -800,13 +801,20 @@ public class DecisionDome extends Minigame {
                 chicken.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 2, false, false));
             }
             chickens.add(new VoteChicken(p.getTeam(), chicken));
-            if(doubled) {
+            if(tripled) {
                 Chicken chickenTwo = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
                 chickenTwo.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
                 if (hidden) {
                     chickenTwo.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 2, false, false));
                 }
                 chickens.add(new VoteChicken(p.getTeam(), chickenTwo));
+
+                Chicken chickenThree = (Chicken) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.CHICKEN);
+                chickenThree.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
+                if (hidden) {
+                    chickenThree.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 2, false, false));
+                }
+                chickens.add(new VoteChicken(p.getTeam(), chickenThree));
             }
             
         } else if (e.getEntity().getType().equals(EntityType.ARROW)) {
