@@ -68,7 +68,9 @@ public class SurvivalGames extends Game {
     private BossBar bossBar;
 
     // SCORING
-    public final int KILL_POINTS_INITIAL = 12;
+    public final int KILL_POINTS_INITIAL_18 = 12;
+    public final int KILL_POINTS_INITIAL_24 = 15;
+    public final int KILL_POINTS_INITIAL = KILL_POINTS_INITIAL_24;
     public int killPoints = KILL_POINTS_INITIAL;
     public final int SURVIVAL_POINTS = 1;
     public final int HORCRUX_DESTROY_POINTS = 5;
@@ -87,8 +89,8 @@ public class SurvivalGames extends Game {
                 "⑬ Live as long as you can, and place your teams horcrux for one revive!\n\n" +
                 "⑬ There are two rounds, so remember who killed you...",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "⑬ +8-12 points for eliminations\n" +
-                        "⑬ +150 points split based on % of damage dealt\n" +
+                        "⑬ +10-15 points for eliminations\n" +
+                        "⑬ +450 points split based on % of damage dealt\n" +
                         "⑬ +1 points for every player outlived\n" +
                         "⑬ Team Bonuses (split amongst team):\n" +
                         "     ⑬ 1st: +12 points, 2nd: +10 points, 3rd: +9 points\n" +
@@ -361,8 +363,8 @@ public class SurvivalGames extends Game {
                 //crateLocation();
             } else if (timeRemaining == 300) {
                 //spawnSupplyCrate();
-                killPoints -= 2;
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (12 -> 10)");
+                killPoints -= 3;
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (15 -> 12)");
                 bossBar.removeAll();
                 bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "KILL POINTS DECREASE", BarColor.RED, BarStyle.SOLID);
                 bossBar.setVisible(true);
@@ -377,7 +379,7 @@ public class SurvivalGames extends Game {
                 event = SurvivalGamesEvent.DEATHMATCH;
             } else if (timeRemaining == 180) {
                 killPoints -= 2;
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED.toString() + ChatColor.BOLD + "Kill points are decreasing! (10 -> 8)");
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED.toString() + ChatColor.BOLD + "Kill points are decreasing! (12 -> 10)");
                 bossBar.removeAll();
                 bossBar.setVisible(false);
             } else if (timeRemaining == 60) {
@@ -569,7 +571,7 @@ public class SurvivalGames extends Game {
             double percentage = 100 *(playerDamage.get(player) / totalDamage);
             int points = 0;
             if (percentage != 0) {
-                points = (int) (2*Math.log(Math.pow(150*Math.sqrt(percentage)/sqrtSum, 5.5)/7));
+                points = (int) (3*Math.log(Math.pow(150*Math.sqrt(percentage)/sqrtSum, 5.5)/7));
                 if (points < 0) {
                     points = 0;
                 }

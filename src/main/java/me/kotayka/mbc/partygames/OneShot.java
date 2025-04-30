@@ -42,6 +42,10 @@ public class OneShot extends PartyGame {
     private final int STREAK_POINTS = 1;
     private final int STREAK_KILL_POINTS = 1;
     private final int WEAPON_POINTS = 3;
+
+    private final int KILLS_PER_WEAPON_18 = 10;
+    private final int KILLS_PER_WEAPON_24 = 15;
+    private final int KILLS_PER_WEAPON = KILLS_PER_WEAPON_24;
     private Map<MBCTeam, BossBar> teamBossBars = new HashMap<>();
     
     private boolean playMusic = true;
@@ -57,8 +61,8 @@ public class OneShot extends PartyGame {
         super("OneShot", new String[] {
                 "⑰ Use your weapons to kill other players with a one shot kill!\n\n" + 
                 "⑰ You can't kill people yet, obviously, but you'll be able to soon!",
-                "⑰ Every 10 kills your team gets, you'll get a new weapon.\n\n" + 
-                "⑰ Get to 40 kills and get a melee kill to win!",
+                "⑰ Every 15 kills your team gets, you'll get a new weapon.\n\n" + 
+                "⑰ Get to 60 kills and get a melee kill to win!",
                 "⑰ Get points for every kill, getting a new weapon, and winning!\n\n" + 
                 "⑰ You can even get bonus points for getting a high enough kill streak!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
@@ -183,7 +187,7 @@ public class OneShot extends PartyGame {
     public void regainItems(Participant p) {
         p.getPlayer().setInvulnerable(false);
 
-        switch(teamKills.get(p.getTeam()) / 10) {
+        switch(teamKills.get(p.getTeam()) / KILLS_PER_WEAPON) {
             case 0:
                 p.getInventory().addItem(CROSSBOW_QUICK_CHARGE);
                 p.getInventory().addItem(new ItemStack(Material.ARROW,1));
@@ -384,7 +388,7 @@ public class OneShot extends PartyGame {
     }
 
     private void incrementBossBar(BossBar b, int k, MBCTeam m) {
-        b.setProgress(((double)k)/10.0);
+        b.setProgress(((double)k)/((double)KILLS_PER_WEAPON));
     }
 
     private void topKillers() {
@@ -556,7 +560,7 @@ public class OneShot extends PartyGame {
         b.removeAll();
         String message = "";
         switch (teamKills.get(m)) {
-            case 10:
+            case KILLS_PER_WEAPON:
                 b = Bukkit.createBossBar(ChatColor.YELLOW + "" + ChatColor.BOLD + "CURRENT WEAPON: Multishot Crossbow", BarColor.YELLOW, BarStyle.SOLID);
                 b.setProgress(0);
                 teamBossBars.replace(m, b);
@@ -567,11 +571,11 @@ public class OneShot extends PartyGame {
                     p.addCurrentScore(WEAPON_POINTS);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                    p.getPlayer().sendMessage(ChatColor.RED +"Your team reached 10 kills and recieved the " + ChatColor.BOLD + "multishot crossbow" + ChatColor.RESET + "" + ChatColor.RED +"!" + MBC.scoreFormatter(WEAPON_POINTS));
+                    p.getPlayer().sendMessage(ChatColor.RED +"Your team reached " + KILLS_PER_WEAPON + " kills and recieved the " + ChatColor.BOLD + "multishot crossbow" + ChatColor.RESET + "" + ChatColor.RED +"!" + MBC.scoreFormatter(WEAPON_POINTS));
                 }
-                message = ChatColor.YELLOW + "" + ChatColor.BOLD + "The " +ChatColor.RESET + "" + ChatColor.BOLD + m.teamNameFormat() + ChatColor.YELLOW + "" + ChatColor.BOLD + " have gotten 10 kills!";
+                message = ChatColor.YELLOW + "" + ChatColor.BOLD + "The " +ChatColor.RESET + "" + ChatColor.BOLD + m.teamNameFormat() + ChatColor.YELLOW + "" + ChatColor.BOLD + " have gotten " + (KILLS_PER_WEAPON) + " kills!";
             break;
-            case 20:
+            case KILLS_PER_WEAPON*2:
                 b = Bukkit.createBossBar(ChatColor.GREEN + "" + ChatColor.BOLD + "CURRENT WEAPON: Bow", BarColor.GREEN, BarStyle.SOLID);
                 b.setProgress(0);
                 teamBossBars.replace(m, b);
@@ -583,11 +587,11 @@ public class OneShot extends PartyGame {
                     b.setVisible(true);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                    p.getPlayer().sendMessage(ChatColor.RED +"Your team reached 20 kills and recieved the " + ChatColor.BOLD + "bow" + ChatColor.RESET + "" + ChatColor.RED +"!" + MBC.scoreFormatter(WEAPON_POINTS));
+                    p.getPlayer().sendMessage(ChatColor.RED +"Your team reached " + (KILLS_PER_WEAPON*2) + " kills and recieved the " + ChatColor.BOLD + "bow" + ChatColor.RESET + "" + ChatColor.RED +"!" + MBC.scoreFormatter(WEAPON_POINTS));
                 }
-                message = ChatColor.GREEN + "" + ChatColor.BOLD + "The " +ChatColor.RESET + m.teamNameFormat() + ChatColor.GREEN + "" + ChatColor.BOLD + " have gotten 20 kills!";
+                message = ChatColor.GREEN + "" + ChatColor.BOLD + "The " +ChatColor.RESET + m.teamNameFormat() + ChatColor.GREEN + "" + ChatColor.BOLD + " have gotten " + (KILLS_PER_WEAPON*2) + " kills!";
             break;
-            case 30:
+            case KILLS_PER_WEAPON*3:
                 b = Bukkit.createBossBar(ChatColor.AQUA + "" + ChatColor.BOLD + "CURRENT WEAPON: Trident", BarColor.BLUE, BarStyle.SOLID);
                 b.setProgress(0);
                 teamBossBars.replace(m, b);
@@ -599,11 +603,11 @@ public class OneShot extends PartyGame {
                     p.addCurrentScore(WEAPON_POINTS);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                    p.getPlayer().sendMessage(ChatColor.RED +"Your team reached 30 kills and recieved the " + ChatColor.BOLD + "trident" + ChatColor.RESET + "" + ChatColor.RED +"!" + MBC.scoreFormatter(WEAPON_POINTS));
+                    p.getPlayer().sendMessage(ChatColor.RED +"Your team reached " + (KILLS_PER_WEAPON*3) + " kills and recieved the " + ChatColor.BOLD + "trident" + ChatColor.RESET + "" + ChatColor.RED +"!" + MBC.scoreFormatter(WEAPON_POINTS));
                 }
-                message = ChatColor.AQUA + "" + ChatColor.BOLD + "The " +ChatColor.RESET + "" + ChatColor.BOLD  + m.teamNameFormat() + ChatColor.AQUA + "" + ChatColor.BOLD + " have gotten 30 kills!";
+                message = ChatColor.AQUA + "" + ChatColor.BOLD + "The " +ChatColor.RESET + "" + ChatColor.BOLD  + m.teamNameFormat() + ChatColor.AQUA + "" + ChatColor.BOLD + " have gotten " + (KILLS_PER_WEAPON*3) + " kills!";
             break;
-            case 40:
+            case KILLS_PER_WEAPON*4:
                 b = Bukkit.createBossBar(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "CURRENT WEAPON: Sword", BarColor.PURPLE, BarStyle.SOLID);
                 b.setProgress(0);
                 teamBossBars.replace(m, b);
@@ -615,9 +619,9 @@ public class OneShot extends PartyGame {
                     p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                    p.getPlayer().sendMessage(ChatColor.RED + "Your team reached 40 kills and recieved the " + ChatColor.BOLD + "sword" + ChatColor.RESET + "" + ChatColor.RED + "! Get one kill to win!" + MBC.scoreFormatter(WEAPON_POINTS));
+                    p.getPlayer().sendMessage(ChatColor.RED + "Your team reached " + (KILLS_PER_WEAPON*4) + " kills and recieved the " + ChatColor.BOLD + "sword" + ChatColor.RESET + "" + ChatColor.RED + "! Get one kill to win!" + MBC.scoreFormatter(WEAPON_POINTS));
                 }
-                message = ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "The " +ChatColor.RESET + "" + ChatColor.BOLD  +  m.teamNameFormat() + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + " have gotten 40 kills, and need one more to win the game!";
+                message = ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "The " +ChatColor.RESET + "" + ChatColor.BOLD  +  m.teamNameFormat() + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + " have gotten " + (KILLS_PER_WEAPON*4) + " kills, and need one more to win the game!";
             break;
             default:
                 message = "This shouldn't be happening.";
@@ -673,14 +677,14 @@ public class OneShot extends PartyGame {
         damagerTeamKills++;
         
         teamKills.replace(m, damagerTeamKills);
-        if (damagerTeamKills == 41) {
+        if (damagerTeamKills == (KILLS_PER_WEAPON*4)+1) {
             EndGame(m);
         }
-        else if (damagerTeamKills % 10 == 0) {
+        else if (damagerTeamKills % KILLS_PER_WEAPON == 0) {
             nextWeapon(m);
         }
         else {
-            incrementBossBar(teamBossBars.get(m), damagerTeamKills % 10, m);
+            incrementBossBar(teamBossBars.get(m), damagerTeamKills % KILLS_PER_WEAPON, m);
         }
 
         for (Participant p : MBC.getInstance().getPlayers()) {

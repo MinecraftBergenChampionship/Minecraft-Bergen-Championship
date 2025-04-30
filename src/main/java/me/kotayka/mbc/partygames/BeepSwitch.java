@@ -97,11 +97,27 @@ public class BeepSwitch extends PartyGame {
 
     private final int deathY = 97;
 
-    public final int STAGE_POINTS = 5;
-    public final int EASY_POINTS = 1;
-    public final int MEDIUM_POINTS = 3;
-    public final int HARD_POINTS = 5;
-    public final int EXTREME_POINTS = 7;
+    public final int STAGE_POINTS_18 = 5;
+    public final int STAGE_POINTS_24 = 6;
+    public final int STAGE_POINTS = STAGE_POINTS_24;
+
+    public final int EASY_POINTS_18 = 1;
+    public final int EASY_POINTS_24 = 3;
+    public final int EASY_POINTS = EASY_POINTS_24;
+
+    public final int MEDIUM_POINTS_18 = 3;
+    public final int MEDIUM_POINTS_24 = 5;
+    public final int MEDIUM_POINTS = MEDIUM_POINTS_24;
+
+    public final int HARD_POINTS_18 = 5;
+    public final int HARD_POINTS_24 = 7;
+    public final int HARD_POINTS = HARD_POINTS_24;
+
+    public final int EXTREME_POINTS_18 = 7;
+    public final int EXTREME_POINTS_24 = 9;
+    public final int EXTREME_POINTS = EXTREME_POINTS_24;
+
+
 
     // game instance
     private static BeepSwitch instance = null;
@@ -121,11 +137,11 @@ public class BeepSwitch extends PartyGame {
                 "⑰ However, only one player on your team will be running the parkour at a time.\n\n" + 
                 "⑰ This player switches every 16 seconds. Communication is key to completing the most paths possible.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "⑰ +1 point for each easy level completed\n" +
-                        "⑰ +3 points for each medium level completed\n" +
-                        "⑰ +5 points for each hard level completed\n" +
-                        "⑰ +7 points for each extreme level completed\n" +
-                        "⑰ +5 points to each member of a team for completing a path of difficulty"
+                        "⑰ +3 points for each easy level completed\n" +
+                        "⑰ +5 points for each medium level completed\n" +
+                        "⑰ +7 points for each hard level completed\n" +
+                        "⑰ +9 points for each extreme level completed\n" +
+                        "⑰ +6 points to each member of a team for completing a path of difficulty"
         });
 
         loadCourses();
@@ -145,7 +161,7 @@ public class BeepSwitch extends PartyGame {
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {
             maxRounds = Math.max(maxRounds, t.getPlayers().size());
         }
-        rounds = maxRounds*4;
+        rounds = maxRounds*3;
 
         setGameState(GameState.TUTORIAL);
 

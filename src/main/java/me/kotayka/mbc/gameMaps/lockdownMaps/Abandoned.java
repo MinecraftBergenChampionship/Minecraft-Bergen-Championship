@@ -41,7 +41,9 @@ public class Abandoned extends LockdownMap {
         int z = -34;
         for (int i = 0; i <6; i++) {
             for (int j = 0; j < 6; j++) {
-                w[i][j] = new Location(Bukkit.getWorld("Lockdown"), x, 2, z);
+                if ((i == 5 && j == 2) || (i == 3 && j == 0) || (i == 0 && j == 3) || (i == 2 && j == 5)) w[i][j] = new Location(Bukkit.getWorld("Lockdown"), x, 6, z);
+                else if ((i == 4 && j == 1) || (i == 1 && j == 4)) w[i][j] = new Location(Bukkit.getWorld("Lockdown"), x, 5, z);
+                else w[i][j] = new Location(Bukkit.getWorld("Lockdown"), x, 2, z);
                 x+=39;
             }
             z+=39;
@@ -54,7 +56,7 @@ public class Abandoned extends LockdownMap {
 
     /**
      * Resets map to default state using a copy of the map stored elsewhere in the world.
-     * O(562,394) ~ O(1) trust
+     * O(3million) ~ O(1) trust (not really actually this takes like a second)
      * there is also probably a better way to do this but nah
      */
     public void resetMap() {
@@ -66,7 +68,7 @@ public class Abandoned extends LockdownMap {
         int z = 947;
         World world = getWorld(); // convenience
         for (int mapX = -53; mapX <= 189; mapX++) {
-            for (int mapY = 0; mapY <= 40; mapY++) {
+            for (int mapY = 0; mapY <= 45; mapY++) {
                 for (int mapZ = -53; mapZ <= 189; mapZ++) {
                     Block originalBlock = world.getBlockAt(x, y, z);
                     Block possiblyChangedBlock = world.getBlockAt(mapX, mapY, mapZ);

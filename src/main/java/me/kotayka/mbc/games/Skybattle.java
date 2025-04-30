@@ -32,13 +32,16 @@ public class Skybattle extends Game {
     // Creeper Entity, Player (that spawned them); used for determining kills by creeper explosion
     public Map<Entity, Player> creeperSpawners = new HashMap<Entity, Player>(5);
     public Map<Entity,Player> witchSpawners = new HashMap<>();
-    private final int KILL_POINTS = 9;
+    private final int KILL_POINTS_18 = 9;
+    private final int KILL_POINTS_24 = 9;
+    private final int KILL_POINTS = KILL_POINTS_24;
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
     private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
     private final int SURVIVAL_POINTS = 1;
     private final int WIN_POINTS = 0;
     // Team bonuses split among team
     private final int[] TEAM_BONUSES_3 = {24, 21, 18, 15, 12, 9};
+    private final int[] TEAM_BONUSES_4 = {36, 32, 28, 24, 20, 18};
 
     public Skybattle() {
         super("Skybattle", new String[] {
@@ -49,11 +52,11 @@ public class Skybattle extends Game {
                 "⑫ Make sure to " + ChatColor.BOLD + "TURN ON PARTICLES" + ChatColor.RESET + " to see the border.\n\n" +
                 "⑫ There's also a " + ChatColor.BOLD + "height border" + ChatColor.RESET + " that lowers over time!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑫ +9 points for eliminations\n" +
+                                "⑫ +10 points for eliminations\n" +
                                 "⑫ +1 points for every player outlived\n" +
                                 "⑫ Team Bonuses (split amongst team):\n" +
-                                "     ⑫ 1st: +8 points, 2nd: +7 points, 3rd: +6 points\n" +
-                                "     ⑫ 4th: +5 points, 5th: +4 points, 6th: +3 points"
+                                "     ⑫ 1st: +9 points, 2nd: +8 points, 3rd: +7 points\n" +
+                                "     ⑫ 4th: +6 points, 5th: +5 points, 6th: +4 points"
         });
     }
     private int roundNum = 1;
@@ -272,7 +275,7 @@ public class Skybattle extends Game {
                     teamPlacements.put(t, 1);
                 }
                 placementPoints();
-                timeRemaining = 43;
+                timeRemaining = 38;
                 setGameState(GameState.END_GAME);
             }
         } else if (getState().equals(GameState.END_ROUND)) {
@@ -285,11 +288,11 @@ public class Skybattle extends Game {
                 setGameState(GameState.STARTING);
             }
         } else if (getState().equals(GameState.END_GAME)) {
-            if (timeRemaining == 40) {
-                Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Most Total Kills: ");
-            } else if (timeRemaining == 36) {
-                mostKillsPrint();
-            }
+            //if (timeRemaining == 40) {
+                //Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Most Total Kills: ");
+            //} //else if (timeRemaining == 36) {
+                //mostKillsPrint();
+            //}
             if (timeRemaining <= 35) {
                 gameEndEvents();
             }
@@ -393,8 +396,8 @@ public class Skybattle extends Game {
                 if (p.getTeam() == MBC.getInstance().spectator) continue;
                 if (teamPlacements.get(t) == null) continue;
                 int placement = teamPlacements.get(t);
-                p.addCurrentScore(TEAM_BONUSES_3[placement-1] / t.getPlayers().size());
-                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_3[placement-1] / t.getPlayers().size())));
+                p.addCurrentScore(TEAM_BONUSES_4[placement-1] / t.getPlayers().size());
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_4[placement-1] / t.getPlayers().size())));
             }
         }
     }

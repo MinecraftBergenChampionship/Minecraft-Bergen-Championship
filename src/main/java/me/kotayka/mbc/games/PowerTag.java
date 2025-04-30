@@ -64,9 +64,15 @@ public class PowerTag extends Game {
     public ArrayList<PowerTagPlayer> infected = new ArrayList<>();
 
     // scoring
-    private final int FIND_POINTS = 7;
+    private final int FIND_POINTS_18 = 7;
+    private final int FIND_POINTS_24 = 10;
+    private final int FIND_POINTS = FIND_POINTS_24;
+
     private final int INCREMENT_POINTS = 1;
-    private final int SURVIVAL_POINTS = 8;
+
+    private final int SURVIVAL_POINTS_18 = 8;
+    private final int SURVIVAL_POINTS_24 = 10;
+    private final int SURVIVAL_POINTS = SURVIVAL_POINTS_24;
 
     public PowerTag() {
         super("PowerTag", new String[] {
@@ -77,9 +83,9 @@ public class PowerTag extends Game {
                 "⑱ Each hider gets a powerup they can use to help escape the hunters.\n\n" +
                 "⑱ However, the hunters will also get to choose a special power to help find the hiders.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑱ +7 points for finding a player as a hunter\n" +
+                                "⑱ +10 points for finding a player as a hunter\n" +
                                 "⑱ +1 point for surviving 10 seconds as a hider\n" +
-                                "⑱ +8 points for surviving an entire round as a hider"
+                                "⑱ +10 points for surviving an entire round as a hider"
         });
     }
     private int roundNum = 0;

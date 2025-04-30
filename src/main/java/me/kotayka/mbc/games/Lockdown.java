@@ -19,6 +19,8 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -32,33 +34,54 @@ public class Lockdown extends Game {
 
     private WorldBorder border = null;
 
-    private final int ORIGINAL_KILL_POINTS = 6;
-    private final int TWO_KILL_POINTS = 5;
-    private final int FOUR_KILL_POINTS = 4;
-    private final int SIX_KILL_POINTS = 3;
+    private final int ORIGINAL_KILL_POINTS_18 = 6;
+    private final int ORIGINAL_KILL_POINTS_24 = 8;
+    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_24;
+
+    private final int TWO_KILL_POINTS_18 = 5;
+    private final int TWO_KILL_POINTS_24 = 7;
+    private final int TWO_KILL_POINTS = TWO_KILL_POINTS_24;
+
+    private final int FOUR_KILL_POINTS_18 = 4;
+    private final int FOUR_KILL_POINTS_24 = 6;
+    private final int FOUR_KILL_POINTS = FOUR_KILL_POINTS_24;
+
+    private final int SIX_KILL_POINTS_18 = 3;
+    private final int SIX_KILL_POINTS_24 = 5;
+    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_24;
 
     private MBCTeam[][] capturedPoints = new MBCTeam[6][6];
 
-    private final int OUTER_CAPTURE_POINTS = 2;
-    private final int INNER_CAPTURE_POINTS = 3;
-    private final int MIDDLE_CAPTURE_POINTS = 4;
+    private final int OUTER_CAPTURE_POINTS_18 = 2;
+    private final int OUTER_CAPTURE_POINTS_24 = 3;
+    private final int OUTER_CAPTURE_POINTS = OUTER_CAPTURE_POINTS_24;
 
-    private final int ESCAPE_POINTS = 8;
+    private final int INNER_CAPTURE_POINTS_18 = 3;
+    private final int INNER_CAPTURE_POINTS_24 = 4;
+    private final int INNER_CAPTURE_POINTS = INNER_CAPTURE_POINTS_24;
+
+    private final int MIDDLE_CAPTURE_POINTS_18 = 4;
+    private final int MIDDLE_CAPTURE_POINTS_24 = 5;
+    private final int MIDDLE_CAPTURE_POINTS = MIDDLE_CAPTURE_POINTS_24;
+
+    private final int ESCAPE_POINTS_18 = 8;
+    private final int ESCAPE_POINTS_24 = 10;
+    private final int ESCAPE_POINTS = ESCAPE_POINTS_24;
 
     public Lockdown() {
         super("Lockdown", new String[] {
-                "⑫ Make your way to the center of the map, capturing as many zones as possible!\n\n" + 
-                "⑫ Escape using the evacuation point in the middle of the map!",
-                "⑫ Replace the wool at a capture zone in the center of a room to get points.\n\n" + 
-                "⑫ Be careful, other teams want to steal your zones - and PVP is on...",
-                "⑫ The border will shrink as time goes on, so make your way to the center.\n\n" +
-                "⑫ The center room has 4 zones as well as the evacuation point!",
+                "⑲ Make your way to the center of the map, capturing as many zones as possible!\n\n" + 
+                "⑲ Escape using the evacuation point in the middle of the map!",
+                "⑲ Replace the wool at a capture zone in the center of a room to get points.\n\n" + 
+                "⑲ Be careful, other teams want to steal your zones - and PVP is on...",
+                "⑲ The border will shrink as time goes on, so make your way to the center.\n\n" +
+                "⑲ The center room has 4 zones as well as the evacuation point!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑫ +2 points per player for capturing a zone in the outer ring\n" +
-                                "⑫ +3 points per player for capturing a zone in the inner ring\n" + 
-                                "⑫ +4 points per player for capturing a zone in the center\n" +
-                                "⑫ +8 points for escaping at the evacuation point\n" +
-                                "⑫ +6 points per kill, decreasing after each kill\n"
+                                "⑲ +3 points per player for capturing a zone in the outer ring\n" +
+                                "⑲ +4 points per player for capturing a zone in the inner ring\n" + 
+                                "⑲ +5 points per player for capturing a zone in the center\n" +
+                                "⑲ +10 points for escaping at the evacuation point\n" +
+                                "⑲ +8 points per kill, decreasing after each kill\n"
         });
     }
     private int roundNum = 1;
@@ -125,6 +148,7 @@ public class Lockdown extends Game {
             p.getPlayer().removePotionEffect(PotionEffectType.SLOWNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.POISON);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
             if (roundNum == 1) {
                 lockdownPlayerMap.put(p.getPlayer().getUniqueId(), new LockdownPlayer(p));
                 playersAlive.add(p);
@@ -211,21 +235,42 @@ public class Lockdown extends Game {
                 timeRemaining = 300;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
+            if (timeRemaining == 235) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking in 10 seconds! All outer rooms will soon be closed!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_HURT, 1, 1);
+                }
+            }
             if (timeRemaining == 225) {
-                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking! All outer rooms will soon be closed!");
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking!");
                 for (LockdownPlayer p : lockdownPlayerMap.values()) {
                     p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING!", "", 20, 60, 20);
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
                 }
                 border.setSize(154, 45);
             }
+            if (timeRemaining == 130) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking in 10 seconds! All rooms except the middle will soon be closed!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_HURT, 1, 1);
+                }
+            }
             if (timeRemaining == 120) {
-                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking! All rooms except the middle will soon be closed!");
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking!");
                 for (LockdownPlayer p : lockdownPlayerMap.values()) {
                     p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING!", "", 20, 60, 20);
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
                 }
                 border.setSize(76, 45);
+            }
+            if (timeRemaining == 55) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking! Use the evacuation zone to escape!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_HURT, 1, 1);
+                }
             }
             if (timeRemaining == 45) {
                 Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Final border closing!");
@@ -341,10 +386,11 @@ public class Lockdown extends Game {
                     else {pointsEarned = MIDDLE_CAPTURE_POINTS;}
                     woolPoints.replace(t, woolPoints.get(t)+pointsEarned);
 
-                    
+                    logger.log("Zone (" + i + "," + j + "): " + t.teamNameFormat());
                 }
                 else {
                     map = map+ChatColor.WHITE +""+ChatColor.BOLD+ "■";
+                    logger.log("Zone (" + i + "," + j + "): No team!");
                 }
             }
             map = map + "\n";
@@ -360,6 +406,7 @@ public class Lockdown extends Game {
                 p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.BLOCKS, 1, 1);
             }
         }
+        logger.log(message);
 
         final String finalMap = map;
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
@@ -425,7 +472,7 @@ public class Lockdown extends Game {
             if (check.getType().equals(Material.WAXED_EXPOSED_COPPER_BULB) && p.getY() < 4.5) {
                 p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "You are now escaping!" + ChatColor.RESET + "" + ChatColor.RED + 
                                                 " Hold shift and wait 5 seconds.");
-                p.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 100, 1, false, false));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 100, 7, false, false));
                 escapeCounter.put(Participant.getParticipant(p), 4);
             }
             
@@ -476,6 +523,7 @@ public class Lockdown extends Game {
         p.getPlayer().sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You Escaped!" + MBC.getInstance().scoreFormatter(ESCAPE_POINTS));
         Bukkit.broadcastMessage(p.getFormattedName() + " escaped the Lockdown!");
         updatePlayersAlive(p);
+        logger.log(p.getFormattedName() + " escaped the Lockdown!");
         p.getPlayer().setGameMode(GameMode.SPECTATOR);
         p.getInventory().clear();
     }
@@ -664,6 +712,11 @@ public class Lockdown extends Game {
         crossbowMeta.setUnbreakable(true);
         crossbow.setItemMeta(crossbowMeta);
 
+        ItemStack map = new ItemStack(Material.FILLED_MAP);
+        MapMeta mapMeta = (MapMeta)map.getItemMeta();
+        mapMeta.setMapId(116);
+        map.setItemMeta(mapMeta);
+
         ItemStack arrow = new ItemStack(Material.ARROW);
         ItemStack steak = new ItemStack(Material.COOKED_BEEF, 8);
         ItemStack wool = p.getParticipant().getTeam().getColoredWool();
@@ -700,6 +753,7 @@ public class Lockdown extends Game {
         p.getPlayer().getInventory().addItem(wool);
         p.getPlayer().getInventory().addItem(shears);
         p.getPlayer().getInventory().addItem(arrow);
+        p.getPlayer().getInventory().addItem(map);
 
         p.getPlayer().getInventory().setHelmet(diamondHelmet);
         p.getPlayer().getInventory().setChestplate(leatherChestplate);
@@ -1064,6 +1118,7 @@ public class Lockdown extends Game {
     public void onDisconnect(PlayerQuitEvent e) {
         if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
             LockdownPlayer p = lockdownPlayerMap.get(e.getPlayer().getUniqueId());
+            updatePlayersAlive(p.getParticipant());
 
 
             for (Player play : Bukkit.getOnlinePlayers()) {
@@ -1099,6 +1154,15 @@ public class Lockdown extends Game {
             e.getPlayer().teleport(map.getCenter());
         }
     }
+
+    /**
+     * Ensures nothing is dropped.
+     */
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        if (!e.getPlayer().getLocation().getWorld().equals(map.getWorld())) return;
+        e.setCancelled(true);
+   }
 
     /*
      * Resets all players to 0 kills and no last damager.

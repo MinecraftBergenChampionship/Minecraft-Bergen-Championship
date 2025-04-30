@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -1323,8 +1324,18 @@ public class Lobby extends Minigame {
         p.getInventory().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
         p.getInventory().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
         p.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
-        p.getPlayer().getInventory().addItem(new ItemStack(Material.STONE_SWORD));
-        p.getPlayer().getInventory().addItem(new ItemStack(Material.STONE_AXE));
+
+        ItemStack stoneSword = new ItemStack(Material.STONE_SWORD);
+        ItemMeta stoneMeta = stoneSword.getItemMeta();
+        stoneMeta.setUnbreakable(true);
+        stoneSword.setItemMeta(stoneMeta);
+        p.getPlayer().getInventory().addItem(stoneSword);
+
+        ItemStack goldAxe = new ItemStack(Material.GOLDEN_AXE);
+        ItemMeta goldMeta = goldAxe.getItemMeta();
+        goldMeta.setUnbreakable(true);
+        goldAxe.setItemMeta(goldMeta);
+        p.getPlayer().getInventory().addItem(goldAxe);
     }
 
     public void removePvpPlayer(Player p) {
