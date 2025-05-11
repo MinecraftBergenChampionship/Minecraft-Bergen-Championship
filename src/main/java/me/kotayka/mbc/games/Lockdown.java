@@ -20,15 +20,19 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
 public class Lockdown extends Game {
     public LockdownMap map = new Abandoned(this);
     public Map<UUID, LockdownPlayer> lockdownPlayerMap = new HashMap<>();
+
+    public List<LockdownPlayer> escapedList = new ArrayList<>();
 
     public HashMap<Participant, Integer> escapeCounter = new HashMap<>();
 
@@ -64,9 +68,9 @@ public class Lockdown extends Game {
     private final int MIDDLE_CAPTURE_POINTS_24 = 5;
     private final int MIDDLE_CAPTURE_POINTS = MIDDLE_CAPTURE_POINTS_24;
 
-    private final int ESCAPE_POINTS_18 = 8;
-    private final int ESCAPE_POINTS_24 = 10;
-    private final int ESCAPE_POINTS = ESCAPE_POINTS_24;
+    private final int ESCAPE_POINTS_18 = 12;
+    private final int ESCAPE_POINTS_24 = 12;
+    private int ESCAPE_POINTS = ESCAPE_POINTS_24;
 
     public Lockdown() {
         super("Lockdown", new String[] {
@@ -80,8 +84,8 @@ public class Lockdown extends Game {
                                 "⑲ +3 points per player for capturing a zone in the outer ring\n" +
                                 "⑲ +4 points per player for capturing a zone in the inner ring\n" + 
                                 "⑲ +5 points per player for capturing a zone in the center\n" +
-                                "⑲ +10 points for escaping at the evacuation point\n" +
-                                "⑲ +8 points per kill, decreasing after each kill\n"
+                                "⑲ +10-12 points for escaping at the evacuation point\n" +
+                                "⑲ +5-8 points per kill, decreasing after each kill\n"
         });
     }
     private int roundNum = 1;
@@ -115,6 +119,7 @@ public class Lockdown extends Game {
 
     public void loadPlayers() {
         setPVP(false);
+        nameTagVisibility(false);
         if (lockdownPlayerMap != null) {
             for (LockdownPlayer p : lockdownPlayerMap.values()) {
                 p.lastDamager = null;
@@ -123,9 +128,15 @@ public class Lockdown extends Game {
         if (border == null) {
             border = map.getWorld().getWorldBorder();
         }
+
+        escapedList = new ArrayList<>();
+
         border.setCenter(64, 64);
         border.setSize(232);
+        border.setDamageAmount(0.5);
+        border.setDamageBuffer(0);
         map.addBarriers();
+        ESCAPE_POINTS = ESCAPE_POINTS_24;
 
         for (int i = 0; i < capturedPoints.length; i++) {
             for (int j = 0; j < capturedPoints[i].length; j++) {
@@ -147,6 +158,7 @@ public class Lockdown extends Game {
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.SLOWNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.POISON);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
             if (roundNum == 1) {
@@ -161,6 +173,7 @@ public class Lockdown extends Game {
         map.spawnPlayers();
         updatePlayersAliveScoreboard();
     }
+    
 
     /**
      * 
@@ -195,9 +208,11 @@ public class Lockdown extends Game {
             if (timeRemaining > 0) {
                 if (roundNum == 1) mapCreator(map.mapName, map.creatorName);
                 startingCountdown();
+                if (timeRemaining == 25) sendSpawns();
                 if (timeRemaining == 20) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.MUSIC_DISC_PRECIPICE, SoundCategory.RECORDS, 1, 1);
+                        p.getInventory().clear();
                     }
                     for (LockdownPlayer p : lockdownPlayerMap.values()) {
                         switch (roundNum) {
@@ -235,11 +250,12 @@ public class Lockdown extends Game {
                 timeRemaining = 300;
             }
         } else if (getState().equals(GameState.ACTIVE)) {
+            repeatingSneakEvent();
             if (timeRemaining == 235) {
                 Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking in 10 seconds! All outer rooms will soon be closed!");
                 for (LockdownPlayer p : lockdownPlayerMap.values()) {
                     p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
-                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_HURT, 1, 1);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1);
                 }
             }
             if (timeRemaining == 225) {
@@ -254,7 +270,7 @@ public class Lockdown extends Game {
                 Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking in 10 seconds! All rooms except the middle will soon be closed!");
                 for (LockdownPlayer p : lockdownPlayerMap.values()) {
                     p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
-                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_HURT, 1, 1);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1);
                 }
             }
             if (timeRemaining == 120) {
@@ -265,11 +281,15 @@ public class Lockdown extends Game {
                 }
                 border.setSize(76, 45);
             }
+            if (timeRemaining == 75) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Escape Points decreased (12 -> 10)!");
+                ESCAPE_POINTS-=2;
+            }
             if (timeRemaining == 55) {
                 Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking! Use the evacuation zone to escape!");
                 for (LockdownPlayer p : lockdownPlayerMap.values()) {
                     p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
-                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_HURT, 1, 1);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1);
                 }
             }
             if (timeRemaining == 45) {
@@ -282,7 +302,13 @@ public class Lockdown extends Game {
             }
             if (timeRemaining == 0) {
                 woolPoints();
+                sendEscapees();
                 escapeCounter.clear();
+                for (Participant p : playersAlive) {
+                    p.getPlayer().sendMessage(ChatColor.RED + "You got locked in! You earn no escape points.");
+                    p.getPlayer().getInventory().clear();
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WARDEN_SONIC_BOOM, 1, 1);
+                }
                 if (roundNum < 3) {
                     roundOverGraphics();
                     for (Player p : Bukkit.getOnlinePlayers()) {
@@ -301,6 +327,11 @@ public class Lockdown extends Game {
             }
 
         } else if (getState().equals(GameState.END_ROUND)) {
+            if (timeRemaining == 5) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.getInventory().clear();
+                }
+            }
             if (timeRemaining == 1) {
                 roundNum++;
                 map.resetMap();
@@ -310,6 +341,12 @@ public class Lockdown extends Game {
                 setGameState(GameState.STARTING);
             }
         } else if (getState().equals(GameState.END_GAME)) {
+            if (timeRemaining == 36) {
+                nameTagVisibility(true);
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.getInventory().clear();
+                }
+            } 
             if (timeRemaining <= 35) {
                 gameEndEvents();
             }
@@ -386,11 +423,9 @@ public class Lockdown extends Game {
                     else {pointsEarned = MIDDLE_CAPTURE_POINTS;}
                     woolPoints.replace(t, woolPoints.get(t)+pointsEarned);
 
-                    logger.log("Zone (" + i + "," + j + "): " + t.teamNameFormat());
                 }
                 else {
                     map = map+ChatColor.WHITE +""+ChatColor.BOLD+ "■";
-                    logger.log("Zone (" + i + "," + j + "): No team!");
                 }
             }
             map = map + "\n";
@@ -407,12 +442,107 @@ public class Lockdown extends Game {
             }
         }
         logger.log(message);
+        
 
         final String finalMap = map;
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
             public void run() { sendMap(finalMap);}
+          }, 100L);
+    }
+
+    public void sendEscapees() {
+        String survivorDisplay = ChatColor.YELLOW + "" + ChatColor.BOLD + "\nEscaped: " + ChatColor.RESET + "\n\n";
+
+        Map<MBCTeam, String> teamEscapes = new HashMap<>();
+
+        for (LockdownPlayer p : escapedList) {
+            MBCTeam m = p.getParticipant().getTeam();
+            if (!teamEscapes.containsKey(m)) {
+                teamEscapes.put(m, p.getParticipant().getFormattedName() + ", ");
+            }
+            else {
+                String survival = teamEscapes.get(m);
+                survival += p.getParticipant().getFormattedName() + ", ";
+                teamEscapes.replace(m, survival);
+            }
+        }
+        
+        MBCTeam[] teamList = {MBCTeam.getTeam("red"), MBCTeam.getTeam("yellow"), MBCTeam.getTeam("green"), 
+                                MBCTeam.getTeam("blue"), MBCTeam.getTeam("purple"), MBCTeam.getTeam("pink")};
+        
+        for (int i = 0; i < teamList.length; i++) {
+            String escapees = teamEscapes.get(teamList[i]);
+            if (escapees != null) {
+                survivorDisplay += escapees.substring(0, escapees.length()-2) + ChatColor.RESET + "\n";
+            }
+        }
+
+        logger.log(survivorDisplay);
+        final String escapedPlayers = survivorDisplay;
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { sendMap(escapedPlayers);}
           }, 40L);
+        
+    }
+
+    /*
+     * Sends spawn locations at beginning of each round.
+     */
+    public void sendSpawns() {
+        MBCTeam[] spawnLocations = map.teamSpawnLocations();
+        String spawns = "\n" +ChatColor.GOLD + ""+ ChatColor.BOLD + "Spawn Locations:\n\n";
+        
+        for (int i = 0; i < capturedPoints.length; i++) {
+            for (int j = 0; j < capturedPoints[i].length; j++) {
+                //(0,2)
+                // (0,5)
+                // (3,5)
+                // (5,3)
+                // (5,0)
+                // (2,0)
+                if (i == 0 && j == 2) {
+                    MBCTeam t = spawnLocations[0];
+                    if (t == null) spawns = spawns+ChatColor.WHITE +""+ChatColor.BOLD+ "■";
+                    else spawns = spawns+t.getChatColor() +"" + ChatColor.BOLD +"■";
+                }
+                else if (i == 0 && j == 5) {
+                    MBCTeam t = spawnLocations[1];
+                    if (t == null) spawns = spawns+ChatColor.WHITE +""+ChatColor.BOLD+ "■";
+                    else spawns = spawns+t.getChatColor() +"" + ChatColor.BOLD +"■";
+                }
+                else if (i == 3 && j == 5) {
+                    MBCTeam t = spawnLocations[2];
+                    if (t == null) spawns = spawns+ChatColor.WHITE +""+ChatColor.BOLD+ "■";
+                    else spawns = spawns+t.getChatColor() +"" + ChatColor.BOLD +"■";
+                }
+                else if (i == 5 && j == 3) {
+                    MBCTeam t = spawnLocations[3];
+                    if (t == null) spawns = spawns+ChatColor.WHITE +""+ChatColor.BOLD+ "■";
+                    else spawns = spawns+t.getChatColor() +"" + ChatColor.BOLD +"■";
+                }
+                else if (i == 5 && j == 0) {
+                    MBCTeam t = spawnLocations[4];
+                    if (t == null) spawns = spawns+ChatColor.WHITE +""+ChatColor.BOLD+ "■";
+                    else spawns = spawns+t.getChatColor() +"" + ChatColor.BOLD +"■";
+                }
+                else if (i == 2 && j == 0) {
+                    MBCTeam t = spawnLocations[5];
+                    if (t == null) spawns = spawns+ChatColor.WHITE +""+ChatColor.BOLD+ "■";
+                    else spawns = spawns+t.getChatColor() +"" + ChatColor.BOLD +"■";
+                }
+                else {
+                    spawns = spawns+ChatColor.WHITE +""+ChatColor.BOLD+ "■";
+                }
+            }
+            spawns = spawns + "\n";
+        }
+
+        Bukkit.broadcastMessage(spawns);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.playSound(p, Sound.ENTITY_CHICKEN_EGG, 1, 1);
+        }
     }
 
     /*
@@ -420,7 +550,22 @@ public class Lockdown extends Game {
      */
     public void sendMap(String s) {
         Bukkit.broadcastMessage(s);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.playSound(p, Sound.ENTITY_CHICKEN_EGG, 1, 1);
+        }
     }
+
+    /*
+     * checks to see if player p is outside world border.
+     */
+    public boolean isOutsideOfBorder(Player p) {
+        Location loc = p.getLocation();
+        double x = loc.getX();
+        double z = loc.getZ();
+        double size = border.getSize();
+        return ((x > size || (-x) > size) || (z > size || (-z) > size));
+    }
+
 
     /**
      * Check to see if a block is being placed in a wool station, what color it is, and which station its in.
@@ -493,11 +638,14 @@ public class Lockdown extends Game {
     public void repeatingSneakEvent() {
         if (!isGameActive()) return;
 
+        ArrayList<Participant> toRemove = new ArrayList<>();
+
         for (Participant p : escapeCounter.keySet()) {
+            if (p == null) continue;
             int time = escapeCounter.get(p);
             if (time == 0) {
                 playerEscape(p);
-                escapeCounter.remove(p);
+                toRemove.add(p);
             }
             else {
                 escapeCounter.replace(p, time-1);
@@ -507,11 +655,11 @@ public class Lockdown extends Game {
             }
         }
 
-        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
-            @Override
-            public void run() { repeatingSneakEvent();}
-          }, 20L);
+        for (Participant p : toRemove) {
+            escapeCounter.remove(p);
+        }
 
+        toRemove.clear();
     }
 
     /*
@@ -526,6 +674,8 @@ public class Lockdown extends Game {
         logger.log(p.getFormattedName() + " escaped the Lockdown!");
         p.getPlayer().setGameMode(GameMode.SPECTATOR);
         p.getInventory().clear();
+        LockdownPlayer lp = lockdownPlayerMap.get(p.getPlayer().getUniqueId());
+        if (lp!=null) escapedList.add(lp);
     }
 
     /*
@@ -592,8 +742,8 @@ public class Lockdown extends Game {
         capturedPoints[row][column] = t;
 
         for (Participant p : t.getPlayers()) {
-            p.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Your team captured a point!");
-            MBC.spawnFirework(p);
+            p.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Your team captured a zone!");
+            if (!p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) MBC.spawnFirework(p);
         }
     }
 
@@ -607,7 +757,7 @@ public class Lockdown extends Game {
         capturedPoints[row][column] = null;
 
         for (Participant p : t.getPlayers()) {
-            p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Another team is breaking one of your points...");
+            p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Another team is breaking one of your zones...");
             p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_ALLAY_DEATH, SoundCategory.BLOCKS, 0.5f, 1);
         }
     }
@@ -712,10 +862,13 @@ public class Lockdown extends Game {
         crossbowMeta.setUnbreakable(true);
         crossbow.setItemMeta(crossbowMeta);
 
-        ItemStack map = new ItemStack(Material.FILLED_MAP);
-        MapMeta mapMeta = (MapMeta)map.getItemMeta();
-        mapMeta.setMapId(116);
-        map.setItemMeta(mapMeta);
+        //ItemStack map = new ItemStack(Material.FILLED_MAP);
+        //MapMeta mapMeta = (MapMeta)map.getItemMeta();
+        //mapMeta.setMapId(116);
+        //MapView mapView = mapMeta.getMapView();
+        //mapView.setTrackingPosition(false);
+        //mapMeta.setMapView(mapView);
+        //map.setItemMeta(mapMeta);
 
         ItemStack arrow = new ItemStack(Material.ARROW);
         ItemStack steak = new ItemStack(Material.COOKED_BEEF, 8);
@@ -753,7 +906,7 @@ public class Lockdown extends Game {
         p.getPlayer().getInventory().addItem(wool);
         p.getPlayer().getInventory().addItem(shears);
         p.getPlayer().getInventory().addItem(arrow);
-        p.getPlayer().getInventory().addItem(map);
+        //p.getPlayer().getInventory().addItem(map);
 
         p.getPlayer().getInventory().setHelmet(diamondHelmet);
         p.getPlayer().getInventory().setChestplate(leatherChestplate);
@@ -936,7 +1089,7 @@ public class Lockdown extends Game {
             MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
                 @Override
                 public void run() { player.getInventory().addItem(arrow);}
-              }, 20L);
+              }, 60L);
         }
     }
 
@@ -981,6 +1134,7 @@ public class Lockdown extends Game {
             }
         }
 
+        e.getPlayer().getInventory().clear();
         e.setCancelled(true);
 
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -995,6 +1149,20 @@ public class Lockdown extends Game {
             timeRemaining = 1;
         }
 
+    }
+
+    /**
+     * If true, will enable name tags to be visible. If false, will enable name tags to be invisible.
+     */
+    private void nameTagVisibility(boolean b) {
+        for (Participant p : MBC.getInstance().getPlayers()) {
+            Team.OptionStatus o;
+            if(b) o = Team.OptionStatus.ALWAYS;
+            else o = Team.OptionStatus.NEVER;
+            for (MBCTeam m : MBC.getInstance().getValidTeams()) {
+                p.board.getTeam(m.getTeamFullName()).setOption(Team.Option.NAME_TAG_VISIBILITY, o);
+            }
+        }
     }
 
     /**
@@ -1028,6 +1196,10 @@ public class Lockdown extends Game {
         Block check = new Location(map.getWorld(), x, 1, z).getBlock();
         if (check.getType() != Material.WAXED_EXPOSED_COPPER_BULB && escapeCounter.containsKey(Participant.getParticipant(p))) {
             removeEscapee(Participant.getParticipant(p));
+        }
+
+        if(isOutsideOfBorder(p)) {
+
         }
         
     }

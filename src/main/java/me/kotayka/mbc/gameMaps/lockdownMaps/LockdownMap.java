@@ -1,5 +1,6 @@
 package me.kotayka.mbc.gameMaps.lockdownMaps;
 
+import me.kotayka.mbc.MBCTeam;
 import me.kotayka.mbc.gameMaps.MBCMap;
 import me.kotayka.mbc.games.Lockdown;
 
@@ -79,6 +80,16 @@ public abstract class LockdownMap extends MBCMap {
      * @implSpec should call removeEntities() and resetKillMaps()
      */
     public abstract void resetMap();
+
+    /**
+     * Called to show where each team spawns. Will be used to give map of where each team is at beginning of round.
+     */
+    public abstract MBCTeam[] teamSpawnLocations();
+
+    /**
+     * Called to reset all team spawn locations in array.
+     */
+    public abstract void resetTeamSpawnLocations();
 
     /**
      * Remove all extraneous entities lingering in the map when resetting.

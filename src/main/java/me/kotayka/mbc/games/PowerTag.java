@@ -483,7 +483,7 @@ public class PowerTag extends Game {
             p.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(hiderPowerupMap.get(p)));
         }
         if (hiderPowerupMap.get(p).equals(hiderPowerupList[1])) {
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30, 255, false, true));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20, 255, false, true));
             p.getPlayer().getInventory().setBoots(new ItemStack(Material.AIR));
 
             MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
@@ -741,7 +741,7 @@ public class PowerTag extends Game {
         for (PowerTagPlayer hider : aliveHiders) {
             double currentDistance = hider.getPlayer().getLocation().distance(p.getPlayer().getLocation());
 
-            if (currentDistance < 8) {
+            if (currentDistance < 10) {
                 hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 80, 3, false, false));
                 hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 80, 3, false, false));
                 hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 80, 255, false, false));
@@ -780,7 +780,7 @@ public class PowerTag extends Game {
         for (PowerTagPlayer hider : aliveHiders) {
             double currentDistance = hider.getPlayer().getLocation().distance(p.getPlayer().getLocation());
 
-            if (currentDistance < 16) {
+            if (currentDistance < 25) {
                 tensedPlayers.put(hider, hider.getPlayer().getLocation());
                 hider.getPlayer().sendMessage(ChatColor.RED + "You were tensed by " + ChatColor.RESET + p.getParticipant().getFormattedName() + ChatColor.RED + "! " + 
                                             "You have 10 seconds to move at least 8 blocks or you will be revealed!");
@@ -824,7 +824,7 @@ public class PowerTag extends Game {
                 if (aliveHiders.contains(hider) && l.distance(hider.getPlayer().getLocation()) < 8) {
                     TAG_WORLD.playSound(p.getPlayer().getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, 1, 1);
                     hider.getPlayer().playSound(hider.getPlayer(), Sound.ENTITY_WARDEN_SONIC_BOOM, 1, 1);
-                    hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 100, 3, false, false));
+                    hider.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 400, 3, false, false));
                     hider.getPlayer().sendTitle(ChatColor.DARK_PURPLE + "" +ChatColor.BOLD + "REVEALED!", "", 0, 60, 20);
                     hider.getPlayer().sendMessage(ChatColor.RED + "You have been revealed. Good luck...");
                     revealCount++;

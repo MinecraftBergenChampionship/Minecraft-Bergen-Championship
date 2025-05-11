@@ -134,6 +134,9 @@ public class SurvivalGames extends Game {
             bossBar.setVisible(false);
         }
 
+        border.setDamageBuffer(0);
+        border.setDamageAmount(0.5);
+
         setPVP(false);
         deadTeams = 0;
         killPoints = KILL_POINTS_INITIAL;
@@ -167,6 +170,7 @@ public class SurvivalGames extends Game {
             p.getPlayer().setExp(0);
             p.getPlayer().setLevel(0);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 10, false, false));
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().removePotionEffect(PotionEffectType.ABSORPTION);
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().setGameMode(GameMode.ADVENTURE);

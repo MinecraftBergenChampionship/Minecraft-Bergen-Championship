@@ -41,7 +41,7 @@ public class Skybattle extends Game {
     private final int WIN_POINTS = 0;
     // Team bonuses split among team
     private final int[] TEAM_BONUSES_3 = {24, 21, 18, 15, 12, 9};
-    private final int[] TEAM_BONUSES_4 = {36, 32, 28, 24, 20, 18};
+    private final int[] TEAM_BONUSES_4 = {36, 32, 28, 24, 20, 16};
 
     public Skybattle() {
         super("Skybattle", new String[] {
@@ -104,6 +104,7 @@ public class Skybattle extends Game {
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.SLOWNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.POISON);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false));
             if (roundNum == 1) {
                 skybattlePlayerMap.put(p.getPlayer().getUniqueId(), new SkybattlePlayer(p));

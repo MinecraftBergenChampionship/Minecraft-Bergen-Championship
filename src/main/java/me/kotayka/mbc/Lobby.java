@@ -7,6 +7,7 @@ import me.kotayka.mbc.partygames.BeepTestLevelLoader;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -388,6 +389,18 @@ public class Lobby extends Minigame {
             e.getPlayer().teleport(new Location(world, 109.5, -4, -59.5, -90, 0));
             pvpDead.remove(e.getPlayer());
         }
+
+        if (pvpStartable && e.getPlayer().getGameMode().equals(GameMode.ADVENTURE) && e.getPlayer().getInventory().getChestplate() == null && e.getPlayer().getY() < 10 && e.getPlayer().getPotionEffect(PotionEffectType.LEVITATION) == null && inElytraArea(e.getPlayer())) {
+            giveElytra(e.getPlayer());
+        }
+
+        if(e.getPlayer().getGameMode() == GameMode.ADVENTURE && e.getPlayer().getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
+            if (e.getPlayer().getInventory().getChestplate() == null);
+            else if (e.getPlayer().getInventory().getChestplate().getType().equals(Material.ELYTRA)) {
+                e.getPlayer().getInventory().setChestplate(new ItemStack(Material.AIR));
+            }
+            e.getPlayer().getInventory().remove(Material.ELYTRA);
+        }
     }
 
     @EventHandler
@@ -589,6 +602,7 @@ public class Lobby extends Minigame {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().setMaxHealth(20);
             p.getPlayer().addPotionEffect(MBC.SATURATION);
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().setGameMode(GameMode.ADVENTURE);
             if (p.winner) {
                 p.getPlayer().teleport(new Location(world, 76.5, 11, -20.5, 90, 0));
@@ -1308,6 +1322,28 @@ public class Lobby extends Minigame {
         return false;
     }
 
+    public boolean inElytraArea(Player p) {
+        Location l = p.getLocation();
+        int x = (int)(l.getX());
+        int z = (int)(l.getZ()) - 1;
+        Block check = new Location(world, x, -6, z).getBlock();
+        if (check.getType() == Material.WAXED_OXIDIZED_COPPER_GRATE) {
+            return true;
+        }
+        return false;
+    }
+
+    public void giveElytra(Player p) {
+        p.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 105, 26, false, false));
+        p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 255, false, false));
+        p.sendTitle(ChatColor.RED + "Elytra given in 5 seconds!","Hit the ground to take off your elytra!",0, 60, 45);
+        p.playSound(p, Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.BLOCKS, 0.5f, 1);
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { p.getInventory().setChestplate(new ItemStack(Material.ELYTRA));}
+          }, 105L);
+    }
+
     public void addPvpPlayer(Player p) {
         p.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "Joined PVP!"));
 
@@ -1357,6 +1393,15 @@ public class Lobby extends Minigame {
             player.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 255));
             player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
+        }
+
+        //for elytra j in case
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.removePotionEffect(PotionEffectType.LEVITATION);
+            if (p.getPlayer().getInventory().getChestplate() == null) continue;
+            if (p.getPlayer().getInventory().getChestplate().getType().equals(Material.ELYTRA)) {
+                p.getPlayer().getInventory().setChestplate(new ItemStack(Material.AIR));
+            }
         }
         pvpers.clear();
     }
@@ -1427,6 +1472,7 @@ public class Lobby extends Minigame {
             p.removePotionEffect(PotionEffectType.NIGHT_VISION);
             p.removePotionEffect(PotionEffectType.RESISTANCE);
             p.addPotionEffect(MBC.SATURATION);
+            p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
         }
     }
 

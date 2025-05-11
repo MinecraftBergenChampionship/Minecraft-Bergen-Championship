@@ -23,13 +23,15 @@ import java.util.List;
 public class Abandoned extends LockdownMap {
     private final Location CENTER = new Location(getWorld(), 1064, 100, 1064);
     private final Location[] SPAWNS = {
-        new Location(getWorld(), 44, 3, -34),
-        new Location(getWorld(), 161, 3, -34),
-        new Location(getWorld(), 161, 3, 83),
-        new Location(getWorld(), 83, 3, 161),
-        new Location(getWorld(), -34, 3, 161),
-        new Location(getWorld(), -34, 3, 44),
+        new Location(getWorld(), 44, 3, -34), // (0,2)
+        new Location(getWorld(), 161, 3, -34), // (0,5)
+        new Location(getWorld(), 161, 3, 83), // (3,5)
+        new Location(getWorld(), 83, 3, 161), // (5,3)
+        new Location(getWorld(), -34, 3, 161), // (5,0)
+        new Location(getWorld(), -34, 3, 44), // (2,0)
     };
+
+    private MBCTeam[] teamSpawns = new MBCTeam[6];
 
     public Abandoned(Lockdown lockdown) {
         super(lockdown);
@@ -89,9 +91,24 @@ public class Abandoned extends LockdownMap {
         //backup at 500 0 500
     }
 
+
+    public MBCTeam[] teamSpawnLocations() {
+        return teamSpawns;
+    }
+
+    public void resetTeamSpawnLocations() {
+        MBCTeam[] spawns = new MBCTeam[6];
+        teamSpawns = spawns;
+    }
+
     public void spawnPlayers() {
         ArrayList<Location> tempSpawns = new ArrayList<>(SPAWNS.length);
         tempSpawns.addAll(Arrays.asList(SPAWNS));
+
+        ArrayList<Location> indexSpawns = new ArrayList<>(SPAWNS.length);
+        indexSpawns.addAll(Arrays.asList(SPAWNS));
+
+        resetTeamSpawnLocations();
 
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {
             int randomNum = (int) (Math.random() * tempSpawns.size());
@@ -100,6 +117,10 @@ public class Abandoned extends LockdownMap {
                 p.getPlayer().teleport(spawn);
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
             }
+
+            int spawnIndex = indexSpawns.indexOf(tempSpawns.get(randomNum));
+            teamSpawns[spawnIndex] = t;
+
             tempSpawns.remove(randomNum);
         }
     }

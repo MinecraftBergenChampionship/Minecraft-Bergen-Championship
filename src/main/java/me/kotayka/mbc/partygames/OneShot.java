@@ -107,6 +107,7 @@ public class OneShot extends PartyGame {
         super.start();
 
         setGameState(GameState.TUTORIAL);
+        
 
         setTimer(30);
     }
@@ -262,6 +263,15 @@ public class OneShot extends PartyGame {
                 b.setVisible(false);
             }
         } 
+
+        for (Item item : map.getWorld().getEntitiesByClass(Item.class)) {
+            item.remove();
+        }
+
+        for (Entity trident : map.getWorld().getEntitiesByClass(Trident.class)) {
+            trident.remove();
+        }
+        
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getPlayer().setInvulnerable(true);
             p.getPlayer().getInventory().clear();
@@ -472,7 +482,7 @@ public class OneShot extends PartyGame {
         else if (e.getEntity() instanceof Trident) {
             Trident trident = (Trident) e.getEntity();
             if (!(trident.getShooter() instanceof Player)) return;
-            if (teamKills.get(Participant.getParticipant(((Player) trident.getShooter())).getTeam()) == 40) {
+            if (teamKills.get(Participant.getParticipant(((Player) trident.getShooter())).getTeam()) == KILLS_PER_WEAPON*4) {
                 trident.remove();
                 return;
             } 
@@ -543,7 +553,7 @@ public class OneShot extends PartyGame {
         if (!getState().equals(GameState.ACTIVE)) return;
         if (!(event.getEntity() instanceof Player) || !(event.getDamager() instanceof Player)) return;
         if (((Player) event.getDamager()).getGameMode() != GameMode.ADVENTURE) return;
-        if (teamKills.get(Participant.getParticipant(((Player) event.getDamager())).getTeam()) != 40) return;
+        if (teamKills.get(Participant.getParticipant(((Player) event.getDamager())).getTeam()) != KILLS_PER_WEAPON*4) return;
 
         if(((Player)event.getDamager()).getInventory().getItemInMainHand().getType() == Material.DIAMOND_SWORD ||
         ((Player)event.getDamager()).getInventory().getItemInOffHand().getType() == Material.DIAMOND_SWORD) {
