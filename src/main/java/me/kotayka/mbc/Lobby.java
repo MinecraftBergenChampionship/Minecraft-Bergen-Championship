@@ -158,7 +158,13 @@ public class Lobby extends Minigame {
             if (timeRemaining == 0) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
+                    if (p.getInventory().getChestplate() == null);
+                    else if (p.getInventory().getChestplate().getType().equals(Material.ELYTRA)) {
+                        p.getInventory().setChestplate(new ItemStack(Material.AIR));
+                    }
+                    p.getInventory().remove(Material.ELYTRA);
                 }
+                
                 toVoting();
             }
         } else if (getState().equals(GameState.END_ROUND)) {
@@ -831,15 +837,18 @@ public class Lobby extends Minigame {
 
             //gameLeaderboard = new Leaderboard(individual, lastBoard, individualLeaderboards.size());
             gameLeaderboard = new Leaderboard(MBC.getInstance().gameScores.getRecentMap(), MBC.getInstance().gameScores.getRecentString(), individualLeaderboards.size());
+            
 
             individualLeaderboards.removeFirst();
         }
 
         Leaderboard individualLeaderboard = new Leaderboard(individual, 0);
         individualLeaderboards.addFirst(individualLeaderboard);
-        individualLeaderboards.add(gameLeaderboard);
-
-        gameLeaderboard.spawnLeaderboard();
+        if (!getState().equals(GameState.END_GAME)) {
+            individualLeaderboards.add(gameLeaderboard);
+            gameLeaderboard.spawnLeaderboard();
+        }
+        
         individualLeaderboard.spawnLeaderboard();
 
         for (int i = 0; i < 8; i++) {

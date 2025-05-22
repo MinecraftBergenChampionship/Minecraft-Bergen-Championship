@@ -68,8 +68,8 @@ public class Lockdown extends Game {
     private final int MIDDLE_CAPTURE_POINTS_24 = 5;
     private final int MIDDLE_CAPTURE_POINTS = MIDDLE_CAPTURE_POINTS_24;
 
-    private final int ESCAPE_POINTS_18 = 12;
-    private final int ESCAPE_POINTS_24 = 12;
+    private final int ESCAPE_POINTS_18 = 10;
+    private final int ESCAPE_POINTS_24 = 10;
     private int ESCAPE_POINTS = ESCAPE_POINTS_24;
 
     public Lockdown() {
@@ -84,7 +84,7 @@ public class Lockdown extends Game {
                                 "⑲ +3 points per player for capturing a zone in the outer ring\n" +
                                 "⑲ +4 points per player for capturing a zone in the inner ring\n" + 
                                 "⑲ +5 points per player for capturing a zone in the center\n" +
-                                "⑲ +10-12 points for escaping at the evacuation point\n" +
+                                "⑲ +10 points for escaping at the evacuation point\n" +
                                 "⑲ +5-8 points per kill, decreasing after each kill\n"
         });
     }
@@ -281,10 +281,6 @@ public class Lockdown extends Game {
                 }
                 border.setSize(76, 45);
             }
-            if (timeRemaining == 75) {
-                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Escape Points decreased (12 -> 10)!");
-                ESCAPE_POINTS-=2;
-            }
             if (timeRemaining == 55) {
                 Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking! Use the evacuation zone to escape!");
                 for (LockdownPlayer p : lockdownPlayerMap.values()) {
@@ -313,6 +309,7 @@ public class Lockdown extends Game {
                     roundOverGraphics();
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.stopSound(Sound.MUSIC_DISC_PRECIPICE, SoundCategory.RECORDS);
+                        p.getPlayer().removePotionEffect(PotionEffectType.LEVITATION);
                     }
                     timeRemaining = 10;
                     setGameState(GameState.END_ROUND);
@@ -320,6 +317,7 @@ public class Lockdown extends Game {
                     gameOverGraphics();
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.stopSound(Sound.MUSIC_DISC_PRECIPICE, SoundCategory.RECORDS);
+                        p.getPlayer().removePotionEffect(PotionEffectType.LEVITATION);
                     }
                     timeRemaining = 40;
                     setGameState(GameState.END_GAME);

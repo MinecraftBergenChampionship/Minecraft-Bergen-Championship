@@ -134,9 +134,6 @@ public class SurvivalGames extends Game {
             bossBar.setVisible(false);
         }
 
-        border.setDamageBuffer(0);
-        border.setDamageAmount(0.5);
-
         setPVP(false);
         deadTeams = 0;
         killPoints = KILL_POINTS_INITIAL;

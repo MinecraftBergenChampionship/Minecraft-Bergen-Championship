@@ -550,13 +550,13 @@ public class PowerTag extends Game {
         ItemMeta tensionMeta = tension.getItemMeta();
         tensionMeta.setDisplayName(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "TENSION");
         ArrayList<String> tensionLore = new ArrayList();
-        tensionLore.add(ChatColor.GREEN + "Make all players in a large radius be forced to move! One time use only.");
+        tensionLore.add(ChatColor.GREEN + "Make all players in a large radius be forced to move from their location! One time use per hunter only.");
         tensionMeta.setLore(tensionLore);
         tensionMeta.setUnbreakable(true);
         tension.setItemMeta(tensionMeta);
 
-        //ItemStack[] items = {trident, troll, toxic, tremor};
-        ItemStack[] items = {tremor, trident, troll, toxic, tension};
+        //ItemStack[] items = {tremor, trident, troll, toxic, tension};
+        ItemStack[] items = {tremor, toxic, tension};
 
         return items;
     }
@@ -1439,6 +1439,7 @@ public class PowerTag extends Game {
      */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
+        if (e.getCurrentItem() == null) {return;}
         Material i = e.getCurrentItem().getType();
         if (i.equals(Material.LEATHER_BOOTS)) e.setCancelled(true);
     }

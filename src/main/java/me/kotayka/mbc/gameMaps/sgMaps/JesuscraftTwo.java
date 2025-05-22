@@ -81,6 +81,8 @@ public class JesuscraftTwo extends SurvivalGamesMap {
         borderHeight = 40;
         border.setCenter(10000, 10001);
         border.setSize(400);
+        border.setDamageBuffer(0);
+        border.setDamageAmount(0.5);
     }
 
     @Override

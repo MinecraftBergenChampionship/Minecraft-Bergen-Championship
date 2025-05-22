@@ -538,7 +538,7 @@ public class BeepSwitch extends PartyGame {
                     break;
             }
             String pathCompleteMessage = ChatColor.BOLD + "The " + p.getTeam().teamNameFormat() + ChatColor.BOLD + 
-                        " have completed the " + ChatColor.GOLD + "" + ChatColor.BOLD + name + ChatColor.BOLD + " path!";
+                        " have completed the " + ChatColor.GOLD + "" + ChatColor.BOLD + name + ChatColor.BOLD + " Path!";
             Bukkit.broadcastMessage(pathCompleteMessage);
             logger.log(pathCompleteMessage);
 

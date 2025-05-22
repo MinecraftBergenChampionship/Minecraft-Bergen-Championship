@@ -105,6 +105,8 @@ public class BCA extends SurvivalGamesMap {
     public void resetBorder() {
         border.setCenter(0, 0);
         border.setSize(400);
+        border.setDamageBuffer(0);
+        border.setDamageAmount(0.5);
     }
 
     @Override

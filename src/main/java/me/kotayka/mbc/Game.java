@@ -8,6 +8,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
+import org.bukkit.entity.WindCharge;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.potion.PotionEffect;
@@ -301,6 +302,13 @@ public abstract class Game extends Minigame {
     }
 
     public void snowballHit(Snowball proj, Player p) {
+        Vector snowballVelocity = proj.getVelocity();
+        p.damage(0.1);
+        p.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.18, snowballVelocity.getZ() * 0.1));
+        proj.remove();
+    }
+
+    public void snowballHit(WindCharge proj, Player p) {
         Vector snowballVelocity = proj.getVelocity();
         p.damage(0.1);
         p.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.18, snowballVelocity.getZ() * 0.1));

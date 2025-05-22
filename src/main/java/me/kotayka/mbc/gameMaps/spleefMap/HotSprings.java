@@ -15,7 +15,7 @@ public class HotSprings extends SpleefMap {
     private int maxErosionLayer = 0;
     int erosion = -1;
     public HotSprings() {
-        super("Hot Springs", 90, "Regular", "bigkirbypuff_");
+        super("Hot Springs", 90, "Wind", "bigkirbypuff_");
 
         for (int i = 0; i < 12; i++) {
             blocks.add(new LinkedList<>());
