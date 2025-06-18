@@ -22,6 +22,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -61,23 +62,23 @@ public class DiscoFever extends PartyGame {
     private EditSession editSession = null;
 
     public Map<ColorType, Material> woodMap = Map.of(ColorType.RED, Material.MANGROVE_PLANKS, ColorType.YELLOW, 
-                                                        Material.BIRCH_PLANKS, ColorType.GREEN, Material.LIME_TERRACOTTA, 
+                                                        Material.BAMBOO_MOSAIC, ColorType.GREEN, Material.LIME_GLAZED_TERRACOTTA, 
                                                         ColorType.BLUE, Material.WARPED_PLANKS, ColorType.PINK, Material.CRIMSON_PLANKS);
     public Map<ColorType, Material> concreteMap = Map.of(ColorType.RED, Material.RED_CONCRETE, ColorType.YELLOW, 
                                                         Material.YELLOW_CONCRETE, ColorType.GREEN, Material.LIME_CONCRETE, 
-                                                        ColorType.BLUE, Material.BLUE_CONCRETE, ColorType.PINK, Material.PURPLE_CONCRETE);
+                                                        ColorType.BLUE, Material.BLUE_CONCRETE, ColorType.PINK, Material.PINK_CONCRETE);
     public Map<ColorType, Material> oreMap = Map.of(ColorType.RED, Material.REDSTONE_BLOCK, ColorType.YELLOW, 
                                                         Material.GOLD_BLOCK, ColorType.GREEN, Material.EMERALD_BLOCK, 
                                                         ColorType.BLUE, Material.LAPIS_BLOCK, ColorType.PINK, Material.AMETHYST_BLOCK);
     public Map<ColorType, Material> woolMap = Map.of(ColorType.RED, Material.RED_WOOL, ColorType.YELLOW, 
                                                         Material.YELLOW_WOOL, ColorType.GREEN, Material.LIME_WOOL, 
-                                                        ColorType.BLUE, Material.BLUE_WOOL, ColorType.PINK, Material.PURPLE_WOOL);
+                                                        ColorType.BLUE, Material.BLUE_WOOL, ColorType.PINK, Material.PINK_WOOL);
     public Map<ColorType, Material> miscMapOne = Map.of(ColorType.RED, Material.RED_MUSHROOM_BLOCK, ColorType.YELLOW, 
                                                         Material.HONEYCOMB_BLOCK, ColorType.GREEN, Material.MELON, 
-                                                        ColorType.BLUE, Material.WARPED_WART_BLOCK, ColorType.PINK, Material.PURPUR_BLOCK);
+                                                        ColorType.BLUE, Material.SCULK, ColorType.PINK, Material.PURPUR_BLOCK);
     public Map<ColorType, Material> miscMapTwo = Map.of(ColorType.RED, Material.BRICKS, ColorType.YELLOW, 
                                                         Material.SPONGE, ColorType.GREEN, Material.MOSS_BLOCK, 
-                                                        ColorType.BLUE, Material.PRISMARINE_BRICKS, ColorType.PINK, Material.STRIPPED_CHERRY_WOOD);
+                                                        ColorType.BLUE, Material.PRISMARINE_BRICKS, ColorType.PINK, Material.BRAIN_CORAL_BLOCK);
 
     public Map<ColorType, Material> randomizedBlocks = new HashMap<ColorType, Material>();
 
@@ -687,6 +688,11 @@ public class DiscoFever extends PartyGame {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void coralDecay(BlockFadeEvent e) {
+        e.setCancelled((true));
     }
 }
 

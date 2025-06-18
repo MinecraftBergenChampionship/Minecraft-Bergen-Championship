@@ -34,15 +34,18 @@ public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
     private boolean revealedGames;
     // Icon display code is kinda missy can probably be improved; a refactoring of game class may need to be made for cleanest icon support but not doing it yet @see Game
-    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑭ Ace Race", "⑬ Survival Games", "⑲ Lockdown", "⑯ Spleef", "⑮ Build Mart", "⑰ Party", "⑱ Power Tag"));
-    // no skybattle currently, as we are skipping in mbc9
+    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑭ Ace Race", "⑲ Lockdown", "⑯ Spleef", "⑮ Build Mart", "⑰ Party", "⑱ Power Tag", "⑫ Skybattle"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
 
     private List<MBCTeam> powerupTeams = new ArrayList<>();
+    private final Map<VotePowerup, Integer> lastPlaceWeights = Map.ofEntries(
+            entry(VotePowerup.DUNK, 3), entry(VotePowerup.MEGA_COW, 3), entry(VotePowerup.CROSSBOWS, 2),
+            entry(VotePowerup.CHICKEN_SWAP, 2)
+    );
     private final Map<VotePowerup, Integer> weights = Map.ofEntries(
-            entry(VotePowerup.DUNK, 4), entry(VotePowerup.MEGA_COW, 4), entry(VotePowerup.CROSSBOWS, 4),
-            entry(VotePowerup.CHICKEN_SWAP, 3), entry(VotePowerup.HIDDEN, 3)
+            entry(VotePowerup.DUNK, 3), entry(VotePowerup.MEGA_COW, 3), entry(VotePowerup.CROSSBOWS, 4),
+            entry(VotePowerup.CHICKEN_SWAP, 1), entry(VotePowerup.HIDDEN, 2), entry(VotePowerup.EGGSTRA_VOTES, 2)
     );
     //removed eggstra votes for now bc it lame
     private Participant mega_cow_shooter = null;
@@ -422,9 +425,26 @@ public class DecisionDome extends Minigame {
             pool.add(powerups.remove(0));
         }
 
+        List<VotePowerup> lastPlacePowerups = new ArrayList<>();
+        for (Map.Entry<VotePowerup, Integer> entry : lastPlaceWeights.entrySet()) {
+            for (int i = 0; i < entry.getValue(); i++) {
+                lastPlacePowerups.add(entry.getKey());
+            }
+        }
+
+        Collections.shuffle(lastPlacePowerups);
+        Set<VotePowerup> lastPlacePool = new HashSet<>();
+        for (int i = 0; i < lastPlacePowerups.size(); i++) {
+            lastPlacePool.add(lastPlacePowerups.remove(0));
+        }
+
         for (MBCTeam t : powerupTeams) {
             // Randomly get powerup
             VotePowerup powerup = powerups.remove(0);
+            if (t.getPlace() == MBC.getInstance().getValidTeams().size()) {
+                powerup = lastPlacePowerups.remove(0);
+            }
+            
             // whole team powerups
             if (powerup == VotePowerup.CROSSBOWS || powerup == VotePowerup.EGGSTRA_VOTES) {
                 for (Participant p : t.getPlayers()) {
@@ -497,9 +517,14 @@ public class DecisionDome extends Minigame {
                 }
             }
         } else {
+            for (MBCTeam t : teams) {
+                if (t.getPlace() == teams.size()) {
+                    powerupTeams.add(t);
+                }
+            }
             List<MBCTeam> candidates = new ArrayList<>();
             for (MBCTeam t : MBC.getInstance().getValidTeams()) {
-                if (t.getPlace() >= teams.size()-2) {
+                if (t.getPlace() >= teams.size()-3 && t.getPlace() != teams.size()) {
                     candidates.add(t);
                 }
             }
@@ -512,7 +537,13 @@ public class DecisionDome extends Minigame {
         }
 
         for (MBCTeam t : powerupTeams) {
-            Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.LIGHT_PURPLE + " were chosen to receive a powerup!");
+            if (t.getPlace() == teams.size()) {
+                Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.LIGHT_PURPLE + " are in last, and were chosen to receive a powerup!");
+            }
+            else {
+                Bukkit.broadcastMessage(t.teamNameFormat() + ChatColor.LIGHT_PURPLE + " were randomly chosen to receive a powerup!");
+            }
+            
             for (Participant p : t.getPlayers()) {
                 p.getPlayer().spawnParticle(Particle.HAPPY_VILLAGER, p.getPlayer().getLocation().add(0.5, 0.75, 0.5), 3);
             }

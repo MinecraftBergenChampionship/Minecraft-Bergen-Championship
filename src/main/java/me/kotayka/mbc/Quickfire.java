@@ -323,6 +323,7 @@ public class Quickfire extends FinaleGame {
         killer.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(victim.getFormattedName() + " - " + ChatColor.RED + "0 ♥"));
         Bukkit.broadcastMessage(victim.getFormattedName() + " was shot by " + killer.getFormattedName());
         logger.log(victim.getPlayerName() + " was shot and killed by " + killer.getPlayerName());
+        victim.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
 
         if (victim.getTeam().equals(firstPlace)) {
             if (playersAlive[0] != 1) {

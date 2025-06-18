@@ -47,7 +47,9 @@ public class Spleef extends Game {
 
     // scoring
     private final int SURVIVAL_POINTS = 2;
-    private final int KILL_POINTS = 3;
+    private final int KILL_POINTS_18 = 3;
+    private final int KILL_POINTS_24 = 5;
+    private final int KILL_POINTS = KILL_POINTS_24;
     private final int LAST_TEAM_BONUS = 2;
 
     // Misc
@@ -67,7 +69,7 @@ public class Spleef extends Game {
                 "⑯ Bonus points are awarded to the highest placing players and the longest lasting full team.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "⑯ +2 points for outliving another player\n" +
-                        "⑯ +3 points for spleefing another player\n" +
+                        "⑯ +5 points for spleefing another player\n" +
                         "⑯ +2 points for every player on the last fully alive team\n" +
                         "⑯ +1-10 points for placing top 8"
         });

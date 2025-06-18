@@ -546,7 +546,7 @@ public class TGTTOS extends Game {
             Location to = e.getTo();
             if (player.getGameMode() != GameMode.SURVIVAL) return;
 
-            if (from.getZ() <= 442) {
+            if (from.getZ() <= 443) {
                 return;
             }
 

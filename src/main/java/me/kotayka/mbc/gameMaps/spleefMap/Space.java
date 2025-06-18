@@ -93,7 +93,7 @@ public class Space extends SpleefMap {
             Bukkit.broadcastMessage(ChatColor.RED+"The planet is decaying!");
         }
         if (timeRemaining < 90) {
-            for (int i = 0; i < 20 && planet.size() > 1; i++) {
+            for (int i = 0; i < 23 && planet.size() > 1; i++) {
                 int rand = (int) (Math.random() * planet.size());
                 decaying.add(planet.get(rand));
                 planet.remove(rand);

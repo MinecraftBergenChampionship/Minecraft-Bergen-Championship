@@ -38,16 +38,16 @@ public class Lockdown extends Game {
 
     private WorldBorder border = null;
 
-    private final int ORIGINAL_KILL_POINTS_18 = 6;
-    private final int ORIGINAL_KILL_POINTS_24 = 8;
+    private final int ORIGINAL_KILL_POINTS_18 = 5;
+    private final int ORIGINAL_KILL_POINTS_24 = 7;
     private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_24;
 
-    private final int TWO_KILL_POINTS_18 = 5;
-    private final int TWO_KILL_POINTS_24 = 7;
+    private final int TWO_KILL_POINTS_18 = 4;
+    private final int TWO_KILL_POINTS_24 = 6;
     private final int TWO_KILL_POINTS = TWO_KILL_POINTS_24;
 
-    private final int FOUR_KILL_POINTS_18 = 4;
-    private final int FOUR_KILL_POINTS_24 = 6;
+    private final int FOUR_KILL_POINTS_18 = 3;
+    private final int FOUR_KILL_POINTS_24 = 5;
     private final int FOUR_KILL_POINTS = FOUR_KILL_POINTS_24;
 
     private final int SIX_KILL_POINTS_18 = 3;
@@ -56,17 +56,12 @@ public class Lockdown extends Game {
 
     private MBCTeam[][] capturedPoints = new MBCTeam[6][6];
 
-    private final int OUTER_CAPTURE_POINTS_18 = 2;
-    private final int OUTER_CAPTURE_POINTS_24 = 3;
-    private final int OUTER_CAPTURE_POINTS = OUTER_CAPTURE_POINTS_24;
-
-    private final int INNER_CAPTURE_POINTS_18 = 3;
-    private final int INNER_CAPTURE_POINTS_24 = 4;
-    private final int INNER_CAPTURE_POINTS = INNER_CAPTURE_POINTS_24;
-
-    private final int MIDDLE_CAPTURE_POINTS_18 = 4;
-    private final int MIDDLE_CAPTURE_POINTS_24 = 5;
-    private final int MIDDLE_CAPTURE_POINTS = MIDDLE_CAPTURE_POINTS_24;
+    private final int FIRST_TEAM_ZONE_POINTS = 1;
+    private final int FIRST_ZONE = 5;
+    private final int SECOND_ZONE = 4;
+    private final int THIRD_ZONE = 3;
+    private final int FOURTH_FIFTH_ZONE = 2;
+    private final int SIXTH_AND_MORE_ZONE = 1;
 
     private final int ESCAPE_POINTS_18 = 10;
     private final int ESCAPE_POINTS_24 = 10;
@@ -81,9 +76,8 @@ public class Lockdown extends Game {
                 "⑲ The border will shrink as time goes on, so make your way to the center.\n\n" +
                 "⑲ The center room has 4 zones as well as the evacuation point!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑲ +3 points per player for capturing a zone in the outer ring\n" +
-                                "⑲ +4 points per player for capturing a zone in the inner ring\n" + 
-                                "⑲ +5 points per player for capturing a zone in the center\n" +
+                                "⑲ +1-5 points per player for capturing a zone, decreasing after each captured\n" +
+                                "⑲ +1 point per player for capturing a zone first\n" +
                                 "⑲ +10 points for escaping at the evacuation point\n" +
                                 "⑲ +5-8 points per kill, decreasing after each kill\n"
         });
@@ -119,7 +113,7 @@ public class Lockdown extends Game {
 
     public void loadPlayers() {
         setPVP(false);
-        nameTagVisibility(false);
+        nameTagVisibility(true);
         if (lockdownPlayerMap != null) {
             for (LockdownPlayer p : lockdownPlayerMap.values()) {
                 p.lastDamager = null;
@@ -216,15 +210,20 @@ public class Lockdown extends Game {
                     }
                     for (LockdownPlayer p : lockdownPlayerMap.values()) {
                         switch (roundNum) {
-                            case(2):
+                            case(4):
                                 giveAxeKit(p);
                                 p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.GREEN+"" + ChatColor.BOLD+"AXES AND BOWS", "", 20, 60, 20);
                                 p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.BLOCKS, 1, 1);
                                 break;
-                            case(3):
+                            case(2):
                                 giveTridentKit(p);
                                 p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.AQUA+"" + ChatColor.BOLD+"TRIDENTS", "", 20, 60, 20);
                                 p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.BLOCKS, 1, 1);
+                                break;
+                            case(3):
+                                giveSwordKit(p);
+                                p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.RED+"" + ChatColor.BOLD+"SWORDS AND CROSSBOWS", "", 20, 60, 20);
+                                p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WARDEN_DEATH, SoundCategory.BLOCKS, 1, 1);
                                 break;
                             case(1):
                             default:
@@ -297,7 +296,6 @@ public class Lockdown extends Game {
                 border.setSize(6, 45);
             }
             if (timeRemaining == 0) {
-                woolPoints();
                 sendEscapees();
                 escapeCounter.clear();
                 for (Participant p : playersAlive) {
@@ -305,6 +303,7 @@ public class Lockdown extends Game {
                     p.getPlayer().getInventory().clear();
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WARDEN_SONIC_BOOM, 1, 1);
                 }
+                woolPoints();
                 if (roundNum < 3) {
                     roundOverGraphics();
                     for (Player p : Bukkit.getOnlinePlayers()) {
@@ -406,6 +405,7 @@ public class Lockdown extends Game {
      */
     public void woolPoints() {
         HashMap<MBCTeam, Integer> woolPoints = new HashMap<>();
+        HashMap<MBCTeam, Integer> capturedZones = new HashMap<>();
 
         String map = "\n" +ChatColor.GOLD + ""+ ChatColor.BOLD + "Map:\n\n";
         for (int i = 0; i < capturedPoints.length; i++) {
@@ -414,12 +414,30 @@ public class Lockdown extends Game {
                     MBCTeam t = capturedPoints[i][j];
                     map = map+ t.getChatColor()+""+ChatColor.BOLD+"■";
                     if (!woolPoints.containsKey(t)) woolPoints.put(t, 0);
+                    if (!capturedZones.containsKey(t)) capturedZones.put(t, 0);
 
                     int pointsEarned = 0;
-                    if (i == 0 || i == 5 || j == 0 || j == 5) {pointsEarned = OUTER_CAPTURE_POINTS;}
-                    else if (i == 1 || i == 4 || j == 1 || j == 4) {pointsEarned = INNER_CAPTURE_POINTS;}
-                    else {pointsEarned = MIDDLE_CAPTURE_POINTS;}
+                    switch(capturedZones.get(t)) {
+                        case 0: 
+                            pointsEarned = FIRST_ZONE; 
+                            break;
+                        case 1: 
+                            pointsEarned = SECOND_ZONE;
+                            break;
+                        case 2: 
+                            pointsEarned = THIRD_ZONE;
+                            break;
+                        case 3:
+                        case 4:
+                            pointsEarned = FOURTH_FIFTH_ZONE;
+                            break;
+                        default: 
+                            pointsEarned = SIXTH_AND_MORE_ZONE;
+                            break;
+                    }
+                    
                     woolPoints.replace(t, woolPoints.get(t)+pointsEarned);
+                    capturedZones.replace(t, capturedZones.get(t)+1);
 
                 }
                 else {
@@ -737,12 +755,23 @@ public class Lockdown extends Game {
         int row = map.rowOfLocation(l);
         int column = map.columnOfLocation(l);
 
-        capturedPoints[row][column] = t;
+        
 
         for (Participant p : t.getPlayers()) {
-            p.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Your team captured a zone!");
             if (!p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) MBC.spawnFirework(p);
+
+            if (capturedPoints[row][column] == null) {
+                p.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Your team captured a zone!" + MBC.getInstance().scoreFormatter(FIRST_TEAM_ZONE_POINTS));
+                p.addCurrentScore(FIRST_TEAM_ZONE_POINTS);
+            }
+            else {
+                p.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Your team captured a zone!");
+            }
         }
+
+        capturedPoints[row][column] = t;
+
+        
     }
 
     /*
@@ -751,8 +780,6 @@ public class Lockdown extends Game {
     public void lostPoint(Location l, MBCTeam t) {
         int row = map.rowOfLocation(l);
         int column = map.columnOfLocation(l);
-
-        capturedPoints[row][column] = null;
 
         for (Participant p : t.getPlayers()) {
             p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Another team is breaking one of your zones...");
@@ -893,10 +920,10 @@ public class Lockdown extends Game {
         chestplateMeta.setUnbreakable(true);
         leatherChestplate.setItemMeta(chestplateMeta);
 
-        ItemStack leatherPants = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_LEGGINGS));
-        ItemMeta pantsMeta = leatherChestplate.getItemMeta();
+        ItemStack ironPants = new ItemStack(Material.IRON_LEGGINGS);
+        ItemMeta pantsMeta = ironPants.getItemMeta();
         pantsMeta.setUnbreakable(true);
-        leatherPants.setItemMeta(pantsMeta);
+        ironPants.setItemMeta(pantsMeta);
 
         p.getPlayer().getInventory().addItem(stoneSword);
         p.getPlayer().getInventory().addItem(crossbow);
@@ -908,7 +935,7 @@ public class Lockdown extends Game {
 
         p.getPlayer().getInventory().setHelmet(diamondHelmet);
         p.getPlayer().getInventory().setChestplate(leatherChestplate);
-        p.getPlayer().getInventory().setLeggings(leatherPants);
+        p.getPlayer().getInventory().setLeggings(ironPants);
         p.getPlayer().getInventory().setBoots(diamondBoots);
     }
 
@@ -922,6 +949,11 @@ public class Lockdown extends Game {
         ItemMeta tridentMeta = trident.getItemMeta();
         tridentMeta.setUnbreakable(true);
         trident.setItemMeta(tridentMeta);
+
+        ItemStack goldAxe = new ItemStack(Material.GOLDEN_AXE);
+        ItemMeta axeMeta = goldAxe.getItemMeta();
+        axeMeta.setUnbreakable(true);
+        goldAxe.setItemMeta(axeMeta);
 
         ItemStack steak = new ItemStack(Material.COOKED_BEEF, 8);
         ItemStack wool = p.getParticipant().getTeam().getColoredWool();
@@ -937,15 +969,15 @@ public class Lockdown extends Game {
         helmetMeta.setUnbreakable(true);
         turtleHelmet.setItemMeta(helmetMeta);
 
-        ItemStack leatherBoots = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_BOOTS));
-        ItemMeta chestplateMeta = leatherBoots.getItemMeta();
-        chestplateMeta.setUnbreakable(true);
-        leatherBoots.setItemMeta(chestplateMeta);
+        ItemStack ironBoots = new ItemStack(Material.IRON_BOOTS);
+        ItemMeta bootsMeta = ironBoots.getItemMeta();
+        bootsMeta.setUnbreakable(true);
+        ironBoots.setItemMeta(bootsMeta);
 
         ItemStack leatherChestplate = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_CHESTPLATE));
-        ItemMeta bootsMeta = leatherChestplate.getItemMeta();
-        bootsMeta.setUnbreakable(true);
-        leatherChestplate.setItemMeta(bootsMeta);
+        ItemMeta chestplateMeta = leatherChestplate.getItemMeta();
+        chestplateMeta.setUnbreakable(true);
+        leatherChestplate.setItemMeta(chestplateMeta);
 
         ItemStack diamondPants = new ItemStack(Material.DIAMOND_LEGGINGS);
         ItemMeta pantsMeta = diamondPants.getItemMeta();
@@ -953,6 +985,7 @@ public class Lockdown extends Game {
         diamondPants.setItemMeta(pantsMeta);
 
         p.getPlayer().getInventory().addItem(trident);
+        p.getPlayer().getInventory().addItem(goldAxe);
         p.getPlayer().getInventory().addItem(steak);
         p.getPlayer().getInventory().addItem(wool);
         p.getPlayer().getInventory().addItem(shears);
@@ -960,7 +993,7 @@ public class Lockdown extends Game {
         p.getPlayer().getInventory().setHelmet(turtleHelmet);
         p.getPlayer().getInventory().setChestplate(leatherChestplate);
         p.getPlayer().getInventory().setLeggings(diamondPants);
-        p.getPlayer().getInventory().setBoots(leatherBoots);
+        p.getPlayer().getInventory().setBoots(ironBoots);
     }
 
      /**

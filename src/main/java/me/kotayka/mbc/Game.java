@@ -323,6 +323,9 @@ public abstract class Game extends Minigame {
             case 1 -> place + "st";
             case 2 -> place + "nd";
             case 3 -> place + "rd";
+            case 21 -> place + "st";
+            case 22 -> place + "nd";
+            case 23 -> place + "rd";
             default -> place + "th";
         };
     }

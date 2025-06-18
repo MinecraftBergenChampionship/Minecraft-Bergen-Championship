@@ -1,6 +1,10 @@
 package me.kotayka.mbc.gamePlayers;
 
 import me.kotayka.mbc.Participant;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 
@@ -9,6 +13,7 @@ public class PowerTagPlayer extends GamePlayer {
     private int survivals = 0;
     private int hideRounds = 0;
     private int timeSurvived = 0;
+    private List<PowerTagPlayer> playersFound = new ArrayList<>();
 
     public PowerTagPlayer(Participant p) {
         super(p);
@@ -61,4 +66,14 @@ public class PowerTagPlayer extends GamePlayer {
     public void incrementTimeSurvived(int extraTime) {
         this.timeSurvived+=extraTime;
     }
+
+    public void addPlayerKiller(PowerTagPlayer p) {
+        playersFound.add(p);
+    }
+
+    public List<PowerTagPlayer> getPlayersFound() {
+        return playersFound;
+    }
+
+    
 }
