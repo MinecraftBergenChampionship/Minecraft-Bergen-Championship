@@ -2,6 +2,7 @@ package me.kotayka.mbc.games;
 
 import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.skybattleMap.Campfire;
+import me.kotayka.mbc.gameMaps.skybattleMap.Endlantis;
 import me.kotayka.mbc.gameMaps.skybattleMap.SkybattleMap;
 import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
 import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
@@ -25,7 +26,7 @@ import java.util.*;
 public class Skybattle extends Game {
     public final Particle.DustOptions BORDER_PARTICLE = new Particle.DustOptions(Color.RED, 3);
     public final Particle.DustOptions TOP_BORDER_PARTICLE = new Particle.DustOptions(Color.ORANGE, 3);
-    public SkybattleMap map = new Campfire(this);
+    public SkybattleMap map = new Endlantis(this);
     public Map<UUID, SkybattlePlayer> skybattlePlayerMap = new HashMap<>();
     // Primed TNT Entity, Player (that placed that block); used for determining kills since primed tnt is spawned by world
     public Map<Entity, Player> TNTPlacers = new HashMap<Entity, Player>(5);

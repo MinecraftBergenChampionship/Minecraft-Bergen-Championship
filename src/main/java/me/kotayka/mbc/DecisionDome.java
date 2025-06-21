@@ -825,6 +825,27 @@ public class DecisionDome extends Minigame {
                 chickens.add(mega_cow);
                 chickens.add(mega_cow);
                 chickens.add(mega_cow);
+                if(tripled) {
+                    Cow cow2 = (Cow) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.COW);
+                    cow2.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
+                    if (hidden) {
+                        cow2.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 2, false, false));
+                    }
+                    VoteChicken mega_cow2 = new VoteChicken(p.getTeam(), cow2);
+                    chickens.add(mega_cow2);
+                    chickens.add(mega_cow2);
+                    chickens.add(mega_cow2);
+
+                    Cow cow3 = (Cow) egg.getLocation().getWorld().spawnEntity(egg.getLocation(), EntityType.COW);
+                    cow3.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION, 2, false, false));
+                    if (hidden) {
+                        cow3.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 2, false, false));
+                    }
+                    VoteChicken mega_cow3 = new VoteChicken(p.getTeam(), cow3);
+                    chickens.add(mega_cow3);
+                    chickens.add(mega_cow3);
+                    chickens.add(mega_cow3);
+                }
                 return;
             }
 
