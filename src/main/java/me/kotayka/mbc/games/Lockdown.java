@@ -16,8 +16,10 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
@@ -36,6 +38,7 @@ public class Lockdown extends Game {
     private Map<UUID, Boolean> canShoot = new HashMap<>();
     public static final long COOLDOWN_TIME = 400; // 0.8 seconds
     private int cooldownTaskID = -1;
+    private static final ItemStack HEAL_POTION = new ItemStack(Material.SPLASH_POTION);
 
     private WorldBorder border = null;
 
@@ -743,8 +746,13 @@ public class Lockdown extends Game {
         // handle shooting paintballs
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             Player player = e.getPlayer();
-            if (player.getInventory().getItemInMainHand().getType() != Material.DIAMOND_HORSE_ARMOR) return;
-            shootPaintball(player);
+            Material heldItem = player.getInventory().getItemInMainHand().getType();
+            if (heldItem == Material.DIAMOND_HORSE_ARMOR) {
+                shootPaintball(player);
+            } else if (heldItem == Material.SPLASH_POTION || player.getInventory().getItemInOffHand().getType() == Material.SPLASH_POTION) {
+                LockdownPlayer lockdownPlayer = lockdownPlayerMap.get(player.getUniqueId());
+                if (lockdownPlayer != null) handlePotionStatus(lockdownPlayer);
+            }
         }
     }
 
@@ -761,7 +769,27 @@ public class Lockdown extends Game {
 
             canShoot.put(shooter.getUniqueId(), false);
             cooldowns.put(shooter.getUniqueId(), System.currentTimeMillis());
+        } else {
+            shooter.playSound(shooter.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 1, 2);
         }
+    }
+
+    /**
+     * Schedules a task to give player a potion if they do not have one and are in the correct GameMode.
+     * {@link #onPlayerInteract} calls this function on valid potion throw
+     * @param player Player who threw the potion
+     */
+    private void handlePotionStatus(LockdownPlayer player) {
+       player.setPotion(false);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+                if (player.getPlayer().getGameMode() == GameMode.SURVIVAL) {
+                    player.setPotion(true);
+                    player.getPlayer().getInventory().addItem(HEAL_POTION);
+                }
+            }
+        }, 300);
     }
 
     /**
@@ -1072,6 +1100,10 @@ public class Lockdown extends Game {
         shearsMeta.setUnbreakable(true);
         shears.setItemMeta(shearsMeta);
 
+        PotionMeta potionMeta = (PotionMeta) HEAL_POTION.getItemMeta();
+        potionMeta.setBasePotionType(PotionType.HEALING);
+        HEAL_POTION.setItemMeta(potionMeta);
+
         ItemStack helm = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_HELMET));
         ItemStack chest = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_CHESTPLATE));
         ItemStack legs = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_LEGGINGS));
@@ -1290,6 +1322,7 @@ public class Lockdown extends Game {
             killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
         }
 
+        victim.getPlayer().setGameMode(GameMode.SPECTATOR);
         victim.getPlayer().getInventory().clear();
 
         for (Player p : Bukkit.getOnlinePlayers()) {
