@@ -59,6 +59,7 @@ public class Lockdown extends Game {
     private final int SIX_KILL_POINTS = SIX_KILL_POINTS_24;
 
     private MBCTeam[][] capturedPoints = new MBCTeam[6][6];
+    private MBCTeam[][] originalCapturedPoints = new MBCTeam[6][6];
 
     private final int FIRST_TEAM_ZONE_POINTS = 1;
     private final int FIRST_ZONE = 5;
@@ -234,6 +235,7 @@ public class Lockdown extends Game {
                                 givePaintballKit(p);
                                 p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.RED+"" + ChatColor.BOLD+"PAINTBALL", "", 20, 60, 20);
                                 p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WARDEN_DEATH, SoundCategory.BLOCKS, 1, 1);
+                                canShoot.put(p.getPlayer().getUniqueId(), true);
                                 cooldownTaskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().getPlugin(), () -> {
                                     Iterator<Map.Entry<UUID, Long>> iterator = cooldowns.entrySet().iterator();
                                     while (iterator.hasNext()) {
@@ -829,14 +831,13 @@ public class Lockdown extends Game {
         int row = map.rowOfLocation(l);
         int column = map.columnOfLocation(l);
 
-        
-
         for (Participant p : t.getPlayers()) {
             if (!p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) MBC.spawnFirework(p);
 
-            if (capturedPoints[row][column] == null) {
+            if (originalCapturedPoints[row][column] == null) {
                 p.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Your team captured a zone!" + MBC.getInstance().scoreFormatter(FIRST_TEAM_ZONE_POINTS));
                 p.addCurrentScore(FIRST_TEAM_ZONE_POINTS);
+                originalCapturedPoints[row][column] = t;
             }
             else {
                 p.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Your team captured a zone!");
@@ -854,6 +855,8 @@ public class Lockdown extends Game {
     public void lostPoint(Location l, MBCTeam t) {
         int row = map.rowOfLocation(l);
         int column = map.columnOfLocation(l);
+
+        capturedPoints[row][column] = null;
 
         for (Participant p : t.getPlayers()) {
             p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Another team is breaking one of your zones...");
@@ -1091,7 +1094,7 @@ public class Lockdown extends Game {
     public static void givePaintballKit(LockdownPlayer p) {
         if (p == null) {return;}
 
-        ItemStack paintballGun = new ItemStack(Material.IRON_HORSE_ARMOR);
+        ItemStack paintballGun = new ItemStack(Material.DIAMOND_HORSE_ARMOR);
         ItemStack steak = new ItemStack(Material.COOKED_BEEF, 8);
         ItemStack wool = p.getParticipant().getTeam().getColoredWool();
         wool.setAmount(64);

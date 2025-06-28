@@ -32,7 +32,7 @@ public class Endlantis extends SkybattleMap {
             new Location(getWorld(), -35, 81, 61),
             new Location(getWorld(), 35, 81, -61),
             new Location(getWorld(), 70, 81, 0),
-            new Location(getWorld(), -35, 81, 61),
+            new Location(getWorld(), 35, 81, 61),
     };
     public Endlantis(Skybattle skb) {
         super(skb);
