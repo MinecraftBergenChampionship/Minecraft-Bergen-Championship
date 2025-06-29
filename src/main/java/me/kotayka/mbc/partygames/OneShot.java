@@ -558,6 +558,8 @@ public class OneShot extends PartyGame {
         if(((Player)event.getDamager()).getInventory().getItemInMainHand().getType() == Material.DIAMOND_SWORD ||
         ((Player)event.getDamager()).getInventory().getItemInOffHand().getType() == Material.DIAMOND_SWORD) {
             if ((Participant.getParticipant(((Player) event.getDamager())).getTeam()).equals((Participant.getParticipant(((Player) event.getEntity())).getTeam()))) return;
+            Participant damager = Participant.getParticipant(((Player) event.getDamager()));
+            damager.addCurrentScore(KILL_POINTS);
             Death(Participant.getParticipant((Player) event.getEntity()), Participant.getParticipant(((Player)event.getDamager())));
             //EndGame(Participant.getParticipant(((Player) event.getDamager())).getTeam());
             event.setCancelled(true);

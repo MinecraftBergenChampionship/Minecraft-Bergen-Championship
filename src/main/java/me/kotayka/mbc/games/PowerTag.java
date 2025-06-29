@@ -1,36 +1,52 @@
 package me.kotayka.mbc.games;
 
-import me.kotayka.mbc.*;
-import me.kotayka.mbc.gameMaps.powerTagMaps.Room;
-import me.kotayka.mbc.gamePlayers.OneShotPlayer;
-import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
-import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
-import me.kotayka.mbc.*;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.*;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import me.kotayka.mbc.Game;
+import me.kotayka.mbc.GameState;
+import me.kotayka.mbc.MBC;
+import me.kotayka.mbc.MBCTeam;
+import me.kotayka.mbc.Participant;
+import me.kotayka.mbc.gameMaps.powerTagMaps.Room;
+import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class PowerTag extends Game {
     public final World TAG_WORLD = Bukkit.getWorld("powerTag");
@@ -70,7 +86,6 @@ public class PowerTag extends Game {
 
     private final int INCREMENT_POINTS = 1;
     private final int HIDE_BONUS_POINTS_TOP_5 = 8;
-    private final int HIDE_BONUS_POINTS_TOP_8 = 5;
     private final int FOUND_TOP_HIDER_BONUS = 5;
 
     private final int SURVIVAL_POINTS_18 = 8;
@@ -559,8 +574,8 @@ public class PowerTag extends Game {
         tensionMeta.setUnbreakable(true);
         tension.setItemMeta(tensionMeta);
 
-        ItemStack[] items = {tremor, trident, troll, toxic, tension};
-        //ItemStack[] items = {tension, trident, toxic};
+        //ItemStack[] items = {tremor, trident, troll, toxic, tension};
+        ItemStack[] items = {tension, trident, toxic};
 
         return items;
     }
@@ -665,8 +680,21 @@ public class PowerTag extends Game {
     public void infectedBegin() {
         infected.clear();
         if (getState().equals(GameState.ACTIVE) && timeRemaining > 85) {
-            PowerTagPlayer infectedHider = hiders.get((int)(Math.random()*hiders.size()));
-            infected.add(infectedHider);
+            if (hiders.size() > 0) {
+                PowerTagPlayer infectedHider = hiders.get((int)(Math.random()*hiders.size()));
+                infected.add(infectedHider);
+                if (hiders.size() > 1) {
+                    ArrayList<PowerTagPlayer> candidates = new ArrayList<>();
+                    for (PowerTagPlayer p : hiders) {
+                        if (!p.equals(infectedHider)) {
+                            candidates.add(p);
+                        }  
+                    }
+
+                    PowerTagPlayer infectedHider2 = candidates.get((int)(Math.random()*candidates.size()));
+                    infected.add(infectedHider2);
+                }
+            }
         }
     }
 
@@ -1024,20 +1052,14 @@ public class PowerTag extends Game {
         }
 
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 5; i++) {
             if (timeSurvivedSorted[i] == null) break;
             PowerTagPlayer hider = timeSurvivedSorted[i];
-            if (i < 5) {
-                hider.getPlayer().sendMessage(ChatColor.GREEN+"You earned a bonus for being the " + (i+1)  + "th best hider!" + MBC.scoreFormatter(HIDE_BONUS_POINTS_TOP_5));
-                for (PowerTagPlayer hunter : hider.getPlayersFound()) {
-                    hunter.getPlayer().sendMessage(ChatColor.GREEN+"You earned a bonus for finding a top hider, "+ hider.getParticipant().getFormattedName()+"!" + MBC.scoreFormatter(FOUND_TOP_HIDER_BONUS));
-                }
-            }
-            else {
-                 hider.getPlayer().sendMessage(ChatColor.GREEN+"You earned a bonus for being the " + (i+1)  + "th best hider!" + MBC.scoreFormatter(HIDE_BONUS_POINTS_TOP_8));
+            hider.getPlayer().sendMessage(ChatColor.GREEN+"You earned a bonus for being the " + (i+1)  + "" + getPlace(i+1) + " best hider!" + MBC.scoreFormatter(HIDE_BONUS_POINTS_TOP_5));
+            for (PowerTagPlayer hunter : hider.getPlayersFound()) {
+                hunter.getPlayer().sendMessage(ChatColor.GREEN+"You earned a bonus for finding a top hider, "+ hider.getParticipant().getFormattedName()+"!" + MBC.scoreFormatter(FOUND_TOP_HIDER_BONUS));
             }
         }
-
     }
 
     /**
@@ -1073,6 +1095,21 @@ public class PowerTag extends Game {
         }
         Bukkit.broadcastMessage(topFive.toString());
 
+    }
+
+    public static String getPlace(int place) {
+        if (place > 10 && place < 21) {
+            return (place + "th");
+        }
+        return switch (place) {
+            case 1 -> place + "st";
+            case 2 -> place + "nd";
+            case 3 -> place + "rd";
+            case 21 -> place + "st";
+            case 22 -> place + "nd";
+            case 23 -> place + "rd";
+            default -> place + "th";
+        };
     }
 
     /**

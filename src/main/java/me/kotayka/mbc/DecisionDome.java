@@ -1,10 +1,36 @@
 package me.kotayka.mbc;
 
-import me.kotayka.mbc.teams.Spectator;
-import org.bukkit.*;
+import static java.util.Map.entry;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Cow;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Egg;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.SmallFireball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
@@ -16,9 +42,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.*;
-
-import static java.util.Map.entry;
+import me.kotayka.mbc.teams.Spectator;
 
 /**
  * DecisionDome is the representation of the Voting Phase of the tournament.
@@ -40,12 +64,12 @@ public class DecisionDome extends Minigame {
 
     private List<MBCTeam> powerupTeams = new ArrayList<>();
     private final Map<VotePowerup, Integer> lastPlaceWeights = Map.ofEntries(
-            entry(VotePowerup.DUNK, 3), entry(VotePowerup.MEGA_COW, 3), entry(VotePowerup.CROSSBOWS, 2),
-            entry(VotePowerup.CHICKEN_SWAP, 2)
+            entry(VotePowerup.DUNK, 4), entry(VotePowerup.MEGA_COW, 3), entry(VotePowerup.CROSSBOWS, 1),
+            entry(VotePowerup.CHICKEN_SWAP, 2), entry(VotePowerup.FIRE_BOMB, 4)
     );
     private final Map<VotePowerup, Integer> weights = Map.ofEntries(
-            entry(VotePowerup.DUNK, 3), entry(VotePowerup.MEGA_COW, 3), entry(VotePowerup.CROSSBOWS, 4),
-            entry(VotePowerup.CHICKEN_SWAP, 1), entry(VotePowerup.HIDDEN, 2), entry(VotePowerup.EGGSTRA_VOTES, 2)
+            entry(VotePowerup.DUNK, 3), entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.CROSSBOWS, 4),
+            entry(VotePowerup.CHICKEN_SWAP, 1), entry(VotePowerup.HIDDEN, 2), entry(VotePowerup.FIRE_BOMB, 2)
     );
     //removed eggstra votes for now bc it lame
     private Participant mega_cow_shooter = null;
@@ -54,6 +78,7 @@ public class DecisionDome extends Minigame {
     private Player hider = null;
     private ChatColor dunked_team = null;
     private boolean hidden = false;
+    private Player bomber = null;
 
     private Participant chooser = null;
 
@@ -100,6 +125,7 @@ public class DecisionDome extends Minigame {
         if (dunked_team != null) dunked_team = null;
         if (hider != null) hider = null;
         if (hidden == true) hidden = false;
+        if (bomber != null) bomber = null;
         if (mega_cow_shooter != null) mega_cow_shooter = null;
 
         if (chooser != null) chooser = null;
@@ -153,6 +179,7 @@ public class DecisionDome extends Minigame {
         if (dunked_team != null) dunked_team = null;
         if (hider != null) hider = null;
         if (hidden == true) hidden = false;
+        if (bomber != null) bomber = null;
         if (mega_cow_shooter != null) mega_cow_shooter = null;
 
         // Deal with players
@@ -293,6 +320,9 @@ public class DecisionDome extends Minigame {
                     Bukkit.broadcastMessage(ChatColor.GREEN + "Counting votes...");
                     createLineAll(21, ChatColor.RED+""+ChatColor.BOLD+"Chosen game revealed: ");
                     winner = countVotes();
+                    for (Section s : sections.values()) {
+                        unFireBombed(s);
+                    }
                 }
                 case 6 -> {
                     if (tie) {
@@ -498,6 +528,10 @@ public class DecisionDome extends Minigame {
             case HIDDEN -> {
                 hider = p.getPlayer();
                 p.getPlayer().getInventory().addItem(new ItemStack(Material.ENDER_EYE, 1));
+            }
+            case FIRE_BOMB -> {
+                bomber = p.getPlayer();
+                p.getPlayer().getInventory().addItem(new ItemStack(Material.FIRE_CHARGE, 1));
             }
         }
     }
@@ -921,6 +955,54 @@ public class DecisionDome extends Minigame {
             }
             e.getEntity().remove();
         }
+        else if (e.getEntity().getType().equals(EntityType.SMALL_FIREBALL) || e.getEntity().getType().equals(EntityType.FIREBALL)) {
+            if (!(e.getEntity().getShooter() instanceof Player) || e.getEntity().getShooter() == null) return;
+
+            Participant shooter = Participant.getParticipant((Player) e.getEntity().getShooter());
+            if (bomber == null || !(shooter.getPlayer().getUniqueId().equals(bomber.getUniqueId()))) {
+                return;
+            }
+
+            Block hitBlock = e.getHitBlock();
+            Location hitBlockLocation = hitBlock.getLocation();
+
+            if (hitBlock != null) {
+                for (Section s : sections.values()) {
+                    for (Location l : s.sectionLocs) {
+                        if ((int)l.getX() == (int)hitBlock.getX() && (int)l.getZ() == (int)hitBlock.getZ()) {
+                            fireBombed(s);
+                            e.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+                e.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    private void fireBombed(Section s) {
+        Bukkit.broadcastMessage(Participant.getParticipant(bomber).getFormattedName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " lit the dome on fire!");
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.playSound(p, Sound.ITEM_FIRECHARGE_USE, 1.0f, 1.0f);
+        }
+        for (Location l : s.sectionLocs) {
+            Block block = l.getBlock();
+            block.getRelative(0, 1, 0).setType(Material.FIRE);
+        }
+
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+                @Override
+                public void run() { unFireBombed(s);}
+              }, 160L);
+    }
+
+    private void unFireBombed(Section s) {
+        for (Location l : s.sectionLocs) {
+            Block block = l.getBlock();
+            block.getRelative(0, 1, 0).setType(Material.AIR);
+        }
     }
 
     private void Dunk(MBCTeam team, Participant damager) {
@@ -1161,6 +1243,17 @@ public class DecisionDome extends Minigame {
             }
             else if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.ENDER_EYE) {
                 e.getPlayer().getInventory().remove(Material.ENDER_EYE);
+                e.setCancelled(true);
+            }
+
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.FIRE_CHARGE && !hidden && e.getPlayer().equals(bomber)) {
+                e.getPlayer().getInventory().remove(Material.FIRE_CHARGE);
+                SmallFireball fireball = e.getPlayer().launchProjectile(SmallFireball.class);
+                e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), Sound.ITEM_FIRECHARGE_USE, 1.0f, 1.0f);
+                e.setCancelled(true);
+            }
+            else if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.FIRE_CHARGE) {
+                e.getPlayer().getInventory().remove(Material.FIRE_CHARGE);
                 e.setCancelled(true);
             }
         }

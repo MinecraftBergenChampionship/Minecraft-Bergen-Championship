@@ -1,6 +1,7 @@
 package me.kotayka.mbc;
 
 import me.kotayka.mbc.comparators.TeamScoreSorter;
+import me.kotayka.mbc.gamePlayers.BuildMartPlayer;
 import me.kotayka.mbc.gamePlayers.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -504,6 +505,10 @@ public abstract class Game extends Minigame {
             case 18, 12 -> Bukkit.broadcastMessage(TO_PRINT);
             case 2 -> Bukkit.broadcastMessage(ChatColor.RED+"Returning to lobby...");
             case 0 -> {
+                for (Participant p : MBC.getInstance().getPlayers()) {
+                    p.getPlayer().setInvulnerable(false);
+                    p.getPlayer().setAllowFlight(false);
+                }
                 logger.logStats();
                 returnToLobby();
             }

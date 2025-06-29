@@ -6,5 +6,6 @@ public enum VotePowerup {
     EGGSTRA_VOTES,
     CROSSBOWS,
     CHICKEN_SWAP,
-    HIDDEN
+    HIDDEN,
+    FIRE_BOMB
 }

@@ -1,18 +1,45 @@
 package me.kotayka.mbc.games;
 
-import me.kotayka.mbc.*;
-import me.kotayka.mbc.gameMaps.lockdownMaps.*;
-import me.kotayka.mbc.gamePlayers.LockdownPlayer;
-import org.bukkit.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.damage.DamageType;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.*;
-import org.bukkit.event.player.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -23,7 +50,14 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import me.kotayka.mbc.Game;
+import me.kotayka.mbc.GameState;
+import me.kotayka.mbc.MBC;
+import me.kotayka.mbc.MBCTeam;
+import me.kotayka.mbc.Participant;
+import me.kotayka.mbc.gameMaps.lockdownMaps.Abandoned;
+import me.kotayka.mbc.gameMaps.lockdownMaps.LockdownMap;
+import me.kotayka.mbc.gamePlayers.LockdownPlayer;
 
 public class Lockdown extends Game {
     public LockdownMap map = new Abandoned(this);
@@ -138,6 +172,7 @@ public class Lockdown extends Game {
         for (int i = 0; i < capturedPoints.length; i++) {
             for (int j = 0; j < capturedPoints[i].length; j++) {
                 capturedPoints[i][j] = null;
+                originalCapturedPoints[i][j] = null;
             }
         }
         if (roundNum == 1)
@@ -197,7 +232,6 @@ public class Lockdown extends Game {
         roundNum = 1;
         resetPlayers();
     }
-
     @Override
     public void events() {
         if (getState().equals(GameState.TUTORIAL)) {
@@ -221,11 +255,11 @@ public class Lockdown extends Game {
                     }
                     for (LockdownPlayer p : lockdownPlayerMap.values()) {
                         switch (roundNum) {
-                            case(4):
-                                giveAxeKit(p);
-                                p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.GREEN+"" + ChatColor.BOLD+"AXES AND BOWS", "", 20, 60, 20);
-                                p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.BLOCKS, 1, 1);
-                                break;
+                            //case(-1):
+                                //giveAxeKit(p);
+                                //p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.GREEN+"" + ChatColor.BOLD+"AXES AND BOWS", "", 20, 60, 20);
+                                //p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.BLOCKS, 1, 1);
+                                //break;
                             case(2):
                                 giveTridentKit(p);
                                 p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.AQUA+"" + ChatColor.BOLD+"TRIDENTS", "", 20, 60, 20);
@@ -234,20 +268,8 @@ public class Lockdown extends Game {
                             case(3):
                                 givePaintballKit(p);
                                 p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.RED+"" + ChatColor.BOLD+"PAINTBALL", "", 20, 60, 20);
-                                p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WARDEN_DEATH, SoundCategory.BLOCKS, 1, 1);
-                                canShoot.put(p.getPlayer().getUniqueId(), true);
-                                cooldownTaskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().getPlugin(), () -> {
-                                    Iterator<Map.Entry<UUID, Long>> iterator = cooldowns.entrySet().iterator();
-                                    while (iterator.hasNext()) {
-                                        Map.Entry<UUID, Long> entry = iterator.next();
-                                        long storedTime = entry.getValue();
-
-                                        if (System.currentTimeMillis() - storedTime >= COOLDOWN_TIME) {
-                                            canShoot.put(entry.getKey(), true);
-                                            iterator.remove();
-                                        }
-                                    }
-                                }, 20, 1);
+                                p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.BLOCKS, 1, 1);
+                                paintballTask(p);
                                 break;
                             case(1):
                             default:
@@ -321,7 +343,6 @@ public class Lockdown extends Game {
             }
             if (timeRemaining == 0) {
                 if (cooldownTaskID != -1) {
-                    Bukkit.broadcastMessage("DEBUG: successfully cleared paintball cooldown task.");
                     Bukkit.getScheduler().cancelTask(cooldownTaskID);
                 }
                 sendEscapees();
@@ -376,6 +397,22 @@ public class Lockdown extends Game {
                 gameEndEvents();
             }
         }
+    }
+
+    public void paintballTask(LockdownPlayer p) {
+        canShoot.put(p.getPlayer().getUniqueId(), true);
+        cooldownTaskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().getPlugin(), () -> {
+            Iterator<Map.Entry<UUID, Long>> iterator = cooldowns.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<UUID, Long> entry = iterator.next();
+                long storedTime = entry.getValue();
+
+                if (System.currentTimeMillis() - storedTime >= COOLDOWN_TIME) {
+                    canShoot.put(entry.getKey(), true);
+                    iterator.remove();
+                }
+            }
+        }, 20, 1);
     }
 
     /*
@@ -831,10 +868,16 @@ public class Lockdown extends Game {
         int row = map.rowOfLocation(l);
         int column = map.columnOfLocation(l);
 
+        boolean hasBeenCaptured = true;
+
+        if (originalCapturedPoints[row][column] == null) {
+            hasBeenCaptured = false;
+        }
+
         for (Participant p : t.getPlayers()) {
             if (!p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) MBC.spawnFirework(p);
 
-            if (originalCapturedPoints[row][column] == null) {
+            if (hasBeenCaptured) {
                 p.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Your team captured a zone!" + MBC.getInstance().scoreFormatter(FIRST_TEAM_ZONE_POINTS));
                 p.addCurrentScore(FIRST_TEAM_ZONE_POINTS);
                 originalCapturedPoints[row][column] = t;
@@ -1125,6 +1168,7 @@ public class Lockdown extends Game {
         p.getPlayer().getInventory().addItem(steak);
         p.getPlayer().getInventory().addItem(wool);
         p.getPlayer().getInventory().addItem(shears);
+        p.getPlayer().getInventory().addItem(HEAL_POTION);
 
         p.getPlayer().getInventory().setHelmet(helm);
         p.getPlayer().getInventory().setChestplate(chest);
@@ -1260,11 +1304,22 @@ public class Lockdown extends Game {
         Vector velocity = projectile.getVelocity();
         projectile.remove();
 
+        shooter.getPlayer().playSound(shooter.getPlayer(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
+        hit.getPlayer().playSound(hit.getPlayer(), Sound.BLOCK_GLASS_BREAK, 1, 1.5f);
+
+        Location l = hitPlayer.getLocation();
+        int x = (l.getBlockX());
+        int z = (l.getBlockZ());
+        Block check = new Location(map.getWorld(), x, 1, z).getBlock();
+        if (check.getType() != Material.WAXED_EXPOSED_COPPER_BULB && escapeCounter.containsKey(Participant.getParticipant(hitPlayer))) {
+            removeEscapee(Participant.getParticipant(hitPlayer));
+        }
+
         if (hitPlayer.getHealth() - PAINTBALL_DAMAGE <= 0) {
             paintballDeath(lockdownPlayerMap.get(shooter.getPlayer().getUniqueId()), lockdownPlayerMap.get(hit.getPlayer().getUniqueId()));
         } else {
             hitPlayer.damage(PAINTBALL_DAMAGE);
-            lockdownPlayerMap.get(hit).lastDamager = shooter.getPlayer();
+            lockdownPlayerMap.get(hit.getPlayer().getUniqueId()).lastDamager = shooter.getPlayer();
         }
         hitPlayer.setVelocity(new Vector(velocity.getX() * 0.1, 0.15, velocity.getZ() * 0.1));
     }
@@ -1333,6 +1388,8 @@ public class Lockdown extends Game {
         }
 
         getLogger().log(deathMessage);
+
+        updatePlayersAlive(victim.getParticipant());
 
         updatePlayersAliveScoreboard();
 

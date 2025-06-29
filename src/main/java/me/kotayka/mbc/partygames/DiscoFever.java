@@ -82,7 +82,7 @@ public class DiscoFever extends PartyGame {
 
     public Map<ColorType, Material> randomizedBlocks = new HashMap<ColorType, Material>();
 
-    public final int STAGE_POINTS = 2;
+    public final int STAGE_POINTS = 3;
     public final int SURVIVAL_POINTS = 1;
     public final int WIN_POINTS = 10;
     public final Location SPAWN = new Location(Bukkit.getWorld("Party"), 400, 1.5, 400, 0, 0);

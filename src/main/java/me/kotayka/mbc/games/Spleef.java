@@ -26,11 +26,8 @@ import java.util.*;
 public class Spleef extends Game {
     private SpleefMap map = null;
     private List<SpleefMap> maps = new ArrayList<>(
-            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new Fortress(), new Colosseum())
+            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
     );
-    //private List<SpleefMap> maps = new ArrayList<>(
-            //Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
-    //);
     //private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
     //public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
     public Map<UUID, SpleefPlayer> spleefPlayers = new HashMap<>();
@@ -106,11 +103,8 @@ public class Spleef extends Game {
         damageMap.clear();
         brokenBlocks.clear();
         maps = new ArrayList<>(
-            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new Fortress(), new Colosseum())
+            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
         );
-        //  maps = new ArrayList<>(
-            //Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
-        //);
         brokenBlocks.clear();
         map.resetMap();
     }
@@ -182,15 +176,19 @@ public class Spleef extends Game {
     }
 
     private void loadMap() {
-        if (roundNum == 0) {
-            map = new HotSprings();
-            map.resetMap();
-        }
-        else {
-            map = maps.get((int) (Math.random()*maps.size()));
-            maps.remove(map);
-            map.resetMap();
-        }
+        //if (roundNum == 0) {
+            //map = new HotSprings();
+            //map.resetMap();
+        //}
+        //else {
+            //map = maps.get((int) (Math.random()*maps.size()));
+            //maps.remove(map);
+            //map.resetMap();
+        //}
+
+        map = maps.get((int) (Math.random()*maps.size()));
+        maps.remove(map);
+        map.resetMap();
     }
 
     @Override

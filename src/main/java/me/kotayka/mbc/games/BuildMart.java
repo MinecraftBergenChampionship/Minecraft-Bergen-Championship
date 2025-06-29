@@ -46,9 +46,9 @@ public class BuildMart extends Game {
     public final World BUILD_WORLD = Bukkit.getWorld("bsabmMaps");
     public static final int NUM_PLOTS_PER_TEAM = 3;
     // Scoring; points are per player
-    public static final int COMPLETION_POINTS_EASY = 4;
+    public static final int COMPLETION_POINTS_EASY = 5;
     public static final int COMPLETION_POINTS_MEDIUM = 8;
-    public static final int COMPLETION_POINTS_HARD = 12;
+    public static final int COMPLETION_POINTS_HARD = 11;
     public static final int PLACEMENT_POINTS = 1;
     public static final int MOST_BUILD_POINTS = 16;
 
