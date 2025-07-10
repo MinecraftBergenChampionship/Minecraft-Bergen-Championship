@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -32,13 +33,16 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -191,7 +195,8 @@ public class Lockdown extends Game {
             p.getPlayer().removePotionEffect(PotionEffectType.SLOWNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.POISON);
             p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
-            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, PotionEffect.INFINITE_DURATION, 255, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
             if (roundNum == 1) {
                 lockdownPlayerMap.put(p.getPlayer().getUniqueId(), new LockdownPlayer(p));
@@ -267,7 +272,7 @@ public class Lockdown extends Game {
                                 break;
                             case(3):
                                 givePaintballKit(p);
-                                p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.RED+"" + ChatColor.BOLD+"PAINTBALL", "", 20, 60, 20);
+                                p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.LIGHT_PURPLE+"" + ChatColor.BOLD+"PAINTBALL", "", 20, 60, 20);
                                 p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.BLOCKS, 1, 1);
                                 paintballTask(p);
                                 break;
@@ -288,8 +293,11 @@ public class Lockdown extends Game {
                 for (LockdownPlayer p : lockdownPlayerMap.values()) {
                     p.getPlayer().setInvulnerable(false);
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
-                    p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
-                    p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
+
+                    if (roundNum != 3) {
+                        p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+                        p.getPlayer().removePotionEffect(PotionEffectType.SATURATION);
+                    }
                 }
                 updatePlayersAliveScoreboard();
                 timeRemaining = 300;
@@ -413,6 +421,15 @@ public class Lockdown extends Game {
                 }
             }
         }, 20, 1);
+    }
+
+    @EventHandler
+    public void onFoodLevelChange(FoodLevelChangeEvent event)
+    {
+        if (!isGameActive()) return;
+        if (roundNum != 3) return;
+
+        event.setCancelled(true);
     }
 
     /*
@@ -788,11 +805,30 @@ public class Lockdown extends Game {
             Material heldItem = player.getInventory().getItemInMainHand().getType();
             if (heldItem == Material.DIAMOND_HORSE_ARMOR) {
                 shootPaintball(player);
-            } else if (heldItem == Material.SPLASH_POTION || player.getInventory().getItemInOffHand().getType() == Material.SPLASH_POTION) {
+            } else if ((heldItem == Material.SPLASH_POTION && e.getHand() == EquipmentSlot.HAND) || (player.getInventory().getItemInOffHand().getType() == Material.SPLASH_POTION  && e.getHand() == EquipmentSlot.OFF_HAND)) {
                 LockdownPlayer lockdownPlayer = lockdownPlayerMap.get(player.getUniqueId());
                 if (lockdownPlayer != null) handlePotionStatus(lockdownPlayer);
             }
         }
+    }
+
+    @EventHandler
+    public void onSwapHandItems(PlayerSwapHandItemsEvent e) {
+        if (e.getOffHandItem() != null && e.getOffHandItem().getType() == Material.SPLASH_POTION) {
+            e.setCancelled(true);
+        }
+        if (e.getOffHandItem() != null && e.getMainHandItem().getType() == Material.SPLASH_POTION) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        if (e.getCursor() != null && e.getCursor().getType() == Material.SPLASH_POTION) {
+            if (e.getSlot() == 40) { // Slot 40 is the offhand slot
+                e.setCancelled(true);
+            }
+    }   
     }
 
     /**
@@ -823,12 +859,12 @@ public class Lockdown extends Game {
         Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
             public void run() {
-                if (player.getPlayer().getGameMode() == GameMode.SURVIVAL) {
+                if (player.getPlayer().getGameMode() == GameMode.SURVIVAL && isGameActive()) {
                     player.setPotion(true);
                     player.getPlayer().getInventory().addItem(HEAL_POTION);
                 }
             }
-        }, 300);
+        }, 400);
     }
 
     /**
@@ -838,6 +874,7 @@ public class Lockdown extends Game {
     public void checkLastTeam(MBCTeam t) {
         if (checkTeamEliminated(t)) {
             teamsAlive.remove(t);
+            t.announceTeamOut();
         }
     }
 
@@ -868,16 +905,16 @@ public class Lockdown extends Game {
         int row = map.rowOfLocation(l);
         int column = map.columnOfLocation(l);
 
-        boolean hasBeenCaptured = true;
+        boolean notYetCaptured = false;
 
         if (originalCapturedPoints[row][column] == null) {
-            hasBeenCaptured = false;
+            notYetCaptured = true;
         }
 
         for (Participant p : t.getPlayers()) {
             if (!p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) MBC.spawnFirework(p);
 
-            if (hasBeenCaptured) {
+            if (notYetCaptured) {
                 p.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Your team captured a zone!" + MBC.getInstance().scoreFormatter(FIRST_TEAM_ZONE_POINTS));
                 p.addCurrentScore(FIRST_TEAM_ZONE_POINTS);
                 originalCapturedPoints[row][column] = t;
@@ -1148,6 +1185,11 @@ public class Lockdown extends Game {
 
         PotionMeta potionMeta = (PotionMeta) HEAL_POTION.getItemMeta();
         potionMeta.setBasePotionType(PotionType.HEALING);
+        ArrayList<String> potionLore = new ArrayList();
+        potionLore.add(ChatColor.LIGHT_PURPLE + "Gives large amount of health on splash!");
+        potionMeta.setLore(potionLore);
+        potionMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "Potion of Healing II");
+        potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 1), true);
         HEAL_POTION.setItemMeta(potionMeta);
 
         ItemStack helm = p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_HELMET));
@@ -1165,7 +1207,6 @@ public class Lockdown extends Game {
         bootsMeta.setUnbreakable(true);
 
         p.getPlayer().getInventory().addItem(paintballGun);
-        p.getPlayer().getInventory().addItem(steak);
         p.getPlayer().getInventory().addItem(wool);
         p.getPlayer().getInventory().addItem(shears);
         p.getPlayer().getInventory().addItem(HEAL_POTION);
@@ -1304,15 +1345,13 @@ public class Lockdown extends Game {
         Vector velocity = projectile.getVelocity();
         projectile.remove();
 
+        Participant damaged = Participant.getParticipant(hitPlayer);
+
         shooter.getPlayer().playSound(shooter.getPlayer(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
         hit.getPlayer().playSound(hit.getPlayer(), Sound.BLOCK_GLASS_BREAK, 1, 1.5f);
 
-        Location l = hitPlayer.getLocation();
-        int x = (l.getBlockX());
-        int z = (l.getBlockZ());
-        Block check = new Location(map.getWorld(), x, 1, z).getBlock();
-        if (check.getType() != Material.WAXED_EXPOSED_COPPER_BULB && escapeCounter.containsKey(Participant.getParticipant(hitPlayer))) {
-            removeEscapee(Participant.getParticipant(hitPlayer));
+        if(escapeCounter.containsKey(damaged)) {
+            removeEscapee(damaged);
         }
 
         if (hitPlayer.getHealth() - PAINTBALL_DAMAGE <= 0) {
@@ -1380,8 +1419,18 @@ public class Lockdown extends Game {
             killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
         }
 
+        int killPoints = killPoints(killer);
+        killer.kills++;
+
+        createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
+        killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!" + MBC.scoreFormatter(killPoints));
+        killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
+        killer.getParticipant().addCurrentScore(killPoints);
+
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
         victim.getPlayer().getInventory().clear();
+        victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
+        victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 30);
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.sendMessage(deathMessage);

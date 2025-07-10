@@ -349,6 +349,26 @@ public abstract class MBCTeam {
         }, 5L);
     }
 
+    /**
+     * Announces team out for lockdown.
+     */
+    public void announceTeamOut() {
+        // small delay to sync messages correctly
+        String s = "" + teamNameFormat() + " are all out of the game!";
+
+        MBC.getInstance().getMinigame().getLogger().log(s);
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().plugin, new Runnable() {
+            @Override
+            public void run() {
+                Bukkit.broadcastMessage(s);
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.ENTITY_BAT_DEATH, 1, 2);
+                }
+            }
+        }, 5L);
+    }
+
     public void setPlace(int place) {
         currentPlace = place;
     }

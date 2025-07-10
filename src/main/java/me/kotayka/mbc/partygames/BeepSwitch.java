@@ -654,7 +654,17 @@ public class BeepSwitch extends PartyGame {
         if (roundNum == rounds-1) return null;
         List<Player> currentPlayers = new ArrayList<>();
         for (List<Player> randList : randomTeamList.values()) {
-            currentPlayers.add(randList.get((roundNum+1)%randList.size()));
+            Player p = randList.get((roundNum+1)%randList.size());
+            int i = 0;
+            while (!p.isOnline()) {
+                i++;
+                p = randList.get((roundNum+1+i)%randList.size());
+                if (i >= randList.size()) {
+                    p = null;
+                    break;
+                }
+            }
+            if(p != null) currentPlayers.add(p);
         }
         return currentPlayers;
     }

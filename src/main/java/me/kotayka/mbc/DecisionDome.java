@@ -34,6 +34,7 @@ import org.bukkit.entity.SmallFireball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -58,14 +59,18 @@ public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
     private boolean revealedGames;
     // Icon display code is kinda missy can probably be improved; a refactoring of game class may need to be made for cleanest icon support but not doing it yet @see Game
-    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑭ Ace Race", "⑲ Lockdown", "⑯ Spleef", "⑮ Build Mart", "⑰ Party", "⑱ Power Tag", "⑫ Skybattle"));
+    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑬ Survival Games", "⑭ Ace Race", "⑲ Lockdown", "⑯ Spleef", "⑰ Party", "⑱ Power Tag", "⑫ Skybattle"));
+    //public List<String> gameNames = new ArrayList<>(Arrays.asList("⑬ Survival Games", "⑪ TGTTOS", "⑭ Ace Race", "⑲ Lockdown", "⑯ Spleef", "⑮ Build Mart", "⑰ Party", "⑱ Power Tag", "⑫ Skybattle"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
 
     private List<MBCTeam> powerupTeams = new ArrayList<>();
+    //private final Map<VotePowerup, Integer> lastPlaceWeights = Map.ofEntries(
+            //entry(VotePowerup.DUNK, 4), entry(VotePowerup.MEGA_COW, 3), entry(VotePowerup.CROSSBOWS, 1),
+            //entry(VotePowerup.CHICKEN_SWAP, 2), entry(VotePowerup.FIRE_BOMB, 4)
+    //);
     private final Map<VotePowerup, Integer> lastPlaceWeights = Map.ofEntries(
-            entry(VotePowerup.DUNK, 4), entry(VotePowerup.MEGA_COW, 3), entry(VotePowerup.CROSSBOWS, 1),
-            entry(VotePowerup.CHICKEN_SWAP, 2), entry(VotePowerup.FIRE_BOMB, 4)
+             entry(VotePowerup.FIRE_BOMB, 4)
     );
     private final Map<VotePowerup, Integer> weights = Map.ofEntries(
             entry(VotePowerup.DUNK, 3), entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.CROSSBOWS, 4),
@@ -79,6 +84,7 @@ public class DecisionDome extends Minigame {
     private ChatColor dunked_team = null;
     private boolean hidden = false;
     private Player bomber = null;
+    private boolean bombed = false;
 
     private Participant chooser = null;
 
@@ -127,6 +133,7 @@ public class DecisionDome extends Minigame {
         if (hidden == true) hidden = false;
         if (bomber != null) bomber = null;
         if (mega_cow_shooter != null) mega_cow_shooter = null;
+        if (bombed == true) bombed = false;
 
         if (chooser != null) chooser = null;
 
@@ -181,6 +188,7 @@ public class DecisionDome extends Minigame {
         if (hidden == true) hidden = false;
         if (bomber != null) bomber = null;
         if (mega_cow_shooter != null) mega_cow_shooter = null;
+        if (bombed == true) bombed = false;
 
         // Deal with players
         loadPlayers();
@@ -505,7 +513,7 @@ public class DecisionDome extends Minigame {
             }
             case CROSSBOWS -> {
                 p.getPlayer().getInventory().addItem(new ItemStack(Material.CROSSBOW, 1));
-                p.getPlayer().getInventory().addItem(new ItemStack(Material.ARROW, 1));
+                p.getPlayer().getInventory().addItem(new ItemStack(Material.ARROW, 2));
             }
             case DUNK -> {
                 dunker = p.getPlayer();
@@ -963,8 +971,23 @@ public class DecisionDome extends Minigame {
                 return;
             }
 
+
+            if (e.getHitEntity() != null) {
+                Location hitBlockLocation = e.getHitEntity().getLocation();
+                for (Section s : sections.values()) {
+                    for (Location l : s.sectionLocs) {
+                        if ((int)l.getX() == (int)hitBlockLocation.getX() && (int)l.getZ() == (int)hitBlockLocation.getZ()) {
+                            fireBombed(s);
+                            e.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+                e.setCancelled(true);
+                return;
+            }
+
             Block hitBlock = e.getHitBlock();
-            Location hitBlockLocation = hitBlock.getLocation();
 
             if (hitBlock != null) {
                 for (Section s : sections.values()) {
@@ -983,7 +1006,9 @@ public class DecisionDome extends Minigame {
     }
 
     private void fireBombed(Section s) {
-        Bukkit.broadcastMessage(Participant.getParticipant(bomber).getFormattedName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " lit the dome on fire!");
+        if (bombed) return;
+        bombed = true;
+        Bukkit.broadcastMessage(Participant.getParticipant(bomber).getFormattedName() + ChatColor.RED + " lit the dome on fire!");
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.playSound(p, Sound.ITEM_FIRECHARGE_USE, 1.0f, 1.0f);
         }
@@ -1045,7 +1070,7 @@ public class DecisionDome extends Minigame {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().sendTitle(" ", team.teamNameFormat() + ChatColor.RESET + " were dunked!", 0, 60, 30);
             p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 1, 1);
-            if (p.getTeam().equals(team)) {
+            if (p.getTeam().equals(team) && !p.equals(swapper)) {
                 p.getPlayer().teleport(getTeleportLocation(p.getTeam().getChatColor()));
                 p.getPlayer().setVelocity(new Vector(0, 0, 0));
             }
@@ -1096,6 +1121,37 @@ public class DecisionDome extends Minigame {
             copyFromY = -30;
         }
 
+    }
+
+    @EventHandler
+    public void onChickenDeath(EntityDeathEvent event) {
+        if (!getState().equals(GameState.ACTIVE) && !(getState().equals(GameState.END_ROUND) && timeRemaining > 8)) return;
+        if (event.getEntity() instanceof Chicken) {
+            Chicken chicken = (Chicken) event.getEntity();
+            VoteChicken rm = null;
+            for (VoteChicken vc : chickens) {
+                if (vc.chicken != null && vc.chicken.equals(chicken)) {
+                    rm = vc;
+                    break;
+                }
+            }
+            if (chickens.contains(rm)) {
+                chickens.remove(rm);
+            }
+        }
+        else if (event.getEntity() instanceof Cow) {
+            Cow cow = (Cow) event.getEntity();
+            VoteChicken rm = null;
+            for (VoteChicken vc : chickens) {
+                if (vc.cow != null && vc.cow.equals(cow)) {
+                    rm = vc;
+                    break;
+                }
+            }
+            if (chickens.contains(rm)) {
+                chickens.remove(rm);
+            }
+        }
     }
 
     @EventHandler
@@ -1249,6 +1305,7 @@ public class DecisionDome extends Minigame {
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.FIRE_CHARGE && !hidden && e.getPlayer().equals(bomber)) {
                 e.getPlayer().getInventory().remove(Material.FIRE_CHARGE);
                 SmallFireball fireball = e.getPlayer().launchProjectile(SmallFireball.class);
+                fireball.setBounce(false);
                 e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), Sound.ITEM_FIRECHARGE_USE, 1.0f, 1.0f);
                 e.setCancelled(true);
             }

@@ -488,7 +488,7 @@ public class PowerTag extends Game {
                 p.getPlayer().getInventory().removeItem(i);
             }
             if (hiderPowerupMap.get(p).equals(hiderPowerupList[0]) || hiderPowerupMap.get(p).equals(hiderPowerupList[1])) p.getPlayer().getInventory().addItem(getHiderPowerupTool());
-            if (hiderPowerupMap.get(p).equals(hiderPowerupList[2])) p.getPlayer().getInventory().addItem(new ItemStack(Material.SNOWBALL, 3));
+            if (hiderPowerupMap.get(p).equals(hiderPowerupList[2])) p.getPlayer().getInventory().addItem(new ItemStack(Material.SNOWBALL, 8));
         }   
     }
 
@@ -560,7 +560,7 @@ public class PowerTag extends Game {
         ItemMeta toxicMeta = toxic.getItemMeta();
         toxicMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "TOXIC");
         ArrayList<String> toxicLore = new ArrayList();
-        toxicLore.add(ChatColor.GREEN + "A player starts infected and spreads disease - everyone infected gets revealed!");
+        toxicLore.add(ChatColor.GREEN + "Two players start infected and spread disease - everyone infected gets revealed!");
         toxicMeta.setLore(toxicLore);
         toxicMeta.setUnbreakable(true);
         toxic.setItemMeta(toxicMeta);
@@ -1055,7 +1055,7 @@ public class PowerTag extends Game {
         for (int i = 0; i < 5; i++) {
             if (timeSurvivedSorted[i] == null) break;
             PowerTagPlayer hider = timeSurvivedSorted[i];
-            hider.getPlayer().sendMessage(ChatColor.GREEN+"You earned a bonus for being the " + (i+1)  + "" + getPlace(i+1) + " best hider!" + MBC.scoreFormatter(HIDE_BONUS_POINTS_TOP_5));
+            hider.getPlayer().sendMessage(ChatColor.GREEN+"You earned a bonus for being the " + "" + getPlace(i+1) + " best hider!" + MBC.scoreFormatter(HIDE_BONUS_POINTS_TOP_5));
             for (PowerTagPlayer hunter : hider.getPlayersFound()) {
                 hunter.getPlayer().sendMessage(ChatColor.GREEN+"You earned a bonus for finding a top hider, "+ hider.getParticipant().getFormattedName()+"!" + MBC.scoreFormatter(FOUND_TOP_HIDER_BONUS));
             }
@@ -1512,7 +1512,7 @@ public class PowerTag extends Game {
         if (timeRemaining > 30 && timeRemaining <= 90 && hunterPowerup.equals(hunterPowerupList[3]) && p.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) {
             if (infected.contains(p)) {
                 for (PowerTagPlayer runner : aliveHiders) {
-                    if (runner.getPlayer().getLocation().distance(p.getPlayer().getLocation()) <= 5.5 && runner.getPlayer().getGameMode().equals(GameMode.SURVIVAL) && !infected.contains(runner)) {
+                    if (runner.getPlayer().getLocation().distance(p.getPlayer().getLocation()) <= 4 && runner.getPlayer().getGameMode().equals(GameMode.SURVIVAL) && !infected.contains(runner)) {
                         infected.add(runner);
                     }
                 }

@@ -106,7 +106,10 @@ public class Skybattle extends Game {
             p.getPlayer().removePotionEffect(PotionEffectType.SLOWNESS);
             p.getPlayer().removePotionEffect(PotionEffectType.POISON);
             p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.SLOW_FALLING);
+            p.getPlayer().removePotionEffect(PotionEffectType.INFESTED);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
             if (roundNum == 1) {
                 skybattlePlayerMap.put(p.getPlayer().getUniqueId(), new SkybattlePlayer(p));
                 playersAlive.add(p);

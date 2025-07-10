@@ -206,6 +206,7 @@ public class OneShot extends PartyGame {
             break;
             case 4:
                 p.getInventory().addItem(SWORD);
+                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, PotionEffect.INFINITE_DURATION, 255, false, false));
                 p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             break;
             default:
@@ -629,6 +630,7 @@ public class OneShot extends PartyGame {
                     p.getInventory().addItem(SWORD);
                     p.addCurrentScore(WEAPON_POINTS);
                     p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, PotionEffect.INFINITE_DURATION, 255, false, false));
                     b.addPlayer(p.getPlayer());
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                     p.getPlayer().sendMessage(ChatColor.RED + "Your team reached " + (KILLS_PER_WEAPON*4) + " kills and recieved the " + ChatColor.BOLD + "sword" + ChatColor.RESET + "" + ChatColor.RED + "! Get one kill to win!" + MBC.scoreFormatter(WEAPON_POINTS));
