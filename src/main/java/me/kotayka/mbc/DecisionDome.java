@@ -65,12 +65,9 @@ public class DecisionDome extends Minigame {
     private final Map<Material, Section> sections = new HashMap<>(8);
 
     private List<MBCTeam> powerupTeams = new ArrayList<>();
-    //private final Map<VotePowerup, Integer> lastPlaceWeights = Map.ofEntries(
-            //entry(VotePowerup.DUNK, 4), entry(VotePowerup.MEGA_COW, 3), entry(VotePowerup.CROSSBOWS, 1),
-            //entry(VotePowerup.CHICKEN_SWAP, 2), entry(VotePowerup.FIRE_BOMB, 4)
-    //);
     private final Map<VotePowerup, Integer> lastPlaceWeights = Map.ofEntries(
-             entry(VotePowerup.FIRE_BOMB, 4)
+            entry(VotePowerup.DUNK, 4), entry(VotePowerup.MEGA_COW, 3), entry(VotePowerup.CROSSBOWS, 1),
+            entry(VotePowerup.CHICKEN_SWAP, 2), entry(VotePowerup.FIRE_BOMB, 4)
     );
     private final Map<VotePowerup, Integer> weights = Map.ofEntries(
             entry(VotePowerup.DUNK, 3), entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.CROSSBOWS, 4),
