@@ -426,7 +426,7 @@ public class PowerTag extends Game {
         ItemMeta invisMeta = invisPowerup.getItemMeta();
         invisMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "INVISIBILITY");
         ArrayList<String> invisLore = new ArrayList();
-        invisLore.add(ChatColor.AQUA + "Gain temporary invisibility (note: your boots are still visible)!");
+        invisLore.add(ChatColor.AQUA + "Gain temporary invisibility (note: particles are visible)!");
         invisMeta.setLore(invisLore);
         invisMeta.setUnbreakable(true);
         invisPowerup.setItemMeta(invisMeta);
