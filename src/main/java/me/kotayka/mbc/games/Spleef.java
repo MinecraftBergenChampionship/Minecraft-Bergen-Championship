@@ -26,8 +26,11 @@ import java.util.*;
 public class Spleef extends Game {
     private SpleefMap map = null;
     private List<SpleefMap> maps = new ArrayList<>(
-            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
+            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Colosseum())
     );
+    //private List<SpleefMap> maps = new ArrayList<>(
+            //Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
+    //);
     //private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
     //public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
     public Map<UUID, SpleefPlayer> spleefPlayers = new HashMap<>();
