@@ -499,7 +499,7 @@ public class BeepSwitch extends PartyGame {
         int[] teamProgress = progress.get(p.getTeam());
 
         MBC.spawnFirework(p.getPlayer().getLocation(), p.getTeam().getColor());
-        p.getPlayer().playSound(p.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
+        p.getPlayer().playSound(p.getPlayer(), "sfx.kill_coins", SoundCategory.BLOCKS, 0.5f, 1);
         p.getPlayer().removePotionEffect(PotionEffectType.SPEED);
 
         String courseComplete = p.getFormattedName() + " has completed " + (path+1) + "-" + (teamProgress[path]+1) + ": " + 

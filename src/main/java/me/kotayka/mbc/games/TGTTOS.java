@@ -174,7 +174,7 @@ public class TGTTOS extends Game {
                     lightTime = 120 - (int)(3*Math.random() + 3);
                 }
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 0.75f, 1);
+                    p.playSound(p, "sfx.started_ring", SoundCategory.BLOCKS, 0.75f, 1);
                     p.playSound(p, Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS, 1, 1);
                 }
             } else {
@@ -182,7 +182,7 @@ public class TGTTOS extends Game {
                 mapCreator(map.getName(), map.getCreator());
                 if (timeRemaining == 9) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "sfx.game_starting_jingle", SoundCategory.RECORDS, 1, 1);
                     }
                 }
             }
@@ -498,13 +498,13 @@ public class TGTTOS extends Game {
             if (timeRemaining <= 10 && timeRemaining > 3) {
                 p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">" + timeRemaining + "<", 0, 20, 0);
             } else if (timeRemaining == 3) {
-                p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_1, SoundCategory.BLOCKS, 1, 1);
+                p.playSound(p, "sfx.starting_beep", SoundCategory.BLOCKS, 1, 1);
                 p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">" + ChatColor.RED + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             } else if (timeRemaining == 2) {
-                p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_1, SoundCategory.BLOCKS, 1, 1);
+                p.playSound(p, "sfx.starting_beep", SoundCategory.BLOCKS, 1, 1);
                 p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">" + ChatColor.YELLOW + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             } else if (timeRemaining == 1) {
-                p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_1, SoundCategory.BLOCKS, 1, 1);
+                p.playSound(p, "sfx.starting_beep", SoundCategory.BLOCKS, 1, 1);
                 p.sendTitle(ChatColor.AQUA + "Chaos begins in:", ChatColor.BOLD + ">" + ChatColor.GREEN + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             }
         }

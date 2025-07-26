@@ -4,6 +4,7 @@ import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.skybattleMap.Campfire;
 import me.kotayka.mbc.gameMaps.skybattleMap.Endlantis;
 import me.kotayka.mbc.gameMaps.skybattleMap.SkybattleMap;
+import me.kotayka.mbc.gamePlayers.LockdownPlayer;
 import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
 import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
 import org.bukkit.*;
@@ -33,16 +34,28 @@ public class Skybattle extends Game {
     // Creeper Entity, Player (that spawned them); used for determining kills by creeper explosion
     public Map<Entity, Player> creeperSpawners = new HashMap<Entity, Player>(5);
     public Map<Entity,Player> witchSpawners = new HashMap<>();
-    private final int KILL_POINTS_18 = 9;
-    private final int KILL_POINTS_24 = 9;
-    private final int KILL_POINTS = KILL_POINTS_24;
+     private final int ORIGINAL_KILL_POINTS_18 = 9;
+    private final int ORIGINAL_KILL_POINTS_24 = 10;
+    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_24;
+
+    private final int THREE_KILL_POINTS_18 = 7;
+    private final int THREE_KILL_POINTS_24 = 8;
+    private final int THREE_KILL_POINTS = THREE_KILL_POINTS_24;
+
+    private final int SIX_KILL_POINTS_18 = 6;
+    private final int SIX_KILL_POINTS_24 = 7;
+    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_24;
+
+    private final int NINE_KILL_POINTS_18 = 5;
+    private final int NINE_KILL_POINTS_24 = 6;
+    private final int NINE_KILL_POINTS = NINE_KILL_POINTS_24;
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
     private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
     private final int SURVIVAL_POINTS = 1;
     private final int WIN_POINTS = 0;
     // Team bonuses split among team
-    private final int[] TEAM_BONUSES_3 = {24, 21, 18, 15, 12, 9};
-    private final int[] TEAM_BONUSES_4 = {36, 32, 28, 24, 20, 16};
+    private final int[] TEAM_BONUSES_3 = {30, 27, 24, 21, 18, 15};
+    private final int[] TEAM_BONUSES_4 = {40, 36, 32, 28, 24, 20};
 
     public Skybattle() {
         super("Skybattle", new String[] {
@@ -177,16 +190,16 @@ public class Skybattle extends Game {
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
                 if (roundNum == 1) mapCreator(map.mapName, map.creatorName);
-                startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                startingCountdown("sfx.starting_beep");
                 if (timeRemaining == 9) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "sfx.game_starting_jingle", SoundCategory.RECORDS, 1, 1);
                     }
                 }
             } else {
                 setGameState(GameState.ACTIVE);
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.RECORDS, 0.75f, 1);
+                    p.playSound(p, "sfx.started_ring", SoundCategory.RECORDS, 0.75f, 1);
                     p.playSound(p, Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS, 1, 1);
                 }
                 map.removeBarriers();
@@ -620,7 +633,7 @@ public class Skybattle extends Game {
                 e.setDeathMessage(player.getParticipant().getFormattedName() + " died mysteriously!");
             } else {
                 e.setDeathMessage(player.getParticipant().getFormattedName() + " mysteriously died to " + killer.getParticipant().getFormattedName());
-                killer.getParticipant().addCurrentScore(KILL_POINTS);
+                killer.getParticipant().addCurrentScore(killPoints(killer));
                 killer.kills++;
                 createLine(2, ChatColor.YELLOW + "" + ChatColor.BOLD + "Your kills: " + ChatColor.RESET + killer.kills, killer.getParticipant());
             }
@@ -630,7 +643,7 @@ public class Skybattle extends Game {
         }
 
         if (killer!=null && !killer.equals(player)) {
-            killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
+            killer.getPlayer().playSound(killer.getPlayer(), "sfx.kill_coins", SoundCategory.BLOCKS, 0.5f, 1);
         }
 
         int count = 0;
@@ -699,9 +712,9 @@ public class Skybattle extends Game {
             killer.kills++;
 
             createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
-            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!" + MBC.scoreFormatter(KILL_POINTS));
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!" + MBC.scoreFormatter(killPoints(killer)));
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
-            killer.getParticipant().addCurrentScore(KILL_POINTS);
+            killer.getParticipant().addCurrentScore(killPoints(killer));
 
             switch (damageCause) {
                 case ENTITY_ATTACK:
@@ -742,9 +755,9 @@ public class Skybattle extends Game {
             killer.kills++;
 
             createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+killer.kills, killer.getParticipant());
-            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!" + MBC.scoreFormatter(KILL_POINTS));
+            killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + victim.getPlayer().getName() + "!" + MBC.scoreFormatter(killPoints(killer)));
             killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
-            killer.getParticipant().addCurrentScore(KILL_POINTS);
+            killer.getParticipant().addCurrentScore(killPoints(killer));
 
             if (!(deathMessage.contains(" " + killer.getPlayer().getName()))) {
                 deathMessage += " whilst fighting " + killer.getParticipant().getFormattedName();
@@ -820,8 +833,8 @@ public class Skybattle extends Game {
             if (p.lastDamager != null) {
                 SkybattlePlayer killer = skybattlePlayerMap.get(p.getPlayer().getUniqueId());
                 if (killer == null) return;
-                killer.getParticipant().addCurrentScore(KILL_POINTS);
-                killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + p.getParticipant().getPlayerName() + "!" + MBC.scoreFormatter(KILL_POINTS));
+                killer.getParticipant().addCurrentScore(killPoints(killer));
+                killer.getPlayer().sendMessage(ChatColor.GREEN+"You killed " + p.getParticipant().getPlayerName() + "!" + MBC.scoreFormatter(killPoints(killer)));
                 killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + p.getParticipant().getFormattedName(), 0, 60, 20);
                 killer.kills++;
             }
@@ -852,6 +865,27 @@ public class Skybattle extends Game {
             p.kills = 0;
             p.voidDeath = false;
             p.lastDamager = null;
+        }
+    }
+
+    /*
+     * Given SkybattlePlayer p, return the correct amount of points they earn for killing a player. Will decrease as # of kills increases
+     */
+    public int killPoints(SkybattlePlayer p) {
+        switch(p.kills) {
+            case (0):
+            case (1):
+                return ORIGINAL_KILL_POINTS;
+            case (2):
+            case (3):
+            case (4):
+                return THREE_KILL_POINTS;
+            case (5):
+            case (6):
+            case (7):
+                return SIX_KILL_POINTS;
+            default:
+                return NINE_KILL_POINTS;
         }
     }
 

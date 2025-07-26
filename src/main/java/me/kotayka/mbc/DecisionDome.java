@@ -59,7 +59,7 @@ public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
     private boolean revealedGames;
     // Icon display code is kinda missy can probably be improved; a refactoring of game class may need to be made for cleanest icon support but not doing it yet @see Game
-    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑬ Survival Games", "⑭ Ace Race", "⑲ Lockdown", "⑯ Spleef", "⑰ Party", "⑱ Power Tag", "⑫ Skybattle"));
+    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑮ Build Mart", "⑭ Ace Race", "⑲ Lockdown", "⑯ Spleef", "⑰ Party", "⑱ Power Tag", "⑫ Skybattle"));
     //public List<String> gameNames = new ArrayList<>(Arrays.asList("⑬ Survival Games", "⑪ TGTTOS", "⑭ Ace Race", "⑲ Lockdown", "⑯ Spleef", "⑮ Build Mart", "⑰ Party", "⑱ Power Tag", "⑫ Skybattle"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
@@ -71,7 +71,7 @@ public class DecisionDome extends Minigame {
     );
     private final Map<VotePowerup, Integer> weights = Map.ofEntries(
             entry(VotePowerup.DUNK, 3), entry(VotePowerup.MEGA_COW, 2), entry(VotePowerup.CROSSBOWS, 4),
-            entry(VotePowerup.CHICKEN_SWAP, 1), entry(VotePowerup.HIDDEN, 2), entry(VotePowerup.FIRE_BOMB, 2)
+            entry(VotePowerup.CHICKEN_SWAP, 1), entry(VotePowerup.HIDDEN, 1), entry(VotePowerup.FIRE_BOMB, 2)
     );
     //removed eggstra votes for now bc it lame
     private Participant mega_cow_shooter = null;
@@ -973,7 +973,7 @@ public class DecisionDome extends Minigame {
                 Location hitBlockLocation = e.getHitEntity().getLocation();
                 for (Section s : sections.values()) {
                     for (Location l : s.sectionLocs) {
-                        if ((int)l.getX() == (int)hitBlockLocation.getX() && (int)l.getZ() == (int)hitBlockLocation.getZ()) {
+                        if ((int)l.getX() == (int)Math.round(hitBlockLocation.getX()) && (int)l.getZ() == (int)Math.round(hitBlockLocation.getZ())) {
                             fireBombed(s);
                             e.setCancelled(true);
                             return;
@@ -989,7 +989,7 @@ public class DecisionDome extends Minigame {
             if (hitBlock != null) {
                 for (Section s : sections.values()) {
                     for (Location l : s.sectionLocs) {
-                        if ((int)l.getX() == (int)hitBlock.getX() && (int)l.getZ() == (int)hitBlock.getZ()) {
+                        if ((int)l.getX() == hitBlock.getX() && (int)l.getZ() == hitBlock.getZ()) {
                             fireBombed(s);
                             e.setCancelled(true);
                             return;
@@ -1122,7 +1122,18 @@ public class DecisionDome extends Minigame {
 
     @EventHandler
     public void onChickenDeath(EntityDeathEvent event) {
-        if (!getState().equals(GameState.ACTIVE) && !(getState().equals(GameState.END_ROUND) && timeRemaining > 8)) return;
+        if (!getState().equals(GameState.ACTIVE)) {
+            if (getState().equals(GameState.END_ROUND)) {
+                if (timeRemaining <= 8) return;
+                else;
+            }
+            else if (getState().equals(GameState.END_GAME)) {
+                return;
+            }
+            else {
+                return;
+            }
+        }
         if (event.getEntity() instanceof Chicken) {
             Chicken chicken = (Chicken) event.getEntity();
             VoteChicken rm = null;
@@ -1133,6 +1144,7 @@ public class DecisionDome extends Minigame {
                 }
             }
             if (chickens.contains(rm)) {
+                Bukkit.broadcastMessage("removed vote chicken due to death");
                 chickens.remove(rm);
             }
         }

@@ -71,7 +71,7 @@ public class Lockdown extends Game {
 
     public HashMap<Participant, Integer> escapeCounter = new HashMap<>();
 
-    public final int PAINTBALL_DAMAGE = 2;
+    public final int PAINTBALL_DAMAGE = 3;
     private Map<UUID, Long> cooldowns = new HashMap<>();
     private Map<UUID, Boolean> canShoot = new HashMap<>();
     public static final long COOLDOWN_TIME = 400; // 0.8 seconds
@@ -764,7 +764,7 @@ public class Lockdown extends Game {
      * Player p escapes! Give points, change playersalive.
      */
     public void playerEscape(Participant p) {
-        p.getPlayer().playSound(p.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 1, 1);
+        p.getPlayer().playSound(p.getPlayer(), "sfx.kill_coins", SoundCategory.BLOCKS, 1, 1);
         p.addCurrentScore(ESCAPE_POINTS);
         p.getPlayer().sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You Escaped!" + MBC.getInstance().scoreFormatter(ESCAPE_POINTS));
         Bukkit.broadcastMessage(p.getFormattedName() + " escaped the Lockdown!");
@@ -864,7 +864,7 @@ public class Lockdown extends Game {
                     player.getPlayer().getInventory().addItem(HEAL_POTION);
                 }
             }
-        }, 400);
+        }, 600);
     }
 
     /**
@@ -1393,7 +1393,7 @@ public class Lockdown extends Game {
         updatePlayersAlive(player.getParticipant());
 
         if (killer!=null && !killer.equals(player)) {
-            killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
+            killer.getPlayer().playSound(killer.getPlayer(), "sfx.kill_coins", SoundCategory.BLOCKS, 0.5f, 1);
         }
 
         e.getPlayer().getInventory().clear();
@@ -1416,7 +1416,7 @@ public class Lockdown extends Game {
     private void paintballDeath(LockdownPlayer killer, LockdownPlayer victim) {
         String deathMessage = victim.getParticipant().getFormattedName() + " was shot by " + killer.getParticipant().getFormattedName();
         if (!killer.equals(victim)) {
-            killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
+            killer.getPlayer().playSound(killer.getPlayer(), "sfx.kill_coins", SoundCategory.BLOCKS, 0.5f, 1);
         }
 
         int killPoints = killPoints(killer);
@@ -1427,6 +1427,7 @@ public class Lockdown extends Game {
         killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
         killer.getParticipant().addCurrentScore(killPoints);
 
+        MBC.spawnFirework(victim.getParticipant());
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
         victim.getPlayer().getInventory().clear();
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
@@ -1549,6 +1550,9 @@ public class Lockdown extends Game {
                 case SUFFOCATION:
                 case FALLING_BLOCK:
                     deathMessage += " whilst fighting " + killer.getParticipant().getFormattedName();
+                    break;
+                case WORLD_BORDER:
+                    deathMessage = victim.getParticipant().getFormattedName() + " was killed in the border fighting " + killer.getParticipant().getFormattedName();
                     break;
                 default:
                     deathMessage = victim.getParticipant().getFormattedName() + " has died to " + killer.getParticipant().getFormattedName();

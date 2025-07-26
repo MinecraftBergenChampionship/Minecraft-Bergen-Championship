@@ -188,8 +188,8 @@ public class Lobby extends Minigame {
                     Bukkit.broadcastMessage("\n"+title+"...\n");
                 }
             }
-            if (timeRemaining > 135 && timeRemaining < 220) {
-                if (timeRemaining % 10 == 0) {
+            if (timeRemaining > 136 && timeRemaining < 186) {
+                if (timeRemaining % 6 == 2) {
                     if (revealIndiv.size() < (8 - revealIndivCounter)) {
                         String title = ChatColor.BOLD+"Nobody!";
                         Bukkit.broadcastMessage(title);
@@ -198,49 +198,49 @@ public class Lobby extends Minigame {
                         revealIndiv(revealIndiv.get(7 - revealIndivCounter), 8 - revealIndivCounter);
                     }
                     revealIndivCounter++;
-                } else if (timeRemaining % 5 == 0) {
+                } else if (timeRemaining % 6 == 4) {
                     String title = ChatColor.BOLD+"In " + Game.getPlace(8 - revealIndivCounter);
-                    MBC.sendTitle(title," ", 20, 140, 20);
+                    MBC.sendTitle(title," ", 20, 40, 20);
                     Bukkit.broadcastMessage("\n"+title+"...\n");
                 }
             }
             switch (timeRemaining) {
-                case 238 -> {
+                case 201 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nBefore our big reveal, we'd like to recognize our team and more!\n");
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.ENTITY_CHICKEN_EGG, 1, 1);
                     }
                 }
-                case 235 -> {
+                case 198 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nOur building team: " + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "BappleBusiness, Grassy311, and _Coookie_!\n");
                     MBC.sendTitle(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Builders", ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "BappleBusiness, Grassy311, _Coookie_", 0, 60, 20);
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 0.9f);
+                        p.playSound(p, "sfx.kill_coins", SoundCategory.BLOCKS, 0.5f, 0.9f);
                     }
                 }
-                case 230 -> {
+                case 195 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nOur admin team: " + ChatColor.GOLD + "" + ChatColor.BOLD + "Pengu1n__, iDrg, and queakie!\n");
                     MBC.sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "Admins",ChatColor.GOLD + "" + ChatColor.BOLD + "Pengu1n__, iDrg, queakie", 0, 60, 20);
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
+                        p.playSound(p, "sfx.kill_coins", SoundCategory.BLOCKS, 0.5f, 1);
                     }
                     
                 }
-                case 225 -> {
+                case 192 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nOur organizers: " + ChatColor.AQUA + "" + ChatColor.BOLD + "bigkirbypuff_ and rspacerr!\n");
                     MBC.sendTitle(ChatColor.AQUA + "" + ChatColor.BOLD + "Organizers", ChatColor.AQUA + "" + ChatColor.BOLD + "bigkirbypuff_, rspacerr", 0, 60, 20);
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1.1f);
+                        p.playSound(p, "sfx.kill_coins", SoundCategory.BLOCKS, 0.5f, 1.1f);
                     }
                 }
-                case 220 -> {
+                case 189 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nSpecial thank you to: " + ChatColor.GREEN + "" + ChatColor.BOLD + "Noxcrew, Capollo Media, and Groink Studios!\n");
                     MBC.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "Special Thanks:", ChatColor.GREEN + "" + ChatColor.BOLD + "Noxcrew (MCC), Capollo Media (Block Wars), Groink Studios (Pandora's Box)", 0, 60, 20);
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 2);
                     }
                 }
-                case 217 -> {
+                case 186 -> {
                     revealIndiv = MBC.getInstance().getPlayers();
                     revealIndiv.sort(new TotalIndividualComparator());
                     while(revealIndiv.size() > 8) {
@@ -248,7 +248,7 @@ public class Lobby extends Minigame {
                     }
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nNow to our individual standings...\n");
                 }
-                case 132 -> {
+                case 133 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nCongrats to our individual winners!\n");
                 }
                 case 130 -> {
@@ -500,7 +500,7 @@ public class Lobby extends Minigame {
             new Location(this.world, 14.5, -2, -58.5, -0, 0),
         };
 
-        MBC.sendTitle(p.getFormattedName(), "with " + p.getRawTotalScore() + " points", 20, 90, 20);
+        MBC.sendTitle(p.getFormattedName(), "with " + p.getRawTotalScore() + " points", 20, 60, 20);
         Bukkit.broadcastMessage("\n" + p.getFormattedName()+ " with " + p.getRawTotalScore() + " points!\n");
         MBC.spawnFirework(locs[place-1], p.getTeam().getColor());
         p.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -601,7 +601,7 @@ public class Lobby extends Minigame {
         teamBarriers(true);
         loadPlayersIndivReveal();
         stopTimer();
-        setTimer(240);
+        setTimer(203);
     }
 
     public void loadPlayersEnd() {
@@ -1142,7 +1142,7 @@ public class Lobby extends Minigame {
                 for (int i = miniBeepers.size() -1; i >= 0; i--) {
                     
                     Player player = miniBeepers.get(i).getPlayer();
-                    player.playSound(player, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 1, 1);
+                    player.playSound(player, "sfx.started_ring", SoundCategory.BLOCKS, 1, 1);
                     if (miniBeepers.size() == 1) player.sendMessage(ChatColor.LIGHT_PURPLE + "Mini Beep has begun with 1 player!");
                     else player.sendMessage(ChatColor.LIGHT_PURPLE + "Mini Beep has begun with " + miniBeepers.size() + " players!");
                     player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.AQUA + "" + currentLevel.getName().trim()));
@@ -1444,7 +1444,7 @@ public class Lobby extends Minigame {
             else e.getPlayer().sendMessage(new TextComponent(killed.getFormattedName() + " was killed by " + k.getFormattedName() + "!"));
 
             killer.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Killed " + killed.getFormattedName()));
-            killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
+            killer.getPlayer().playSound(killer.getPlayer(), "sfx.kill_coins", SoundCategory.BLOCKS, 0.5f, 1);
         }
         
         

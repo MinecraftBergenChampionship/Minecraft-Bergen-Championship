@@ -162,6 +162,7 @@ public class DiscoFever extends PartyGame {
         switch (getState()) {
             case TUTORIAL:
                 if (timeRemaining == 0) {
+                    MBC.getInstance().sendMutedMessages();
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         p.getPlayer().teleport(SPAWN);
                         playerClear(p.getPlayer());

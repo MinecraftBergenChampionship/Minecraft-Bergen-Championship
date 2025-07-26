@@ -158,7 +158,7 @@ public class Quickfire extends FinaleGame {
             if (score[0] == 0 && score[1] == 0)mapCreator(map.mapName, map.creatorName);
             if (timeRemaining == 0) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 1, 1);
+                    p.playSound(p, "sfx.started_ring", SoundCategory.BLOCKS, 1, 1);
                 }
                 Barriers(false);
                 setGameState(GameState.ACTIVE);
@@ -169,7 +169,7 @@ public class Quickfire extends FinaleGame {
                         p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
                     }
                 }
-                startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                startingCountdown("sfx.starting_beep");
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             createLineAll(20, ChatColor.RED.toString() + ChatColor.BOLD + "Time: " + ChatColor.RESET + getFormattedTime(timeElapsed));
@@ -354,7 +354,7 @@ public class Quickfire extends FinaleGame {
             createScoreboard();
             p.sendTitle(t.teamNameFormat() + " win MBC!", " ", 0, 100, 20);
             p.stopSound(Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS);
-            p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_6, SoundCategory.BLOCKS, 1, 1);
+            p.playSound(p, "sfx.winners_jingle", SoundCategory.BLOCKS, 1, 1);
             p.setInvulnerable(true);
         }
 

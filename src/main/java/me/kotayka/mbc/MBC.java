@@ -1,35 +1,77 @@
 package me.kotayka.mbc;
 
-import me.kotayka.mbc.NPCs.NPCManager;
-import me.kotayka.mbc.commands.loadPlayers;
-import me.kotayka.mbc.comparators.TeamScoreSorter;
-import me.kotayka.mbc.comparators.TotalIndividualComparator;
-import me.kotayka.mbc.games.*;
-import me.kotayka.mbc.partygames.OneShot;
-import me.kotayka.mbc.teams.*;
-import com.destroystokyo.paper.event.player.PlayerJumpEvent;
-import org.bukkit.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.*;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Painting;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
-import java.io.File;
-import java.util.*;
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
+
+import me.kotayka.mbc.NPCs.NPCManager;
+import me.kotayka.mbc.commands.loadPlayers;
+import me.kotayka.mbc.comparators.TeamScoreSorter;
+import me.kotayka.mbc.comparators.TotalIndividualComparator;
+import me.kotayka.mbc.gameMaps.tgttosMap.Meatball;
+import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
+import me.kotayka.mbc.games.AceRace;
+import me.kotayka.mbc.games.BuildMart;
+import me.kotayka.mbc.games.Lockdown;
+import me.kotayka.mbc.games.Party;
+import me.kotayka.mbc.games.PowerTag;
+import me.kotayka.mbc.games.Skybattle;
+import me.kotayka.mbc.games.Spleef;
+import me.kotayka.mbc.games.SurvivalGames;
+import me.kotayka.mbc.games.TGTTOS;
+import me.kotayka.mbc.teams.Blue;
+import me.kotayka.mbc.teams.Green;
+import me.kotayka.mbc.teams.Pink;
+import me.kotayka.mbc.teams.Purple;
+import me.kotayka.mbc.teams.Red;
+import me.kotayka.mbc.teams.Spectator;
+import me.kotayka.mbc.teams.Yellow;
 
 public class MBC implements Listener {
     // singleton for event
@@ -522,6 +564,68 @@ public class MBC implements Listener {
         sender.sendMessage(msg + "");
     }
 
+    public void setPlayerQuickfireCondition(Participant part) {
+        if (MBC.getInstance().quickfire == null) {
+            Bukkit.broadcastMessage("Cannot set player to quickfire team if quickfire is inactive!");
+            return;
+        }
+
+        MBCTeam firstPlace = MBC.getInstance().quickfire.firstPlace;
+        MBCTeam secondPlace = MBC.getInstance().quickfire.secondPlace;
+        Player p = part.getPlayer();
+
+        if (part.getTeam().equals(firstPlace) || part.getTeam().equals(secondPlace)) {
+            if (MBC.getInstance().quickfire.quickfirePlayers.containsKey(p.getPlayer().getUniqueId())) {}
+            else {
+                MBC.getInstance().quickfire.quickfirePlayers.put(p.getPlayer().getUniqueId(), new QuickfirePlayer(part));
+                part.board.getTeam(firstPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+                part.board.getTeam(secondPlace.fullName).setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+            }
+        }
+
+        p.setGameMode(GameMode.ADVENTURE);
+        p.setAllowFlight(false);
+        p.setFlying(false);
+        p.setInvulnerable(false);
+        p.getPlayer().getInventory().clear();
+        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
+
+        ItemStack CROSSBOW = new ItemStack(Material.CROSSBOW);
+        ItemMeta bowMeta = CROSSBOW.getItemMeta();
+        bowMeta.setUnbreakable(true);
+        CROSSBOW.setItemMeta(bowMeta);
+        CROSSBOW.addEnchantment(Enchantment.QUICK_CHARGE, 3);
+        ItemStack BOOTS = new ItemStack(Material.LEATHER_BOOTS);
+
+
+        if (part.getTeam().equals(firstPlace)) {
+            p.getPlayer().setMaxHealth(8);
+            p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
+            p.getInventory().addItem(CROSSBOW);
+            p.getInventory().addItem(new ItemStack(Material.ARROW,64));
+            p.getInventory().setBoots(firstPlace.getColoredLeatherArmor(BOOTS));
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
+        } else if (part.getTeam().equals(secondPlace)) {
+            p.getPlayer().setMaxHealth(8);
+            p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
+            p.getInventory().addItem(CROSSBOW);
+            p.getInventory().addItem(new ItemStack(Material.ARROW,64));
+            p.getInventory().setBoots(secondPlace.getColoredLeatherArmor(BOOTS));
+            p.getPlayer().setGameMode(GameMode.ADVENTURE);
+            p.getPlayer().removePotionEffect(PotionEffectType.GLOWING);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
+        } else {
+            p.getPlayer().setGameMode(GameMode.SPECTATOR);
+            p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
+            p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+        }
+        
+
+        
+    }
+
 
     /**
      * Handles formatting player messages
@@ -570,7 +674,7 @@ public class MBC implements Listener {
                     Location l = p.getLocation();
                     l.setPitch(-30);
                     p.setVelocity(p.getVelocity().add(l.getDirection().multiply(4.0).setY(1.25)));
-                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_4, SoundCategory.BLOCKS, 1, 1);
+                    p.playSound(p, "sfx.orange_red_jump_pad", SoundCategory.BLOCKS, 1, 1);
                 }
             }, 1);
             return;
@@ -584,7 +688,7 @@ public class MBC implements Listener {
                     Location l = p.getLocation();
                     l.setPitch(-30);
                     p.setVelocity(p.getVelocity().add(l.getDirection().multiply(2.0)));
-                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_4, SoundCategory.BLOCKS, 1, 1);
+                    p.playSound(p, "sfx.orange_red_jump_pad", SoundCategory.BLOCKS, 1, 1);
                 }
             }, 1);
             return;
@@ -596,7 +700,7 @@ public class MBC implements Listener {
                 public void run() {
                     Player p = e.getPlayer();
                     p.setVelocity(p.getVelocity().add(new Vector(p.getVelocity().getX(), p.getVelocity().getY()*1.75, p.getVelocity().getZ())));
-                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_5, SoundCategory.BLOCKS, 1, 1);
+                    p.playSound(p, "sfx.green_jump_pad", SoundCategory.BLOCKS, 1, 1);
                 }
             }, 1);
         }
@@ -607,8 +711,8 @@ public class MBC implements Listener {
         if (isOnBlockWithBuffer(e.getPlayer(), MBC.SPEED_PAD)) {
             PotionEffect s = e.getPlayer().getPotionEffect(PotionEffectType.SPEED);
 
-            if (s == null) e.getPlayer().playSound(e.getPlayer(), Sound.ITEM_GOAT_HORN_SOUND_3, SoundCategory.BLOCKS, 1, 1);
-            else if (s.isShorterThan(new PotionEffect(PotionEffectType.SPEED, 70, 3, false, false))) e.getPlayer().playSound(e.getPlayer(), Sound.ITEM_GOAT_HORN_SOUND_3, SoundCategory.BLOCKS, 1, 1);
+            if (s == null) e.getPlayer().playSound(e.getPlayer(), "sfx.speed_pad", SoundCategory.BLOCKS, 1, 1);
+            else if (s.isShorterThan(new PotionEffect(PotionEffectType.SPEED, 70, 3, false, false))) e.getPlayer().playSound(e.getPlayer(), "sfx.speed_pad", SoundCategory.BLOCKS, 1, 1);
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
             
         }

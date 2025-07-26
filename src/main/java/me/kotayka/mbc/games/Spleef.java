@@ -26,11 +26,8 @@ import java.util.*;
 public class Spleef extends Game {
     private SpleefMap map = null;
     private List<SpleefMap> maps = new ArrayList<>(
-            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Colosseum())
+            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
     );
-    //private List<SpleefMap> maps = new ArrayList<>(
-            //Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
-    //);
     //private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
     //public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
     public Map<UUID, SpleefPlayer> spleefPlayers = new HashMap<>();
@@ -212,7 +209,7 @@ public class Spleef extends Game {
             }
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
-                startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                startingCountdown("sfx.starting_beep");
                 mapCreator(map.Name(), map.Creator());
                 if (timeRemaining == 5 && map.getMapType().equals("Gravity")) {
                     Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "Prepare for an antigravity experience!\n");
@@ -224,7 +221,7 @@ public class Spleef extends Game {
                 }
                 if (timeRemaining == 9) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "sfx.game_starting_jingle", SoundCategory.RECORDS, 1, 1);
                     }
                 }
                 if (timeRemaining == 5 && map.getMapType().equals("Blind")) {
@@ -232,9 +229,9 @@ public class Spleef extends Game {
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
                         p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.RECORDS, 1, 1);
-                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 3, false, false));
+                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 60, 3, false, false));
                     }
-                    Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "The lights are dimming...\n");
+                    Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "It's become a little more difficult to see your competitors...\n");
                 }
                 if (timeRemaining == 5 && map.getMapType().equals("Wind")) {
                     Bukkit.broadcastMessage("\n" + MBC.MBC_STRING_PREFIX + "There's a little extra wind in the air...\n");
@@ -254,7 +251,7 @@ public class Spleef extends Game {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 0.75f, 1);
+                    p.playSound(p, "sfx.started_ring", SoundCategory.BLOCKS, 0.75f, 1);
                     p.playSound(p, Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS, 1, 1);
                 }
                 setGameState(GameState.ACTIVE);
@@ -268,7 +265,7 @@ public class Spleef extends Game {
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1, 1);
                         if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
-                        p.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
+                        p.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
                     }
                 }
                 else {
@@ -280,7 +277,7 @@ public class Spleef extends Game {
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 1);
                         if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) continue;
-                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, PotionEffect.INFINITE_DURATION, 3, false, false));
+                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 3, false, false));
                     }
                 }
             }
@@ -299,7 +296,7 @@ public class Spleef extends Game {
                         if (map.getMapType().equals("Gravity")) {
                             p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
                         } else if (map.getMapType().equals("Blind")) {
-                            p.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
+                            p.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
                         }
                     }
                     roundOverGraphics();
@@ -313,7 +310,7 @@ public class Spleef extends Game {
                         if (map.getMapType().equals("Gravity")) {
                             p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
                         } else if (map.getMapType().equals("Blind")) {
-                            p.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
+                            p.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
                         }
                     }
                     gameOverGraphics();
@@ -425,7 +422,7 @@ public class Spleef extends Game {
                 killer.getPlayer().sendMessage(ChatColor.GREEN+"You spleefed " + victim.getPlayer().getName() + "!" + MBC.scoreFormatter(KILL_POINTS));
                 killer.getPlayer().sendTitle(" ", "[" + ChatColor.BLUE + "x" + ChatColor.RESET + "] " + victim.getParticipant().getFormattedName(), 0, 60, 20);
                 createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Spleefs: "+ChatColor.RESET+killer.getKills(), killer.getParticipant());
-                killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
+                killer.getPlayer().playSound(killer.getPlayer(), "sfx.kill_coins", SoundCategory.BLOCKS, 0.5f, 1);
                 deathMessage = victim.getParticipant().getFormattedName()+" was spleefed by " + killer.getParticipant().getFormattedName();
             } else {
                 deathMessage = victim.getParticipant().getFormattedName() + " fell into the void";
@@ -449,7 +446,7 @@ public class Spleef extends Game {
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
         victim.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
         victim.getPlayer().removePotionEffect(PotionEffectType.HASTE);
-        victim.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
+        victim.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
         MBC.spawnFirework(victim.getParticipant());
         victim.getPlayer().teleport(spawnpoint);
         victim.setPlacement(playersAlive.size()+1);

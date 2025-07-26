@@ -37,7 +37,7 @@ public class OneShot extends PartyGame {
     private Map<MBCTeam, Integer> teamKills = new HashMap<>();
     public Map<UUID, OneShotPlayer> oneShotPlayerMap = new HashMap<>();
     public Location[] spawnpoints = map.spawnpoints;
-    private final int WIN_POINTS = 5;
+    private final int WIN_POINTS = 3;
     private final int KILL_POINTS = 1;
     private final int STREAK_POINTS = 1;
     private final int STREAK_KILL_POINTS = 1;
@@ -363,18 +363,18 @@ public class OneShot extends PartyGame {
             }
         } else if (getState().equals(GameState.STARTING)) {
             if (timeRemaining > 0) {
-                startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                startingCountdown("sfx.starting_beep");
                 mapCreator(map.mapName, map.creatorName);
                 if (timeRemaining == 9) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "sfx.game_starting_jingle", SoundCategory.RECORDS, 1, 1);
                     }
                 }
             } else {
                 setGameState(GameState.ACTIVE);
                 replayMusic();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 0.75f, 1);
+                    p.playSound(p, "sfx.started_ring", SoundCategory.BLOCKS, 0.75f, 1);
                 }
                 setPVP(true);
                        

@@ -87,7 +87,7 @@ public class BuildMart extends Game {
         //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -258, 185, -28))); //ghost
         //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -267, 185, -28))); //witch cauldron
         //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, -28))); //shark
-        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -285, 185, -28))); //zombie
+        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -249, 185, -58))); //zombie
         //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -33, 185, -58))); //murder
         //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -58))); //pumpkin
         //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -186, 185, -58))); //dungeon
@@ -495,19 +495,22 @@ public class BuildMart extends Game {
         Collections.shuffle(HARD_FIRST_BUILDS);
 
         //load first easy builds at the start
-        for (Build b : EASY_FIRST_BUILDS) {
+        for (int i = 0 ; i < EASY_FIRST_BUILDS.size(); i++) {
+            Build b = EASY_FIRST_BUILDS.get(i);
             EASY_BUILDS.remove(b);
             EASY_BUILDS.add(0, b);
         }
 
         //load first medium builds at the start
-        for (Build b : MEDIUM_FIRST_BUILDS) {
+        for (int i = 0 ; i < MEDIUM_FIRST_BUILDS.size(); i++) {
+            Build b = MEDIUM_FIRST_BUILDS.get(i);
             MEDIUM_BUILDS.remove(b);
             MEDIUM_BUILDS.add(0, b);
         }
 
         //load first hard builds at the start
-        for (Build b : HARD_FIRST_BUILDS) {
+        for (int i = 0 ; i < HARD_FIRST_BUILDS.size(); i++) {
+            Build b = HARD_FIRST_BUILDS.get(i);
             HARD_BUILDS.remove(b);
             HARD_BUILDS.add(0, b);
         }

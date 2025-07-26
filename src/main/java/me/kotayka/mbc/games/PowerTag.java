@@ -882,13 +882,13 @@ public class PowerTag extends Game {
             if (timeRemaining <= 10 && timeRemaining > 3) {
                 p.sendTitle(ChatColor.AQUA + "Hiders released in:", ChatColor.BOLD + ">" + timeRemaining + "<", 0, 20, 0);
             } else if (timeRemaining == 3) {
-                p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_1, SoundCategory.BLOCKS, 1, 1);
+                p.playSound(p, "sfx.starting_beep", SoundCategory.BLOCKS, 1, 1);
                 p.sendTitle(ChatColor.AQUA + "Hiders released in:", ChatColor.BOLD + ">" + ChatColor.RED + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             } else if (timeRemaining == 2) {
-                p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_1, SoundCategory.BLOCKS, 1, 1);
+                p.playSound(p, "sfx.starting_beep", SoundCategory.BLOCKS, 1, 1);
                 p.sendTitle(ChatColor.AQUA + "Hiders released in:", ChatColor.BOLD + ">" + ChatColor.YELLOW + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             } else if (timeRemaining == 1) {
-                p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_1, SoundCategory.BLOCKS, 1, 1);
+                p.playSound(p, "sfx.starting_beep", SoundCategory.BLOCKS, 1, 1);
                 p.sendTitle(ChatColor.AQUA + "Hiders released in:", ChatColor.BOLD + ">" + ChatColor.GREEN + "" + ChatColor.BOLD + timeRemaining + ChatColor.WHITE + "" + ChatColor.BOLD + "<", 0, 20, 0);
             }
         }

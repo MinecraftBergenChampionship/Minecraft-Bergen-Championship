@@ -243,6 +243,8 @@ public class Dragons extends PartyGame {
             deathMessage = p.getFormattedName()+" fell from a high place";
         }
 
+        
+        updatePlayersAlive(p);
         for (Player play : Bukkit.getOnlinePlayers()) {
             if (playersAlive.contains(Participant.getParticipant(play))) {
                 play.sendMessage(deathMessage + MBC.scoreFormatter(SURVIVAL_POINTS));
@@ -253,7 +255,7 @@ public class Dragons extends PartyGame {
         }
         logger.log(deathMessage);
 
-        updatePlayersAlive(p);
+        
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 20);
         victim.getPlayer().setGameMode(GameMode.SPECTATOR);
@@ -271,6 +273,7 @@ public class Dragons extends PartyGame {
         switch (getState()) {
             case TUTORIAL:
                 if (timeRemaining == 0) {
+                    MBC.getInstance().sendMutedMessages();
                     setGameState(GameState.STARTING);
                     setTimer(16);
                 } else if (timeRemaining % 7 == 0) {
@@ -278,11 +281,11 @@ public class Dragons extends PartyGame {
                 }
                 break;
             case STARTING:
-                startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                startingCountdown("sfx.starting_beep");
                 mapCreator(map.mapName, map.creatorName);
                 if (timeRemaining == 9) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "sfx.game_starting_jingle", SoundCategory.RECORDS, 1, 1);
                     }
                 }
                 if (timeRemaining == 0) {

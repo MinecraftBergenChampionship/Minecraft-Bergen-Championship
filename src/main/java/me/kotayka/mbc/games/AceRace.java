@@ -159,7 +159,7 @@ public class AceRace extends Game {
                 mapCreator(map.mapName, map.creatorName);
                 if (timeRemaining == 11) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_0, SoundCategory.RECORDS, 0.75f, 1);
+                        p.playSound(p, "sfx.ace_race_starting", SoundCategory.RECORDS, 0.75f, 1);
                     }
                 }
             } else {
@@ -169,7 +169,7 @@ public class AceRace extends Game {
                 timeRemaining = 720;
                 startingTime = System.currentTimeMillis();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.RECORDS, 0.75f, 1);
+                    p.playSound(p, "sfx.started_ring", SoundCategory.RECORDS, 0.75f, 1);
                     p.playSound(p, Sound.MUSIC_DISC_11, SoundCategory.RECORDS, 1, 1);
                 }
             }

@@ -6,6 +6,7 @@ import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.sgMaps.JesuscraftTwo;
 import me.kotayka.mbc.gameMaps.sgMaps.BCA;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
+
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -68,15 +69,15 @@ public class SurvivalGames extends Game {
     private BossBar bossBar;
 
     // SCORING
-    public final int KILL_POINTS_INITIAL_18 = 12;
-    public final int KILL_POINTS_INITIAL_24 = 15;
+    public final int KILL_POINTS_INITIAL_18 = 13;
+    public final int KILL_POINTS_INITIAL_24 = 16;
     public final int KILL_POINTS_INITIAL = KILL_POINTS_INITIAL_24;
     public int killPoints = KILL_POINTS_INITIAL;
     public final int SURVIVAL_POINTS = 1;
-    public final int HORCRUX_DESTROY_POINTS = 5;
-    // Shared amongst each team: 12, 10, 9, 7, 6, 5 points for each player
-    public final int[] TEAM_BONUSES_4 = {48, 40, 36, 28, 24, 20};
-    public final int[] TEAM_BONUSES_3 = {36, 30, 27, 21, 18, 15};
+    public final int HORCRUX_DESTROY_POINTS = 10;
+    // Shared amongst each team: 14, 11, 10, 8, 7, 6 points for each player
+    public final int[] TEAM_BONUSES_4 = {56, 44, 40, 32, 28, 24};
+    public final int[] TEAM_BONUSES_3 = {42, 33, 30, 24, 21, 18};
     private double totalDamage = 0;
     // public final int WIN_POINTS = 36; // shared amongst all remaining players
 
@@ -364,8 +365,8 @@ public class SurvivalGames extends Game {
                 //crateLocation();
             } else if (timeRemaining == 300) {
                 //spawnSupplyCrate();
-                killPoints -= 3;
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Kill points are decreasing! (15 -> 12)");
+                killPoints -= 4;
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "" + ChatColor.BOLD + "Max kill points are decreasing! (16 -> 12)");
                 bossBar.removeAll();
                 bossBar = Bukkit.createBossBar(ChatColor.RED + "" + ChatColor.BOLD + "KILL POINTS DECREASE", BarColor.RED, BarStyle.SOLID);
                 bossBar.setVisible(true);
@@ -379,8 +380,8 @@ public class SurvivalGames extends Game {
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 event = SurvivalGamesEvent.DEATHMATCH;
             } else if (timeRemaining == 180) {
-                killPoints -= 2;
-                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED.toString() + ChatColor.BOLD + "Kill points are decreasing! (12 -> 10)");
+                killPoints -= 4;
+                Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED.toString() + ChatColor.BOLD + "Max kill points are decreasing! (12 -> 8)");
                 bossBar.removeAll();
                 bossBar.setVisible(false);
             } else if (timeRemaining == 60) {
@@ -572,7 +573,7 @@ public class SurvivalGames extends Game {
             double percentage = 100 *(playerDamage.get(player) / totalDamage);
             int points = 0;
             if (percentage != 0) {
-                points = (int) (3*Math.log(Math.pow(150*Math.sqrt(percentage)/sqrtSum, 5.5)/7));
+                points = (int) (5*Math.log(Math.pow(150*Math.sqrt(percentage)/sqrtSum, 5.5)/7));
                 if (points < 0) {
                     points = 0;
                 }
@@ -763,7 +764,7 @@ public class SurvivalGames extends Game {
                 createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+kills, killer);
             }
             deathEffectsWithHealthSG(e, horcrux, e.getPlayer().getLastDamageCause().getCause());
-            killer.getPlayer().playSound(killer.getPlayer(), Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 0.5f, 1);
+            killer.getPlayer().playSound(killer.getPlayer(), "sfx.kill_coins", SoundCategory.BLOCKS, 0.5f, 1);
     
         } else {
             Participant p = Participant.getParticipant(victim);
@@ -1253,6 +1254,25 @@ public class SurvivalGames extends Game {
             }
         }
     }
+
+    /*
+     * Given SurvivalGamesPlayer p, return the correct multiplier for killing a player.
+     */
+    public double killPointMultiplier(Player p) {
+        switch(playerKills.get(p)) {
+            case (0):
+            case (1):
+            case (2):
+                return 1;
+            case (3):
+            case (4):
+            case (5):
+                return 0.75;
+            default:
+                return 0.5;
+        }
+    }
+
 }
 
 class SurvivalGamesItem {

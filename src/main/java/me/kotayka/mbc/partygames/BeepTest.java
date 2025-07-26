@@ -193,16 +193,16 @@ public class BeepTest extends PartyGame {
                 }
                 break;
             case STARTING:
-                startingCountdown(Sound.ITEM_GOAT_HORN_SOUND_1);
+                startingCountdown("sfx.starting_beep");
                 if (timeRemaining == 9) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_7, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "sfx.game_starting_jingle", SoundCategory.RECORDS, 1, 1);
                     }
                 }
                 if (timeRemaining == 0) {
                     //MBC.getInstance().hideAllPlayers();
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.ITEM_GOAT_HORN_SOUND_2, SoundCategory.BLOCKS, 0.75f, 1);
+                        p.playSound(p, "sfx.started_ring", SoundCategory.BLOCKS, 0.75f, 1);
                         p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, .75f,1); // temp?
                     }
                     Barriers(false);
