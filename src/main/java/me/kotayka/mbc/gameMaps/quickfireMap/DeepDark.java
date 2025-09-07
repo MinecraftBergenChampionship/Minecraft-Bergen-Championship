@@ -12,11 +12,14 @@ public class DeepDark extends QuickfireMap {
     private Location TEAM_ONE_SPAWN = new Location(world, 536, 1, -500);
     private Location TEAM_TWO_SPAWN = new Location(world, 464, 1, -500);
     private int timeUntilGlowing = 90;
+    private Location TEAM_ONE_INTRO = new Location(Bukkit.getWorld("Quickfire"), 531.0, 3, -496.5, -120, 10);
+    private Location TEAM_TWO_INTRO = new Location(Bukkit.getWorld("Quickfire"), 470, 3, -502.5, 60, 15);
+    
     private Location SPAWN = new Location(Bukkit.getWorld("Quickfire"), 500, 55, -500, -90, 90);
 
     public DeepDark(Quickfire qf) {
         super(qf);
-        loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, SPAWN, timeUntilGlowing);
+        loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, TEAM_ONE_INTRO, TEAM_TWO_INTRO, SPAWN, timeUntilGlowing);
         super.mapName = "Deep Dark";
         super.creatorName = "bigkirbypuff_";
     }

@@ -207,7 +207,7 @@ public class Lockdown extends Game {
             // reset scoreboard & variables after each round
             createLine(2, ChatColor.YELLOW+""+ChatColor.BOLD+"Your kills: "+ChatColor.RESET+(Objects.requireNonNull(lockdownPlayerMap.get(p.getPlayer().getUniqueId()))).kills, p);
         }
-        map.spawnPlayers();
+        map.spawnPlayers(roundNum);
         updatePlayersAliveScoreboard();
     }
     

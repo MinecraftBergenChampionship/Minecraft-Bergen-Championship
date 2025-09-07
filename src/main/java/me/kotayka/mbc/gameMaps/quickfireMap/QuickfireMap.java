@@ -12,6 +12,8 @@ public abstract class QuickfireMap extends MBCMap {
     private Location TEAM_ONE_SPAWN;
     private Location TEAM_TWO_SPAWN;
     private Location SPAWN;
+    private Location TEAM_ONE_INTRO;
+    private Location TEAM_TWO_INTRO;
     private int timeUntilGlowing;
 
     public QuickfireMap(Quickfire qf) {
@@ -28,6 +30,14 @@ public abstract class QuickfireMap extends MBCMap {
         return TEAM_TWO_SPAWN;
     }
 
+    public Location getTeamOneIntro() {
+        return TEAM_ONE_INTRO;
+    }
+
+    public Location getTeamTwoIntro() {
+        return TEAM_TWO_INTRO;
+    }
+
     public Location getSpawn() {
         return SPAWN;
     }
@@ -36,9 +46,11 @@ public abstract class QuickfireMap extends MBCMap {
         return timeUntilGlowing;
     }
 
-    public void loadWorld(Location TEAM_ONE_SPAWN, Location TEAM_TWO_SPAWN, Location SPAWN, int timeUntilGlowing) {
+    public void loadWorld(Location TEAM_ONE_SPAWN, Location TEAM_TWO_SPAWN, Location TEAM_ONE_INTRO, Location TEAM_TWO_INTRO, Location SPAWN, int timeUntilGlowing) {
         this.TEAM_ONE_SPAWN = TEAM_ONE_SPAWN;
         this.TEAM_TWO_SPAWN = TEAM_TWO_SPAWN;
+        this.TEAM_ONE_INTRO = TEAM_ONE_INTRO;
+        this.TEAM_TWO_INTRO = TEAM_TWO_INTRO;
         this.SPAWN = SPAWN;
         this.timeUntilGlowing = timeUntilGlowing;
     }

@@ -18,16 +18,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Abandoned extends LockdownMap {
     private final Location CENTER = new Location(getWorld(), 1064, 100, 1064);
     private final Location[] SPAWNS = {
         new Location(getWorld(), 44, 3, -34), // (0,2)
-        new Location(getWorld(), 161, 3, -34), // (0,5)
+        new Location(getWorld(), 161, 3, -34), // (0,5) (corner)
         new Location(getWorld(), 161, 3, 83), // (3,5)
         new Location(getWorld(), 83, 3, 161), // (5,3)
-        new Location(getWorld(), -34, 3, 161), // (5,0)
+        new Location(getWorld(), -34, 3, 161), // (5,0) (corner)
         new Location(getWorld(), -34, 3, 44), // (2,0)
     };
 
@@ -101,27 +102,32 @@ public class Abandoned extends LockdownMap {
         teamSpawns = spawns;
     }
 
-    public void spawnPlayers() {
-        ArrayList<Location> tempSpawns = new ArrayList<>(SPAWNS.length);
-        tempSpawns.addAll(Arrays.asList(SPAWNS));
-
+    public void spawnPlayers(int roundNum) {
         ArrayList<Location> indexSpawns = new ArrayList<>(SPAWNS.length);
         indexSpawns.addAll(Arrays.asList(SPAWNS));
 
         resetTeamSpawnLocations();
 
-        for (MBCTeam t : MBC.getInstance().getValidTeams()) {
-            int randomNum = (int) (Math.random() * tempSpawns.size());
+        ArrayList<MBCTeam> teamList = roundNumToList(roundNum);
+        for (int i = 0; i < teamList.size(); i++) {
+            MBCTeam t = teamList.get(i);
             for (Participant p : t.teamPlayers) {
-                Location spawn = tempSpawns.get(randomNum);
+                Location spawn = indexSpawns.get(i);
                 p.getPlayer().teleport(spawn);
                 p.getPlayer().setGameMode(GameMode.ADVENTURE);
             }
 
-            int spawnIndex = indexSpawns.indexOf(tempSpawns.get(randomNum));
+            int spawnIndex = indexSpawns.indexOf(indexSpawns.get(i));
             teamSpawns[spawnIndex] = t;
+        }
+    }
 
-            tempSpawns.remove(randomNum);
+    public ArrayList<MBCTeam> roundNumToList(int i) {
+        switch(i) {
+            case 2: return roundTwoSpawns();
+            case 3: return roundThreeSpawns();
+            case 1: return roundOneSpawns();
+            default: return roundOneSpawns();
         }
     }
 
@@ -156,6 +162,61 @@ public class Abandoned extends LockdownMap {
                 }
             }
         }
+    }
+
+    @Override
+    public ArrayList<MBCTeam> roundOneSpawns() {
+        ArrayList<MBCTeam> teamList = new ArrayList<>(SPAWNS.length);
+        for (MBCTeam t : MBC.getInstance().getValidTeams()) {
+            teamList.add(t);
+        }
+
+        Collections.shuffle(teamList);
+
+        MBCTeam[] originalTeamOrder = new MBCTeam[6];
+        
+        for (int i = 0; i < originalTeamOrder.length; i++) {
+            originalTeamOrder[i] = teamList.get(i);
+        }
+
+        setTeamOrder(originalTeamOrder);
+
+        return teamList;
+    }
+
+    @Override
+    public ArrayList<MBCTeam> roundTwoSpawns() {
+        ArrayList<MBCTeam> teamList = new ArrayList<>(SPAWNS.length);
+        MBCTeam[] originalTeamOrder = getTeamOrder();
+
+        teamList.add(originalTeamOrder[3]);
+        teamList.add(originalTeamOrder[0]);
+        teamList.add(originalTeamOrder[4]);
+        teamList.add(originalTeamOrder[2]);
+        teamList.add(originalTeamOrder[5]);
+        teamList.add(originalTeamOrder[1]);
+
+        return teamList;
+    }
+
+    @Override
+    public ArrayList<MBCTeam> roundThreeSpawns() {
+        ArrayList<MBCTeam> teamList = new ArrayList<>(SPAWNS.length);
+        MBCTeam[] originalTeamOrder = getTeamOrder();
+
+        teamList.add(originalTeamOrder[1]);
+        teamList.add(originalTeamOrder[2]);
+        teamList.add(originalTeamOrder[0]);
+        teamList.add(originalTeamOrder[5]);
+        teamList.add(originalTeamOrder[3]);
+        teamList.add(originalTeamOrder[4]);
+
+        return teamList;
+    }
+
+    @Override
+    public void spawnPlayers() {
+        spawnPlayers(1);
     }
 
 }

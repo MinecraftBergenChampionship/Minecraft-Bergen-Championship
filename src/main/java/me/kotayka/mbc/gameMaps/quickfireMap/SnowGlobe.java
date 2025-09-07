@@ -12,11 +12,13 @@ public class SnowGlobe extends QuickfireMap {
     private Location TEAM_ONE_SPAWN = new Location(world, -532, 1, -500);
     private Location TEAM_TWO_SPAWN = new Location(world, -468, 1, -500);
     private int timeUntilGlowing = 90;
+    private Location TEAM_ONE_INTRO = new Location(Bukkit.getWorld("Quickfire"), -537.5, 2.5, -496.0, -120, 10);
+    private Location TEAM_TWO_INTRO = new Location(Bukkit.getWorld("Quickfire"), -461.5, 2.5, -503.0, 60, 10);
     private Location SPAWN = new Location(Bukkit.getWorld("Quickfire"), -500, 70, -500, -90, 90);
 
     public SnowGlobe(Quickfire qf) {
         super(qf);
-        loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, SPAWN, timeUntilGlowing);
+        loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, TEAM_ONE_INTRO, TEAM_TWO_INTRO, SPAWN, timeUntilGlowing);
         super.mapName = "Snow Globe";
         super.creatorName = "bigkirbypuff_";
     }

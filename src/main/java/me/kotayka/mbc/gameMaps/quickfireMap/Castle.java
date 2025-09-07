@@ -9,14 +9,16 @@ import org.bukkit.*;
 
 public class Castle extends QuickfireMap {
     private World world = Bukkit.getWorld("Quickfire");
-    private Location TEAM_ONE_SPAWN = new Location(world, 19.5, -60, 0);
-    private Location TEAM_TWO_SPAWN = new Location(world, -19.5,  -60, 0);
+    private Location TEAM_ONE_SPAWN = new Location(world, 19.5, -60, 0, 60, -15);
+    private Location TEAM_TWO_SPAWN = new Location(world, -19.5,  -60, 0, -60, -15);
+    private Location TEAM_ONE_INTRO = new Location(Bukkit.getWorld("Quickfire"), 13.5, -58.5, 3.75, -120, 15);
+    private Location TEAM_TWO_INTRO = new Location(Bukkit.getWorld("Quickfire"), -12.5, -58.5, -3.25, 120, 15);
     private int timeUntilGlowing = 60;
     private Location SPAWN = new Location(Bukkit.getWorld("Quickfire"), 1.5, -35, 0.5, -90, 90);
 
     public Castle(Quickfire qf) {
         super(qf);
-        loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, SPAWN, timeUntilGlowing);
+        loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, TEAM_ONE_INTRO, TEAM_TWO_INTRO, SPAWN, timeUntilGlowing);
         super.mapName = "Castle";
         super.creatorName = "bigkirbypuff_";
     }

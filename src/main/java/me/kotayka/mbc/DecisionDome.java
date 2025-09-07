@@ -495,7 +495,7 @@ public class DecisionDome extends Minigame {
                         p.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD+"You got the powerup: " + powerup.toString());
                         getPowerup(powerup, p);
                     } else {
-                        p.getPlayer().sendMessage(p.getFormattedName() + ChatColor.LIGHT_PURPLE+" received the powerup: " + powerup);
+                        pl.getPlayer().sendMessage(p.getFormattedName() + ChatColor.LIGHT_PURPLE+" received the powerup: " + powerup);
                     }
                 }
             }
@@ -1150,15 +1150,21 @@ public class DecisionDome extends Minigame {
         }
         else if (event.getEntity() instanceof Cow) {
             Cow cow = (Cow) event.getEntity();
-            VoteChicken rm = null;
-            for (VoteChicken vc : chickens) {
-                if (vc.cow != null && vc.cow.equals(cow)) {
-                    rm = vc;
+            for (int i = 0; i < 3; i++) {
+                VoteChicken rm = null;
+                for (VoteChicken vc : chickens) {
+                    if (vc.cow != null && vc.cow.equals(cow)) {
+                        rm = vc;
+                        break;
+                    }
+                }
+                if (chickens.contains(rm)) {
+                    Bukkit.broadcastMessage("removed vote cow due to death");
+                    chickens.remove(rm);
+                }
+                else {
                     break;
                 }
-            }
-            if (chickens.contains(rm)) {
-                chickens.remove(rm);
             }
         }
     }

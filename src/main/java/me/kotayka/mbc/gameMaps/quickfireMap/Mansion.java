@@ -11,12 +11,14 @@ public class Mansion extends QuickfireMap {
     private World world = Bukkit.getWorld("Quickfire");
     private Location TEAM_ONE_SPAWN = new Location(world, 530, 1, 500);
     private Location TEAM_TWO_SPAWN = new Location(world, 470, 1, 500);
+    private Location TEAM_ONE_INTRO = new Location(Bukkit.getWorld("Quickfire"), 524.5, 2.5, 504.0, -120, 15);
+    private Location TEAM_TWO_INTRO = new Location(Bukkit.getWorld("Quickfire"), 476.5, 2.5, 497.0, 60, 15);
     private int timeUntilGlowing = 90;
     private Location SPAWN = new Location(Bukkit.getWorld("Quickfire"), 500, 60, 500, -90, 90);
 
     public Mansion(Quickfire qf) {
         super(qf);
-        loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, SPAWN, timeUntilGlowing);
+        loadWorld(TEAM_ONE_SPAWN, TEAM_TWO_SPAWN, TEAM_ONE_INTRO, TEAM_TWO_INTRO, SPAWN, timeUntilGlowing);
         super.mapName = "Mansion";
         super.creatorName = "bigkirbypuff_";
     }

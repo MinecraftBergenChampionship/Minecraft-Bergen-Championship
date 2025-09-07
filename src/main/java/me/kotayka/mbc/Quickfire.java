@@ -1,19 +1,20 @@
 package me.kotayka.mbc;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
-import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
-import me.kotayka.mbc.gameMaps.quickfireMap.SnowGlobe;
-import me.kotayka.mbc.gameMaps.quickfireMap.Castle;
-import me.kotayka.mbc.gameMaps.quickfireMap.DeepDark;
-import me.kotayka.mbc.gameMaps.quickfireMap.Mansion;
-import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
-
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -21,11 +22,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockReceiveGameEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -33,6 +37,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+
+import me.kotayka.mbc.gameMaps.quickfireMap.DeepDark;
+import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
+import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 
 
 
@@ -45,6 +55,19 @@ public class Quickfire extends FinaleGame {
     private World world = Bukkit.getWorld("Quickfire");
     private final Location TEAM_ONE_SPAWN = map.getTeamOneSpawn();
     private final Location TEAM_TWO_SPAWN = map.getTeamTwoSpawn();
+
+    private Map<UUID, String> playerWalkoutSongs = new HashMap<>();
+    private Map<UUID, String> playerWalkoutBlurbs = new HashMap<>();
+    private Map<UUID, String> playerWalkoutSongNames = new HashMap<>();
+    private String defaultWalkoutSong = "walkout.default";
+    private List<Participant> firstPlaceWalkoutOrder = new ArrayList<>();
+    private List<Participant> secondPlaceWalkoutOrder = new ArrayList<>();
+    private int currentWalkoutNumber = 0;
+    private Participant currentlyWalkingOut;
+
+    private final int finalePlayers;
+    private final int firstPlacePlayers;
+    private final int secondPlacePlayers;
     private final Location SPAWN = map.getSpawn();
     private int[] playersAlive;
     private int timeElapsed = 0;
@@ -77,6 +100,11 @@ public class Quickfire extends FinaleGame {
         CROSSBOW.addEnchantment(Enchantment.QUICK_CHARGE, 3);
 
         playersAlive = new int[]{firstPlace.teamPlayers.size(), secondPlace.teamPlayers.size()};
+        firstPlacePlayers = firstPlace.teamPlayers.size();
+        secondPlacePlayers = secondPlace.teamPlayers.size();
+        finalePlayers = firstPlacePlayers+secondPlacePlayers;
+
+        fillMaps();
     }
 
     public Quickfire(@NotNull MBCTeam firstPlace, @NotNull MBCTeam secondPlace) {
@@ -101,6 +129,57 @@ public class Quickfire extends FinaleGame {
         CROSSBOW.addEnchantment(Enchantment.QUICK_CHARGE, 3);
 
         playersAlive = new int[]{firstPlace.teamPlayers.size(), secondPlace.teamPlayers.size()};
+        firstPlacePlayers = firstPlace.teamPlayers.size();
+        secondPlacePlayers = secondPlace.teamPlayers.size();
+        finalePlayers = firstPlacePlayers+secondPlacePlayers;
+
+        fillMaps();
+    }
+
+    public void fillMaps() {
+        UUID cam = UUID.fromString("5618582d-edf2-41db-8549-56319cd45a98");
+        UUID collin = UUID.fromString("2ca6218b-02b0-4d02-8935-34126ee15d4f");
+        UUID caleb = UUID.fromString("31de7d72-2000-474c-a583-e193d85cfbcc");
+        UUID devin = UUID.fromString("aadabd61-0548-4b3b-8c49-6efac9ca1f55");
+        UUID nikola = UUID.fromString("86db6c06-b38d-430c-a572-75afe051f482");
+        UUID eclipse = UUID.fromString("351e2396-70ca-453f-8415-695e33061da3");
+        UUID terri = UUID.fromString("0961f44c-0f50-41de-ad24-bb00692811dd");
+        UUID edward = UUID.fromString("ae32acfb-9446-485f-bf79-4262d8458a1c");
+        UUID cookie = UUID.fromString("1134e9f1-5daa-4078-b2d7-b79f784ea3db");
+        UUID tony = UUID.fromString("7bb2f9e8-e030-44cb-9141-5c419dd09b21");
+
+        playerWalkoutSongs.put(cam, "walkout.bigkirbypuff");
+        playerWalkoutSongs.put(collin, "walkout.rspacerr");
+        playerWalkoutSongs.put(caleb, "walkout.mrcarb");
+        playerWalkoutSongs.put(devin, "walkout.idrg");
+        playerWalkoutSongs.put(nikola, "walkout.nikesauce");
+        playerWalkoutSongs.put(eclipse, "walkout.remtolka");
+        playerWalkoutSongs.put(terri, "walkout.aesoney");
+        playerWalkoutSongs.put(edward, "walkout.bapplebusiness");
+        playerWalkoutSongs.put(cookie, "walkout.cookie");
+        playerWalkoutSongs.put(tony, "walkout.atrackpadplayer");
+
+        playerWalkoutBlurbs.put(cam, "Representing the South Side of Chicago...");
+        playerWalkoutBlurbs.put(collin, "Don't ask him how he eats his Chicken Nuggets...");
+        playerWalkoutBlurbs.put(caleb, "With his mouse in one hand and an extra large boba in the other...");
+        playerWalkoutBlurbs.put(devin, "The powerless president and fraudulent dictator of Ethipia...");
+        playerWalkoutBlurbs.put(nikola, "Watch out for his railroad tunnels underneath the Quickfire arena...");
+        playerWalkoutBlurbs.put(eclipse, "She's immortal until proven mortal...");
+        playerWalkoutBlurbs.put(terri, "The Queen of Build Mart herself...");
+        playerWalkoutBlurbs.put(edward, "Known to many as \"Wikipedia's most Wanted\"...");
+        playerWalkoutBlurbs.put(cookie, "One could say she's a \"tough cookie\"...");
+        playerWalkoutBlurbs.put(tony, "When his pants turn brown... run...");
+
+        playerWalkoutSongNames.put(cam, "Sleepyhead, Passion Pit");
+        playerWalkoutSongNames.put(collin, "Radioactive, Imagine Dragons");
+        playerWalkoutSongNames.put(caleb, "HOT TO GO!, Chappell Roan");
+        playerWalkoutSongNames.put(devin, "Desenfocao', Rauw Alejandro");
+        playerWalkoutSongNames.put(nikola, "Boss, Plok!");
+        playerWalkoutSongNames.put(eclipse, "Immortals, Fall Out Boy");
+        playerWalkoutSongNames.put(terri, "Daydreamin', Ariana Grande");
+        playerWalkoutSongNames.put(edward, "Requiem: II, György Ligeti");
+        playerWalkoutSongNames.put(cookie, "Low, Flo Rida & T-Pain");
+        playerWalkoutSongNames.put(tony, "Home Depot Theme Song");
     }
 
     @Override
@@ -120,7 +199,7 @@ public class Quickfire extends FinaleGame {
 
 
         setGameState(GameState.TUTORIAL);
-        setTimer(53);
+        setTimer(finalePlayers*12 + 31);
     }
 
     @Override
@@ -145,17 +224,173 @@ public class Quickfire extends FinaleGame {
         if (getState().equals(GameState.TUTORIAL)) {
             if (timeRemaining < 0) {
                 Bukkit.broadcastMessage("tutorial negative");
-                timeRemaining = 53;
+                timeRemaining = finalePlayers*12 + 31;
             }
             if (timeRemaining == 0) {
                 startRound();
                 setGameState(GameState.STARTING);
-                timeRemaining = 30;
-            } else if (timeRemaining % 7 == 0) {
-                Introduction();
+
+                timeRemaining = 35;
+            } //else if (timeRemaining % 7 == 0) {
+                //Introduction();
+            //}
+            if (timeRemaining == finalePlayers*12 + 30) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.sendTitle(ChatColor.BOLD + "Quickfire", firstPlace.teamNameFormat() + " vs. " + secondPlace.teamNameFormat(), 5, 60, 35);
+                    p.playSound(p, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.RECORDS,1, 1);
+                    playerIntroOrder();
+                }
+
+            }
+            if (timeRemaining == finalePlayers*12 + 25) {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "Welcome to the finale of MBC, " + ChatColor.RESET + "⑩" + ChatColor.BOLD + " Quickfire!");
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.ENTITY_CHICKEN_EGG, 1, 1);
+                }
+            }
+            if (timeRemaining == finalePlayers*12 + 20) {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "The first place " + ChatColor.RESET + firstPlace.teamNameFormat() + 
+                                            ChatColor.BOLD + " will be playing the second place " +  ChatColor.RESET + secondPlace.teamNameFormat() +
+                                            ChatColor.BOLD + " for the MBC "+ ChatColor.RESET + "④" +ChatColor.GOLD + ChatColor.BOLD  + " CROWN!");
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.ENTITY_CHICKEN_EGG, 1, 1);
+                }
+            }
+            if (timeRemaining == finalePlayers*12 + 15) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.setGameMode(GameMode.SPECTATOR);
+                    p.teleport(map.getTeamTwoIntro());
+                }
+            }
+            if (timeRemaining == finalePlayers*12 + 14) {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "Introducing the second place team: the " + ChatColor.RESET + secondPlace.teamNameFormat() + ChatColor.BOLD + "!");
+                currentWalkoutNumber = 0;
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.ENTITY_LIGHTNING_BOLT_THUNDER,SoundCategory.RECORDS, 1, 1);
+                }
+            }
+            if (timeRemaining > firstPlacePlayers*12 + 10 && timeRemaining <= finalePlayers*12 + 10) {
+                switch(timeRemaining%12) {
+                    case (11) -> {
+                        currentWalkoutNumber++;
+                    }
+                    case (10) -> {
+                        if (currentWalkoutNumber >= secondPlaceWalkoutOrder.size()) currentWalkoutNumber = secondPlaceWalkoutOrder.size()-1;
+                        currentlyWalkingOut = secondPlaceWalkoutOrder.get(currentWalkoutNumber);
+                        UUID playerUUID = currentlyWalkingOut.getPlayer().getUniqueId();
+                        String song = playerWalkoutSongs.get(playerUUID);
+                        if (song == null) {
+                            song = defaultWalkoutSong;
+                        }
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            p.playSound(p, song, 1, 1);
+                        }
+                    }
+                    case (7) -> {
+                        UUID playerUUID = currentlyWalkingOut.getPlayer().getUniqueId();
+                        String blurb = playerWalkoutBlurbs.get(playerUUID);
+                        if (blurb == null) {
+                            blurb = ChatColor.BOLD + "From the " + ChatColor.RESET + secondPlace.teamNameFormat() + ChatColor.BOLD + "...";
+                        }
+                        Bukkit.broadcastMessage(ChatColor.BOLD + blurb);
+                    }
+                    case (4) -> {
+                        currentlyWalkingOut.getPlayer().teleport(TEAM_TWO_SPAWN);
+                        currentlyWalkingOut.getPlayer().setGameMode(GameMode.ADVENTURE);
+                        MBC.spawnFirework(currentlyWalkingOut);
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            p.sendTitle(currentlyWalkingOut.getFormattedName(), "", 20, 60, 20);
+                        }
+                        Bukkit.broadcastMessage(currentlyWalkingOut.getFormattedName() + "!");
+                    }
+                }
+            }
+            if (timeRemaining == firstPlacePlayers*12 + 10) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.setGameMode(GameMode.SPECTATOR);
+                    p.teleport(map.getTeamOneIntro());
+                }
+            }
+            if (timeRemaining == firstPlacePlayers*12 + 9) {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "Introducing the first place team: the " + ChatColor.RESET + firstPlace.teamNameFormat() + ChatColor.BOLD + "!");
+                currentWalkoutNumber = 0;
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.ENTITY_LIGHTNING_BOLT_THUNDER,SoundCategory.RECORDS, 1, 1);
+                }
+            }
+            if (timeRemaining > 5 && timeRemaining <= firstPlacePlayers*12 + 5) {
+                switch(timeRemaining%12) {
+                    case (10) -> {
+                        currentlyWalkingOut.getPlayer().teleport(TEAM_ONE_SPAWN);
+                        currentlyWalkingOut.getPlayer().setGameMode(GameMode.ADVENTURE);
+                        MBC.spawnFirework(currentlyWalkingOut);
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            p.sendTitle(currentlyWalkingOut.getFormattedName(), "", 20, 60, 20);
+                        }
+                        Bukkit.broadcastMessage(currentlyWalkingOut.getFormattedName() + "!");
+                    }
+                    case (5) -> {
+                        currentWalkoutNumber++;
+                    }
+                    case (4) -> {
+                        if (currentWalkoutNumber >= firstPlaceWalkoutOrder.size()) currentWalkoutNumber = firstPlaceWalkoutOrder.size()-1;
+                        currentlyWalkingOut = firstPlaceWalkoutOrder.get(currentWalkoutNumber);
+                        UUID playerUUID = currentlyWalkingOut.getPlayer().getUniqueId();
+                        String song = playerWalkoutSongs.get(playerUUID);
+                        if (song == null) {
+                            song = defaultWalkoutSong;
+                        }
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            p.playSound(p, song, 1, 1);
+                        }
+                    }
+                    case (1) -> {
+                        UUID playerUUID = currentlyWalkingOut.getPlayer().getUniqueId();
+                        String blurb = playerWalkoutBlurbs.get(playerUUID);
+                        if (blurb == null) {
+                            blurb = ChatColor.BOLD + "From the " + ChatColor.RESET + firstPlace.teamNameFormat() + ChatColor.BOLD + "...";
+                        }
+                        Bukkit.broadcastMessage(ChatColor.BOLD + blurb);
+                    }
+                }
+            }
+            if (timeRemaining == 4) {
+                Bukkit.broadcastMessage(ChatColor.BOLD + "The winner of this best of 5 game of Quickfire will win MBC!");
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p, Sound.ENTITY_CHICKEN_EGG, 1, 1);
+                }
+            }
+            if (timeRemaining == 2) {
+                
+                Bukkit.broadcastMessage(ChatColor.BOLD + "All songs from the finale contestants:\n");
+                ArrayList<UUID> songsDisplayed = new ArrayList<>();
+                for (int i = 0; i < secondPlaceWalkoutOrder.size(); i++) {
+                    Participant p = secondPlaceWalkoutOrder.get(i);
+                    UUID playerUUID = p.getPlayer().getUniqueId();
+                    if (!songsDisplayed.contains(playerUUID)) {
+                        String songName = playerWalkoutSongNames.get(playerUUID);
+                        Bukkit.broadcastMessage(p.getFormattedName() + ": " + ChatColor.BOLD + songName);
+                        songsDisplayed.add(playerUUID);
+                    }
+                }
+                Bukkit.broadcastMessage("\n");
+                for (int i = 0; i < firstPlaceWalkoutOrder.size(); i++) {
+                    Participant p = firstPlaceWalkoutOrder.get(i);
+                    UUID playerUUID = p.getPlayer().getUniqueId();
+                    if (!songsDisplayed.contains(playerUUID)) {
+                        String songName = playerWalkoutSongNames.get(playerUUID);
+                        Bukkit.broadcastMessage(p.getFormattedName() + ": " + ChatColor.BOLD + songName);
+                        songsDisplayed.add(playerUUID);
+                    }
+                }
+                
+
             }
         } else if (getState().equals(GameState.STARTING)) {
-            if (score[0] == 0 && score[1] == 0)mapCreator(map.mapName, map.creatorName);
+            if (score[0] == 0 && score[1] == 0) {
+                mapCreator(map.mapName, map.creatorName);
+            }
+            
             if (timeRemaining == 0) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, "sfx.started_ring", SoundCategory.BLOCKS, 1, 1);
@@ -202,6 +437,18 @@ public class Quickfire extends FinaleGame {
                 returnToLobby();
             }
         }
+    }
+
+    public void playerIntroOrder() {
+        for (int i = 0; i < firstPlacePlayers; i++) {
+            firstPlaceWalkoutOrder.add(firstPlace.getPlayers().get(i));
+        }
+        for (int i = 0; i < secondPlacePlayers; i++) {
+            secondPlaceWalkoutOrder.add(secondPlace.getPlayers().get(i));
+        }
+
+        Collections.shuffle(firstPlaceWalkoutOrder);
+        Collections.shuffle(secondPlaceWalkoutOrder);
     }
 
     public void startRound() {
@@ -434,7 +681,7 @@ public class Quickfire extends FinaleGame {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (getState().equals(GameState.TUTORIAL)) {
+        if (getState().equals(GameState.TUTORIAL) && e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
             e.setCancelled(true);
             return;
         }

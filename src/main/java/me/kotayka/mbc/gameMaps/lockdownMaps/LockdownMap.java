@@ -1,6 +1,8 @@
 package me.kotayka.mbc.gameMaps.lockdownMaps;
 
+import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.MBCTeam;
+import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.MBCMap;
 import me.kotayka.mbc.games.Lockdown;
 
@@ -18,6 +20,8 @@ public abstract class LockdownMap extends MBCMap {
     private Location CENTER;
     private Location[][] woolLocations = new Location[6][6]; 
     public Location[] spawns;
+
+    private MBCTeam[] teamOrder = new MBCTeam[6];
 
     public LockdownMap(Lockdown ld) {
         super(Bukkit.getWorld("Lockdown"));
@@ -74,6 +78,20 @@ public abstract class LockdownMap extends MBCMap {
         return -1;
     }
 
+    public abstract ArrayList<MBCTeam> roundOneSpawns();
+
+    public abstract ArrayList<MBCTeam> roundTwoSpawns();
+
+    public abstract ArrayList<MBCTeam> roundThreeSpawns();
+
+    public void setTeamOrder(MBCTeam[] teamOrder) {
+        this.teamOrder = teamOrder;
+    }
+
+    public MBCTeam[] getTeamOrder() {
+        return teamOrder;
+    }
+
     /**
      * Expensive function called after each round and when loading the game;
      * Resets the map to a state copied from another area in the Skybattle World.
@@ -114,6 +132,7 @@ public abstract class LockdownMap extends MBCMap {
      * TODO: could maybe standardize something and then override if necessary but I'm kinda lazy
      */
     public abstract void spawnPlayers();
+    public abstract void spawnPlayers(int roundNum);
 
     public Location getCenter() { return CENTER; }
 

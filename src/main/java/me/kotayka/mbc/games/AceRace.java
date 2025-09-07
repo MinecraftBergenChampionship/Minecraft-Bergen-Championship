@@ -220,6 +220,7 @@ public class AceRace extends Game {
         trident.setItemMeta(itemMeta);
         trident.addEnchantment(Enchantment.RIPTIDE, 1);
         ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
+        leatherBoots.addEnchantment(Enchantment.DEPTH_STRIDER, 1);
 
         ItemStack redDye = new ItemStack(Material.RED_DYE);
         ItemMeta redMeta = redDye.getItemMeta();

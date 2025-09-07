@@ -494,9 +494,12 @@ public class MBC implements Listener {
 
         if (currentGame != null && ((currentGame != lobby && currentGame != aceRace && currentGame.getState().equals(GameState.TUTORIAL)) ||
                 (currentGame == lobby && lobby.getState().equals(GameState.END_ROUND) && lobby.timeRemaining <= 80 && lobby.timeRemaining > 69))) {
-            mutedMessages.add(msg);
-            player.sendMessage(ChatColor.RED + "Chat is currently muted, your message will send after!");
-            e.setCancelled(true);
+            if (currentGame instanceof Quickfire) {}
+            else {
+                mutedMessages.add(msg);
+                player.sendMessage(ChatColor.RED + "Chat is currently muted, your message will send after!");
+                e.setCancelled(true);
+            }
         }
     }
 
