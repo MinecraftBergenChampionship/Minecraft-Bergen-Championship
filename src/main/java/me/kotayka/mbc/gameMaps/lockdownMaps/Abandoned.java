@@ -111,6 +111,7 @@ public class Abandoned extends LockdownMap {
         ArrayList<MBCTeam> teamList = roundNumToList(roundNum);
         for (int i = 0; i < teamList.size(); i++) {
             MBCTeam t = teamList.get(i);
+            if (t == null) continue;
             for (Participant p : t.teamPlayers) {
                 Location spawn = indexSpawns.get(i);
                 p.getPlayer().teleport(spawn);
@@ -176,6 +177,7 @@ public class Abandoned extends LockdownMap {
         MBCTeam[] originalTeamOrder = new MBCTeam[6];
         
         for (int i = 0; i < originalTeamOrder.length; i++) {
+            if (i == teamList.size()) break;
             originalTeamOrder[i] = teamList.get(i);
         }
 

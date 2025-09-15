@@ -508,7 +508,7 @@ public class Spleef extends Game {
         noBreakList.add(Material.BARRIER);
         noBreakList.add(Material.POLISHED_BLACKSTONE);
         noBreakList.add(Material.POLISHED_BLACKSTONE_SLAB);
-        noBreakList.add(Material.RED_TERRACOTTA);
+        //noBreakList.add(Material.RED_TERRACOTTA);
         noBreakList.add(Material.POLISHED_BLACKSTONE_STAIRS);
         noBreakList.add(Material.POLISHED_BLACKSTONE_BRICKS);
         noBreakList.add(Material.POLISHED_BLACKSTONE_BRICK_STAIRS);

@@ -3,8 +3,10 @@ package me.kotayka.mbc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -62,6 +64,7 @@ public class Quickfire extends FinaleGame {
     private String defaultWalkoutSong = "walkout.default";
     private List<Participant> firstPlaceWalkoutOrder = new ArrayList<>();
     private List<Participant> secondPlaceWalkoutOrder = new ArrayList<>();
+    private List<Participant> alreadyWalkedOut = new ArrayList<>();
     private int currentWalkoutNumber = 0;
     private Participant currentlyWalkingOut;
 
@@ -440,11 +443,23 @@ public class Quickfire extends FinaleGame {
     }
 
     public void playerIntroOrder() {
-        for (int i = 0; i < firstPlacePlayers; i++) {
-            firstPlaceWalkoutOrder.add(firstPlace.getPlayers().get(i));
+        
+        List<Participant> firstPlaceParticipants = firstPlace.getPlayers();
+        Set<Participant> set1 = new HashSet<>(firstPlaceParticipants);
+        firstPlaceParticipants.clear();
+        firstPlaceParticipants.addAll(set1);
+
+        List<Participant> secondPlaceParticipants = firstPlace.getPlayers();
+        Set<Participant> set2 = new HashSet<>(firstPlaceParticipants);
+        secondPlaceParticipants.clear();
+        secondPlaceParticipants.addAll(set2);
+
+
+        for (int i = 0; i < firstPlaceParticipants.size(); i++) {
+            firstPlaceWalkoutOrder.add(firstPlaceParticipants.get(i));
         }
-        for (int i = 0; i < secondPlacePlayers; i++) {
-            secondPlaceWalkoutOrder.add(secondPlace.getPlayers().get(i));
+        for (int i = 0; i < secondPlaceParticipants.size(); i++) {
+            secondPlaceWalkoutOrder.add(secondPlaceParticipants.get(i));
         }
 
         Collections.shuffle(firstPlaceWalkoutOrder);
@@ -480,7 +495,6 @@ public class Quickfire extends FinaleGame {
             } else {
                 p.getPlayer().setGameMode(GameMode.SPECTATOR);
                 p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
-                p.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             }
         }
     }

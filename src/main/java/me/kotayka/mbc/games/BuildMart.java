@@ -80,18 +80,21 @@ public class BuildMart extends Game {
         //where the builds which are first are initialized. change these based off of event
 
         //halloween
-        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, 2))); //graveyard
-        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -285, 185, 2))); //skeleton face
-        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -294, 185, 2))); //nether star
-        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -114, 185, 2))); // wither skeleton face
-        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -258, 185, -28))); //ghost
-        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -267, 185, -28))); //witch cauldron
-        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, -28))); //shark
-        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -249, 185, -58))); //zombie
-        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -33, 185, -58))); //murder
-        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -58))); //pumpkin
+        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, 2))); //graveyard
+        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -285, 185, 2))); //skeleton face
+        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -294, 185, 2))); //nether star
+        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -114, 185, 2))); // wither skeleton face
+        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -258, 185, -28))); //ghost
+        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -267, 185, -28))); //witch cauldron
+        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, -28))); //shark
+        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -321, 185, -28))); //something else i forgot
+        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -249, 185, -58))); //zombie
+        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -33, 185, -58))); //murder
+        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -58))); //pumpkin
+        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -195, 185, -58))); //black cat
+        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -222, 185, -58))); //inside out
+
         //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -186, 185, -58))); //dungeon
-        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -195, 185, -58))); //black cat
 
         //christmas
         //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -321, 185, 2))); //reindeer
