@@ -82,33 +82,33 @@ public class Lockdown extends Game {
 
     private final int ORIGINAL_KILL_POINTS_18 = 5;
     private final int ORIGINAL_KILL_POINTS_24 = 7;
-    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_24;
+    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_18;
 
     private final int TWO_KILL_POINTS_18 = 4;
     private final int TWO_KILL_POINTS_24 = 6;
-    private final int TWO_KILL_POINTS = TWO_KILL_POINTS_24;
+    private final int TWO_KILL_POINTS = TWO_KILL_POINTS_18;
 
     private final int FOUR_KILL_POINTS_18 = 3;
     private final int FOUR_KILL_POINTS_24 = 5;
-    private final int FOUR_KILL_POINTS = FOUR_KILL_POINTS_24;
+    private final int FOUR_KILL_POINTS = FOUR_KILL_POINTS_18;
 
     private final int SIX_KILL_POINTS_18 = 3;
     private final int SIX_KILL_POINTS_24 = 5;
-    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_24;
+    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_18;
 
     private MBCTeam[][] capturedPoints = new MBCTeam[6][6];
     private MBCTeam[][] originalCapturedPoints = new MBCTeam[6][6];
 
     private final int FIRST_TEAM_ZONE_POINTS = 1;
-    private final int FIRST_ZONE = 5;
-    private final int SECOND_ZONE = 4;
-    private final int THIRD_ZONE = 3;
+    private final int FIRST_ZONE = 4; // for 24 players this is 5
+    private final int SECOND_ZONE = 3; // for 24 players this is 4
+    private final int THIRD_ZONE = 2; // for 24 players this is 3
     private final int FOURTH_FIFTH_ZONE = 2;
     private final int SIXTH_AND_MORE_ZONE = 1;
 
     private final int ESCAPE_POINTS_18 = 10;
     private final int ESCAPE_POINTS_24 = 10;
-    private int ESCAPE_POINTS = ESCAPE_POINTS_24;
+    private int ESCAPE_POINTS = ESCAPE_POINTS_18;
 
     public Lockdown() {
         super("Lockdown", new String[] {

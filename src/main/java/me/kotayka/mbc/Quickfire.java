@@ -40,7 +40,6 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import me.kotayka.mbc.gameMaps.quickfireMap.DeepDark;
 import me.kotayka.mbc.gameMaps.quickfireMap.Mansion;
 import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
 import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
@@ -151,6 +150,15 @@ public class Quickfire extends FinaleGame {
         UUID edward = UUID.fromString("ae32acfb-9446-485f-bf79-4262d8458a1c");
         UUID cookie = UUID.fromString("1134e9f1-5daa-4078-b2d7-b79f784ea3db");
         UUID tony = UUID.fromString("7bb2f9e8-e030-44cb-9141-5c419dd09b21");
+        UUID carrie = UUID.fromString("478eb5a6-adc9-40f0-80a1-e82fd3fb4561");
+        UUID cres = UUID.fromString("84c20807-2a17-4f9f-9c9b-15cd71b5633d");
+        UUID mango = UUID.fromString("6fa5b228-c821-451c-b936-52dec38923a1");
+        UUID liz = UUID.fromString("5c58b780-daf9-4558-926f-b89ff18a4858");
+        UUID esther = UUID.fromString("bb684862-ad93-4373-b89c-4151116acd06");
+        UUID janzelle = UUID.fromString("f1794b6e-2c6c-4d43-84b2-16c1eb15c7ab");
+        UUID pickle = UUID.fromString("acd494ee-3ba3-4de2-9474-6a21261d9413");
+        UUID noah = UUID.fromString("80b6f6d7-afbd-4c78-befa-55bc26579b19");
+        UUID queakie = UUID.fromString("355562aa-2235-4838-9afb-87fc23aec431");
 
         playerWalkoutSongs.put(cam, "walkout.bigkirbypuff");
         playerWalkoutSongs.put(collin, "walkout.rspacerr");
@@ -162,6 +170,15 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongs.put(edward, "walkout.bapplebusiness");
         playerWalkoutSongs.put(cookie, "walkout.cookie");
         playerWalkoutSongs.put(tony, "walkout.atrackpadplayer");
+        playerWalkoutSongs.put(carrie, "walkout.sandwichmasterxx");
+        playerWalkoutSongs.put(cres, "walkout.cres_uwu");
+        playerWalkoutSongs.put(mango, "walkout.mango3139");
+        playerWalkoutSongs.put(liz, "walkout.mastersvetlana");
+        playerWalkoutSongs.put(esther, "walkout.zero");
+        playerWalkoutSongs.put(janzelle, "walkout.janeru");
+        playerWalkoutSongs.put(pickle, "walkout.picklepvp");
+        playerWalkoutSongs.put(noah, "walkout.trapshadow");
+        playerWalkoutSongs.put(queakie, "walkout.queakie");
 
         playerWalkoutBlurbs.put(cam, "Representing the South Side of Chicago...");
         playerWalkoutBlurbs.put(collin, "Don't ask him how he eats his Chicken Nuggets...");
@@ -173,6 +190,15 @@ public class Quickfire extends FinaleGame {
         playerWalkoutBlurbs.put(edward, "Known to many as \"Wikipedia's most Wanted\"...");
         playerWalkoutBlurbs.put(cookie, "One could say she's a \"tough cookie\"...");
         playerWalkoutBlurbs.put(tony, "When his pants turn brown... run...");
+        playerWalkoutBlurbs.put(carrie, "A woman of many middle names...");
+        playerWalkoutBlurbs.put(cres, "Everybody, raise your ya ya ya for...");
+        playerWalkoutBlurbs.put(mango, "AHHHHHHHHHHH!");
+        playerWalkoutBlurbs.put(liz, "To everyone's shock, awe, and disbelief...");
+        playerWalkoutBlurbs.put(esther, "Don't ask her about her time working at Paris Baguette...");
+        playerWalkoutBlurbs.put(janzelle, "She is not in danger - she IS the danger...");
+        playerWalkoutBlurbs.put(pickle, "Pickle, puh Pickle, puh, puh, puh, Pickle Pickle...");
+        playerWalkoutBlurbs.put(noah, "Just the name \"Noah Paul Gaming\" strikes fear in his competitors...");
+        playerWalkoutBlurbs.put(queakie, "Ready to find your entire family genealogy..");
 
         playerWalkoutSongNames.put(cam, "Sleepyhead, Passion Pit");
         playerWalkoutSongNames.put(collin, "Radioactive, Imagine Dragons");
@@ -184,6 +210,15 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongNames.put(edward, "Requiem: II, György Ligeti");
         playerWalkoutSongNames.put(cookie, "Low, Flo Rida & T-Pain");
         playerWalkoutSongNames.put(tony, "Home Depot Theme Song");
+        playerWalkoutSongNames.put(carrie, "Like a G6, Far East Movement");
+        playerWalkoutSongNames.put(cres, "Gameboy, KATSEYE");
+        playerWalkoutSongNames.put(mango, "The Devourer of Gods, Terraria Calamity Mod");
+        playerWalkoutSongNames.put(liz, "Fight Song, Sister Sin");
+        playerWalkoutSongNames.put(esther, "SHYNE, Travis Scott");
+        playerWalkoutSongNames.put(janzelle, "Next Level Charli, Charli XCX");
+        playerWalkoutSongNames.put(pickle, "Pickle Song");
+        playerWalkoutSongNames.put(noah, "Steve Intro, Super Smash Bros. Ultimate");
+        playerWalkoutSongNames.put(queakie, "We Like to Party, Vengaboys");
     }
 
     @Override

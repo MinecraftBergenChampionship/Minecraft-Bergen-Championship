@@ -45,7 +45,7 @@ public class OneShot extends PartyGame {
 
     private final int KILLS_PER_WEAPON_18 = 10;
     private final int KILLS_PER_WEAPON_24 = 15;
-    private final int KILLS_PER_WEAPON = KILLS_PER_WEAPON_24;
+    private final int KILLS_PER_WEAPON = KILLS_PER_WEAPON_18;
     private Map<MBCTeam, BossBar> teamBossBars = new HashMap<>();
     
     private boolean playMusic = true;

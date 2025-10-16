@@ -7,10 +7,10 @@ public class Red extends MBCTeam {
 
     public Red() {
         //regular
-        super("RedRabbits", "Red Rabbits", 'Ⓡ', ChatColor.RED);
+        //super("RedRabbits", "Red Rabbits", 'Ⓡ', ChatColor.RED);
 
         //halloween
-        //super("RedRavens", "Red Ravens", 'Ⓛ', ChatColor.RED);
+        super("RedRavens", "Red Ravens", 'Ⓛ', ChatColor.RED);
 
         //christmas
         //super("RedReindeer", "Red Reindeer", 'ⓡ', ChatColor.RED);
