@@ -500,6 +500,32 @@ public class Quickfire extends FinaleGame {
 
         Collections.shuffle(firstPlaceWalkoutOrder);
         Collections.shuffle(secondPlaceWalkoutOrder);
+
+        ArrayList<UUID> songsDisplayed = new ArrayList<>();
+        for (int i = secondPlaceWalkoutOrder.size(); i >= 0; i--) {
+            Participant p = secondPlaceWalkoutOrder.get(i);
+            UUID playerUUID = p.getPlayer().getUniqueId();
+            if (!songsDisplayed.contains(playerUUID)) {
+                String songName = playerWalkoutSongNames.get(playerUUID);
+                Bukkit.broadcastMessage(p.getFormattedName() + ": " + ChatColor.BOLD + songName);
+                songsDisplayed.add(playerUUID);
+            }
+            else {
+                secondPlaceWalkoutOrder.remove(i);
+            }
+        }
+        for (int i = firstPlaceWalkoutOrder.size(); i >= 0; i--) {
+            Participant p = firstPlaceWalkoutOrder.get(i);
+            UUID playerUUID = p.getPlayer().getUniqueId();
+            if (!songsDisplayed.contains(playerUUID)) {
+            String songName = playerWalkoutSongNames.get(playerUUID);
+            Bukkit.broadcastMessage(p.getFormattedName() + ": " + ChatColor.BOLD + songName);
+            songsDisplayed.add(playerUUID);
+            }
+            else {
+                firstPlaceWalkoutOrder.remove(i);
+            }
+        }
     }
 
     public void startRound() {
