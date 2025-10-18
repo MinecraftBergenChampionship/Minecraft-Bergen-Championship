@@ -485,8 +485,8 @@ public class Quickfire extends FinaleGame {
         firstPlaceParticipants.clear();
         firstPlaceParticipants.addAll(set1);
 
-        List<Participant> secondPlaceParticipants = firstPlace.getPlayers();
-        Set<Participant> set2 = new HashSet<>(firstPlaceParticipants);
+        List<Participant> secondPlaceParticipants = secondPlace.getPlayers();
+        Set<Participant> set2 = new HashSet<>(secondPlaceParticipants);
         secondPlaceParticipants.clear();
         secondPlaceParticipants.addAll(set2);
 
