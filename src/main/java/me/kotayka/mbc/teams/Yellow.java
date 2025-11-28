@@ -10,9 +10,9 @@ public class Yellow extends MBCTeam {
         //super("YellowYaks", "Yellow Yaks", 'Ⓨ', ChatColor.YELLOW);
 
         //halloween
-        super("MustardMummies", "Mustard Mummies", 'Ⓜ', ChatColor.YELLOW);
+        //super("MustardMummies", "Mustard Mummies", 'Ⓜ', ChatColor.YELLOW);
 
         //christmas
-        //super("YellowYetis", "Yellow Yetis", 'ⓨ', ChatColor.YELLOW);
+        super("YellowYetis", "Yellow Yetis", 'ⓨ', ChatColor.YELLOW);
     }
 }

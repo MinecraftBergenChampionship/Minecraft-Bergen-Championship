@@ -82,7 +82,7 @@ public class PowerTag extends Game {
     // scoring
     private final int FIND_POINTS_18 = 7;
     private final int FIND_POINTS_24 = 10;
-    private final int FIND_POINTS = FIND_POINTS_18;
+    private final int FIND_POINTS = FIND_POINTS_24;
 
     private final int INCREMENT_POINTS = 1;
     private final int HIDE_BONUS_POINTS_TOP_5 = 8;
@@ -90,7 +90,7 @@ public class PowerTag extends Game {
 
     private final int SURVIVAL_POINTS_18 = 8;
     private final int SURVIVAL_POINTS_24 = 10;
-    private final int SURVIVAL_POINTS = SURVIVAL_POINTS_18;
+    private final int SURVIVAL_POINTS = SURVIVAL_POINTS_24;
 
     public PowerTag() {
         super("PowerTag", new String[] {

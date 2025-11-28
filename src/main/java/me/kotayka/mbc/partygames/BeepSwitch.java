@@ -97,25 +97,25 @@ public class BeepSwitch extends PartyGame {
 
     private final int deathY = 97;
 
-    public final int STAGE_POINTS_18 = 5;
+    public final int STAGE_POINTS_18 = 4;
     public final int STAGE_POINTS_24 = 6;
-    public final int STAGE_POINTS = STAGE_POINTS_18;
+    public final int STAGE_POINTS = STAGE_POINTS_24;
 
     public final int EASY_POINTS_18 = 1;
-    public final int EASY_POINTS_24 = 3;
-    public final int EASY_POINTS = EASY_POINTS_18;
+    public final int EASY_POINTS_24 = 2;
+    public final int EASY_POINTS = EASY_POINTS_24;
 
     public final int MEDIUM_POINTS_18 = 3;
-    public final int MEDIUM_POINTS_24 = 5;
-    public final int MEDIUM_POINTS = MEDIUM_POINTS_18;
+    public final int MEDIUM_POINTS_24 = 4;
+    public final int MEDIUM_POINTS = MEDIUM_POINTS_24;
 
     public final int HARD_POINTS_18 = 5;
-    public final int HARD_POINTS_24 = 7;
-    public final int HARD_POINTS = HARD_POINTS_18;
+    public final int HARD_POINTS_24 = 6;
+    public final int HARD_POINTS = HARD_POINTS_24;
 
     public final int EXTREME_POINTS_18 = 7;
-    public final int EXTREME_POINTS_24 = 9;
-    public final int EXTREME_POINTS = EXTREME_POINTS_18;
+    public final int EXTREME_POINTS_24 = 8;
+    public final int EXTREME_POINTS = EXTREME_POINTS_24;
 
 
 
@@ -687,10 +687,10 @@ public class BeepSwitch extends PartyGame {
 
         //medium
         Collections.shuffle(mediumLevels);
-        placeMediumExtremeCourse(mediumLevels.get(0), -5033, 97, -4952);
-        placeMediumExtremeCourse(mediumLevels.get(1), -5033, 97, -4920);
-        placeMediumExtremeCourse(mediumLevels.get(2), -5033, 97, -4888);
-        placeMediumExtremeCourse(mediumLevels.get(3), -5033, 97, -4856);
+        placeMediumExtremeCourse(easyLevels.get(4), -5033, 97, -4952);
+        placeMediumExtremeCourse(mediumLevels.get(0), -5033, 97, -4920);
+        placeMediumExtremeCourse(mediumLevels.get(1), -5033, 97, -4888);
+        placeMediumExtremeCourse(mediumLevels.get(2), -5033, 97, -4856);
         List<BeepTestLevel> medium = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
             medium.add(mediumLevels.get(i));
@@ -699,10 +699,10 @@ public class BeepSwitch extends PartyGame {
 
         //hard
         Collections.shuffle(hardLevels);
-        placeEasyHardCourse(hardLevels.get(0), -4991, 97, -5022);
-        placeEasyHardCourse(hardLevels.get(1), -4991, 97, -5054);
-        placeEasyHardCourse(hardLevels.get(2), -4991, 97, -5086);
-        placeEasyHardCourse(hardLevels.get(3), -4991, 97, -5118);
+        placeEasyHardCourse(mediumLevels.get(3), -4991, 97, -5022);
+        placeEasyHardCourse(mediumLevels.get(4), -4991, 97, -5054);
+        placeEasyHardCourse(hardLevels.get(0), -4991, 97, -5086);
+        placeEasyHardCourse(hardLevels.get(1), -4991, 97, -5118);
         List<BeepTestLevel> hard = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
             hard.add(hardLevels.get(i));
@@ -711,10 +711,10 @@ public class BeepSwitch extends PartyGame {
 
         //extreme
         Collections.shuffle(extremeLevels);
-        placeMediumExtremeCourse(extremeLevels.get(0), -4991, 97, -4952);
-        placeMediumExtremeCourse(extremeLevels.get(1), -4991, 97, -4920);
-        placeMediumExtremeCourse(extremeLevels.get(2), -4991, 97, -4888);
-        placeMediumExtremeCourse(extremeLevels.get(3), -4991, 97, -4856);
+        placeMediumExtremeCourse(hardLevels.get(2), -4991, 97, -4952);
+        placeMediumExtremeCourse(hardLevels.get(3), -4991, 97, -4920);
+        placeMediumExtremeCourse(hardLevels.get(4), -4991, 97, -4888);
+        placeMediumExtremeCourse(extremeLevels.get(0), -4991, 97, -4856);
         List<BeepTestLevel> extreme = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
             extreme.add(extremeLevels.get(i));

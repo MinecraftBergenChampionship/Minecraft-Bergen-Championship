@@ -46,7 +46,7 @@ public class Spleef extends Game {
     private final int SURVIVAL_POINTS = 2;
     private final int KILL_POINTS_18 = 3;
     private final int KILL_POINTS_24 = 5;
-    private final int KILL_POINTS = KILL_POINTS_18;
+    private final int KILL_POINTS = KILL_POINTS_24;
     private final int LAST_TEAM_BONUS = 2;
 
     // Misc

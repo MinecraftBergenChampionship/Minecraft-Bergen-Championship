@@ -80,32 +80,32 @@ public class BuildMart extends Game {
         //where the builds which are first are initialized. change these based off of event
 
         //halloween
-        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, 2))); //graveyard
-        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -285, 185, 2))); //skeleton face
-        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -294, 185, 2))); //nether star
-        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -114, 185, 2))); // wither skeleton face
-        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -258, 185, -28))); //ghost
-        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -267, 185, -28))); //witch cauldron
-        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, -28))); //shark
-        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -321, 185, -28))); //something else i forgot
-        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -249, 185, -58))); //zombie
-        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -33, 185, -58))); //murder
-        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -58))); //pumpkin
-        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -195, 185, -58))); //black cat
-        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -222, 185, -58))); //inside out
+        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, 2))); //graveyard
+        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -285, 185, 2))); //skeleton face
+        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -294, 185, 2))); //nether star
+        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -114, 185, 2))); // wither skeleton face
+        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -258, 185, -28))); //ghost
+        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -267, 185, -28))); //witch cauldron
+        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -276, 185, -28))); //shark
+        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -321, 185, -28))); //something else i forgot
+        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -249, 185, -58))); //zombie
+        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -33, 185, -58))); //murder
+        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -58))); //pumpkin
+        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -195, 185, -58))); //black cat
+        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -222, 185, -58))); //inside out
 
         //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -186, 185, -58))); //dungeon
 
         //christmas
-        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -321, 185, 2))); //reindeer
-        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -330, 185, 2))); //baby penguins
-        //EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -339, 185, 2))); //candy canes
-        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -186, 185, -28))); // milk and cookies
-        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -28))); // christmas tree
-        //MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -303, 185, -28))); // snowman
-        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -15, 185, -58))); // chimney
-        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -204, 185, -58))); // snow globe
-        //HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -213, 185, -58))); // sleigh
+        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -321, 185, 2))); //reindeer
+        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -330, 185, 2))); //baby penguins
+        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -339, 185, 2))); //candy canes
+        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -186, 185, -28))); // milk and cookies
+        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -28))); // christmas tree
+        MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -303, 185, -28))); // snowman
+        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -15, 185, -58))); // chimney
+        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -204, 185, -58))); // snow globe
+        HARD_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -213, 185, -58))); // sleigh
 
     }
 
@@ -239,9 +239,9 @@ public class BuildMart extends Game {
 
                     if (mostBuilds(t)) {
                         for (Participant p : t.getTeam().teamPlayers) {
-                            p.getPlayer().sendMessage
-                                (ChatColor.GREEN + "Your team finished with the most builds completed!" + MBC.scoreFormatter(MOST_BUILD_POINTS));
-                            p.addCurrentScore(MOST_BUILD_POINTS);
+                            //p.getPlayer().sendMessage
+                                //(ChatColor.GREEN + "Your team finished with the most builds completed!" + MBC.scoreFormatter(MOST_BUILD_POINTS));
+                            //p.addCurrentScore(MOST_BUILD_POINTS);
                         }
                     }
 

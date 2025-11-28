@@ -48,19 +48,19 @@ public class AceRace extends Game {
     // SCORING VARIABLES
     public static final int FINISH_RACE_POINTS_18 = 12;  
     public static final int FINISH_RACE_POINTS_24 = 18;  
-    public static final int FINISH_RACE_POINTS = FINISH_RACE_POINTS_18;   
+    public static final int FINISH_RACE_POINTS = FINISH_RACE_POINTS_24;   
 
     public static final int PLACEMENT_LAP_POINTS_18 = 1;
     public static final int PLACEMENT_LAP_POINTS_24 = 1;
-    public static final int PLACEMENT_LAP_POINTS = PLACEMENT_LAP_POINTS_18;
+    public static final int PLACEMENT_LAP_POINTS = PLACEMENT_LAP_POINTS_24;
 
     public static final int LAP_COMPLETION_POINTS_18 = 1;  
     public static final int LAP_COMPLETION_POINTS_24 = 2; 
-    public static final int LAP_COMPLETION_POINTS = LAP_COMPLETION_POINTS_18;
+    public static final int LAP_COMPLETION_POINTS = LAP_COMPLETION_POINTS_24;
 
     public static final int PLACEMENT_FINAL_LAP_POINTS_18 = 3;
     public static final int PLACEMENT_FINAL_LAP_POINTS_24 = 3;
-    public static final int PLACEMENT_FINAL_LAP_POINTS = PLACEMENT_FINAL_LAP_POINTS_18;
+    public static final int PLACEMENT_FINAL_LAP_POINTS = PLACEMENT_FINAL_LAP_POINTS_24;
 
     public static final int[] PLACEMENT_BONUSES = {20, 15, 15, 10, 10, 5, 5, 5, 5, 5}; // points for Top 10 finishers
     public static final int TUTORIAL_TIME = 240;
