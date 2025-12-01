@@ -575,7 +575,7 @@ public class PowerTag extends Game {
         tension.setItemMeta(tensionMeta);
 
         //ItemStack[] items = {tremor, trident, troll, toxic, tension};
-        ItemStack[] items = {tension, trident, toxic};
+        ItemStack[] items = {tension, tremor, toxic};
 
         return items;
     }

@@ -161,7 +161,7 @@ public class BeepSwitch extends PartyGame {
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {
             maxRounds = Math.max(maxRounds, t.getPlayers().size());
         }
-        rounds = maxRounds*4;
+        rounds = maxRounds*3;
 
         setGameState(GameState.TUTORIAL);
 
