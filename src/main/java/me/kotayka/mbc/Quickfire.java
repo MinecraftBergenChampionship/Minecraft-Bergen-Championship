@@ -40,7 +40,6 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import me.kotayka.mbc.gameMaps.quickfireMap.Mansion;
 import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
 import me.kotayka.mbc.gameMaps.quickfireMap.SnowGlobe;
 import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
@@ -160,6 +159,10 @@ public class Quickfire extends FinaleGame {
         UUID pickle = UUID.fromString("acd494ee-3ba3-4de2-9474-6a21261d9413");
         UUID noah = UUID.fromString("80b6f6d7-afbd-4c78-befa-55bc26579b19");
         UUID queakie = UUID.fromString("355562aa-2235-4838-9afb-87fc23aec431");
+        UUID penguin = UUID.fromString("670995ca-adbc-4c5e-aa7b-6939db10e2b4");
+        UUID ehnry = UUID.fromString("8da6e75d-44b2-4d2f-8104-526331033873");
+        UUID sam = UUID.fromString("4cb9d97c-cb8f-4a35-b0a4-6c82b782aa1a");
+        UUID blueboy = UUID.fromString("9dfa1dab-2e36-4482-96ab-d3a765eceacf");
 
         playerWalkoutSongs.put(cam, "walkout.bigkirbypuff");
         playerWalkoutSongs.put(collin, "walkout.rspacerr");
@@ -180,6 +183,10 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongs.put(pickle, "walkout.picklepvp");
         playerWalkoutSongs.put(noah, "walkout.trapshadow");
         playerWalkoutSongs.put(queakie, "walkout.queakie");
+        playerWalkoutSongs.put(penguin, "walkout.penguin");
+        playerWalkoutSongs.put(ehnry, "walkout.ehnry");
+        playerWalkoutSongs.put(sam, "walkout.sammjamzz");
+        playerWalkoutSongs.put(blueboy, "walkout.blueboyv1");
 
         playerWalkoutBlurbs.put(cam, "Representing the South Side of Chicago...");
         playerWalkoutBlurbs.put(collin, "Don't ask him how he eats his Chicken Nuggets...");
@@ -199,7 +206,10 @@ public class Quickfire extends FinaleGame {
         playerWalkoutBlurbs.put(janzelle, "She is not in danger - she IS the danger...");
         playerWalkoutBlurbs.put(pickle, "Pickle, puh Pickle, puh, puh, puh, Pickle Pickle...");
         playerWalkoutBlurbs.put(noah, "Just the name \"Noah Paul Gaming\" strikes fear in his competitors...");
-        playerWalkoutBlurbs.put(queakie, "Ready to find your entire family genealogy..");
+        playerWalkoutBlurbs.put(queakie, "Ready to find your entire family genealogy...");
+        playerWalkoutBlurbs.put(penguin, "He has MBC rings for every finger on his hand...");
+        playerWalkoutBlurbs.put(ehnry, "He's spent thousands of dollars on CS2 cases...");
+        playerWalkoutBlurbs.put(sam, "Dancing her way into quickfire...");
 
         playerWalkoutSongNames.put(cam, "Sleepyhead, Passion Pit");
         playerWalkoutSongNames.put(collin, "Radioactive, Imagine Dragons");
@@ -210,7 +220,7 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongNames.put(terri, "Daydreamin', Ariana Grande");
         playerWalkoutSongNames.put(edward, "Requiem: II, György Ligeti");
         playerWalkoutSongNames.put(cookie, "Low, Flo Rida & T-Pain");
-        playerWalkoutSongNames.put(tony, "Home Depot Theme Song");
+        playerWalkoutSongNames.put(tony, "We are Charlie Kirk, SPALEXMA");
         playerWalkoutSongNames.put(carrie, "Like a G6, Far East Movement");
         playerWalkoutSongNames.put(cres, "Gameboy, KATSEYE");
         playerWalkoutSongNames.put(mango, "The Devourer of Gods, Terraria Calamity Mod");
@@ -220,6 +230,10 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongNames.put(pickle, "Pickle Song");
         playerWalkoutSongNames.put(noah, "Steve Intro, Super Smash Bros. Ultimate");
         playerWalkoutSongNames.put(queakie, "We Like to Party, Vengaboys");
+        playerWalkoutSongNames.put(penguin, "The Duck Song, Bryant Oden");
+        playerWalkoutSongNames.put(ehnry, "Get Outside, Youtube Audio Library");
+        playerWalkoutSongNames.put(sam, "I Wish that Heaven had a Phone to Call You Up");
+        playerWalkoutSongNames.put(blueboy, "Simple and Clean, Hikaru Utada");
     }
 
     @Override
@@ -304,6 +318,9 @@ public class Quickfire extends FinaleGame {
             }
             if (timeRemaining == finalePlayers*12 + 14) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Introducing the second place team: the " + ChatColor.RESET + secondPlace.teamNameFormat() + ChatColor.BOLD + "!");
+                for (int i = 0; i < secondPlaceWalkoutOrder.size(); i++) {
+                    Bukkit.broadcastMessage(secondPlaceWalkoutOrder.get(i).getFormattedName());
+                }
                 currentWalkoutNumber = 0;
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, Sound.ENTITY_LIGHTNING_BOLT_THUNDER,SoundCategory.RECORDS, 1, 1);
@@ -313,9 +330,10 @@ public class Quickfire extends FinaleGame {
                 switch(timeRemaining%12) {
                     case (11) -> {
                         currentWalkoutNumber++;
+                        System.out.println(currentWalkoutNumber);
                     }
                     case (10) -> {
-                        if (currentWalkoutNumber >= secondPlaceWalkoutOrder.size()) currentWalkoutNumber = secondPlaceWalkoutOrder.size()-1;
+                        if (currentWalkoutNumber >= secondPlaceWalkoutOrder.size()) currentWalkoutNumber = 0;
                         currentlyWalkingOut = secondPlaceWalkoutOrder.get(currentWalkoutNumber);
                         UUID playerUUID = currentlyWalkingOut.getPlayer().getUniqueId();
                         String song = playerWalkoutSongs.get(playerUUID);
@@ -353,12 +371,15 @@ public class Quickfire extends FinaleGame {
             }
             if (timeRemaining == firstPlacePlayers*12 + 9) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Introducing the first place team: the " + ChatColor.RESET + firstPlace.teamNameFormat() + ChatColor.BOLD + "!");
+                for (int i = 0; i < firstPlaceWalkoutOrder.size(); i++) {
+                    Bukkit.broadcastMessage(firstPlaceWalkoutOrder.get(i).getFormattedName());
+                }
                 currentWalkoutNumber = 0;
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, Sound.ENTITY_LIGHTNING_BOLT_THUNDER,SoundCategory.RECORDS, 1, 1);
                 }
             }
-            if (timeRemaining > 5 && timeRemaining <= firstPlacePlayers*12 + 5) {
+            if (timeRemaining > 5 && timeRemaining <= firstPlacePlayers*12 + 4) {
                 switch(timeRemaining%12) {
                     case (10) -> {
                         currentlyWalkingOut.getPlayer().teleport(TEAM_ONE_SPAWN);
@@ -371,9 +392,10 @@ public class Quickfire extends FinaleGame {
                     }
                     case (5) -> {
                         currentWalkoutNumber++;
+                        System.out.println(currentWalkoutNumber);
                     }
                     case (4) -> {
-                        if (currentWalkoutNumber >= firstPlaceWalkoutOrder.size()) currentWalkoutNumber = firstPlaceWalkoutOrder.size()-1;
+                        if (currentWalkoutNumber >= firstPlaceWalkoutOrder.size()) currentWalkoutNumber = 0;
                         currentlyWalkingOut = firstPlaceWalkoutOrder.get(currentWalkoutNumber);
                         UUID playerUUID = currentlyWalkingOut.getPlayer().getUniqueId();
                         String song = playerWalkoutSongs.get(playerUUID);
@@ -503,24 +525,24 @@ public class Quickfire extends FinaleGame {
         Collections.shuffle(secondPlaceWalkoutOrder);
 
         ArrayList<UUID> songsDisplayed = new ArrayList<>();
-        for (int i = secondPlaceWalkoutOrder.size(); i >= 0; i--) {
+        for (int i = secondPlaceWalkoutOrder.size()-1; i >= 0; i--) {
             Participant p = secondPlaceWalkoutOrder.get(i);
             UUID playerUUID = p.getPlayer().getUniqueId();
             if (!songsDisplayed.contains(playerUUID)) {
                 String songName = playerWalkoutSongNames.get(playerUUID);
-                Bukkit.broadcastMessage(p.getFormattedName() + ": " + ChatColor.BOLD + songName);
+                //Bukkit.broadcastMessage(p.getFormattedName() + ": " + ChatColor.BOLD + songName);
                 songsDisplayed.add(playerUUID);
             }
             else {
                 secondPlaceWalkoutOrder.remove(i);
             }
         }
-        for (int i = firstPlaceWalkoutOrder.size(); i >= 0; i--) {
+        for (int i = firstPlaceWalkoutOrder.size()-1; i >= 0; i--) {
             Participant p = firstPlaceWalkoutOrder.get(i);
             UUID playerUUID = p.getPlayer().getUniqueId();
             if (!songsDisplayed.contains(playerUUID)) {
             String songName = playerWalkoutSongNames.get(playerUUID);
-            Bukkit.broadcastMessage(p.getFormattedName() + ": " + ChatColor.BOLD + songName);
+            //Bukkit.broadcastMessage(p.getFormattedName() + ": " + ChatColor.BOLD + songName);
             songsDisplayed.add(playerUUID);
             }
             else {

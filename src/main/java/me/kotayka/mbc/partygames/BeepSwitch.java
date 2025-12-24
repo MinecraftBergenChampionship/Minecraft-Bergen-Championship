@@ -99,23 +99,23 @@ public class BeepSwitch extends PartyGame {
 
     public final int STAGE_POINTS_18 = 4;
     public final int STAGE_POINTS_24 = 6;
-    public final int STAGE_POINTS = STAGE_POINTS_24;
+    public final int STAGE_POINTS = STAGE_POINTS_18;
 
     public final int EASY_POINTS_18 = 1;
     public final int EASY_POINTS_24 = 2;
-    public final int EASY_POINTS = EASY_POINTS_24;
+    public final int EASY_POINTS = EASY_POINTS_18;
 
     public final int MEDIUM_POINTS_18 = 3;
     public final int MEDIUM_POINTS_24 = 4;
-    public final int MEDIUM_POINTS = MEDIUM_POINTS_24;
+    public final int MEDIUM_POINTS = MEDIUM_POINTS_18;
 
     public final int HARD_POINTS_18 = 5;
     public final int HARD_POINTS_24 = 6;
-    public final int HARD_POINTS = HARD_POINTS_24;
+    public final int HARD_POINTS = HARD_POINTS_18;
 
     public final int EXTREME_POINTS_18 = 7;
     public final int EXTREME_POINTS_24 = 8;
-    public final int EXTREME_POINTS = EXTREME_POINTS_24;
+    public final int EXTREME_POINTS = EXTREME_POINTS_18;
 
 
 
@@ -137,11 +137,11 @@ public class BeepSwitch extends PartyGame {
                 "⑰ However, only one player on your team will be running the parkour at a time.\n\n" + 
                 "⑰ This player switches every 16 seconds. Communication is key to completing the most paths possible.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "⑰ +3 points for each easy level completed\n" +
-                        "⑰ +5 points for each medium level completed\n" +
-                        "⑰ +7 points for each hard level completed\n" +
-                        "⑰ +9 points for each extreme level completed\n" +
-                        "⑰ +6 points to each member of a team for completing a path of difficulty"
+                        "⑰ +1 points for each easy level completed\n" +
+                        "⑰ +3 points for each medium level completed\n" +
+                        "⑰ +5 points for each hard level completed\n" +
+                        "⑰ +7 points for each extreme level completed\n" +
+                        "⑰ +4 points to each member of a team for completing a path of difficulty"
         });
 
         loadCourses();

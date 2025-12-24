@@ -3,10 +3,13 @@ package me.kotayka.mbc.games;
 import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.skybattleMap.Campfire;
 import me.kotayka.mbc.gameMaps.skybattleMap.Endlantis;
+import me.kotayka.mbc.gameMaps.skybattleMap.Icelantis;
 import me.kotayka.mbc.gameMaps.skybattleMap.SkybattleMap;
 import me.kotayka.mbc.gamePlayers.LockdownPlayer;
 import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
 import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
+import me.kotayka.mbc.gamePlayers.SpleefPlayer;
+
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -27,7 +30,7 @@ import java.util.*;
 public class Skybattle extends Game {
     public final Particle.DustOptions BORDER_PARTICLE = new Particle.DustOptions(Color.RED, 3);
     public final Particle.DustOptions TOP_BORDER_PARTICLE = new Particle.DustOptions(Color.ORANGE, 3);
-    public SkybattleMap map = new Endlantis(this);
+    public SkybattleMap map = new Icelantis(this);
     public Map<UUID, SkybattlePlayer> skybattlePlayerMap = new HashMap<>();
     // Primed TNT Entity, Player (that placed that block); used for determining kills since primed tnt is spawned by world
     public Map<Entity, Player> TNTPlacers = new HashMap<Entity, Player>(5);
@@ -36,19 +39,19 @@ public class Skybattle extends Game {
     public Map<Entity,Player> witchSpawners = new HashMap<>();
      private final int ORIGINAL_KILL_POINTS_18 = 9;
     private final int ORIGINAL_KILL_POINTS_24 = 10;
-    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_24;
+    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_18;
 
     private final int THREE_KILL_POINTS_18 = 7;
     private final int THREE_KILL_POINTS_24 = 8;
-    private final int THREE_KILL_POINTS = THREE_KILL_POINTS_24;
+    private final int THREE_KILL_POINTS = THREE_KILL_POINTS_18;
 
     private final int SIX_KILL_POINTS_18 = 6;
     private final int SIX_KILL_POINTS_24 = 7;
-    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_24;
+    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_18;
 
     private final int NINE_KILL_POINTS_18 = 5;
     private final int NINE_KILL_POINTS_24 = 6;
-    private final int NINE_KILL_POINTS = NINE_KILL_POINTS_24;
+    private final int NINE_KILL_POINTS = NINE_KILL_POINTS_18;
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
     private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
     private final int SURVIVAL_POINTS = 1;
@@ -66,11 +69,11 @@ public class Skybattle extends Game {
                 "⑫ Make sure to " + ChatColor.BOLD + "TURN ON PARTICLES" + ChatColor.RESET + " to see the border.\n\n" +
                 "⑫ There's also a " + ChatColor.BOLD + "height border" + ChatColor.RESET + " that lowers over time!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑫ +10 points for eliminations\n" +
+                                "⑫ +5-9 points for eliminations\n" +
                                 "⑫ +1 points for every player outlived\n" +
                                 "⑫ Team Bonuses (split amongst team):\n" +
-                                "     ⑫ 1st: +9 points, 2nd: +8 points, 3rd: +7 points\n" +
-                                "     ⑫ 4th: +6 points, 5th: +5 points, 6th: +4 points"
+                                "     ⑫ 1st: +10 points, 2nd: +9 points, 3rd: +8 points\n" +
+                                "     ⑫ 4th: +7 points, 5th: +6 points, 6th: +5 points"
         });
     }
     private int roundNum = 1;
@@ -312,6 +315,9 @@ public class Skybattle extends Game {
                 //mostKillsPrint();
             //}
             if (timeRemaining <= 35) {
+                for (SkybattlePlayer p : skybattlePlayerMap.values()) {
+                        logger.log(p.getParticipant().getFormattedName() + ": " + p.kills + " kills");
+                    }
                 gameEndEvents();
             }
         }
@@ -414,8 +420,8 @@ public class Skybattle extends Game {
                 if (p.getTeam() == MBC.getInstance().spectator) continue;
                 if (teamPlacements.get(t) == null) continue;
                 int placement = teamPlacements.get(t);
-                p.addCurrentScore(TEAM_BONUSES_4[placement-1] / t.getPlayers().size());
-                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_4[placement-1] / t.getPlayers().size())));
+                p.addCurrentScore(TEAM_BONUSES_3[placement-1] / t.getPlayers().size());
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_3[placement-1] / t.getPlayers().size())));
             }
         }
     }
@@ -496,6 +502,11 @@ public class Skybattle extends Game {
 
         if (e.getBlock().getType() == Material.IRON_ORE) {
             map.getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.IRON_INGOT, 1));
+            return;
+        }
+
+        if (e.getBlock().getType() == Material.SNOW_BLOCK) {
+            e.setDropItems(false);
             return;
         }
 

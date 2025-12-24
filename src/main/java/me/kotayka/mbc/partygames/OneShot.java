@@ -45,7 +45,7 @@ public class OneShot extends PartyGame {
 
     private final int KILLS_PER_WEAPON_18 = 10;
     private final int KILLS_PER_WEAPON_24 = 15;
-    private final int KILLS_PER_WEAPON = KILLS_PER_WEAPON_24;
+    private final int KILLS_PER_WEAPON = KILLS_PER_WEAPON_18;
     private Map<MBCTeam, BossBar> teamBossBars = new HashMap<>();
     
     private boolean playMusic = true;
@@ -61,8 +61,8 @@ public class OneShot extends PartyGame {
         super("OneShot", new String[] {
                 "⑰ Use your weapons to kill other players with a one shot kill!\n\n" + 
                 "⑰ You can't kill people yet, obviously, but you'll be able to soon!",
-                "⑰ Every 15 kills your team gets, you'll get a new weapon.\n\n" + 
-                "⑰ Get to 60 kills and get a melee kill to win!",
+                "⑰ Every 10 kills your team gets, you'll get a new weapon.\n\n" + 
+                "⑰ Get to 40 kills and get a melee kill to win!",
                 "⑰ Get points for every kill, getting a new weapon, and winning!\n\n" + 
                 "⑰ You can even get bonus points for getting a high enough kill streak!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +

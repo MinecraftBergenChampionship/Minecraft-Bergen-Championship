@@ -62,6 +62,8 @@ import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.lockdownMaps.Abandoned;
 import me.kotayka.mbc.gameMaps.lockdownMaps.LockdownMap;
 import me.kotayka.mbc.gamePlayers.LockdownPlayer;
+import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
+import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 
 public class Lockdown extends Game {
     public LockdownMap map = new Abandoned(this);
@@ -82,27 +84,27 @@ public class Lockdown extends Game {
 
     private final int ORIGINAL_KILL_POINTS_18 = 5;
     private final int ORIGINAL_KILL_POINTS_24 = 7;
-    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_24;
+    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_18;
 
     private final int TWO_KILL_POINTS_18 = 4;
     private final int TWO_KILL_POINTS_24 = 6;
-    private final int TWO_KILL_POINTS = TWO_KILL_POINTS_24;
+    private final int TWO_KILL_POINTS = TWO_KILL_POINTS_18;
 
     private final int FOUR_KILL_POINTS_18 = 3;
     private final int FOUR_KILL_POINTS_24 = 5;
-    private final int FOUR_KILL_POINTS = FOUR_KILL_POINTS_24;
+    private final int FOUR_KILL_POINTS = FOUR_KILL_POINTS_18;
 
     private final int SIX_KILL_POINTS_18 = 3;
     private final int SIX_KILL_POINTS_24 = 5;
-    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_24;
+    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_18;
 
     private MBCTeam[][] capturedPoints = new MBCTeam[6][6];
     private MBCTeam[][] originalCapturedPoints = new MBCTeam[6][6];
 
     private final int FIRST_TEAM_ZONE_POINTS = 1;
-    private final int FIRST_ZONE = 5; // for 24 players this is 5
-    private final int SECOND_ZONE = 4; // for 24 players this is 4
-    private final int THIRD_ZONE = 3; // for 24 players this is 3
+    private final int FIRST_ZONE = 4; // for 24 players this is 5
+    private final int SECOND_ZONE = 3; // for 24 players this is 4
+    private final int THIRD_ZONE = 2; // for 24 players this is 3
     private final int FOURTH_FIFTH_ZONE = 2;
     private final int SIXTH_AND_MORE_ZONE = 1;
 
@@ -122,7 +124,7 @@ public class Lockdown extends Game {
                                 "⑲ +1-5 points per player for capturing a zone, decreasing after each captured\n" +
                                 "⑲ +1 point per player for capturing a zone first\n" +
                                 "⑲ +10 points for escaping at the evacuation point\n" +
-                                "⑲ +5-8 points per kill, decreasing after each kill\n"
+                                "⑲ +3-5 points per kill, decreasing after each kill\n"
         });
     }
     private int roundNum = 1;

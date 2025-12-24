@@ -48,19 +48,19 @@ public class AceRace extends Game {
     // SCORING VARIABLES
     public static final int FINISH_RACE_POINTS_18 = 12;  
     public static final int FINISH_RACE_POINTS_24 = 18;  
-    public static final int FINISH_RACE_POINTS = FINISH_RACE_POINTS_24;   
+    public static final int FINISH_RACE_POINTS = FINISH_RACE_POINTS_18;   
 
     public static final int PLACEMENT_LAP_POINTS_18 = 1;
     public static final int PLACEMENT_LAP_POINTS_24 = 1;
-    public static final int PLACEMENT_LAP_POINTS = PLACEMENT_LAP_POINTS_24;
+    public static final int PLACEMENT_LAP_POINTS = PLACEMENT_LAP_POINTS_18;
 
     public static final int LAP_COMPLETION_POINTS_18 = 1;  
     public static final int LAP_COMPLETION_POINTS_24 = 2; 
-    public static final int LAP_COMPLETION_POINTS = LAP_COMPLETION_POINTS_24;
+    public static final int LAP_COMPLETION_POINTS = LAP_COMPLETION_POINTS_18;
 
     public static final int PLACEMENT_FINAL_LAP_POINTS_18 = 3;
     public static final int PLACEMENT_FINAL_LAP_POINTS_24 = 3;
-    public static final int PLACEMENT_FINAL_LAP_POINTS = PLACEMENT_FINAL_LAP_POINTS_24;
+    public static final int PLACEMENT_FINAL_LAP_POINTS = PLACEMENT_FINAL_LAP_POINTS_18;
 
     public static final int[] PLACEMENT_BONUSES = {20, 15, 15, 10, 10, 5, 5, 5, 5, 5}; // points for Top 10 finishers
     public static final int TUTORIAL_TIME = 240;
@@ -78,9 +78,9 @@ public class AceRace extends Game {
                     "⑭ Soar with an elytra by pressing space midair!\n" + 
                     "⑭ Checkpoints will be given across the map.",
                     ChatColor.BOLD + "Scoring:\n" + ChatColor.RESET +
-                            "⑭ +2 points for completing a lap\n" +
+                            "⑭ +1 point for completing a lap\n" +
                             "⑭ +1 point for every player beaten on a lap\n" +
-                            "⑭ +18 points for finishing the course\n" +
+                            "⑭ +12 points for finishing the course\n" +
                             "⑭ +3 points for every player beaten on the final lap\n" +
                             "⑭ Top 8 Bonuses- 1st:+20, 2nd,3rd:+15, 4th,5th:+10, 6th-10th:+5"
             });

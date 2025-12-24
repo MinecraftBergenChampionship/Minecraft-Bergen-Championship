@@ -68,12 +68,12 @@ public class BuildMart extends Game {
                 "⑮ Chests are also provided to help your team organize.\n" +
                 "⑮ Don't forget to use " + ChatColor.BOLD + "/checkbuild" + ChatColor.RESET + " if you're stumped!",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "⑮ +4 points **per player** for completing an easy build\n" +
+                        "⑮ +5 points **per player** for completing an easy build\n" +
                         "⑮ +8 points **per player** for completing a medium build\n" +
-                        "⑮ +12 points **per player** for completing a hard build\n" +
+                        "⑮ +11 points **per player** for completing a hard build\n" +
                         "⑮ +1 points **per player** for each team beat when completing a build\n" +
-                        "⑮ Max +3 points **per player** for each build partially completed at game end\n" +
-                        "⑮ +16 points **per player** on the team with the most builds completed of any team\n" 
+                        "⑮ Max +3 points **per player** for each build partially completed at game end\n"// +
+                        //"⑮ +16 points **per player** on the team with the most builds completed of any team\n" 
         });
 
 
@@ -100,6 +100,7 @@ public class BuildMart extends Game {
         EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -321, 185, 2))); //reindeer
         EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -330, 185, 2))); //baby penguins
         EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -339, 185, 2))); //candy canes
+        EASY_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -348, 185, 2))); //moose
         MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -186, 185, -28))); // milk and cookies
         MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -177, 185, -28))); // christmas tree
         MEDIUM_FIRST_BUILDS.add(new Build(new Location(BUILD_WORLD, -303, 185, -28))); // snowman

@@ -6,6 +6,7 @@ import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.sgMaps.JesuscraftTwo;
 import me.kotayka.mbc.gameMaps.sgMaps.BCA;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
+import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -71,7 +72,7 @@ public class SurvivalGames extends Game {
     // SCORING
     public final int KILL_POINTS_INITIAL_18 = 13;
     public final int KILL_POINTS_INITIAL_24 = 16;
-    public final int KILL_POINTS_INITIAL = KILL_POINTS_INITIAL_24;
+    public final int KILL_POINTS_INITIAL = KILL_POINTS_INITIAL_18;
     public int killPoints = KILL_POINTS_INITIAL;
     public final int SURVIVAL_POINTS = 1;
     public final int HORCRUX_DESTROY_POINTS = 10;
@@ -459,6 +460,9 @@ public class SurvivalGames extends Game {
                 }
                 map.resetMap();
             }
+            for (Player p : playerKills.keySet()) {
+                        logger.log(Participant.getParticipant(p).getFormattedName() + ": " + playerKills.get(p) + " kills");
+                    }
             gameEndEvents();
         }
     }

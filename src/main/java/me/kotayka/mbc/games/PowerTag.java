@@ -82,7 +82,7 @@ public class PowerTag extends Game {
     // scoring
     private final int FIND_POINTS_18 = 7;
     private final int FIND_POINTS_24 = 10;
-    private final int FIND_POINTS = FIND_POINTS_24;
+    private final int FIND_POINTS = FIND_POINTS_18;
 
     private final int INCREMENT_POINTS = 1;
     private final int HIDE_BONUS_POINTS_TOP_5 = 8;
@@ -90,7 +90,7 @@ public class PowerTag extends Game {
 
     private final int SURVIVAL_POINTS_18 = 8;
     private final int SURVIVAL_POINTS_24 = 10;
-    private final int SURVIVAL_POINTS = SURVIVAL_POINTS_24;
+    private final int SURVIVAL_POINTS = SURVIVAL_POINTS_18;
 
     public PowerTag() {
         super("PowerTag", new String[] {
@@ -101,9 +101,9 @@ public class PowerTag extends Game {
                 "⑱ Each hider gets a powerup they can use to help escape the hunters.\n\n" +
                 "⑱ However, the hunters will also get to choose a special power to help find the hiders.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑱ +10 points for finding a player as a hunter\n" +
+                                "⑱ +7 points for finding a player as a hunter\n" +
                                 "⑱ +1 point for surviving 10 seconds as a hider\n" +
-                                "⑱ +10 points for surviving an entire round as a hider\n" +
+                                "⑱ +8 points for surviving an entire round as a hider\n" +
                                 "⑱ +5-8 points for being in the top 8 longest surviving hiders\n" +
                                 "⑱ +5 points for finding a top 8 longest surviving hider"
         });
@@ -341,7 +341,7 @@ public class PowerTag extends Game {
             else if (timeRemaining == 52) {
                 displaySurvivors();
                 for (PowerTagPlayer p : powerTagPlayerMap.values()) {
-                        logger.log(p.getParticipant().getFormattedName() + ": " + p.getSurvivals() + "rounds survived, " + p.getKills() + " tags, " + p.getTimeSurvived() + "seconds survived");
+                        logger.log(p.getParticipant().getFormattedName() + ": " + p.getSurvivals() + " rounds survived, " + p.getKills() + " tags, " + p.getTimeSurvived() + "seconds survived");
                     }
             }
         }
@@ -1436,7 +1436,11 @@ public class PowerTag extends Game {
                 Player shooter = (Player) e.getEntity().getShooter();
                 Player hit = (Player) e.getHitEntity();
                 hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20, 2, false, false));
+                hit.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10, 2, false, false));
                 shooter.sendMessage(ChatColor.RED+"You hit " + ChatColor.RESET + Participant.getParticipant((Player)e.getHitEntity()).getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + " with a slowball!");
+                if (hunters.contains(powerTagPlayerMap.get(hit.getUniqueId()))) {
+                    Bukkit.broadcastMessage(Participant.getParticipant((Player)e.getHitEntity()).getFormattedName() + ChatColor.RED+ " was hit by a slowball - everyone point and laugh!");
+                }
                 return;
             }
             
