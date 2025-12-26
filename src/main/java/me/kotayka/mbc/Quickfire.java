@@ -210,6 +210,7 @@ public class Quickfire extends FinaleGame {
         playerWalkoutBlurbs.put(penguin, "He has MBC rings for every finger on his hand...");
         playerWalkoutBlurbs.put(ehnry, "He's spent thousands of dollars on CS2 cases...");
         playerWalkoutBlurbs.put(sam, "Dancing her way into quickfire...");
+        playerWalkoutBlurbs.put(blueboy, "IMG_0351.png...");
 
         playerWalkoutSongNames.put(cam, "Sleepyhead, Passion Pit");
         playerWalkoutSongNames.put(collin, "Radioactive, Imagine Dragons");
