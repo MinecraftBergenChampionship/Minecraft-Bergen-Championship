@@ -1362,7 +1362,7 @@ public class Lockdown extends Game {
             hitPlayer.damage(PAINTBALL_DAMAGE);
             lockdownPlayerMap.get(hit.getPlayer().getUniqueId()).lastDamager = shooter.getPlayer();
         }
-        hitPlayer.setVelocity(new Vector(velocity.getX() * 0.1, 0.15, velocity.getZ() * 0.1));
+        //hitPlayer.setVelocity(new Vector(velocity.getX() * 0.1, 0.15, velocity.getZ() * 0.1));
     }
 
     /**
