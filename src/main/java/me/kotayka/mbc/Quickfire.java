@@ -319,7 +319,7 @@ public class Quickfire extends FinaleGame {
             if (timeRemaining == finalePlayers*12 + 14) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Introducing the second place team: the " + ChatColor.RESET + secondPlace.teamNameFormat() + ChatColor.BOLD + "!");
                 for (int i = 0; i < secondPlaceWalkoutOrder.size(); i++) {
-                    Bukkit.broadcastMessage(secondPlaceWalkoutOrder.get(i).getFormattedName());
+                    //Bukkit.broadcastMessage(secondPlaceWalkoutOrder.get(i).getFormattedName());
                 }
                 currentWalkoutNumber = 0;
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -330,7 +330,7 @@ public class Quickfire extends FinaleGame {
                 switch(timeRemaining%12) {
                     case (11) -> {
                         currentWalkoutNumber++;
-                        System.out.println(currentWalkoutNumber);
+                        //System.out.println(currentWalkoutNumber);
                     }
                     case (10) -> {
                         if (currentWalkoutNumber >= secondPlaceWalkoutOrder.size()) currentWalkoutNumber = 0;
@@ -372,7 +372,7 @@ public class Quickfire extends FinaleGame {
             if (timeRemaining == firstPlacePlayers*12 + 9) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "Introducing the first place team: the " + ChatColor.RESET + firstPlace.teamNameFormat() + ChatColor.BOLD + "!");
                 for (int i = 0; i < firstPlaceWalkoutOrder.size(); i++) {
-                    Bukkit.broadcastMessage(firstPlaceWalkoutOrder.get(i).getFormattedName());
+                    //Bukkit.broadcastMessage(firstPlaceWalkoutOrder.get(i).getFormattedName());
                 }
                 currentWalkoutNumber = 0;
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -392,7 +392,7 @@ public class Quickfire extends FinaleGame {
                     }
                     case (5) -> {
                         currentWalkoutNumber++;
-                        System.out.println(currentWalkoutNumber);
+                        //System.out.println(currentWalkoutNumber);
                     }
                     case (4) -> {
                         if (currentWalkoutNumber >= firstPlaceWalkoutOrder.size()) currentWalkoutNumber = 0;

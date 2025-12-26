@@ -488,7 +488,7 @@ public class PowerTag extends Game {
                 p.getPlayer().getInventory().removeItem(i);
             }
             if (hiderPowerupMap.get(p).equals(hiderPowerupList[0]) || hiderPowerupMap.get(p).equals(hiderPowerupList[1])) p.getPlayer().getInventory().addItem(getHiderPowerupTool());
-            if (hiderPowerupMap.get(p).equals(hiderPowerupList[2])) p.getPlayer().getInventory().addItem(new ItemStack(Material.SNOWBALL, 8));
+            if (hiderPowerupMap.get(p).equals(hiderPowerupList[2])) p.getPlayer().getInventory().addItem(new ItemStack(Material.SNOWBALL, 5));
         }   
     }
 
@@ -1438,9 +1438,6 @@ public class PowerTag extends Game {
                 hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20, 2, false, false));
                 hit.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10, 2, false, false));
                 shooter.sendMessage(ChatColor.RED+"You hit " + ChatColor.RESET + Participant.getParticipant((Player)e.getHitEntity()).getFormattedName() + ChatColor.RESET + "" + ChatColor.RED + " with a slowball!");
-                if (hunters.contains(powerTagPlayerMap.get(hit.getUniqueId()))) {
-                    Bukkit.broadcastMessage(Participant.getParticipant((Player)e.getHitEntity()).getFormattedName() + ChatColor.RED+ " was hit by a slowball - everyone point and laugh!");
-                }
                 return;
             }
             
