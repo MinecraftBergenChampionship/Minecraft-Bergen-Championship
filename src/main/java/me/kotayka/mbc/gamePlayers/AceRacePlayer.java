@@ -24,6 +24,7 @@ public class AceRacePlayer extends GamePlayer {
     public long lapStartTime;
     public long totalTime;
     public int placement;
+    public int currentPlace;
     public boolean completedFirstLap = false;
     public boolean fastestLapsContainsPlayer;
     public long fastestLap;
@@ -228,6 +229,12 @@ public class AceRacePlayer extends GamePlayer {
             checkpoint++;
             ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
         }
+        if (ACE_RACE.getState().equals(GameState.ACTIVE) && !(lap == 1 && checkpoint == 0)) {
+            currentPlace = ACE_RACE.checkpointPlacement(this, lap, checkpoint);
+            String currentPlacementString = AceRace.getPlace(currentPlace);
+            this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You are currently in " + currentPlacementString + " place.");
+        }
+        
     }
 
     /**

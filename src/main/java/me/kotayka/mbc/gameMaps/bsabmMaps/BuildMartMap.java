@@ -27,6 +27,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
         super.replicationLocations.put(BreakAreaType.OAK_LOGS, new Location(w, -49, -16, 159));
         super.replicationLocations.put(BreakAreaType.DARK_OAK_LOGS, new Location(w, -4, -16, 159));
         super.replicationLocations.put(BreakAreaType.CHERRY_LOGS, new Location(w, 5, -16, 159));
+        super.replicationLocations.put(BreakAreaType.MANGROVE_LOGS, new Location(w, 14, -16, 159));
         super.replicationLocations.put(BreakAreaType.SAND, new Location(w, -60, -16, 159));
         super.replicationLocations.put(BreakAreaType.ORES, new Location(w, -78, -16, 159));
         this.BUILD_MART = buildMart;
@@ -101,7 +102,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
         addBreakArea(new BreakArea(Material.OAK_LOG, new Location(w, -79, 73, 24), new Location(w, -71, 79, 32), BreakAreaType.OAK_LOGS, new Location(w, -81, 72, 21, 0, 0)));
         addBreakArea(new BreakArea(Material.OAK_LOG, new Location(w, -79, 82, 24), new Location(w, -71, 88, 32), BreakAreaType.OAK_LOGS, new Location(w, -81, 81, 22, 0, 0)));
         addBreakArea(new BreakArea(Material.BIRCH_LOG, new Location(w, -91, 73, 24), new Location(w, -83, 79, 32), BreakAreaType.BIRCH_LOGS, new Location(w, -81, 72, 21, 0, 0)));
-        addBreakArea(new BreakArea(Material.BIRCH_LOG, new Location(w, -91, 82, 24), new Location(w, -83, 88, 32), BreakAreaType.BIRCH_LOGS, new Location(w, -81, 81, 22, 0, 0)));
+        addBreakArea(new BreakArea(Material.MANGROVE_LOG, new Location(w, -91, 82, 24), new Location(w, -83, 88, 32), BreakAreaType.MANGROVE_LOGS, new Location(w, -81, 81, 22, 0, 0)));
         addBreakArea(new BreakArea(Material.JUNGLE_LOG, new Location(w, -79, 73, -4), new Location(w, -71, 79, 4), BreakAreaType.JUNGLE_LOGS, new Location(w, -81, 72, 7, -180, 0)));
         addBreakArea(new BreakArea(Material.CHERRY_LOG, new Location(w, -79, 82, -4), new Location(w, -71, 88, 4), BreakAreaType.CHERRY_LOGS, new Location(w, -81, 81, 6, -180, 0)));
         addBreakArea(new BreakArea(Material.DARK_OAK_LOG, new Location(w, -91, 73, -4), new Location(w, -83, 79, 4), BreakAreaType.DARK_OAK_LOGS, new Location(w, -81, 72, 7, -180, 0)));
@@ -114,7 +115,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
         addBreakArea(new BreakArea(Material.DIORITE, new Location(w, -8, 67, -100), new Location(w, 2, 73, -90), new Location(w, -11, 74, -87, -90, 0)));
         addBreakArea(new BreakArea(Material.GRANITE, new Location(w, -30, 67, -84), new Location(w, -20, 73, -74), new Location(w, -17, 74, -87, 90, 0)));
         addBreakArea(new BreakArea(Material.ANDESITE, new Location(w, -30, 67, -100), new Location(w, -20, 73, -90), new Location(w, -17, 74, -87, 90, 0)));
-        addBreakArea(new BreakArea(Material.MOSSY_COBBLESTONE, new Location(w, -19, 67, -115), new Location(w, -9, 73, -105), new Location(w, -14, 74, -101, 180, 0)));
+        addBreakArea(new BreakArea(Material.TUFF, new Location(w, -19, 67, -115), new Location(w, -9, 73, -105), new Location(w, -14, 74, -101, 180, 0)));
 
         // bricks
         Location spawn_bricks = new Location(w, -43, 73, 63, 45, 0);
@@ -122,7 +123,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
         addBreakArea(new BreakArea(Material.BRICKS, new Location(w, -50, 66, 71), new Location(w, -40, 72, 81), spawn_bricks));
         addBreakArea(new BreakArea(Material.CHISELED_STONE_BRICKS, new Location(w, -62, 66, 71), new Location(w, -52, 72, 81), spawn_bricks));
         addBreakArea(new BreakArea(Material.PRISMARINE_BRICKS, new Location(w, -62, 66, 59), new Location(w, -52, 72, 69), spawn_bricks));
-        addBreakArea(new BreakArea(Material.NETHER_BRICKS, new Location(w, -62, 66, 47), new Location(w, -52, 72, 57), spawn_bricks));
+        addBreakArea(new BreakArea(Material.MOSSY_COBBLESTONE, new Location(w, -62, 66, 47), new Location(w, -52, 72, 57), spawn_bricks));
 
         // nether
         addBreakArea(new BreakArea(Material.WARPED_WART_BLOCK, new Location(w, 20, 66, 69), new Location(w, 30, 72, 79), new Location(w, 17, 73, 82, -90, 0)));

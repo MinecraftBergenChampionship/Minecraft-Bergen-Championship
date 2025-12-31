@@ -33,6 +33,8 @@ import org.bukkit.util.Vector;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import javax.management.relation.RoleList;
+
 public class AceRace extends Game {
     // Change this to determine played map
     //public AceRaceMap map = new Biomes();
@@ -40,6 +42,10 @@ public class AceRace extends Game {
     public static World world = Bukkit.getWorld("AceRace");;
     public Map<UUID, AceRacePlayer> aceRacePlayerMap = new HashMap<UUID, AceRacePlayer>();
     public short[] finishedPlayersByLap = {0, 0, 0};
+    public AceRacePlayer[][] lapOne;
+    public AceRacePlayer[][] lapTwo;
+    public AceRacePlayer[][] lapThree;
+    public ArrayList<AceRacePlayer> currentPlacements = new ArrayList<>();
     public long startingTime;
 
     // keep track of top 5 fastest
@@ -107,6 +113,9 @@ public class AceRace extends Game {
             p.getPlayer().teleport(map.getIntroLocation());
             p.reset();
         }
+        lapOne = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
+        lapTwo = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
+        lapThree = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
 
         setTimer(TUTORIAL_TIME);
     }
@@ -271,18 +280,18 @@ public class AceRace extends Game {
                     double diffY = player.getY() - mover.getY();
                     double diffZ = player.getZ() - mover.getZ();
                     if (Math.sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ) <= 5) {
-                        checker.addHiddenPlayer(mover);
-                        player.hidePlayer(mover);
-                        mover.hidePlayer(player);
+                        //checker.addHiddenPlayer(mover);
+                        //player.hidePlayer(mover);
+                        //mover.hidePlayer(player);
                     }
                     else if(checker.checkHiddenPlayer(mover) && Math.sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ) <= 10) {
-                        player.hidePlayer(mover);
-                        mover.hidePlayer(player);
+                        //player.hidePlayer(mover);
+                        //mover.hidePlayer(player);
                     }
                     else {
-                        checker.removeHiddenPlayer(mover);
-                        mover.showPlayer(player);
-                        player.showPlayer(mover);
+                        //checker.removeHiddenPlayer(mover);
+                        //mover.showPlayer(player);
+                        //player.showPlayer(mover);
                     }
                 }
             }
@@ -334,6 +343,40 @@ public class AceRace extends Game {
 
     public AceRacePlayer getGamePlayer(Player p) {
         return aceRacePlayerMap.get(p.getUniqueId());
+    }
+
+      /**
+     * Inputs a player, along with their current lap and checkpoint number. Returns their current placement. Returns -1 if error.
+     */
+    public int checkpointPlacement(AceRacePlayer p, int lap, int checkpoint) {
+        switch(lap) {
+            case 1:
+                for (int i = 0; i < lapOne.length; i++) {
+                    if (lapOne[checkpoint][i] == null) {
+                        lapOne[checkpoint][i] = p;
+                        return (i+1);
+                    }
+                }
+                return -1;
+            case 2:
+                for (int i = 0; i < lapTwo.length; i++) {
+                    if (lapTwo[checkpoint][i] == null) {
+                        lapTwo[checkpoint][i] = p;
+                        return (i+1);
+                    }
+                }
+                return -1;
+            case 3:
+                for (int i = 0; i < lapThree.length; i++) {
+                    if (lapThree[checkpoint][i] == null) {
+                        lapThree[checkpoint][i] = p;
+                        return (i+1);
+                    }
+                }
+                return -1;
+            default:
+                return -1;
+        }
     }
 
     public void lastCheckpoint(Player p) {

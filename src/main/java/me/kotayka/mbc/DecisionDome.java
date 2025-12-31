@@ -500,7 +500,11 @@ public class DecisionDome extends Minigame {
                 }
             }
             powerups.remove(powerup);
+            if (lastPlacePowerups.contains(powerup)) {
+                lastPlacePowerups.remove(powerup);
+            }
         }
+        
     }
 
     private void getPowerup(VotePowerup pu, Participant p) {
@@ -980,6 +984,15 @@ public class DecisionDome extends Minigame {
                         }
                     }
                 }
+                for (Section s : sections.values()) {
+                    for (Location l : s.sectionLocs) {
+                        if (l.distance(hitBlockLocation) <= 1) {
+                            fireBombed(s);
+                            e.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
                 e.setCancelled(true);
                 return;
             }
@@ -990,6 +1003,15 @@ public class DecisionDome extends Minigame {
                 for (Section s : sections.values()) {
                     for (Location l : s.sectionLocs) {
                         if ((int)l.getX() == hitBlock.getX() && (int)l.getZ() == hitBlock.getZ()) {
+                            fireBombed(s);
+                            e.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+                for (Section s : sections.values()) {
+                    for (Location l : s.sectionLocs) {
+                        if (l.distance(hitBlock.getLocation()) <= 1) {
                             fireBombed(s);
                             e.setCancelled(true);
                             return;
