@@ -70,6 +70,7 @@ public class Lobby extends Minigame {
     private List<BeepTestLevel> mediumLevels = null;
     private List<BeepTestLevel> hardLevels = null;
     private BeepTestLevel currentLevel = null;
+    private boolean hardMode = false;
     private int beepRound = 0;
     private boolean activeBeep = false;
     private final int BEEP_DEATH_Y = -6;
@@ -149,7 +150,7 @@ public class Lobby extends Minigame {
                 toVoting();
             }
         } else if (getState().equals(GameState.ACTIVE)) {
-            if (MBC.getInstance().gameNum == 4 && (timeRemaining == 276 || timeRemaining == 138)) {
+            if (MBC.getInstance().gameNum == 4 && (timeRemaining == 130)) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
                     p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
@@ -451,12 +452,12 @@ public class Lobby extends Minigame {
         miniBeepStartable = true;
         pvpStartable = true;
         if (MBC.getInstance().gameNum == 4) {
-            setTimer(414);
+            setTimer(260);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
             }
         } else {
-            setTimer(138);
+            setTimer(130);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
             }
@@ -986,7 +987,9 @@ public class Lobby extends Minigame {
 
         p.playSound(p, Sound.ENTITY_BAT_DEATH, 1, 1);
         if (b) {
-            if (beepRound == 1) {
+            if (hardMode) {
+                p.sendMessage("You were eliminated by " + ChatColor.RED + currentLevel.getName().trim() + "!");
+            } else if (beepRound == 1) {
                 p.sendMessage("You were eliminated by " + ChatColor.AQUA + currentLevel.getName().trim() + "!");
             } else if (beepRound == 2) {
                 p.sendMessage("You were eliminated by " + ChatColor.GREEN + currentLevel.getName().trim() + "!");
@@ -997,7 +1000,9 @@ public class Lobby extends Minigame {
             }
         }
         else {
-            if (beepRound == 2) {
+            if (hardMode) {
+                p.sendMessage("You were eliminated by " + ChatColor.RED + lastLevelName.trim() + "!");
+            } else if (beepRound == 2) {
                 p.sendMessage("You were eliminated by " + ChatColor.AQUA + lastLevelName.trim() + "!");
             } else if (beepRound == 3) {
                 p.sendMessage("You were eliminated by " + ChatColor.GREEN + lastLevelName.trim() + "!");
@@ -1048,6 +1053,10 @@ public class Lobby extends Minigame {
             chooseFrom = hardLevels;
         }
 
+        if (hardMode) {
+            chooseFrom = hardLevels;
+        }
+
         // select random level
         int rand = (int) (Math.random() * chooseFrom.size());
         currentLevel = chooseFrom.get(rand);
@@ -1055,6 +1064,10 @@ public class Lobby extends Minigame {
         beepRound++;
 
         changeBeepMap();
+    }
+
+    public void hardMode() {
+        hardMode = !hardMode;
     }
 
     public void changeBeepMap() {
@@ -1145,7 +1158,9 @@ public class Lobby extends Minigame {
                     player.playSound(player, "sfx.started_ring", SoundCategory.BLOCKS, 1, 1);
                     if (miniBeepers.size() == 1) player.sendMessage(ChatColor.LIGHT_PURPLE + "Mini Beep has begun with 1 player!");
                     else player.sendMessage(ChatColor.LIGHT_PURPLE + "Mini Beep has begun with " + miniBeepers.size() + " players!");
-                    player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.AQUA + "" + currentLevel.getName().trim()));
+                    if (hardMode) {player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "" + currentLevel.getName().trim()));} 
+                    else {player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.AQUA + "" + currentLevel.getName().trim()));}
+                    
                 }
             }
             case 48 -> {
@@ -1163,7 +1178,8 @@ public class Lobby extends Minigame {
                     Player player = miniBeepers.get(i).getPlayer();
                     player.playSound(player, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1, 1);
                     player.sendMessage("You completed " + ChatColor.AQUA + lastLevelName + "!");
-                    player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "" + currentLevel.getName().trim()));
+                    if (hardMode) {player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "" + currentLevel.getName().trim()));} 
+                    else {player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "" + currentLevel.getName().trim()));}
                 }         
             }
             case 33 -> {
@@ -1181,7 +1197,8 @@ public class Lobby extends Minigame {
                     Player player = miniBeepers.get(i).getPlayer();
                     player.playSound(player, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1, 1);
                     player.sendMessage("You completed " + ChatColor.GREEN + lastLevelName + "!");
-                    player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.YELLOW + "" + currentLevel.getName().trim()));
+                    if (hardMode) {player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "" + currentLevel.getName().trim()));} 
+                    else {player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.YELLOW + "" + currentLevel.getName().trim()));}
                 }  
             }
             case 18 -> {

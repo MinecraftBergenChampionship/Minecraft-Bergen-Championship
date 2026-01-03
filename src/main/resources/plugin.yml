@@ -16,6 +16,9 @@ commands:
   minibeepstop:
     description: Stop mini beep in lobby
     permission: minecraft.command.op
+  hardmode:
+    description: activates or deactiviates hard mode
+    permission: minecraft.command.op
   pvpstop:
     description: Stop pvp in lobby
     permission: minecraft.command.op

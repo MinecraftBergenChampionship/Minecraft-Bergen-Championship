@@ -56,6 +56,7 @@ public class Plugin extends JavaPlugin implements Listener {
 
         getCommand("pause").setExecutor(new pause());
         getCommand("minibeepstop").setExecutor(new minibeepstop());
+        getCommand("hardmode").setExecutor(new hardmode());
         getCommand("pvpstop").setExecutor(new pvpstop());
         getCommand("unpause").setExecutor(new unpause());
         getCommand("gamenum").setExecutor(new gamenum());
