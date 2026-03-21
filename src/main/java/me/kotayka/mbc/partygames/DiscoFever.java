@@ -123,6 +123,7 @@ public class DiscoFever extends PartyGame {
         initializeRegions();
         Barriers(true);
         setSpawnArea(true);
+        Bukkit.getWorld("Party").setGameRule(GameRule.FALL_DAMAGE, false);
 
         setGameState(GameState.TUTORIAL);
         randomPattern = generatePattern();
@@ -203,7 +204,7 @@ public class DiscoFever extends PartyGame {
                 startingCountdown();
                 if (timeRemaining == 10) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS,1,1);
+                        p.playSound(p, "igm.disco_fever", SoundCategory.RECORDS,1,1);
                     }
                 }
 
@@ -220,7 +221,7 @@ public class DiscoFever extends PartyGame {
                 if (timeRemaining == 0 || discoPrimary.getZ() > 674) {
                     endDisco();
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.stopSound(Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS);
+                        p.stopSound("igm.disco_fever", SoundCategory.RECORDS);
                     }
                     setGameState(GameState.END_GAME);
                     setTimer(7);

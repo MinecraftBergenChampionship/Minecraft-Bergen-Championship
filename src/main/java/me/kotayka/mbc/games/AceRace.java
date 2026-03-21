@@ -179,7 +179,7 @@ public class AceRace extends Game {
                 startingTime = System.currentTimeMillis();
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, "sfx.started_ring", SoundCategory.RECORDS, 0.75f, 1);
-                    p.playSound(p, Sound.MUSIC_DISC_11, SoundCategory.RECORDS, 1, 1);
+                    p.playSound(p, "igm.ace_race", SoundCategory.RECORDS, 1, 1);
                 }
             }
         } else if (getState().equals(GameState.ACTIVE)) {
@@ -189,7 +189,7 @@ public class AceRace extends Game {
             } else if (timeRemaining <= 0) {
                 gameOverGraphics();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.stopSound(Sound.MUSIC_DISC_11, SoundCategory.RECORDS);
+                    p.stopSound("igm.ace_race", SoundCategory.RECORDS);
                 }
                 for (AceRacePlayer p : aceRacePlayerMap.values()) {
                     if (!(p.getPlayer().getGameMode().equals(GameMode.SPECTATOR))) {
@@ -202,8 +202,8 @@ public class AceRace extends Game {
             }
             else if (timeRemaining % 157 == 92) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.stopSound(Sound.MUSIC_DISC_11, SoundCategory.RECORDS);
-                    p.playSound(p, Sound.MUSIC_DISC_11, SoundCategory.RECORDS, 1, 1);
+                    p.stopSound("igm.ace_race", SoundCategory.RECORDS);
+                    p.playSound(p, "igm.ace_race", SoundCategory.RECORDS, 1, 1);
                 }
             }
         } else if (getState().equals(GameState.END_GAME)) {

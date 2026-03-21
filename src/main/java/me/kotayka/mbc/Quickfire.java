@@ -464,7 +464,7 @@ public class Quickfire extends FinaleGame {
             } else {
                 if (timeRemaining == 16) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "igm.quickfire", SoundCategory.RECORDS, 1, 1);
                     }
                 }
                 startingCountdown("sfx.starting_beep");
@@ -484,7 +484,7 @@ public class Quickfire extends FinaleGame {
             }
             else if (timeElapsed%217 == 201) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
+                    p.playSound(p, "igm.quickfire", SoundCategory.RECORDS, 1, 1);
                 }
             }
             timeElapsed++;
@@ -595,9 +595,9 @@ public class Quickfire extends FinaleGame {
         logger.log(winner.getTeamName() + " have won the round!\n");
         createScoreboard();
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.stopSound(Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS);
+            p.stopSound("igm.quickfire", SoundCategory.RECORDS);
             p.setInvulnerable(true);
-            p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
+            p.playSound(p, "igm.quickfire", SoundCategory.RECORDS, 1, 1);
         }
         playersAlive[0] = firstPlace.teamPlayers.size();
         playersAlive[1] = secondPlace.teamPlayers.size();
@@ -700,7 +700,7 @@ public class Quickfire extends FinaleGame {
             p.removePotionEffect(PotionEffectType.GLOWING);
             createScoreboard();
             p.sendTitle(t.teamNameFormat() + " win MBC!", " ", 0, 100, 20);
-            p.stopSound(Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS);
+            p.stopSound("igm.quickfire", SoundCategory.RECORDS);
             p.playSound(p, "sfx.winners_jingle", SoundCategory.BLOCKS, 1, 1);
             p.setInvulnerable(true);
         }

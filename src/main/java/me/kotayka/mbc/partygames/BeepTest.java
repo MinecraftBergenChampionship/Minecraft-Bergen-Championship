@@ -134,7 +134,7 @@ public class BeepTest extends PartyGame {
         ended = true;
         MBC.getInstance().showAllPlayers();
         for (Participant p : MBC.getInstance().getPlayers()) {
-            p.getPlayer().stopSound(Sound.MUSIC_DISC_13);
+            p.getPlayer().stopSound("igm.beep_switch");
             p.getPlayer().setMaxHealth(20);
             p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
         }
@@ -151,7 +151,7 @@ public class BeepTest extends PartyGame {
         } else {
             // start next game
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.stopSound(Sound.MUSIC_DISC_13, SoundCategory.RECORDS);
+                p.stopSound("igm.beep_switch", SoundCategory.RECORDS);
             }
             setupNext();
         }
@@ -203,7 +203,7 @@ public class BeepTest extends PartyGame {
                     //MBC.getInstance().hideAllPlayers();
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, "sfx.started_ring", SoundCategory.BLOCKS, 0.75f, 1);
-                        p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, .75f,1); // temp?
+                        p.playSound(p, "igm.beep_switch", SoundCategory.RECORDS, .75f,1); // temp?
                     }
                     Barriers(false);
                     newGround();

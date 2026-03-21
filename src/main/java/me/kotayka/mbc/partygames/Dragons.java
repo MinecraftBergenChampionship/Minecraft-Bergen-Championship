@@ -179,7 +179,7 @@ public class Dragons extends PartyGame {
         removeDragons();
 
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
-            p.getPlayer().stopSound(Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS);
+            p.getPlayer().stopSound("igm.dragons", SoundCategory.RECORDS);
         }
 
         for (Participant p : playersAlive) {
@@ -290,7 +290,7 @@ public class Dragons extends PartyGame {
                 }
                 if (timeRemaining == 0) {
                     for (Participant p : MBC.getInstance().getPlayers()) {
-                        p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS,1,1);
+                        p.getPlayer().playSound(p.getPlayer(), "igm.dragons", SoundCategory.RECORDS,1,1);
                         p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                         ItemStack i = new ItemStack(Material.IRON_AXE);
                         ItemMeta meta = i.getItemMeta();

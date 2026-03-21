@@ -253,7 +253,7 @@ public class Spleef extends Game {
                 }
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, "sfx.started_ring", SoundCategory.BLOCKS, 0.75f, 1);
-                    p.playSound(p, Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS, 1, 1);
+                    p.playSound(p, "igm.spleef", SoundCategory.RECORDS, 1, 1);
                 }
                 setGameState(GameState.ACTIVE);
                 timeRemaining = 180;
@@ -293,7 +293,7 @@ public class Spleef extends Game {
 
                 if (roundNum < 3) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.stopSound(Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS);
+                        p.stopSound("igm.spleef", SoundCategory.RECORDS);
                         if (map.getMapType().equals("Gravity")) {
                             p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
                         } else if (map.getMapType().equals("Blind")) {
@@ -307,7 +307,7 @@ public class Spleef extends Game {
                     timeRemaining = 9;
                 } else {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.stopSound(Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS);
+                        p.stopSound("igm.spleef", SoundCategory.RECORDS);
                         if (map.getMapType().equals("Gravity")) {
                             p.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
                         } else if (map.getMapType().equals("Blind")) {

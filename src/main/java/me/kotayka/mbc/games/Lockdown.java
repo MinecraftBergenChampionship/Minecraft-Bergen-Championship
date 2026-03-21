@@ -257,7 +257,7 @@ public class Lockdown extends Game {
                 if (timeRemaining == 25) sendSpawns();
                 if (timeRemaining == 20) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_PRECIPICE, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "igm.lockdown", SoundCategory.RECORDS, 1, 1);
                         p.getInventory().clear();
                     }
                     for (LockdownPlayer p : lockdownPlayerMap.values()) {
@@ -366,7 +366,7 @@ public class Lockdown extends Game {
                 if (roundNum < 3) {
                     roundOverGraphics();
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.stopSound(Sound.MUSIC_DISC_PRECIPICE, SoundCategory.RECORDS);
+                        p.stopSound("igm.lockdown", SoundCategory.RECORDS);
                         p.getPlayer().removePotionEffect(PotionEffectType.LEVITATION);
                     }
                     timeRemaining = 10;
@@ -374,7 +374,7 @@ public class Lockdown extends Game {
                 } else {
                     gameOverGraphics();
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.stopSound(Sound.MUSIC_DISC_PRECIPICE, SoundCategory.RECORDS);
+                        p.stopSound("igm.lockdown", SoundCategory.RECORDS);
                         p.getPlayer().removePotionEffect(PotionEffectType.LEVITATION);
                     }
                     timeRemaining = 40;

@@ -16,7 +16,7 @@ public class Party extends Game {
     private final World world = Bukkit.getWorld("Party");
     protected final Location LOBBY = new Location(world, 0.5, -17.5, -999.5);
     //private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "Dragons", "OneShot"));
-    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "Dragons", "OneShot", "BeepSwitch"));
+    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "Dragons", "OneShot", "BeepSwitch", "Drain"));
     private Map<String, ChatColor> colorGames = new HashMap<>();
     public static final int GAMES_PLAYED = 3;
     private int gameNum;
@@ -30,7 +30,7 @@ public class Party extends Game {
             "⑰ Make sure to read the instructions for each game carefully!\n\n" +
             "⑰ Each game has unique gameplay, rules and scoring.",
             "⑰ The three minigames will be chosen from in a random order.\n\n" +
-            "⑰ Our four games for this event are " + ChatColor.BOLD + "Dragons, Disco Fever, Beep Switch, and One Shot." + ChatColor.RESET,
+            "⑰ Our four games for this event are " + ChatColor.BOLD + "Drain, Dragons, Disco Fever, Beep Switch, and One Shot." + ChatColor.RESET,
             ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                     "⑰ You'll find out! "
         });
@@ -64,6 +64,7 @@ public class Party extends Game {
         colorGames.put("Dragons", ChatColor.LIGHT_PURPLE);
         colorGames.put("OneShot", ChatColor.GOLD);
         colorGames.put("DiscoFever", ChatColor.GREEN);
+        colorGames.put("Drain", ChatColor.RED);
 
         setTimer(32);
     }

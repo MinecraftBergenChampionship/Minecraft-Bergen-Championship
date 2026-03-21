@@ -203,7 +203,7 @@ public class Skybattle extends Game {
                 setGameState(GameState.ACTIVE);
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, "sfx.started_ring", SoundCategory.RECORDS, 0.75f, 1);
-                    p.playSound(p, Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS, 1, 1);
+                    p.playSound(p, "igm.skybattle", SoundCategory.RECORDS, 1, 1);
                 }
                 map.removeBarriers();
                 setPVP(true);
@@ -226,7 +226,7 @@ public class Skybattle extends Game {
                     if (roundNum < 3) {
                         roundOverGraphics();
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
+                            p.stopSound("igm.skybattle", SoundCategory.RECORDS);
                         }
                         for (Participant p : playersAlive) {
                             MBCTeam t = p.getTeam();
@@ -239,7 +239,7 @@ public class Skybattle extends Game {
                     } else {
                         gameOverGraphics();
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
+                            p.stopSound("igm.skybattle", SoundCategory.RECORDS);
                         }
                         for (Participant p : playersAlive) {
                             MBCTeam t = p.getTeam();
@@ -275,7 +275,7 @@ public class Skybattle extends Game {
             if (timeRemaining == 0 && roundNum < 3) {
                 roundOverGraphics();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
+                    p.stopSound("igm.skybattle", SoundCategory.RECORDS);
                 }
                 roundWinners(WIN_POINTS, SURVIVAL_POINTS);
                 for (Participant p : playersAlive) {
@@ -288,7 +288,7 @@ public class Skybattle extends Game {
             } else if (timeRemaining == 0) {
                 gameOverGraphics();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.stopSound(Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS);
+                    p.stopSound("igm.skybattle", SoundCategory.RECORDS);
                 }
                 roundWinners(WIN_POINTS, SURVIVAL_POINTS);
                 for (Participant p : playersAlive) {

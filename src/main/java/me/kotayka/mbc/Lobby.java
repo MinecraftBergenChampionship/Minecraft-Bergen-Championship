@@ -152,13 +152,13 @@ public class Lobby extends Minigame {
         } else if (getState().equals(GameState.ACTIVE)) {
             if (MBC.getInstance().gameNum == 4 && (timeRemaining == 130)) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
-                    p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
+                    p.stopSound("igm.lobby", SoundCategory.RECORDS);
+                    p.playSound(p, "igm.lobby", SoundCategory.RECORDS, 1, 1);
                 }
             }
             if (timeRemaining == 0) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.stopSound(Sound.MUSIC_DISC_5, SoundCategory.RECORDS);
+                    p.stopSound("igm.lobby", SoundCategory.RECORDS);
                     if (p.getInventory().getChestplate() == null);
                     else if (p.getInventory().getChestplate().getType().equals(Material.ELYTRA)) {
                         p.getInventory().setChestplate(new ItemStack(Material.AIR));
@@ -329,7 +329,7 @@ public class Lobby extends Minigame {
                     populatePodium();
                     boolean flag = reveal.size() > 1;
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_WAIT, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "igm.final_duel", SoundCategory.RECORDS, 1, 1);
                         p.setGameMode(GameMode.ADVENTURE);
                         p.teleport(LOBBY);
                         if (flag) {
@@ -454,12 +454,12 @@ public class Lobby extends Minigame {
         if (MBC.getInstance().gameNum == 4) {
             setTimer(260);
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
+                p.playSound(p, "igm.lobby", SoundCategory.RECORDS, 1, 1);
             }
         } else {
             setTimer(130);
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.playSound(p, Sound.MUSIC_DISC_5, SoundCategory.RECORDS, 1, 1);
+                p.playSound(p, "igm.lobby", SoundCategory.RECORDS, 1, 1);
             }
         }
     }
@@ -617,7 +617,7 @@ public class Lobby extends Minigame {
             } else {
                 p.getPlayer().teleport(new Location(world, 62.5, 4, -20.5, -90, -25));
             }
-            p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_WARD, SoundCategory.RECORDS, 1, 1);
+            p.getPlayer().playSound(p.getPlayer(), "igm.walk_of_fame", SoundCategory.RECORDS, 1, 1);
         }
     }
 
@@ -690,7 +690,7 @@ public class Lobby extends Minigame {
             cameraman.setCustomName(ChatColor.RED + "" + ChatColor.BOLD + "Camera here!");
             cameraman.setInvisible(true);
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.playSound(p, Sound.MUSIC_DISC_STRAD, SoundCategory.RECORDS, 1, 1);
+                p.playSound(p, "igm.mbc_start", SoundCategory.RECORDS, 1, 1);
                 p.removePotionEffect(PotionEffectType.BLINDNESS);
                 p.setGameMode(GameMode.SPECTATOR);
                 p.setSpectatorTarget(cameraman);

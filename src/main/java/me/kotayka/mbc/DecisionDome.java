@@ -228,7 +228,7 @@ public class DecisionDome extends Minigame {
                 } else {
                     p.getPlayer().setGameMode(GameMode.SPECTATOR);
                 }
-                p.getPlayer().playSound(p.getPlayer(), Sound.MUSIC_DISC_CAT,SoundCategory.RECORDS, 1, 1);
+                p.getPlayer().playSound(p.getPlayer(), "igm.decision_dome",SoundCategory.RECORDS, 1, 1);
             }
         }
 

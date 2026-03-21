@@ -232,7 +232,7 @@ public class Dodgebolt extends FinaleGame {
             } else {
                 if (timeRemaining == 16) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "igm.quickfire", SoundCategory.RECORDS, 1, 1);
                     }
                 }
                 startingCountdown();
@@ -439,7 +439,7 @@ public class Dodgebolt extends FinaleGame {
         for (Player p : Bukkit.getOnlinePlayers()) {
             createScoreboard();
             p.sendTitle(t.teamNameFormat() + " win MBC!", " ", 0, 100, 20);
-            p.stopSound(Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS);
+            p.stopSound("igm.quickfire", SoundCategory.RECORDS);
             p.playSound(p, Sound.ENTITY_ENDER_DRAGON_DEATH, 1, 1);
             p.setInvulnerable(true);
         }
@@ -454,9 +454,9 @@ public class Dodgebolt extends FinaleGame {
     private void endRound() {
         createScoreboard();
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.stopSound(Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS);
+            p.stopSound("igm.quickfire", SoundCategory.RECORDS);
             p.setInvulnerable(true);
-            p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
+            p.playSound(p, "igm.quickfire", SoundCategory.RECORDS, 1, 1);
         }
         setTimerLine = false;
         createLineAll(21, ChatColor.RED.toString()+ChatColor.BOLD+"Next Round:");
@@ -561,7 +561,7 @@ public class Dodgebolt extends FinaleGame {
     public void onRespawn(PlayerRespawnEvent e) {
         e.getPlayer().getInventory().clear();
         e.setRespawnLocation(SPAWN);
-        e.getPlayer().playSound(e.getPlayer(), Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);
+        e.getPlayer().playSound(e.getPlayer(), "igm.quickfire", SoundCategory.RECORDS, 1, 1);
     }
 
     @EventHandler

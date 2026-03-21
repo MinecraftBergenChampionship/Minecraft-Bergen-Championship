@@ -258,7 +258,7 @@ public class SurvivalGames extends Game {
                 startingCountdown();
                 if (timeRemaining == 10) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_FAR, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "igm.survival_games", SoundCategory.RECORDS, 1, 1);
                     }
                 }
             } else {
@@ -311,7 +311,7 @@ public class SurvivalGames extends Game {
                     placementPoints();
                     if (!firstRound) {
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            p.stopSound(Sound.MUSIC_DISC_FAR, SoundCategory.RECORDS);
+                            p.stopSound("igm.survival_games", SoundCategory.RECORDS);
                         }
                         bossBar.setVisible(false);
                         gameOverGraphics();
@@ -320,7 +320,7 @@ public class SurvivalGames extends Game {
                         timeRemaining = 37;
                     } else {
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            p.stopSound(Sound.MUSIC_DISC_FAR, SoundCategory.RECORDS);
+                            p.stopSound("igm.survival_games", SoundCategory.RECORDS);
                         }
                         roundOverGraphics();
                         roundWinners(0, SURVIVAL_POINTS);
@@ -380,7 +380,12 @@ public class SurvivalGames extends Game {
                 getLogger().log(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 Bukkit.broadcastMessage(ChatColor.RED+""+ChatColor.BOLD+"Chests have been refilled!");
                 event = SurvivalGamesEvent.DEATHMATCH;
-            } else if (timeRemaining == 180) {
+            } else if (timeRemaining == 212) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.playSound(p, "igm.survival_games", SoundCategory.RECORDS, 1, 1);
+                }
+            }
+            else if (timeRemaining == 180) {
                 killPoints -= 4;
                 Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED.toString() + ChatColor.BOLD + "Max kill points are decreasing! (12 -> 8)");
                 bossBar.removeAll();

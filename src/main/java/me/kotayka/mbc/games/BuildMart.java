@@ -186,7 +186,7 @@ public class BuildMart extends Game {
                         p.getPlayer().setGameMode(GameMode.ADVENTURE);
                     }
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "igm.build_mart", SoundCategory.RECORDS, 1, 1);
                     }
                 }
                 if (timeRemaining == 40) {
@@ -198,7 +198,7 @@ public class BuildMart extends Game {
             if (timeRemaining == 0) {
                 gameOverGraphics();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.stopSound(Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS);
+                    p.stopSound("igm.build_mart", SoundCategory.RECORDS);
                 }
                 for (Participant p : MBC.getInstance().getPlayers()) {
                     flightEffects(p); // sets gamemode adventure
@@ -252,8 +252,8 @@ public class BuildMart extends Game {
             }
             else if (timeRemaining == 250 || timeRemaining == 500) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.stopSound(Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS);
-                    p.playSound(p, Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS, 1, 1);
+                    p.stopSound("igm.build_mart", SoundCategory.RECORDS);
+                    p.playSound(p, "igm.build_mart", SoundCategory.RECORDS, 1, 1);
                 }
             }
         } else if (getState().equals(GameState.END_GAME)) {

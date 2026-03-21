@@ -156,6 +156,7 @@ public class BeepSwitch extends PartyGame {
         world().setTime(18000);
         
         Barriers(true);
+        Bukkit.getWorld("Party").setGameRule(GameRule.FALL_DAMAGE, false);
 
         int maxRounds = 0;
         for (MBCTeam t : MBC.getInstance().getValidTeams()) {
@@ -177,7 +178,7 @@ public class BeepSwitch extends PartyGame {
         
         MBC.getInstance().showAllPlayers();
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.stopSound(Sound.MUSIC_DISC_13, SoundCategory.RECORDS);
+            p.stopSound("igm.beep_switch", SoundCategory.RECORDS);
         }
         if (MBC.getInstance().party == null) {
             for (Participant p : MBC.getInstance().getPlayers()) {
@@ -275,7 +276,7 @@ public class BeepSwitch extends PartyGame {
                 if (timeRemaining == 2) {
                     roundsLeftDisplay();
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, .75f,1);
+                        p.playSound(p, "igm.beep_switch", SoundCategory.RECORDS, .75f,1);
                     }
                     List<Player> currentPlayers = currentPlayers();
                     for (Player p : currentPlayers) {
@@ -346,7 +347,7 @@ public class BeepSwitch extends PartyGame {
             case END_ROUND:
                 if (timeRemaining == 4) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.stopSound(Sound.MUSIC_DISC_13, SoundCategory.RECORDS);
+                        p.stopSound("igm.beep_switch", SoundCategory.RECORDS);
                     }
                     endEvents();
                 }

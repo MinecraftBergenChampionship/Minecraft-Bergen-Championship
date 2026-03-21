@@ -242,7 +242,7 @@ public class PowerTag extends Game {
                 }
                 else if (timeRemaining == 0) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.playSound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS, 1, 1);
+                        p.playSound(p, "igm.power_tag", SoundCategory.RECORDS, 1, 1);
                     }
                     setGameState(GameState.ACTIVE);
                     removeHiderPowerups();
@@ -283,7 +283,7 @@ public class PowerTag extends Game {
                 aliveUntilEnd();
                 nameTagVisibility(true);
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.stopSound(Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS);
+                    p.stopSound("igm.power_tag", SoundCategory.RECORDS);
                 }
                 for (PowerTagPlayer p : hiders) {
                     p.incrementHideRounds();

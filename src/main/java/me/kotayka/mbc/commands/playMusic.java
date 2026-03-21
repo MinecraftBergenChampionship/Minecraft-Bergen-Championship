@@ -35,21 +35,22 @@ public class playMusic implements CommandExecutor {
             if (args.length == 1) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     switch(args[0]){
-                        case ("TGTTOS") -> {p.playSound(p, Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS, 1, 1);}
-                        case ("SurvivalGames") -> {p.playSound(p, Sound.MUSIC_DISC_FAR, SoundCategory.RECORDS, 1, 1);}
-                        case ("Skybattle") -> {p.playSound(p, Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS, 1, 1);}
-                        case ("BuildMart") -> {p.playSound(p, Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS, 1, 1);}
-                        case ("Spleef") -> {p.playSound(p, Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS, 1, 1);}
-                        case ("AceRace") -> {p.playSound(p, Sound.MUSIC_DISC_11, SoundCategory.RECORDS, 1, 1);}
-                        case ("DecisionDome") -> {p.playSound(p, Sound.MUSIC_DISC_CAT, SoundCategory.RECORDS, 1, 1);}
-                        case ("Quickfire") -> {p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);}
+                        case ("TGTTOS") -> {p.playSound(p, "igm.tgttos", SoundCategory.RECORDS, 1, 1);}
+                        case ("SurvivalGames") -> {p.playSound(p, "igm.survival_games", SoundCategory.RECORDS, 1, 1);}
+                        case ("Skybattle") -> {p.playSound(p, "igm.skybattle", SoundCategory.RECORDS, 1, 1);}
+                        case ("BuildMart") -> {p.playSound(p, "igm.build_mart", SoundCategory.RECORDS, 1, 1);}
+                        case ("Spleef") -> {p.playSound(p, "igm.spleef", SoundCategory.RECORDS, 1, 1);}
+                        case ("AceRace") -> {p.playSound(p, "igm.ace_race", SoundCategory.RECORDS, 1, 1);}
+                        case ("DecisionDome") -> {p.playSound(p, "igm.decision_dome", SoundCategory.RECORDS, 1, 1);}
+                        case ("Quickfire") -> {p.playSound(p, "igm.quickfire", SoundCategory.RECORDS, 1, 1);}
                         case ("Party") -> {send.sendMessage("No valid music - please select a specific party game");}
-                        case ("PowerTag") -> {p.playSound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS, 1, 1);}
-                        case ("Lockdown") -> {p.playSound(p, Sound.MUSIC_DISC_PRECIPICE, SoundCategory.RECORDS, 1, 1);}
-                        case ("OneShot") -> {p.playSound(p, Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS, 1, 1);}
-                        case ("BeepSwitch") -> {p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, .75f, 1);}
-                        case ("DiscoFever") -> {p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS, 1, 1);}
-                        case ("Dragons") -> {p.playSound(p, Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS, 1, 1);}
+                        case ("PowerTag") -> {p.playSound(p, "igm.power_tag", SoundCategory.RECORDS, 1, 1);}
+                        case ("Lockdown") -> {p.playSound(p, "igm.lockdown", SoundCategory.RECORDS, 1, 1);}
+                        case ("OneShot") -> {p.playSound(p, "igm.oneshot", SoundCategory.RECORDS, 1, 1);}
+                        case ("BeepSwitch") -> {p.playSound(p, "igm.beep_switch", SoundCategory.RECORDS, .75f, 1);}
+                        case ("DiscoFever") -> {p.playSound(p, "igm.disco_fever", SoundCategory.RECORDS, 1, 1);}
+                        case ("Dragons") -> {p.playSound(p, "igm.dragons", SoundCategory.RECORDS, 1, 1);}
+                        case ("Drain") -> {p.playSound(p, "igm.drain", SoundCategory.RECORDS, 1, 1);}
                     }
                 }
             }
@@ -61,21 +62,22 @@ public class playMusic implements CommandExecutor {
                 }
                 Player p = part.getPlayer();
                 switch(args[0]){
-                    case ("TGTTOS") -> {p.playSound(p, Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS, 1, 1);}
-                    case ("SurvivalGames") -> {p.playSound(p, Sound.MUSIC_DISC_FAR, SoundCategory.RECORDS, 1, 1);}
-                    case ("Skybattle") -> {p.playSound(p, Sound.MUSIC_DISC_STAL, SoundCategory.RECORDS, 1, 1);}
-                    case ("BuildMart") -> {p.playSound(p, Sound.MUSIC_DISC_MALL, SoundCategory.RECORDS, 1, 1);}
-                    case ("Spleef") -> {p.playSound(p, Sound.MUSIC_DISC_PIGSTEP, SoundCategory.RECORDS, 1, 1);}
-                    case ("AceRace") -> {p.playSound(p, Sound.MUSIC_DISC_11, SoundCategory.RECORDS, 1, 1);}
-                    case ("DecisionDome") -> {p.playSound(p, Sound.MUSIC_DISC_CAT, SoundCategory.RECORDS, 1, 1);}
-                    case ("Quickfire") -> {p.playSound(p, Sound.MUSIC_DISC_CHIRP, SoundCategory.RECORDS, 1, 1);}
+                    case ("TGTTOS") -> {p.playSound(p, "igm.tgttos", SoundCategory.RECORDS, 1, 1);}
+                    case ("SurvivalGames") -> {p.playSound(p, "igm.survival_games", SoundCategory.RECORDS, 1, 1);}
+                    case ("Skybattle") -> {p.playSound(p, "igm.skybattle", SoundCategory.RECORDS, 1, 1);}
+                    case ("BuildMart") -> {p.playSound(p, "igm.build_mart", SoundCategory.RECORDS, 1, 1);}
+                    case ("Spleef") -> {p.playSound(p, "igm.spleef", SoundCategory.RECORDS, 1, 1);}
+                    case ("AceRace") -> {p.playSound(p, "igm.ace_race", SoundCategory.RECORDS, 1, 1);}
+                    case ("DecisionDome") -> {p.playSound(p, "igm.decision_dome", SoundCategory.RECORDS, 1, 1);}
+                    case ("Quickfire") -> {p.playSound(p, "igm.quickfire", SoundCategory.RECORDS, 1, 1);}
                     case ("Party") -> {send.sendMessage("No valid music - please select a specific party game");}
-                    case ("PowerTag") -> {p.playSound(p, Sound.MUSIC_DISC_CREATOR, SoundCategory.RECORDS, 1, 1);}
-                    case ("Lockdown") -> {p.playSound(p, Sound.MUSIC_DISC_PRECIPICE, SoundCategory.RECORDS, 1, 1);}
-                    case ("OneShot") -> {p.playSound(p, Sound.MUSIC_DISC_BLOCKS, SoundCategory.RECORDS, 1, 1);}
-                    case ("BeepSwitch") -> {p.playSound(p, Sound.MUSIC_DISC_13, SoundCategory.RECORDS, 1, 1);}
-                    case ("DiscoFever") -> {p.playSound(p, Sound.MUSIC_DISC_MELLOHI, SoundCategory.RECORDS, 1, 1);}
-                    case ("Dragons") -> {p.playSound(p, Sound.MUSIC_DISC_RELIC, SoundCategory.RECORDS, 1, 1);}
+                    case ("PowerTag") -> {p.playSound(p, "igm.power_tag", SoundCategory.RECORDS, 1, 1);}
+                    case ("Lockdown") -> {p.playSound(p, "igm.lockdown", SoundCategory.RECORDS, 1, 1);}
+                    case ("OneShot") -> {p.playSound(p, "igm.oneshot", SoundCategory.RECORDS, 1, 1);}
+                    case ("BeepSwitch") -> {p.playSound(p, "igm.beep_switch", SoundCategory.RECORDS, 1, 1);}
+                    case ("DiscoFever") -> {p.playSound(p, "igm.disco_fever", SoundCategory.RECORDS, 1, 1);}
+                    case ("Dragons") -> {p.playSound(p, "igm.dragons", SoundCategory.RECORDS, 1, 1);}
+                    case ("Drain") -> {p.playSound(p, "igm.drain", SoundCategory.RECORDS, 1, 1);}
                 }
             }
             

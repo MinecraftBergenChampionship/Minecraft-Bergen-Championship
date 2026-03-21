@@ -175,7 +175,7 @@ public class TGTTOS extends Game {
                 }
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, "sfx.started_ring", SoundCategory.BLOCKS, 0.75f, 1);
-                    p.playSound(p, Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS, 1, 1);
+                    p.playSound(p, "igm.tgttos", SoundCategory.RECORDS, 1, 1);
                 }
             } else {
                 Countdown();
@@ -220,7 +220,7 @@ public class TGTTOS extends Game {
                 }
                 roundOverGraphics();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
+                    p.stopSound("igm.tgttos", SoundCategory.RECORDS);
                 }
             }
         } else if (getState().equals(GameState.END_GAME)) {
@@ -229,7 +229,7 @@ public class TGTTOS extends Game {
                     Bukkit.getScheduler().cancelTask(cooldownID);
                 }
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.stopSound(Sound.MUSIC_DISC_OTHERSIDE, SoundCategory.RECORDS);
+                    p.stopSound("igm.tgttos", SoundCategory.RECORDS);
                 }
                 gameOverGraphics();
             } else if (timeRemaining == 0) {
