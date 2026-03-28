@@ -481,7 +481,7 @@ public class Drain extends PartyGame {
         for (boolean b : check) {
             if (b) {
                 counter++;
-                Bukkit.broadcastMessage("pattern found at origin block x: " + xPattern + ", z:" + zPattern);
+                Bukkit.broadcastMessage("pattern found at origin block x: " + xDrained + ", z:" + zDrained);
             }
         }
         return counter;
@@ -645,9 +645,9 @@ public class Drain extends PartyGame {
                 }
             }
             p.sendMessage(displayPlayer);
-            p.sendMessage(color + "" + ChatColor.BOLD + "Make the " + patternName + " pattern to gain extra points!");
-            p.sendTitle(color + "" + ChatColor.BOLD + "Pattern: " +patternName, ChatColor.GRAY + "Check chat or the outside of spawn to see the full pattern.", 5, 70, 5);
-            createLine(18, color + "" + ChatColor.BOLD + "Pattern: " + ChatColor.RESET + patternName, Participant.getParticipant(p));
+            p.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Make the " + patternName + " pattern to gain extra points!");
+            p.sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "Pattern: " +patternName, ChatColor.GRAY + "Check chat or the outside of spawn to see the full pattern.", 5, 70, 5);
+            createLine(18, ChatColor.GOLD + "" + ChatColor.BOLD + "Pattern: " + ChatColor.RESET + patternName, Participant.getParticipant(p));
             p.playSound(p, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.RECORDS, 1, 1);
         }
 
