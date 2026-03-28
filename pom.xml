@@ -10,8 +10,9 @@
     <packaging>jar</packaging>
 
     <name>MBC</name>
-    <description>Minecraft Bruh Championship Gamemodes</description>
+    <description>MBC Plugin</description>
     <properties>
+        <!--NOTE: using ${java.version} may cause mismatch between plugin and server if server is significantly behind-->
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -23,8 +24,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -99,7 +100,8 @@
         </repository>
         <repository>
             <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <!--<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>-->
+            <url>https://hub.spigotmc.org/nexus/#browse/browse:snapshots</url>
         </repository>
         <repository>
             <id>sonatype</id>
@@ -114,10 +116,14 @@
             <id>enginehub-maven</id>
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
+        <repository>
+            <id>jetbrains-annotations</id>
+            <url>https://mvnrepository.com/artifact/org.jetbrains/annotations</url>
+        </repository>
     </repositories>
 
     <dependencies>
-        <dependency>
+       <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>1.21.1-R0.1-SNAPSHOT</version>
@@ -125,15 +131,14 @@
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
-            <version>1.21.1-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-            <classifier>remapped-mojang</classifier> <!-- Important! -->
+            <artifactId>spigot-api</artifactId>
+            <version>1.21.1-R0.1-20241007.193101-50</version>
+            <!--<classifier>remapped-mojang</classifier>--> <!-- Important! -->
         </dependency>
         <dependency>
             <groupId>net.citizensnpcs</groupId>
             <artifactId>citizens-main</artifactId>
-            <version>2.0.35-b3583</version>
+            <version>2.0.35-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
             <exclusions>
@@ -143,18 +148,23 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.mojang</groupId>
-            <artifactId>authlib</artifactId>
-            <version>1.5.21</version>
-            <scope>provided</scope>
-        </dependency>
         <!--WorldEdit-->
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
             <version>7.3.0-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.0.2-1</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kotayka</groupId>
+            <artifactId>MBC</artifactId>
+            <version>2.0</version>
         </dependency>
     </dependencies>
 </project>
