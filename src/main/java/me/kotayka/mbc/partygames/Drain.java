@@ -273,6 +273,7 @@ public class Drain extends PartyGame {
                 for (Participant p : t.getPlayers()) {
                     taskCounter.put(p, massPoints.get(t) / t.getPlayers().size());
                 }
+                Bukkit.broadcastMessage("Mass for " + t.teamNameFormat() + ": " + massPoints.get(t));
             }
         }
 
@@ -286,9 +287,9 @@ public class Drain extends PartyGame {
         for (Participant p : taskCounter.keySet()) {
             int tasks = taskCounter.get(p);
             int pointsGained = (int) (SPECIAL_POINTS
-                    * Math.ceil(1.0 / (double) (MBC.getInstance().getPlayers().size())));
+                    * 1.0 / (double) (MBC.getInstance().getPlayers().size()));
             if (totalTasks != 0) {
-                pointsGained = (int) (SPECIAL_POINTS * Math.ceil(((double) tasks) / ((double) totalTasks)));
+                pointsGained = (int) (SPECIAL_POINTS * ((double) tasks) / ((double) totalTasks));
             }
             p.addCurrentScore(pointsGained);
 
@@ -404,9 +405,9 @@ public class Drain extends PartyGame {
         for (MBCTeam t : patternsFound.keySet()) {
             for (Participant p : t.getPlayers()) {
                 int patterns = patternsFound.get(t) / t.getPlayers().size();
-                int pointsGained = (int) (PATTERN_POINTS * Math.ceil(1.0 / (double) (MBC.getInstance().getPlayers().size())));
+                int pointsGained = (int) (PATTERN_POINTS * 1.0 / (double) (MBC.getInstance().getPlayers().size()));
                 if (totalPatterns != 0) {
-                    pointsGained = (int) (PATTERN_POINTS * Math.ceil(((double) patterns) / ((double) totalPatterns)));
+                    pointsGained = (int) (PATTERN_POINTS * ((double) patterns) / ((double) totalPatterns));
                 }
                 p.addCurrentScore(pointsGained);
 
@@ -432,7 +433,7 @@ public class Drain extends PartyGame {
         for (Participant p : MBC.getInstance().getPlayers()) {
             String playerMessage = "";
             if (pointMap.containsKey(p)) {
-                playerMessage = ChatColor.GREEN + "Your team made " + patternsFound.get(p.getTeam()) + " patterns, scoring you "
+                playerMessage = ChatColor.GREEN + "Your team made " + (patternsFound.get(p.getTeam())/rotationsReflections) + " patterns, scoring you "
                         + ChatColor.BOLD + pointMap.get(p) + ChatColor.RESET + "" + ChatColor.GREEN
                         + " points!";
                 p.getPlayer().sendMessage(playerMessage);
@@ -476,12 +477,13 @@ public class Drain extends PartyGame {
                 zAdd++;
             }
             xAdd++;
+            zAdd = 0;
         }
         
         for (boolean b : check) {
             if (b) {
                 counter++;
-                Bukkit.broadcastMessage("pattern found at origin block x: " + xDrained + ", z:" + zDrained);
+                //Bukkit.broadcastMessage("pattern found at origin block x: " + xDrained + ", z:" + zDrained);
             }
         }
         return counter;
@@ -512,9 +514,9 @@ public class Drain extends PartyGame {
 
         for (Participant p : drainMap.keySet()) {
             int drained = drainMap.get(p);
-            int pointsGained = (int) (DRAIN_POINTS * Math.ceil(1.0 / (double) (MBC.getInstance().getPlayers().size())));
+            int pointsGained = (int) (DRAIN_POINTS * 1.0 / (double) (MBC.getInstance().getPlayers().size()));
             if (totalDrained != 0) {
-                pointsGained = (int) (DRAIN_POINTS * Math.ceil(((double) drained) / ((double) totalDrained)));
+                pointsGained = (int) (DRAIN_POINTS * ((double) drained) / ((double) totalDrained));
             }
             p.addCurrentScore(pointsGained);
 
