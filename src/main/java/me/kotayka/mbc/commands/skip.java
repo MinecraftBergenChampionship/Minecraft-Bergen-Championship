@@ -1,5 +1,6 @@
 package me.kotayka.mbc.commands;
 
+import me.kotayka.mbc.Lobby;
 import me.kotayka.mbc.MBC;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,7 +15,7 @@ public class skip implements CommandExecutor {
             return false;
         }
 
-        if (sender.isOp() && !MBC.getInstance().logStats()) {
+        if (sender.isOp() && (!MBC.getInstance().logStats() || !(MBC.getInstance().getMinigame() instanceof Lobby))) {
             MBC.getInstance().getMinigame().timeRemaining = 1;
             return true;
         }
