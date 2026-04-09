@@ -342,7 +342,7 @@ public class Quickfire extends FinaleGame {
                             song = defaultWalkoutSong;
                         }
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            p.playSound(p, song, 1, 1);
+                            p.playSound(p, song, SoundCategory.RECORDS, 1, 1);
                         }
                     }
                     case (7) -> {
