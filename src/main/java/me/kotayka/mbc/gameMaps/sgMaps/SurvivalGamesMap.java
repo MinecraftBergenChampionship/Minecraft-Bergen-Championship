@@ -29,7 +29,9 @@ public abstract class SurvivalGamesMap extends MBCMap {
     //public boolean airdrops; // incase future maps may require airdrops: not implemented yet
 
     public SurvivalGamesMap() {
-        super(Bukkit.getWorld("Survival_Games"));
+        // im not entirely sure why this was the case to begin with
+        // super(Bukkit.getWorld("Survival_Games"));
+        super(Bukkit.getWorld("SG4"));
     }
 
     public abstract void setBarriers(boolean barriers);

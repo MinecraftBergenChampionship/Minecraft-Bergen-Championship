@@ -27,7 +27,8 @@ import java.util.*;
 public class Spleef extends Game {
     private SpleefMap map = null;
     private List<SpleefMap> maps = new ArrayList<>(
-            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
+            // Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
+            Arrays.asList(new Classic(), new SkySpleef(), new Colosseum())
     );
     //private List<SpleefMap> maps = new ArrayList<>(Arrays.asList(new Classic()));
     //public List<SpleefPlayer> spleefPlayers = new ArrayList<SpleefPlayer>();
@@ -104,7 +105,8 @@ public class Spleef extends Game {
         damageMap.clear();
         brokenBlocks.clear();
         maps = new ArrayList<>(
-            Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
+            // Arrays.asList(new Classic(), new Space(), new SkySpleef(), new HotSprings(), new Fortress(), new Colosseum())
+            Arrays.asList(new Classic(), new SkySpleef(), new Colosseum())
         );
         brokenBlocks.clear();
         map.resetMap();

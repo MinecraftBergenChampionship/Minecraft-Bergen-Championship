@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.sgMaps.JesuscraftTwo;
 import me.kotayka.mbc.gameMaps.sgMaps.BCA;
+import me.kotayka.mbc.gameMaps.sgMaps.SG4;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
 import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
 
@@ -47,7 +48,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class SurvivalGames extends Game {
-    private final SurvivalGamesMap map = new BCA();
+    private final SurvivalGamesMap map = new SG4();
     private WorldBorder border = null;
     private List<SurvivalGamesItem> items;
 
@@ -88,7 +89,7 @@ public class SurvivalGames extends Game {
                 "⑬ There will be a short grace period.",
                 "⑬ Purchase items at the enchant table, drag and click books to enchant!\n\n" + 
                 "⑬ Additionally, watch out for the border, " + ChatColor.BOLD + " you will not be able to break glass or open doors behind the border.",
-                "⑬ Live as long as you can, and place your teams horcrux for one revive!\n\n" +
+                "⑬ Live as long as you can, and place your team's Revival Totem for one revive!\n\n" +
                 "⑬ There are two rounds, so remember who killed you...",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
                         "⑬ +10-15 points for eliminations\n" +
@@ -159,7 +160,7 @@ public class SurvivalGames extends Game {
 
             ItemMeta meta = endCrystal.getItemMeta();
             if (meta != null) {
-                meta.setDisplayName("Horcrux");
+                meta.setDisplayName("Respawn Totem");
                 endCrystal.setItemMeta(meta);
             }
 
@@ -679,21 +680,21 @@ public class SurvivalGames extends Game {
         Participant participant = Participant.getParticipant(p);
 
         if (participant.getTeam().equals(horcrux.team)) {
-            p.sendMessage(ChatColor.RED+"You cannot break your own Horcrux!");
+            p.sendMessage(ChatColor.RED+"You cannot break your own Respawn Totem!");
         }
         else if (horcrux.inUse) {
-            p.sendMessage(ChatColor.RED+"This Horcrux is currently in use.");
+            p.sendMessage(ChatColor.RED+"This Respawn Totem is currently in use.");
         }
         else {
             MBC.spawnFirework(a.getLocation().clone().add(0.5, 2, 0.5), horcrux.team.getColor());
 
-            p.sendMessage("You broke " + horcrux.team.getTeamName() + "'s horcrux!" + MBC.scoreFormatter(HORCRUX_DESTROY_POINTS));
+            p.sendMessage("You broke " + horcrux.team.getTeamName() + "'s Respawn Totem!" + MBC.scoreFormatter(HORCRUX_DESTROY_POINTS));
             participant.addCurrentScore(HORCRUX_DESTROY_POINTS);
 
-            logger.log(horcrux.team.getTeamName() + "'s Horcrux was destroyed by " + participant.getPlayerName());
+            logger.log(horcrux.team.getTeamName() + "'s Respawn Totem was destroyed by " + participant.getPlayerName());
             for (Participant par : MBC.getInstance().players) {
                 if (par.getTeam().equals(horcrux.team)) {
-                    par.getPlayer().sendMessage(ChatColor.RED+"Your Horcrux has been destroyed by " + participant.getFormattedName() + "!");
+                    par.getPlayer().sendMessage(ChatColor.RED+"Your Respawn Totem has been destroyed by " + participant.getFormattedName() + "!");
                 }
             }
 
@@ -1242,9 +1243,9 @@ public class SurvivalGames extends Game {
                     h.placed = true;
                     h.used = true;
                     h.armorStand.remove();
-                    logger.log(h.team.getTeamName() + "'s Horcrux was destroyed by the border!");
+                    logger.log(h.team.getTeamName() + "'s Respawn Totem was destroyed by the border!");
                     for (Participant p : h.team.getPlayers()) {
-                        p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Your Horcrux was destroyed by the border!");
+                        p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Your Respawn Totem was destroyed by the border!");
                     }
                     return;
                 }
@@ -1256,9 +1257,9 @@ public class SurvivalGames extends Game {
                 h.placed = true;
                 h.used = true;
                 h.armorStand.remove();
-                logger.log(h.team.getTeamName() + "'s Horcrux was destroyed by the border!");
+                logger.log(h.team.getTeamName() + "'s Respawn Totem was destroyed by the border!");
                 for (Participant p : h.team.getPlayers()) {
-                    p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Your Horcrux was destroyed by the border!");
+                    p.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Your Respawn Totem was destroyed by the border!");
                 }
             }
         }

@@ -69,10 +69,16 @@ public class TGTTOS extends Game {
     private static final int MAX_ROUNDS = 6;
     private TGTTOSMap map = null;
     private List<TGTTOSMap> maps = new ArrayList<>(
+            Arrays.asList(new Pit(), new Walls(),
+                    new Cliffs(), new Skydive(), new Boats(), new SquidGame()
+            )
+            /*
             Arrays.asList(new Pit(), new Meatball(), new Walls(),
                     new Cliffs(), new Elytra(), new Skydive(),
                     new Boats(), new Glide(), new SquidGame(), new Trident()
-            ));
+            )
+             */
+    );
     private List<TGTTOSMap> mapsFirst = new ArrayList<>(Arrays.asList());
 
     private List<Participant> finishedParticipants;
@@ -243,9 +249,15 @@ public class TGTTOS extends Game {
     public void onRestart() {
         roundNum = 0;
         maps = new ArrayList<>(
-                Arrays.asList(new Pit(), new Meatball(), new Walls(),
-                        new Cliffs(), new Glide(), new Skydive(), new Boats(), new SquidGame(), new Trident()
+                Arrays.asList(new Pit(), new Walls(),
+                        new Cliffs(), new Skydive(), new Boats(), new SquidGame()
                 )
+                /*
+                Arrays.asList(new Pit(), new Meatball(), new Walls(),
+                        new Cliffs(), new Elytra(), new Skydive(),
+                        new Boats(), new Glide(), new SquidGame(), new Trident()
+                )
+                 */
         );
         removePlacedBlocks();
     }

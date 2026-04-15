@@ -59,7 +59,7 @@ public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
     private boolean revealedGames;
     // Icon display code is kinda missy can probably be improved; a refactoring of game class may need to be made for cleanest icon support but not doing it yet @see Game
-    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑮ Build Mart", "⑭ Skybattle", "⑲ Lockdown", "⑯ Spleef", "⑰ Party", "⑱ Power Tag")); // skips ace race and sg
+    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑬ Survival Games", "⑪ TGTTOS",  "⑭ Skybattle", "⑯ Spleef", "⑰ Party", "⑱ Power Tag")); // skip ace race, lockdown, build mart
     //public List<String> gameNames = new ArrayList<>(Arrays.asList("⑬ Survival Games", "⑪ TGTTOS", "⑭ Ace Race", "⑲ Lockdown", "⑯ Spleef", "⑮ Build Mart", "⑰ Party", "⑱ Power Tag", "⑫ Skybattle"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
@@ -1340,7 +1340,6 @@ public class DecisionDome extends Minigame {
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.FIRE_CHARGE && !hidden && e.getPlayer().equals(bomber)) {
                 e.getPlayer().getInventory().remove(Material.FIRE_CHARGE);
                 SmallFireball fireball = e.getPlayer().launchProjectile(SmallFireball.class);
-                fireball.setBounce(false);
                 e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), Sound.ITEM_FIRECHARGE_USE, 1.0f, 1.0f);
                 e.setCancelled(true);
             }
