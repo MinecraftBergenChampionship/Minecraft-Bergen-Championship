@@ -135,6 +135,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
 
     @Override
     public void onMove(PlayerMoveEvent e) {
+        if (e.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
         if (e.getPlayer().getLocation().getY() <= deathY) {
             if (e.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
                 Location l = e.getPlayer().getLocation();

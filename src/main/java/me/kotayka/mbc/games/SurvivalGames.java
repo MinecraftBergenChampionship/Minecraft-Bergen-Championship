@@ -18,6 +18,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -25,7 +26,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
@@ -935,7 +936,7 @@ public class SurvivalGames extends Game {
 
         // this solution might be temporary, not sure if other maps or other blocks are necessary to add.
         String brokenBlock = e.getBlock().getType().toString();
-        if (brokenBlock.contains("GLASS") || e.getBlock().getType().equals(Material.TALL_GRASS) || e.getBlock().getType().equals(Material.FIRE)) {
+        if (brokenBlock.contains("GLASS") || e.getBlock().getType().equals(Material.TALL_GRASS) || e.getBlock().getType().equals(Material.FIRE) || e.getBlock().getType().equals(Material.SHORT_GRASS)) {
             map.brokenBlocks.put(e.getBlock().getLocation(), e.getBlock().getType());
             return;
         }
@@ -1033,11 +1034,25 @@ public class SurvivalGames extends Game {
         if (!e.getPlayer().getLocation().getWorld().equals(map.getWorld())) return;
         Material i = e.getItemDrop().getItemStack().getType();
         if (i == Material.ELYTRA) e.setCancelled(true);
+        if (i == Material.END_CRYSTAL) e.setCancelled(true);
         else return;
    }
 
     @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (event.getOldCursor().getType() == Material.END_CRYSTAL) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
+        // prevent moving Respawn totems
+        if (e.getView().getType() != InventoryType.CRAFTING && e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.END_CRYSTAL) {
+            e.setCancelled(true);
+            return;
+        }
+
         if (e.getView().getTitle().equals("Enchanting")) {
             // handle custom enchants;
             handleEnchantGUI(e);

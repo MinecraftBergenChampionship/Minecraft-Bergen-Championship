@@ -3,6 +3,7 @@ package me.kotayka.mbc;
 import me.kotayka.mbc.commands.*;
 import me.kotayka.mbc.commands.tab.*;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.boss.BossBar;
 import org.bukkit.boss.KeyedBossBar;
@@ -29,6 +30,7 @@ public class Plugin extends JavaPlugin implements Listener {
             p.setInvulnerable(false);
         }
         Bukkit.getLogger().info("MBC enabled");
+        Bukkit.broadcastMessage(ChatColor.GREEN + "Special MBC Event is ready!");
         Bukkit.broadcastMessage("Enable stat logging with /statlogs set true");
         Bukkit.broadcastMessage("If this is after a reset, do /gamenum now!");
 
@@ -106,6 +108,8 @@ public class Plugin extends JavaPlugin implements Listener {
             } else if (recipe.getResult().getType() == Material.SNOW_BLOCK) {
                 it.remove();
             } else if (recipe.getResult().getType() == Material.SHIELD) {
+                it.remove();
+            } else if (recipe.getResult().getType() == Material.FLINT_AND_STEEL) {
                 it.remove();
             }
         }

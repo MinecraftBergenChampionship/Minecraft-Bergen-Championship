@@ -252,7 +252,6 @@ public class Quickfire extends FinaleGame {
             initLogger();
         }
 
-
         setGameState(GameState.TUTORIAL);
         setTimer(finalePlayers*12 + 31);
     }
