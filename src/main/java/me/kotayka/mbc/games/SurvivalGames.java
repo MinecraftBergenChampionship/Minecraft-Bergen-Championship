@@ -20,6 +20,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -571,6 +572,25 @@ public class SurvivalGames extends Game {
         }
     }
 
+    // Apply speed and slightly worse regeneration when eating rabbit stew
+    private void eatRabbitStew(Player p) {
+        if (p.getInventory().getItemInMainHand().getType() != Material.RABBIT_STEW && p.getInventory().getItemInMainHand().getType() != Material.RABBIT_STEW) {
+            return;
+        }
+
+        boolean mainHand = p.getInventory().getItemInMainHand().getType() == Material.RABBIT_STEW;
+        p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 160, 1, false, true));
+        p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20, 1, false, true));
+        p.playSound(p.getLocation(), Sound.BLOCK_GRASS_BREAK, 1, 1);
+        map.getWorld().spawnParticle(Particle.BLOCK, p.getEyeLocation(), 5, Material.DIRT.createBlockData());
+
+        if (mainHand) {
+            p.getInventory().setItemInMainHand(null);
+        } else {
+            p.getInventory().setItemInOffHand(null);
+        }
+    }
+
     private void damagePoints() {
         int sqrtSum = 0;
         for (Player player : playerDamage.keySet()) {
@@ -621,6 +641,11 @@ public class SurvivalGames extends Game {
 
         if (p.getInventory().getItemInMainHand().getType() == Material.MUSHROOM_STEW || p.getInventory().getItemInOffHand().getType() == Material.MUSHROOM_STEW) {
             eatMushroomStew(p);
+            return;
+        }
+
+        if (p.getInventory().getItemInMainHand().getType() == Material.RABBIT_STEW || p.getInventory().getItemInOffHand().getType() == Material.RABBIT_STEW) {
+            eatRabbitStew(p);
             return;
         }
 
