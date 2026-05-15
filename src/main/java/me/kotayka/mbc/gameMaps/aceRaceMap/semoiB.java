@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 public class semoiB extends AceRaceMap {
+    boolean powerups = false;
     Location[] respawns = {
             new Location(getWorld(), -2158, 13, -2303, 90, 0),  // default
             new Location(getWorld(), -2281, 13, -2241, 30, 0),

@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 public class Biomes extends AceRaceMap {
+    boolean powerups = false;
     Location[] respawns = {
             new Location(getWorld(), 2, 26, 150, 90, 0),  // default
             new Location(getWorld(), -59, 26, 140, 125, 0),

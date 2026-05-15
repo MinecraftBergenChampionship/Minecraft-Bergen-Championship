@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 public class iDrgCity extends AceRaceMap {
+    boolean powerups = false;
     Location[] respawns = {
             new Location(getWorld(), -926, 42, -1080, -45, 0),  // default
             new Location(getWorld(), -910, 37, -993, 0, 0),

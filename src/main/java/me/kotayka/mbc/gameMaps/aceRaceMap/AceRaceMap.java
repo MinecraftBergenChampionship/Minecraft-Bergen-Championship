@@ -21,6 +21,7 @@ public abstract class AceRaceMap extends MBCMap {
     public List<Location> respawns;
     public List<Location> checkpoints;
     public int mapLength;
+    public boolean powerups;
 
     public List<String> deathObjects;
 

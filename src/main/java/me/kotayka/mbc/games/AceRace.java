@@ -6,6 +6,7 @@ import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.MBCTeam;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
+import me.kotayka.mbc.gameMaps.aceRaceMap.QueakiesGoldMine;
 import me.kotayka.mbc.gameMaps.aceRaceMap.iDrgCity;
 import me.kotayka.mbc.gameMaps.aceRaceMap.semoiB;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
@@ -38,7 +39,7 @@ import javax.management.relation.RoleList;
 public class AceRace extends Game {
     // Change this to determine played map
     //public AceRaceMap map = new Biomes();
-    public AceRaceMap map = new iDrgCity();
+    public AceRaceMap map = new QueakiesGoldMine();
     public static World world = Bukkit.getWorld("AceRace");;
     public Map<UUID, AceRacePlayer> aceRacePlayerMap = new HashMap<UUID, AceRacePlayer>();
     public short[] finishedPlayersByLap = {0, 0, 0};
