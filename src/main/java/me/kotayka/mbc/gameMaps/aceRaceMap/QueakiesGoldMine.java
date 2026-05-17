@@ -13,9 +13,9 @@ public class QueakiesGoldMine extends AceRaceMap {
             new Location(getWorld(), -890, 101, 1053, 30, -5),
             new Location(getWorld(), -926, 105, 1095, 60, 0),
             new Location(getWorld(), -1010, 101, 1119, 90, 0),
-            new Location(getWorld(), -1094, 101, 1074, 150, -5),
+            new Location(getWorld(), -1115, 102, 1043, 180, 0),
             new Location(getWorld(), -1116, 101, 961, -150, 0),
-            new Location(getWorld(), -1083, 101, 914, -135, 0),
+            new Location(getWorld(), -1061, 121, 898, -113, 0),
     };
 
     Location[] checkpoints = {
@@ -25,9 +25,9 @@ public class QueakiesGoldMine extends AceRaceMap {
             new Location(getWorld(), -893, 101, 1056),
             new Location(getWorld(), -929, 105, 1097),
             new Location(getWorld(), -1015, 101, 1120),
-            new Location(getWorld(), -1098, 101, 1070),
+            new Location(getWorld(), -1110, 101, 1050),
             new Location(getWorld(), -1114, 101, 958),
-            new Location(getWorld(), -1081, 101, 910),
+            new Location(getWorld(), -1062, 121, 897),
     };
 
     public QueakiesGoldMine() {

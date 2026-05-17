@@ -104,6 +104,7 @@ public class AceRace extends Game {
                 });
 
         World aceRaceWorld = Bukkit.getWorld("acerace");
+        stopMinecartSystem();
         if (aceRaceWorld != null) {
             TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1074.30, 108.00, 910.68));
             TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1076.30, 107.00, 912.30));
@@ -165,7 +166,7 @@ public class AceRace extends Game {
             }
         };
 
-        minecartSpawnTask.runTaskTimer(MBC.getInstance().getPlugin(), 0L, 2L);
+        minecartSpawnTask.runTaskTimer(MBC.getInstance().getPlugin(), 0L, 1L);
 
         minecartTickTask = new BukkitRunnable() {
             @Override
@@ -244,7 +245,7 @@ public class AceRace extends Game {
         if (isCollision) {
             for (Participant p : MBC.getInstance().getPlayers()) {
                 Player player = p.getPlayer();
-                if (player.getLocation().distance(loc) <= 2) {
+                if (player.getLocation().distance(loc) <= 1.5) {
                     AceRacePlayer acePlayer = getGamePlayer(player);
                     if (acePlayer != null) {
                         int checkpoint = acePlayer.checkpoint;
@@ -266,11 +267,21 @@ public class AceRace extends Game {
             minecartTickTask.cancel();
             minecartTickTask = null;
         }
+
+        // Remove tracked minecarts
         for (Minecart cart : activeMinecarts) {
             if (cart != null && cart.isValid()) cart.remove();
         }
         activeMinecarts.clear();
         minecartSpawnTimes.clear();
+
+        if (world != null) {
+            for (Entity entity : world.getEntities()) {
+                if (entity instanceof Minecart) {
+                    entity.remove();
+                }
+            }
+        }
     }
 
     public void createScoreboard(Participant p) {
