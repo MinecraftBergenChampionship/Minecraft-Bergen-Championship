@@ -14,8 +14,11 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -28,20 +31,20 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.HashSet;
 
 import javax.management.relation.RoleList;
 
 public class AceRace extends Game {
-    // Change this to determine played map
-    //public AceRaceMap map = new Biomes();
     public AceRaceMap map = new QueakiesGoldMine();
-    public static World world = Bukkit.getWorld("AceRace");;
-    public Map<UUID, AceRacePlayer> aceRacePlayerMap = new HashMap<UUID, AceRacePlayer>();
+    public static World world = Bukkit.getWorld("AceRace");
+    public Map<UUID, AceRacePlayer> aceRacePlayerMap = new HashMap<>();
     public short[] finishedPlayersByLap = {0, 0, 0};
     public AceRacePlayer[][] lapOne;
     public AceRacePlayer[][] lapTwo;
@@ -49,48 +52,225 @@ public class AceRace extends Game {
     public ArrayList<AceRacePlayer> currentPlacements = new ArrayList<>();
     public long startingTime;
 
-    // keep track of top 5 fastest
-    public SortedMap<Long, List<String>> fastestLaps = new TreeMap<Long, List<String>>();
+    private final List<Minecart> activeMinecarts = new ArrayList<>();
+    private final Map<UUID, Long> minecartSpawnTimes = new HashMap<>();
+    private BukkitRunnable minecartSpawnTask;
+    private BukkitRunnable minecartTickTask;
 
-    // SCORING VARIABLES
-    public static final int FINISH_RACE_POINTS_18 = 12;  
-    public static final int FINISH_RACE_POINTS_24 = 18;  
-    public static final int FINISH_RACE_POINTS = FINISH_RACE_POINTS_18;   
+    private static final double MINECART_SPEED = 0.4;
+    private static final long GRACE_PERIOD_MS = 500;
+    private static final List<Location> TRACK_SPAWN_LOCATIONS = new ArrayList<>();
+    private final Map<Location, Long> spawnLocationCooldowns = new HashMap<>();
+
+    public SortedMap<Long, List<String>> fastestLaps = new TreeMap<>();
+
+    public static final int FINISH_RACE_POINTS_18 = 12;
+    public static final int FINISH_RACE_POINTS_24 = 18;
+    public static final int FINISH_RACE_POINTS = FINISH_RACE_POINTS_18;
 
     public static final int PLACEMENT_LAP_POINTS_18 = 1;
     public static final int PLACEMENT_LAP_POINTS_24 = 1;
     public static final int PLACEMENT_LAP_POINTS = PLACEMENT_LAP_POINTS_18;
 
-    public static final int LAP_COMPLETION_POINTS_18 = 1;  
-    public static final int LAP_COMPLETION_POINTS_24 = 2; 
+    public static final int LAP_COMPLETION_POINTS_18 = 1;
+    public static final int LAP_COMPLETION_POINTS_24 = 2;
     public static final int LAP_COMPLETION_POINTS = LAP_COMPLETION_POINTS_18;
 
     public static final int PLACEMENT_FINAL_LAP_POINTS_18 = 3;
     public static final int PLACEMENT_FINAL_LAP_POINTS_24 = 3;
     public static final int PLACEMENT_FINAL_LAP_POINTS = PLACEMENT_FINAL_LAP_POINTS_18;
 
-    public static final int[] PLACEMENT_BONUSES = {20, 15, 15, 10, 10, 5, 5, 5, 5, 5}; // points for Top 10 finishers
+    public static final int[] PLACEMENT_BONUSES = {20, 15, 15, 10, 10, 5, 5, 5, 5, 5};
     public static final int TUTORIAL_TIME = 240;
 
     private boolean finishedIntro = false;
 
     public AceRace() {
         super("Ace Race",
-            new String[] {
-                    "⑭ Complete the race as fast as you can!\n\n" + 
-                    "⑭ The " + ChatColor.BOLD + "practice time" + ChatColor.RESET + " has started.",
-                    "⑭ Red jump pads will boost you, orange jump pads will launch you higher, and green pads will give you a jump boost.\n\n" + 
-                    "⑭ Orange tiles with arrows will give you a speed boost.",
-                    "⑭ Hold right click with a trident to get a boost in water.\n" + 
-                    "⑭ Soar with an elytra by pressing space midair!\n" + 
-                    "⑭ Checkpoints will be given across the map.",
-                    ChatColor.BOLD + "Scoring:\n" + ChatColor.RESET +
-                            "⑭ +1 point for completing a lap\n" +
-                            "⑭ +1 point for every player beaten on a lap\n" +
-                            "⑭ +12 points for finishing the course\n" +
-                            "⑭ +3 points for every player beaten on the final lap\n" +
-                            "⑭ Top 8 Bonuses- 1st:+20, 2nd,3rd:+15, 4th,5th:+10, 6th-10th:+5"
-            });
+                new String[] {
+                        "⑭ Complete the race as fast as you can!\n\n" +
+                                "⑭ The " + ChatColor.BOLD + "practice time" + ChatColor.RESET + " has started.",
+                        "⑭ Red jump pads will boost you, orange jump pads will launch you higher, and green pads will give you a jump boost.\n\n" +
+                                "⑭ Orange tiles with arrows will give you a speed boost.",
+                        "⑭ Hold right click with a trident to get a boost in water.\n" +
+                                "⑭ Soar with an elytra by pressing space midair!\n" +
+                                "⑭ Checkpoints will be given across the map.",
+                        ChatColor.BOLD + "Scoring:\n" + ChatColor.RESET +
+                                "⑭ +1 point for completing a lap\n" +
+                                "⑭ +1 point for every player beaten on a lap\n" +
+                                "⑭ +12 points for finishing the course\n" +
+                                "⑭ +3 points for every player beaten on the final lap\n" +
+                                "⑭ Top 8 Bonuses- 1st:+20, 2nd,3rd:+15, 4th,5th:+10, 6th-10th:+5"
+                });
+
+        World aceRaceWorld = Bukkit.getWorld("acerace");
+        if (aceRaceWorld != null) {
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1074.30, 108.00, 910.68));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1076.30, 107.00, 912.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1079.30, 106.00, 915.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1080.30, 106.00, 918.70));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1082.30, 106.00, 920.68));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1081.30, 106.00, 922.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1081.30, 105.00, 924.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1084.30, 105.00, 926.70));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1085.62, 106.00, 928.70));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1090.30, 104.00, 932.48));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1089.30, 103.00, 934.70));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1094.30, 103.00, 939.60));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1097.30, 102.00, 946.54));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1099.30, 101.00, 948.56));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1098.30, 102.00, 952.36));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1116.70, 101.00, 946.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1114.70, 101.00, 941.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1106.70, 103.00, 931.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1105.70, 103.00, 930.10));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1104.70, 104.00, 928.55));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1102.70, 104.00, 925.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1098.70, 104.00, 922.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1095.70, 105.00, 918.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1095.70, 105.00, 916.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1090.70, 106.00, 912.30));
+            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1087.70, 106.00, 910.24));
+        }
+    }
+
+    private void startMinecartSystem() {
+
+        minecartSpawnTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!getState().equals(GameState.ACTIVE)) return;
+                if (TRACK_SPAWN_LOCATIONS.isEmpty()) return;
+
+                Location spawnLoc = TRACK_SPAWN_LOCATIONS
+                        .get(new Random().nextInt(TRACK_SPAWN_LOCATIONS.size()));
+
+                long now = System.currentTimeMillis();
+
+                Long lastSpawn = spawnLocationCooldowns.get(spawnLoc);
+                if (lastSpawn != null && (now - lastSpawn) < 500) {
+                    return;
+                }
+
+                spawnLocationCooldowns.put(spawnLoc, now);
+
+                Minecart cart = spawnLoc.getWorld().spawn(spawnLoc, Minecart.class);
+
+                cart.setMaxSpeed(MINECART_SPEED);
+                cart.setSlowWhenEmpty(false);
+                cart.setVelocity(spawnLoc.getDirection().multiply(MINECART_SPEED));
+
+                activeMinecarts.add(cart);
+                minecartSpawnTimes.put(cart.getUniqueId(), now);
+            }
+        };
+
+        minecartSpawnTask.runTaskTimer(MBC.getInstance().getPlugin(), 0L, 2L);
+
+        minecartTickTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!getState().equals(GameState.ACTIVE)) return;
+
+                Set<Minecart> toRemove = new HashSet<>();
+
+                for (Minecart cart : activeMinecarts) {
+
+                    if (toRemove.contains(cart)) continue;
+
+                    if (cart.isDead() || !cart.isValid()) {
+                        toRemove.add(cart);
+                        minecartSpawnTimes.remove(cart.getUniqueId());
+                        continue;
+                    }
+
+                    Location loc = cart.getLocation();
+                    Block currentBlock = loc.getBlock();
+
+                    if (currentBlock.getType() == Material.BLACK_CONCRETE) {
+                        triggerMinecartExplosion(cart, false);
+                        cart.remove();
+                        toRemove.add(cart);
+                        minecartSpawnTimes.remove(cart.getUniqueId());
+                        continue;
+                    }
+
+                    long spawnTime = minecartSpawnTimes.getOrDefault(cart.getUniqueId(), System.currentTimeMillis());
+                    boolean inGracePeriod = (System.currentTimeMillis() - spawnTime) < GRACE_PERIOD_MS;
+
+                    if (inGracePeriod) continue;
+
+                    for (Entity nearby : cart.getNearbyEntities(2, 2, 2)) {
+
+                        if (nearby instanceof Player) {
+                            triggerMinecartExplosion(cart, true);
+                            cart.remove();
+                            toRemove.add(cart);
+                            minecartSpawnTimes.remove(cart.getUniqueId());
+                            break;
+                        }
+
+                        if (nearby instanceof Minecart && nearby != cart) {
+                            triggerMinecartExplosion(cart, true);
+                            ((Minecart) nearby).remove();
+
+                            toRemove.add((Minecart) nearby);
+                            cart.remove();
+
+                            minecartSpawnTimes.remove(nearby.getUniqueId());
+                            minecartSpawnTimes.remove(cart.getUniqueId());
+                            break;
+                        }
+                    }
+                }
+
+                activeMinecarts.removeAll(toRemove);
+            }
+        };
+
+        minecartTickTask.runTaskTimer(MBC.getInstance().getPlugin(), 0L, 1L);
+    }
+
+    private void triggerMinecartExplosion(Minecart cart, boolean isCollision) {
+        Location loc = cart.getLocation();
+        World w = loc.getWorld();
+        if (w == null) return;
+
+        w.spawnParticle(Particle.EXPLOSION, loc, 3, 0.3, 0.3, 0.3, 0);
+        w.spawnParticle(Particle.FLAME, loc, 20, 0.5, 0.5, 0.5, 0.05);
+        w.spawnParticle(Particle.SMOKE, loc, 15, 0.4, 0.4, 0.4, 0.02);
+        w.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f);
+
+        if (isCollision) {
+            for (Participant p : MBC.getInstance().getPlayers()) {
+                Player player = p.getPlayer();
+                if (player.getLocation().distance(loc) <= 2) {
+                    AceRacePlayer acePlayer = getGamePlayer(player);
+                    if (acePlayer != null) {
+                        int checkpoint = acePlayer.checkpoint;
+                        player.teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength - 1 : checkpoint - 1));
+                        player.removePotionEffect(PotionEffectType.SPEED);
+                        player.setFireTicks(0);
+                    }
+                }
+            }
+        }
+    }
+
+    private void stopMinecartSystem() {
+        if (minecartSpawnTask != null) {
+            minecartSpawnTask.cancel();
+            minecartSpawnTask = null;
+        }
+        if (minecartTickTask != null) {
+            minecartTickTask.cancel();
+            minecartTickTask = null;
+        }
+        for (Minecart cart : activeMinecarts) {
+            if (cart != null && cart.isValid()) cart.remove();
+        }
+        activeMinecarts.clear();
+        minecartSpawnTimes.clear();
     }
 
     public void createScoreboard(Participant p) {
@@ -105,10 +285,6 @@ public class AceRace extends Game {
     public void start() {
         super.start();
         setGameState(GameState.TUTORIAL);
-
-        //for (Player p : Bukkit.getOnlinePlayers()) {
-            //p.teleport(map.getIntroLocation());
-        //}
 
         for (AceRacePlayer p : aceRacePlayerMap.values()) {
             p.getPlayer().teleport(map.getIntroLocation());
@@ -147,7 +323,6 @@ public class AceRace extends Game {
                 Introduction();
             } else if (!finishedIntro && timeRemaining == TUTORIAL_TIME-30){
                 MBC.getInstance().sendMutedMessages();
-                //Bukkit.broadcastMessage(MBC.MBC_STRING_PREFIX + ChatColor.GOLD + "" + ChatColor.BOLD + "Starting Practice Time!");
                 finishedIntro = true;
             } else if (timeRemaining == 60) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "One minute left of practice!");
@@ -157,7 +332,6 @@ public class AceRace extends Game {
                 map.setBarriers(true);
                 for (AceRacePlayer p : aceRacePlayerMap.values()) {
                     p.getPlayer().teleport(map.getIntroLocation());
-                    //p.getPlayer().teleport(new Location(map.getWorld(), 2, 26, 150, 90, 0));
                     p.checkpoint = 0;
                 }
                 setGameState(GameState.STARTING);
@@ -175,9 +349,9 @@ public class AceRace extends Game {
             } else {
                 setGameState(GameState.ACTIVE);
                 map.setBarriers(false);
-                //setPVP(true);
                 timeRemaining = 720;
                 startingTime = System.currentTimeMillis();
+                startMinecartSystem();
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.playSound(p, "sfx.started_ring", SoundCategory.RECORDS, 0.75f, 1);
                     p.playSound(p, "igm.ace_race", SoundCategory.RECORDS, 1, 1);
@@ -186,8 +360,8 @@ public class AceRace extends Game {
         } else if (getState().equals(GameState.ACTIVE)) {
             if (timeRemaining == 30) {
                 Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "30 seconds remaining!");
-                // TODO: play overtime music (or if there are like 2 players still racing: tbd)
             } else if (timeRemaining <= 0) {
+                stopMinecartSystem();
                 gameOverGraphics();
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.stopSound("igm.ace_race", SoundCategory.RECORDS);
@@ -247,7 +421,6 @@ public class AceRace extends Game {
 
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getInventory().clear();
-            //p.getInventory().addItem(trident);
             p.getInventory().addItem(redDye);
             p.getInventory().addItem(yellowDye);
             p.getInventory().addItem(limeDye);
@@ -257,7 +430,6 @@ public class AceRace extends Game {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, PotionEffect.INFINITE_DURATION, 1, false, false));
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
-            //p.getPlayer().teleport(new Location(map.getWorld(), 1, 26, 150, 90, 0));
 
             aceRacePlayerMap.put(p.getPlayer().getUniqueId(), new AceRacePlayer(p, this));
         }
@@ -270,7 +442,6 @@ public class AceRace extends Game {
             return;
         }
 
-        // experimental: making players disappear for others if they are within 5 blocks
         if (e.getPlayer().getGameMode() != GameMode.SPECTATOR) {
             Player mover = e.getPlayer();
             for (Participant p : MBC.getInstance().getPlayers()) {
@@ -281,23 +452,15 @@ public class AceRace extends Game {
                     double diffY = player.getY() - mover.getY();
                     double diffZ = player.getZ() - mover.getZ();
                     if (Math.sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ) <= 5) {
-                        //checker.addHiddenPlayer(mover);
-                        //player.hidePlayer(mover);
-                        //mover.hidePlayer(player);
                     }
                     else if(checker.checkHiddenPlayer(mover) && Math.sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ) <= 10) {
-                        //player.hidePlayer(mover);
-                        //mover.hidePlayer(player);
                     }
                     else {
-                        //checker.removeHiddenPlayer(mover);
-                        //mover.showPlayer(player);
-                        //player.showPlayer(mover);
                     }
                 }
             }
         }
-        
+
         Player p = e.getPlayer();
         AceRacePlayer player = getGamePlayer(p);
         if (player == null) return;
@@ -309,32 +472,19 @@ public class AceRace extends Game {
             p.setFireTicks(0);
         }
 
-
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
-            //Location l = p.getLocation();
-            //l.setPitch(-30);
-            //Vector d = l.getDirection();
-            //p.setVelocity(d.multiply(4));
-            //p.setVelocity(new Vector(p.getVelocity().getX(), 1.65, p.getVelocity().getZ()));
             player.setCheckpoint();
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
-            //Location l = p.getLocation();
-            //l.setPitch(-30);
-            //Vector d = l.getDirection();
-            //p.setVelocity(d.multiply(2.5));
-            //p.setVelocity(new Vector(p.getVelocity().getX(), 1.25, p.getVelocity().getZ()));
             player.setCheckpoint();
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
             player.setCheckpoint();
-            //p.setVelocity(new Vector(e.getPlayer().getVelocity().getX(), 1.25, e.getPlayer().getVelocity().getZ()));
             return;
         }
         if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
-            //p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
             return;
         }
         if (e.getTo().getBlock().getType().toString().toLowerCase().contains("carpet")) {
@@ -346,9 +496,6 @@ public class AceRace extends Game {
         return aceRacePlayerMap.get(p.getUniqueId());
     }
 
-      /**
-     * Inputs a player, along with their current lap and checkpoint number. Returns their current placement. Returns -1 if error.
-     */
     public int checkpointPlacement(AceRacePlayer p, int lap, int checkpoint) {
         switch(lap) {
             case 1:
@@ -405,12 +552,11 @@ public class AceRace extends Game {
         p.removePotionEffect(PotionEffectType.SPEED);
         p.setFireTicks(0);
     }
-    
-   public void topLaps() {
+
+    public void topLaps() {
         StringBuilder topFive = new StringBuilder();
         int counter = 0;
-        
-        //Bukkit.broadcastMessage("[Debug] fastestLaps.keySet().size() == " + fastestLaps.keySet().size());
+
         for (Long l : fastestLaps.keySet()) {
             for (int i = 0; i < fastestLaps.get(l).size(); i++) {
                 topFive.append(String.format((counter+1) + ". %-18s %-9s\n", fastestLaps.get(l).get(i), new SimpleDateFormat("m:ss.S").format(new Date(l))));
@@ -418,29 +564,29 @@ public class AceRace extends Game {
             counter++;
         }
         Bukkit.broadcastMessage(topFive.toString());
-   }
+    }
 
-   @EventHandler
+    @EventHandler
     public void onDrop(PlayerDropItemEvent e) {
         if (!e.getPlayer().getLocation().getWorld().equals(map.getWorld())) return;
         e.setCancelled(true);
-   }
+    }
 
-   @EventHandler
+    @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         Material i = e.getCurrentItem().getType();
         if (i == null) e.setCancelled(true);
         if (i.equals(Material.LEATHER_BOOTS)) e.setCancelled(true);
     }
 
-       @EventHandler
+    @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
 
             AceRacePlayer p = getGamePlayer(e.getPlayer());
-            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RED_DYE 
-            || e.getPlayer().getInventory().getItemInMainHand().getType() == Material.YELLOW_DYE 
-            || e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE) {
+            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RED_DYE
+                    || e.getPlayer().getInventory().getItemInMainHand().getType() == Material.YELLOW_DYE
+                    || e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE) {
                 int time = p.cooldownTimer;
                 if (time < timeRemaining) {
                     p.getPlayer().sendMessage(ChatColor.RED + "Please wait a moment before using an item again!");
@@ -455,21 +601,20 @@ public class AceRace extends Game {
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RED_DYE) firstCheckpoint(e.getPlayer());
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.YELLOW_DYE) lastCheckpoint(e.getPlayer());
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE) nextCheckpoint(e.getPlayer());
-            
         }
 
         if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Set<Material> trapdoorList = Set.of(Material.OAK_TRAPDOOR, Material.DARK_OAK_TRAPDOOR, Material.SPRUCE_TRAPDOOR, Material.BIRCH_TRAPDOOR,
-                                        Material.ACACIA_TRAPDOOR, Material.CHERRY_TRAPDOOR, Material.MANGROVE_TRAPDOOR, Material.JUNGLE_TRAPDOOR,
-                                        Material.CRIMSON_TRAPDOOR, Material.WARPED_TRAPDOOR);
+                    Material.ACACIA_TRAPDOOR, Material.CHERRY_TRAPDOOR, Material.MANGROVE_TRAPDOOR, Material.JUNGLE_TRAPDOOR,
+                    Material.CRIMSON_TRAPDOOR, Material.WARPED_TRAPDOOR);
             if(trapdoorList.contains(e.getClickedBlock().getType())) e.setCancelled(true);
         }
     }
 
-   @EventHandler
+    @EventHandler
     public void onReconnect(PlayerJoinEvent e) {
         AceRacePlayer p = getGamePlayer(e.getPlayer());
-        if (p == null) return; // new login; doesn't matter
+        if (p == null) return;
         p.setPlayer(e.getPlayer());
     }
 }
