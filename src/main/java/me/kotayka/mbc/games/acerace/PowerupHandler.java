@@ -1,14 +1,16 @@
 package me.kotayka.mbc.games.acerace;
 
+import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
+import org.bukkit.*;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
+import org.bukkit.util.Vector;
 
 import java.util.Map;
 
@@ -20,8 +22,11 @@ public final class PowerupHandler {
     // Ace Race Powerups represented as Minecraft Items.
     private static final Material BANANA_PEEL = Material.LIGHT_WEIGHTED_PRESSURE_PLATE;
     private static final Material MEATBALL = Material.SNOWBALL;
+    private static final Material SUGAR_HIGH = Material.SUGAR;
     private static final Material LEAP = Material.FEATHER;
     private static final Material STAR = Material.NETHER_STAR;
+    private static final Material ROCKET_LAUNCHER = Material.WOODEN_SHOVEL;
+    private static final Material TNT = Material.TNT;
 
     // PotionEffects
     private static final PotionEffect STUN_SLOW = new PotionEffect(PotionEffectType.SLOWNESS, 10, 10, false);
@@ -30,15 +35,21 @@ public final class PowerupHandler {
     // Collections of Powerup meta for convenient access.
     private static final Map<Material, AceRacePowerup> POWERUP_MATERIALS = Map.ofEntries(
         Map.entry(BANANA_PEEL, AceRacePowerup.BANANA_PEEL),
+        Map.entry(SUGAR_HIGH, AceRacePowerup.SUGAR_HIGH),
         Map.entry(MEATBALL, AceRacePowerup.MEATBALL),
         Map.entry(LEAP, AceRacePowerup.LEAP),
+        Map.entry(ROCKET_LAUNCHER, AceRacePowerup.ROCKET_LAUNCHER),
+        Map.entry(TNT, AceRacePowerup.TNT),
         Map.entry(STAR, AceRacePowerup.STAR)
     );
 
     private static final Map<AceRacePowerup, ItemStack> POWERUP_ITEMS = Map.ofEntries(
         Map.entry(AceRacePowerup.BANANA_PEEL, new ItemStack(BANANA_PEEL, 2)),
+        Map.entry(AceRacePowerup.SUGAR_HIGH, new ItemStack(SUGAR_HIGH, 1)),
         Map.entry(AceRacePowerup.MEATBALL, new ItemStack(MEATBALL, 3)),
         Map.entry(AceRacePowerup.LEAP, new ItemStack(LEAP, 1)),
+        Map.entry(AceRacePowerup.TNT, new ItemStack(TNT, 2)),
+        Map.entry(AceRacePowerup.ROCKET_LAUNCHER, new ItemStack(ROCKET_LAUNCHER, 1)),
         Map.entry(AceRacePowerup.STAR, new ItemStack(STAR, 1))
     );
 
@@ -60,7 +71,7 @@ public final class PowerupHandler {
      * @param heldItem Item currently being used
      * @implNote Currently only fires powerups if used in their main hand, not in their offhand.
      */
-    static void usePowerup(AceRacePlayer player, Material heldItem) {
+    static void usePowerup(AceRacePlayer player, Material heldItem, boolean lookingAtBlock) {
         if (!POWERUP_MATERIALS.containsKey(heldItem)) return;
 
         AceRacePowerup powerup = POWERUP_MATERIALS.get(heldItem);
@@ -79,6 +90,55 @@ public final class PowerupHandler {
                 player.getPlayer().getInventory().remove(LEAP);
                 useLeap(player.getPlayer());
                 break;
+            case SUGAR_HIGH:
+                int sugar_count = playerInventory.getItemInMainHand().getAmount();
+                if (sugar_count > 1) {
+                    playerInventory.getItemInMainHand().setAmount(1);
+                } else {
+                    playerInventory.remove(SUGAR_HIGH);
+                }
+                useSugarHigh(player.getPlayer());
+                break;
+            case MEATBALL:
+                int meatball_count = playerInventory.getItemInMainHand().getAmount();
+                if (meatball_count > 1) {
+                    playerInventory.getItemInMainHand().setAmount(meatball_count - 1);
+                } else {
+                    playerInventory.remove(MEATBALL);
+                }
+                break;
+            case TNT:
+                int tnt_count = playerInventory.getItemInMainHand().getAmount();
+                if (tnt_count > 1) {
+                    playerInventory.getItemInMainHand().setAmount(tnt_count - 1);
+                } else {
+                    playerInventory.remove(TNT);
+                }
+                throwTNT(player.getPlayer());
+                break;
+            case ROCKET_LAUNCHER:
+                if (!lookingAtBlock) return;
+
+                ItemStack item = playerInventory.getItemInMainHand();
+                ItemMeta meta = item.getItemMeta();
+
+                if (meta instanceof org.bukkit.inventory.meta.Damageable damageable) {
+                    int max = item.getType().getMaxDurability();
+                    int step = max / 4;
+
+                    int newDamage = damageable.getDamage() + step;
+
+                    if (newDamage >= max) {
+                        playerInventory.setItemInMainHand(null);
+                    } else {
+                        damageable.setDamage(newDamage);
+                        item.setItemMeta((ItemMeta) damageable);
+                        playerInventory.setItemInMainHand(item);
+                    }
+                }
+
+                useRocketLauncher(player.getPlayer());
+                break;
         }
     }
 
@@ -88,9 +148,69 @@ public final class PowerupHandler {
 
     }
 
-    private static void useBanana(Player player) {
-        Location location = player.getLocation();
+    private static void useRocketLauncher(Player player) {
+        Vector direction = player.getLocation().getDirection();
+        Vector reverse = direction.multiply(-1).normalize();
+        double power = 1.5;
 
+        Vector velocity = reverse.multiply(power);
+        velocity.setY(velocity.getY());
+
+        player.setVelocity(velocity);
+    }
+
+    private static void throwTNT(Player player) {
+        Location loc = player.getEyeLocation().add(
+                player.getLocation().getDirection().multiply(1.2)
+        );
+
+        TNTPrimed tnt = player.getWorld().spawn(loc, TNTPrimed.class);
+
+        tnt.setFuseTicks(80);
+        tnt.setYield(0f);
+
+        Vector velocity = player.getLocation().getDirection().multiply(1.2);
+        tnt.setVelocity(velocity);
+    }
+
+
+    private static void useBanana(Player player) {
+        Location location = player.getLocation().clone();
+
+        Bukkit.getScheduler().runTaskLater(MBC.getInstance().getPlugin(), () -> {
+            AreaEffectCloud cloud = (AreaEffectCloud) location.getWorld()
+                    .spawnEntity(location, EntityType.AREA_EFFECT_CLOUD);
+
+            cloud.setDuration(140);
+            cloud.setRadius(2.5f);
+            cloud.setColor(Color.YELLOW);
+
+            cloud.setParticle(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f));
+
+            cloud.setReapplicationDelay(10);
+            cloud.setWaitTime(0);
+
+            cloud.addCustomEffect(
+                    new PotionEffect(PotionEffectType.SLOWNESS, 60, 3),
+                    true
+            );
+        }, 60L);
+
+        AreaEffectCloud warningCloud = (AreaEffectCloud) location.getWorld()
+                .spawnEntity(location, EntityType.AREA_EFFECT_CLOUD);
+
+        warningCloud.setDuration(60);
+        warningCloud.setRadius(2.5f);
+        warningCloud.setColor(Color.GREEN);
+
+        warningCloud.setParticle(Particle.DUST, new Particle.DustOptions(Color.GREEN, 1.0f));
+    }
+
+
+    private static void useSugarHigh(Player player) {
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 140, 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 140, 4));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 140, 4));
     }
 
     /**
