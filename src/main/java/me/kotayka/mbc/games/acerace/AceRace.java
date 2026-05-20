@@ -266,7 +266,10 @@ public class AceRace extends Game {
         }
     }
 
-    private void stopMinecartSystem() {
+    // The access modifier has temporarily been changed to public
+    // so that it is accessible by Plugin.java.
+    // A better system will be planned in the future.
+    public void stopMinecartSystem() {
         if (minecartSpawnTask != null) {
             minecartSpawnTask.cancel();
             minecartSpawnTask = null;
