@@ -15,8 +15,11 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -26,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
@@ -326,6 +330,28 @@ public class AceRace extends Game {
         stopMinecartSystem();
     }
 
+    @EventHandler
+    public void onTntExplode(EntityExplodeEvent event) {
+        Location center = event.getLocation();
+        double radius = 5.0;
+
+        List<Player> players = center.getWorld().getPlayers();
+
+        for (Player p : players) {
+            if (p.getLocation().distance(center) <= radius) {
+                AceRacePlayer acePlayer = getGamePlayer(p);
+                if (acePlayer != null) {
+                    int checkpoint = acePlayer.checkpoint;
+                    p.teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength - 1 : checkpoint - 1));
+                    p.removePotionEffect(PotionEffectType.SPEED);
+                    p.setFireTicks(0);
+                }
+            }
+        }
+
+        event.blockList().clear();
+    }
+
     public void events() {
         if (getState().equals(GameState.TUTORIAL)) {
             if (timeRemaining == 0) {
@@ -621,7 +647,7 @@ public class AceRace extends Game {
                 // in all other cases, consider a powerup to be used.
                 // PowerupHandler.usePowerup() will determine appropriate effects if a powerup is used.
                 // if a powerup is not used, no additional effects will occur, and the event will not be cancelled.
-                PowerupHandler.usePowerup(p, playerItem);
+                PowerupHandler.usePowerup(p, playerItem, e.getAction() == Action.RIGHT_CLICK_BLOCK);
             }
         }
 
@@ -631,6 +657,41 @@ public class AceRace extends Game {
                     Material.CRIMSON_TRAPDOOR, Material.WARPED_TRAPDOOR);
             if(trapdoorList.contains(e.getClickedBlock().getType())) e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onSnowballHit(ProjectileHitEvent event) {
+        if (!(event.getEntity() instanceof Snowball snowball)) return;
+
+        Entity hitEntity = event.getHitEntity();
+        if (!(hitEntity instanceof Player victim)) return;
+
+        ProjectileSource shooterSource = snowball.getShooter();
+
+        String attackerName = "Unknown";
+        if (shooterSource instanceof Player attacker) {
+            attackerName = attacker.getName();
+        }
+
+        victim.addPotionEffect(new PotionEffect(
+                PotionEffectType.BLINDNESS,
+                100,
+                0,
+                false,
+                true,
+                true
+        ));
+
+        victim.addPotionEffect(new PotionEffect(
+                PotionEffectType.SLOWNESS,
+                100,
+                2,
+                false,
+                true,
+                true
+        ));
+
+        victim.sendMessage("You were hit by" + attackerName + "!");
     }
 
     @EventHandler
