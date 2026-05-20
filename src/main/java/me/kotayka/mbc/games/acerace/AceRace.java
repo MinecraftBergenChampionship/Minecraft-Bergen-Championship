@@ -356,6 +356,7 @@ public class AceRace extends Game {
         }
 
         event.blockList().clear();
+        stopMinecartSystem();
     }
 
     public void events() {
