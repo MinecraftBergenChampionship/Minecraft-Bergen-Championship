@@ -107,7 +107,7 @@ public class DiscoFever extends PartyGame {
                 "⑰ You'll get points for each player you outlive, along with points for every few rounds you survive.\n\n" +
                 "⑰ Players recieve a bonus for reaching the end of the course (and getting to the monkey!!).",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "⑰ +2 points for surviving a speed increase\n" +
+                        "⑰ +3 points for surviving a speed increase\n" +
                         "⑰ +1 point for each player outlived\n" +
                         "⑰ +10 points for reaching the end of the course\n"
         });
