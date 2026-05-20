@@ -101,9 +101,9 @@ public class PowerTag extends Game {
                 "⑱ Each hider gets a powerup they can use to help escape the hunters.\n\n" +
                 "⑱ However, the hunters will also get to choose a special power to help find the hiders.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                                "⑱ +7 points for finding a player as a hunter\n" +
+                                "⑱ +10 points for finding a player as a hunter\n" +
                                 "⑱ +1 point for surviving 10 seconds as a hider\n" +
-                                "⑱ +8 points for surviving an entire round as a hider\n" +
+                                "⑱ +10 points for surviving an entire round as a hider\n" +
                                 "⑱ +5-8 points for being in the top 8 longest surviving hiders\n" +
                                 "⑱ +5 points for finding a top 8 longest surviving hider"
         });

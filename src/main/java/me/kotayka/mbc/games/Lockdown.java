@@ -102,9 +102,9 @@ public class Lockdown extends Game {
     private MBCTeam[][] originalCapturedPoints = new MBCTeam[6][6];
 
     private final int FIRST_TEAM_ZONE_POINTS = 1;
-    private final int FIRST_ZONE = 4; // for 24 players this is 5
-    private final int SECOND_ZONE = 3; // for 24 players this is 4
-    private final int THIRD_ZONE = 2; // for 24 players this is 3
+    private final int FIRST_ZONE = 5; // for 24 players this is 5, 18 is 4
+    private final int SECOND_ZONE = 4; // for 24 players this is 4, 18 is 3
+    private final int THIRD_ZONE = 3; // for 24 players this is 3, 18 is 2
     private final int FOURTH_FIFTH_ZONE = 2;
     private final int SIXTH_AND_MORE_ZONE = 1;
 
@@ -124,7 +124,7 @@ public class Lockdown extends Game {
                                 "⑲ +1-5 points per player for capturing a zone, decreasing after each captured\n" +
                                 "⑲ +1 point per player for capturing a zone first\n" +
                                 "⑲ +10 points for escaping at the evacuation point\n" +
-                                "⑲ +3-5 points per kill, decreasing after each kill\n"
+                                "⑲ +5-7 points per kill, decreasing after each kill\n"
         });
     }
     private int roundNum = 1;

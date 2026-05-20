@@ -89,9 +89,9 @@ public class AceRace extends Game {
                                 "⑭ Soar with an elytra by pressing space midair!\n" +
                                 "⑭ Checkpoints will be given across the map.",
                         ChatColor.BOLD + "Scoring:\n" + ChatColor.RESET +
-                                "⑭ +1 point for completing a lap\n" +
+                                "⑭ +2 points for completing a lap\n" +
                                 "⑭ +1 point for every player beaten on a lap\n" +
-                                "⑭ +12 points for finishing the course\n" +
+                                "⑭ +18 points for finishing the course\n" +
                                 "⑭ +3 points for every player beaten on the final lap\n" +
                                 "⑭ Top 8 Bonuses- 1st:+20, 2nd,3rd:+15, 4th,5th:+10, 6th-10th:+5"
                 });

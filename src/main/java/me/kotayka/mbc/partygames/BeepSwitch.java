@@ -137,11 +137,11 @@ public class BeepSwitch extends PartyGame {
                 "⑰ However, only one player on your team will be running the parkour at a time.\n\n" + 
                 "⑰ This player switches every 16 seconds. Communication is key to completing the most paths possible.",
                 ChatColor.BOLD + "Scoring: \n" + ChatColor.RESET +
-                        "⑰ +1 points for each easy level completed\n" +
-                        "⑰ +3 points for each medium level completed\n" +
-                        "⑰ +5 points for each hard level completed\n" +
-                        "⑰ +7 points for each extreme level completed\n" +
-                        "⑰ +4 points to each member of a team for completing a path of difficulty"
+                        "⑰ +2 points for each easy level completed\n" +
+                        "⑰ +4 points for each medium level completed\n" +
+                        "⑰ +6 points for each hard level completed\n" +
+                        "⑰ +8 points for each extreme level completed\n" +
+                        "⑰ +6 points to each member of a team for completing a path of difficulty"
         });
 
         loadCourses();
