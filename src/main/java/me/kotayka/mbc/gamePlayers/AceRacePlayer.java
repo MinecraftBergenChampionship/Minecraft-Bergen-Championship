@@ -246,49 +246,14 @@ public class AceRacePlayer extends GamePlayer {
                 this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You are currently in " + currentPlacementString + " place.");
             }
         } else {
-            // Handle case where a player has skipped a non-final checkpoint.
             if (checkpoint != 0) {
+                // This code segment specifically does not run for the initial checkpoint.
                 this.getParticipant().getPlayer().sendTitle(" ", ChatColor.YELLOW + "Checkpoint " + (checkpoint+1) + "/" + ACE_RACE.map.mapLength, 0, 40, 20);
                 if (givePowerup)
                     PowerupHandler.givePowerup(this);
-                checkpoint++;
-                ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
             }
-            if (ACE_RACE.getState().equals(GameState.ACTIVE) && !(lap == 1 && checkpoint == 0)) {
-                currentPlace = ACE_RACE.checkpointPlacement(this, lap, checkpoint);
-                String currentPlacementString = AceRace.getPlace(currentPlace);
-                this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You are currently in " + currentPlacementString + " place.");
-            }
-        }
-        if (!nextCheckpoint && !skipCheckpoint) return;
-
-        // Prioritize if the player has reached the first checkpoint.
-        if (nextCheckpoint) {
-            // case for finishing lap
-            if (checkpoint == ACE_RACE.map.mapLength) {
-                checkpoint = 0;
-                ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
-                Lap();
-            } else { // not last checkpoint
-                if (checkpoint != 0) {
-                    // This code segment specifically does not run for the initial checkpoint.
-                    this.getParticipant().getPlayer().sendTitle(" ", ChatColor.YELLOW + "Checkpoint " + (checkpoint+1) + "/" + ACE_RACE.map.mapLength, 0, 40, 20);
-                    if (givePowerup)
-                        PowerupHandler.givePowerup(this);
-                }
-                checkpoint++;
-                ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
-            }
-            if (ACE_RACE.getState().equals(GameState.ACTIVE) && !(lap == 1 && checkpoint == 0)) {
-                currentPlace = ACE_RACE.checkpointPlacement(this, lap, checkpoint);
-                String currentPlacementString = AceRace.getPlace(currentPlace);
-                this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You are currently in " + currentPlacementString + " place.");
-            }
-        } else {
-            // Handle case where a player has skipped a non-final checkpoint.
-
-
-
+            checkpoint++;
+            ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
         }
     }
 
