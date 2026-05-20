@@ -2,6 +2,7 @@ package me.kotayka.mbc;
 
 import me.kotayka.mbc.commands.*;
 import me.kotayka.mbc.commands.tab.*;
+import me.kotayka.mbc.games.acerace.AceRace;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.boss.BossBar;
@@ -122,6 +123,11 @@ public class Plugin extends JavaPlugin implements Listener {
 
         for (Leaderboard leaderboards : Lobby.individualLeaderboards) {
             leaderboards.RemoveStands();
+        }
+
+        // Bandaid fix for Minecart system.
+        if (MBC.getInstance().getGame() instanceof AceRace) {
+            ((AceRace) MBC.getInstance().getGame()).stopMinecartSystem();
         }
     }
 }
