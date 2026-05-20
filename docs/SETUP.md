@@ -8,8 +8,7 @@ Thank you for your interest in helping develop MBC!
 This project makes use of several external libraries. 
 We use [Maven](https://maven.apache.org/) as our Java build tool.
 
-Since I currently use **IntelliJ** and **WSL2 Ubuntu** (Linux) for development, these docs are written with those specifications in mind.
-These are subject to future modifications and revisions for alternate software are anticipated.
+These docs were initially written for use with the **IntelliJ** IDE paired with **WSL2 Ubuntu**.
 
 ## Workflow 
 
@@ -22,7 +21,7 @@ Once given access to the organization, feel free to clone the environment onto y
 
 ## Java
 
-You must setup and install a JDK for local Java development.
+You must set up and install a JDK for local Java development.
 Currently, Minecraft requires **Java 17** for versions above 1.18, and **Java 21** for 1.20.5+.
 
 An appropriate JDK can be downloaded from the [Oracle website](https://www.oracle.com/java/technologies/downloads/) for Windows or macOS developers.

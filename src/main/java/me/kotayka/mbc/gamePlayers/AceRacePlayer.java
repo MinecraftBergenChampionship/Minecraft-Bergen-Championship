@@ -2,19 +2,17 @@ package me.kotayka.mbc.gamePlayers;
 
 import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
-import me.kotayka.mbc.MBCTeam;
 import me.kotayka.mbc.Participant;
-import me.kotayka.mbc.games.AceRace;
+import me.kotayka.mbc.games.acerace.AceRace;
+import me.kotayka.mbc.games.acerace.PowerupHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class AceRacePlayer extends GamePlayer {
     protected static AceRace ACE_RACE;  // essentially a global const
@@ -73,7 +71,7 @@ public class AceRacePlayer extends GamePlayer {
         completedFirstLap = true;
         // only add to Top 5 if this lap's split was faster or equal to the 5th (map is maintained to be at max size 5).
         // TODO: this may be buggy and may require a second review. The use of a set means equivalent laps are also not tracked
-        if (ACE_RACE.fastestLaps.size() == 0) {
+        if (ACE_RACE.fastestLaps.isEmpty()) {
             //this is the first lap completed
             List<String> t = new ArrayList<String>();
             t.add(this.getParticipant().getFormattedName());
@@ -196,8 +194,7 @@ public class AceRacePlayer extends GamePlayer {
     }
 
     public boolean checkHiddenPlayer(Player p) {
-        if (hiddenPlayers.contains(p)) return true;
-        return false;
+        return hiddenPlayers.contains(p);
     }
 
     public boolean removeHiddenPlayer(Player p) {
@@ -208,44 +205,52 @@ public class AceRacePlayer extends GamePlayer {
 
     /**
      * Determines whether a player has reached the next checkpoint.
+     * A player has reached the next checkpoint if they are within a distance of 6 of either the next or subsequent checkpoint.
      * Modifies values of currentCheckpoint and nextCheckpoint; both are manually reset each lap
+     *
+     * @param givePowerup Whether or not to provide a powerup to the `this` player.
+     * @implNote Note that this function is currently only triggered when a player walks over a "checkpoint checker" special block,
+     *           including jump pads and carpet.
      */
-    public void setCheckpoint() {
+    public void setCheckpoint(boolean givePowerup) {
         // exit if player is Spectator or done with race
         if (getParticipant().getPlayer().getGameMode().equals(GameMode.SPECTATOR)) return;
 
-        // if we are not near a checkpoint, exit
-        if (!checkCoords()) return;
+        // check distance to next checkpoint and the following checkpoint
+        Location location = getParticipant().getPlayer().getLocation();
+        boolean nextCheckpoint = ACE_RACE.map.checkpoints.get(checkpoint % ACE_RACE.map.mapLength).distance(location) <= 12;
+        boolean skipCheckpoint = ACE_RACE.map.checkpoints.get((checkpoint + 1) % ACE_RACE.map.mapLength).distance(location) <= 12;
 
-        // case for finishing lap
-        if (checkpoint == ACE_RACE.map.mapLength) {
-            checkpoint = 0;
-            ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
-            Lap();
-        } else { // not last checkpoint
-            if (checkpoint != 0) {
-                this.getParticipant().getPlayer().sendTitle(" ", ChatColor.YELLOW + "Checkpoint " + (checkpoint+1) + "/" + ACE_RACE.map.mapLength, 0, 40, 20);
+        if (!nextCheckpoint && !skipCheckpoint) return;
+
+        // Prioritize if the player has reached the first checkpoint.
+        if (nextCheckpoint) {
+            // case for finishing lap
+            if (checkpoint == ACE_RACE.map.mapLength) {
+                checkpoint = 0;
+                ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
+                Lap();
+            } else { // not last checkpoint
+                if (checkpoint != 0) {
+                    // This code segment specifically does not run for the initial checkpoint.
+                    this.getParticipant().getPlayer().sendTitle(" ", ChatColor.YELLOW + "Checkpoint " + (checkpoint+1) + "/" + ACE_RACE.map.mapLength, 0, 40, 20);
+                    if (givePowerup)
+                        PowerupHandler.givePowerup(this);
+                }
+                checkpoint++;
+                ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
             }
-            checkpoint++;
-            ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
-        }
-        if (ACE_RACE.getState().equals(GameState.ACTIVE) && !(lap == 1 && checkpoint == 0)) {
-            currentPlace = ACE_RACE.checkpointPlacement(this, lap, checkpoint);
-            String currentPlacementString = AceRace.getPlace(currentPlace);
-            this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You are currently in " + currentPlacementString + " place.");
-        }
-        
-    }
+            if (ACE_RACE.getState().equals(GameState.ACTIVE) && !(lap == 1 && checkpoint == 0)) {
+                currentPlace = ACE_RACE.checkpointPlacement(this, lap, checkpoint);
+                String currentPlacementString = AceRace.getPlace(currentPlace);
+                this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You are currently in " + currentPlacementString + " place.");
+            }
+        } else {
+            // Handle case where a player has skipped a non-final checkpoint.
 
-    /**
-     * Check if player has reached next checkpoint.
-     * Does not update checkpoint variable.
-     * @see AceRacePlayer setCheckpoint()
-     * @return true if next checkpoint is within 6 distance, false otherwise
-     */
-    public boolean checkCoords() {
-        // If checkpoint is out of bounds, player is on last lap and should compare to first checkpoint
-        return (ACE_RACE.map.checkpoints.get(checkpoint < ACE_RACE.map.mapLength ? checkpoint : 0).distance(getParticipant().getPlayer().getLocation()) <= 12);
+
+
+        }
     }
 
     /**
@@ -262,10 +267,7 @@ public class AceRacePlayer extends GamePlayer {
     }
 
     public void reset() {
-        // assuming each map will have 3 laps
-        for (int i = 0; i < 3; i++) {
-            lapTimes[i] = "";
-        }
+        Arrays.fill(lapTimes, "");
         lap = 1;
         checkpoint = 0;
         lapStartTime = 0;

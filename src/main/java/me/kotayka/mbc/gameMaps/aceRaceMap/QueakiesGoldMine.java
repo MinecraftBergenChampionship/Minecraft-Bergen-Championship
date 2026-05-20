@@ -5,7 +5,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 public class QueakiesGoldMine extends AceRaceMap {
-    boolean powerups = true;
     Location[] respawns = {
             new Location(getWorld(), -1005, 101, 880, -90, 0),  // default
             new Location(getWorld(), -975, 102, 882, -60, -5),
@@ -32,8 +31,9 @@ public class QueakiesGoldMine extends AceRaceMap {
 
     public QueakiesGoldMine() {
         super(97, new Location(Bukkit.getWorld("AceRace"), -1005, 101, 880, -90, 0), "Lava");
+        super.powerups = true;
         mapName = "Queakie's Gold Mine";
-        creatorName = "bigkirbypuff_";
+        creatorName = "bigkirbypuff_, Pengu1n__, iDrg";
         loadCheckpoints(respawns, checkpoints);
     }
 
