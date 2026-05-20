@@ -73,7 +73,7 @@ public class SurvivalGames extends Game {
     // SCORING
     public final int KILL_POINTS_INITIAL_18 = 13;
     public final int KILL_POINTS_INITIAL_24 = 16;
-    public final int KILL_POINTS_INITIAL = KILL_POINTS_INITIAL_18;
+    public final int KILL_POINTS_INITIAL = KILL_POINTS_INITIAL_24;
     public int killPoints = KILL_POINTS_INITIAL;
     public final int SURVIVAL_POINTS = 1;
     public final int HORCRUX_DESTROY_POINTS = 10;

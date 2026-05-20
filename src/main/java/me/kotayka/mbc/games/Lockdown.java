@@ -84,19 +84,19 @@ public class Lockdown extends Game {
 
     private final int ORIGINAL_KILL_POINTS_18 = 5;
     private final int ORIGINAL_KILL_POINTS_24 = 7;
-    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_18;
+    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_24;
 
     private final int TWO_KILL_POINTS_18 = 4;
     private final int TWO_KILL_POINTS_24 = 6;
-    private final int TWO_KILL_POINTS = TWO_KILL_POINTS_18;
+    private final int TWO_KILL_POINTS = TWO_KILL_POINTS_24;
 
     private final int FOUR_KILL_POINTS_18 = 3;
     private final int FOUR_KILL_POINTS_24 = 5;
-    private final int FOUR_KILL_POINTS = FOUR_KILL_POINTS_18;
+    private final int FOUR_KILL_POINTS = FOUR_KILL_POINTS_24;
 
     private final int SIX_KILL_POINTS_18 = 3;
     private final int SIX_KILL_POINTS_24 = 5;
-    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_18;
+    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_24;
 
     private MBCTeam[][] capturedPoints = new MBCTeam[6][6];
     private MBCTeam[][] originalCapturedPoints = new MBCTeam[6][6];
