@@ -7,7 +7,7 @@ public enum AceRacePowerup {
     MEATBALL,
     LEAP,
     TNT,
-    STAR,
     ROCKET_LAUNCHER,
-    TELEPORTER
+    TELEPORTER,
+    STAR
 }

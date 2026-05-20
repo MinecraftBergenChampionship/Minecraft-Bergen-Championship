@@ -8,8 +8,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -20,12 +22,13 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.Map;
 
 /**
  * This class handles powerup related effects for AceRace.
  * Note: The `public` access modifier exists so outside packages can access this class, which is planned to be changed.
  */
-public final class PowerupHandler implements Listener {
+public final class PowerupHandler {
     // Ace Race Powerups represented as Minecraft Items.
     private static final Material BANANA_PEEL = Material.LIGHT_WEIGHTED_PRESSURE_PLATE;
     private static final Material MEATBALL = Material.SNOWBALL;
@@ -128,7 +131,11 @@ public final class PowerupHandler implements Listener {
             case BANANA_PEEL:
                 int banana_count = playerInventory.getItemInMainHand().getAmount();
                 if (banana_count > 1) {
-                    playerInventory.getItemInMainHand().setAmount(banana_count-1);
+                    playerInventory.getItemInMainHand().setAmount(banana_count - 1);
+                }
+                int count = playerInventory.getItemInMainHand().getAmount();
+                if (count > 1) {
+                    playerInventory.getItemInMainHand().setAmount(1);
                 } else {
                     playerInventory.remove(BANANA_PEEL);
                     playersWithPowerup.remove(player.getPlayer());
@@ -143,6 +150,7 @@ public final class PowerupHandler implements Listener {
                     playerInventory.remove(LEAP);
                     playersWithPowerup.remove(player.getPlayer());
                 }
+                player.getPlayer().getInventory().remove(LEAP);
                 useLeap(player.getPlayer());
                 break;
             case SUGAR_HIGH:
@@ -237,7 +245,6 @@ public final class PowerupHandler implements Listener {
         Vector velocity = player.getLocation().getDirection().multiply(1.2);
         tnt.setVelocity(velocity);
     }
-
 
     private static void useBanana(AceRacePlayer player) {
         Location location = player.getPlayer().getLocation().clone();
@@ -343,7 +350,7 @@ public final class PowerupHandler implements Listener {
      *
      * @param stunnedPlayer Player being stunned
      */
-    private static void stunPlayer(Player stunnedPlayer) {
+    public static void stunPlayer(Player stunnedPlayer) {
         stunnedPlayer.addPotionEffect(STUN_SLOW);
         stunnedPlayer.addPotionEffect(STUN_BLIND);
     }
