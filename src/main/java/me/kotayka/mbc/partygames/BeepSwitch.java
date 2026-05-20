@@ -99,23 +99,23 @@ public class BeepSwitch extends PartyGame {
 
     public final int STAGE_POINTS_18 = 4;
     public final int STAGE_POINTS_24 = 6;
-    public final int STAGE_POINTS = STAGE_POINTS_18;
+    public final int STAGE_POINTS = STAGE_POINTS_24;
 
     public final int EASY_POINTS_18 = 1;
     public final int EASY_POINTS_24 = 2;
-    public final int EASY_POINTS = EASY_POINTS_18;
+    public final int EASY_POINTS = EASY_POINTS_24;
 
     public final int MEDIUM_POINTS_18 = 3;
     public final int MEDIUM_POINTS_24 = 4;
-    public final int MEDIUM_POINTS = MEDIUM_POINTS_18;
+    public final int MEDIUM_POINTS = MEDIUM_POINTS_24;
 
     public final int HARD_POINTS_18 = 5;
     public final int HARD_POINTS_24 = 6;
-    public final int HARD_POINTS = HARD_POINTS_18;
+    public final int HARD_POINTS = HARD_POINTS_24;
 
     public final int EXTREME_POINTS_18 = 7;
     public final int EXTREME_POINTS_24 = 8;
-    public final int EXTREME_POINTS = EXTREME_POINTS_18;
+    public final int EXTREME_POINTS = EXTREME_POINTS_24;
 
 
 

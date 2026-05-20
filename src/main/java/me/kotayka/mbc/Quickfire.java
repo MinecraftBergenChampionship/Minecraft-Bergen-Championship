@@ -163,6 +163,12 @@ public class Quickfire extends FinaleGame {
         UUID ehnry = UUID.fromString("8da6e75d-44b2-4d2f-8104-526331033873");
         UUID sam = UUID.fromString("4cb9d97c-cb8f-4a35-b0a4-6c82b782aa1a");
         UUID blueboy = UUID.fromString("9dfa1dab-2e36-4482-96ab-d3a765eceacf");
+        UUID malena = UUID.fromString("00b80aa8-fd4a-400a-8a54-bb12d93ee988");
+        UUID nathaniel = UUID.fromString("485c4607-0a5d-42ff-b5a3-7d2c5b5d1dd8");
+        UUID forrest = UUID.fromString("81de6059-a7ef-478f-9b0a-9631fcf4043b");
+        //UUID james = UUID.fromString("e469f61b-5dd1-427d-b54f-2cefbd7abf0c");
+        UUID danny = UUID.fromString("f4220995-3609-4007-9438-4f4d89e9d993");
+        UUID mari = UUID.fromString("7f04d129-e313-4711-870f-d04db68274c2");
 
         playerWalkoutSongs.put(cam, "walkout.bigkirbypuff");
         playerWalkoutSongs.put(collin, "walkout.rspacerr");
@@ -187,8 +193,13 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongs.put(ehnry, "walkout.ehnry");
         playerWalkoutSongs.put(sam, "walkout.sammjamzz");
         playerWalkoutSongs.put(blueboy, "walkout.blueboyv1");
+        playerWalkoutSongs.put(malena, "walkout.yamilton");
+        playerWalkoutSongs.put(nathaniel, "walkout.paradox");
+        playerWalkoutSongs.put(forrest, "walkout.tigerblocks");
+        playerWalkoutSongs.put(danny, "walkout.friegg");
+        playerWalkoutSongs.put(mari, "walkout.bowwo");
 
-        playerWalkoutBlurbs.put(cam, "Representing the South Side of Chicago...");
+        playerWalkoutBlurbs.put(cam, "The worldwide #1 supporter of milk...");
         playerWalkoutBlurbs.put(collin, "Don't ask him how he eats his Chicken Nuggets...");
         playerWalkoutBlurbs.put(caleb, "With his mouse in one hand and an extra large boba in the other...");
         playerWalkoutBlurbs.put(devin, "The powerless president and fraudulent dictator of Ethipia...");
@@ -211,6 +222,11 @@ public class Quickfire extends FinaleGame {
         playerWalkoutBlurbs.put(ehnry, "He's spent thousands of dollars on CS2 cases...");
         playerWalkoutBlurbs.put(sam, "Dancing her way into quickfire...");
         playerWalkoutBlurbs.put(blueboy, "IMG_0351.png...");
+        playerWalkoutBlurbs.put(malena, "No, it's NOT offensive to her culture to listen to emo music...");
+        playerWalkoutBlurbs.put(nathaniel, "He has a \"noteworthy\" relationship with Aristotle...");
+        playerWalkoutBlurbs.put(forrest, "Known to many as the \"Red Chud\"...");
+        playerWalkoutBlurbs.put(danny, "This chip guy is coming for the 'chip...");
+        playerWalkoutBlurbs.put(mari, "The pro gamer from the land of corn...");
 
         playerWalkoutSongNames.put(cam, "Sleepyhead, Passion Pit");
         playerWalkoutSongNames.put(collin, "Radioactive, Imagine Dragons");
@@ -235,6 +251,11 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongNames.put(ehnry, "Get Outside, Youtube Audio Library");
         playerWalkoutSongNames.put(sam, "I Wish that Heaven had a Phone to Call You Up");
         playerWalkoutSongNames.put(blueboy, "Simple and Clean, Hikaru Utada");
+        playerWalkoutSongNames.put(malena, "Strangers, Ethel Cain");
+        playerWalkoutSongNames.put(nathaniel, "Tubthumping, Chumbawamba");
+        playerWalkoutSongNames.put(forrest, "Hips Don't Lie, Shakira");
+        playerWalkoutSongNames.put(danny, "Tornado, Good Kid");
+        playerWalkoutSongNames.put(mari, "So Much Better, Legally Blonde: The Musical");
     }
 
     @Override

@@ -16,7 +16,8 @@ public class Party extends Game {
     private final World world = Bukkit.getWorld("Party");
     protected final Location LOBBY = new Location(world, 0.5, -17.5, -999.5);
     //private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "Dragons", "OneShot"));
-    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "Dragons", "OneShot", "BeepSwitch", "Drain"));
+    //private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "Dragons", "OneShot", "BeepSwitch", "Drain"));
+    private List<String> gameNames = new ArrayList<>(Arrays.asList("DiscoFever", "Dragons", "OneShot", "BeepSwitch"));
     private Map<String, ChatColor> colorGames = new HashMap<>();
     public static final int GAMES_PLAYED = 3;
     private int gameNum;
@@ -76,6 +77,9 @@ public class Party extends Game {
      * Returns associated PartyGame.
      */
     public PartyGame getRandomPartyGame() {
+        if (gameNum == 0) {
+            return PartyGameFactory.getPartyGame("Drain");
+        }
         if (gameNames.size() > 0) {
             int randomNum = (int)(Math.random()*gameNames.size());
             String randomGame = gameNames.get(randomNum);
