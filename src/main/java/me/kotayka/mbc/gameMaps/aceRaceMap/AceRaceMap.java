@@ -1,7 +1,7 @@
 package me.kotayka.mbc.gameMaps.aceRaceMap;
 
 import me.kotayka.mbc.gameMaps.MBCMap;
-import me.kotayka.mbc.games.AceRace;
+import me.kotayka.mbc.games.acerace.AceRace;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

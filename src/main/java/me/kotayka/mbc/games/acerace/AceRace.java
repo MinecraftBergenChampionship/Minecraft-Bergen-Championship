@@ -1,17 +1,12 @@
-package me.kotayka.mbc.games;
+package me.kotayka.mbc.games.acerace;
 
 import me.kotayka.mbc.Game;
 import me.kotayka.mbc.GameState;
 import me.kotayka.mbc.MBC;
-import me.kotayka.mbc.MBCTeam;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
 import me.kotayka.mbc.gameMaps.aceRaceMap.QueakiesGoldMine;
-import me.kotayka.mbc.gameMaps.aceRaceMap.iDrgCity;
-import me.kotayka.mbc.gameMaps.aceRaceMap.semoiB;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -38,8 +33,6 @@ import org.bukkit.util.Vector;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashSet;
-
-import javax.management.relation.RoleList;
 
 public class AceRace extends Game {
     public AceRaceMap map = new QueakiesGoldMine();
@@ -313,6 +306,7 @@ public class AceRace extends Game {
         for (AceRacePlayer p : aceRacePlayerMap.values()) {
             p.reset();
         }
+        stopMinecartSystem();
     }
 
     public void events() {
@@ -440,6 +434,7 @@ public class AceRace extends Game {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, PotionEffect.INFINITE_DURATION, 1, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 1, false, false));
             p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 
             aceRacePlayerMap.put(p.getPlayer().getUniqueId(), new AceRacePlayer(p, this));
@@ -483,23 +478,21 @@ public class AceRace extends Game {
             p.setFireTicks(0);
         }
 
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.MEGA_BOOST_PAD) {
-            player.setCheckpoint();
+        // Attempt to set a checkpoint when a player lands on a special block.
+        Material landingBlock = e.getTo().getBlock().getRelative(BlockFace.DOWN).getType();
+        if (landingBlock == MBC.MEGA_BOOST_PAD || landingBlock == MBC.JUMP_PAD || landingBlock == MBC.BOOST_PAD) {
+            player.setCheckpoint(false);
             return;
         }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.BOOST_PAD) {
-            player.setCheckpoint();
-            return;
-        }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.JUMP_PAD) {
-            player.setCheckpoint();
-            return;
-        }
-        if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == MBC.SPEED_PAD) {
-            return;
-        }
-        if (e.getTo().getBlock().getType().toString().toLowerCase().contains("carpet")) {
-            player.setCheckpoint();
+
+        // Attempt to set a checkpoint whenever a carpet block is reached.
+        // If powerups are enabled, provide a powerup on black carpet.
+        Material block = e.getTo().getBlock().getType();
+        if (block.toString().toLowerCase().contains("carpet")) {
+            // For simplicity, provide a powerup whenever a black carpet checkpoint is reached.
+            // TODO: player.setCheckpoint() should return a boolean indicating whether it was successful, then a powerup should be given here.
+            //       Powerups should also not be distributed on Lap completion.
+            player.setCheckpoint(map.powerups && block == Material.BLACK_CARPET && getState() == GameState.ACTIVE);
         }
     }
 
@@ -593,25 +586,26 @@ public class AceRace extends Game {
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
-
             AceRacePlayer p = getGamePlayer(e.getPlayer());
-            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RED_DYE
-                    || e.getPlayer().getInventory().getItemInMainHand().getType() == Material.YELLOW_DYE
-                    || e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE) {
+            Material playerItem = e.getPlayer().getInventory().getItemInMainHand().getType();
+            if (playerItem == Material.RED_DYE || playerItem == Material.YELLOW_DYE || playerItem == Material.LIME_DYE) {
                 int time = p.cooldownTimer;
                 if (time < timeRemaining) {
                     p.getPlayer().sendMessage(ChatColor.RED + "Please wait a moment before using an item again!");
                     e.setCancelled(true);
                     return;
-                }
-                else {
+                } else {
                     p.cooldownTimer = timeRemaining - 2;
                 }
+                if (playerItem == Material.RED_DYE) firstCheckpoint(e.getPlayer());
+                else if (playerItem == Material.YELLOW_DYE) lastCheckpoint(e.getPlayer());
+                else nextCheckpoint(e.getPlayer());
+            } else {
+                // in all other cases, consider a powerup to be used.
+                // PowerupHandler.usePowerup() will determine appropriate effects if a powerup is used.
+                // if a powerup is not used, no additional effects will occur, and the event will not be cancelled.
+                PowerupHandler.usePowerup(p, playerItem);
             }
-
-            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.RED_DYE) firstCheckpoint(e.getPlayer());
-            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.YELLOW_DYE) lastCheckpoint(e.getPlayer());
-            if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.LIME_DYE) nextCheckpoint(e.getPlayer());
         }
 
         if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
