@@ -133,6 +133,21 @@ public class AceRace extends Game {
     }
 
     private void startMinecartSystem() {
+        int minecartCount = 0;
+
+        if (world == null) return;
+
+        for (Entity entity : world.getEntities()) {
+            if (entity instanceof Minecart) {
+                minecartCount++;
+            }
+        }
+
+        if (minecartCount > 200) {
+            stopMinecartSystem();
+        }
+
+        if (minecartSpawnTask != null) return;
 
         minecartSpawnTask = new BukkitRunnable() {
             @Override
@@ -255,7 +270,10 @@ public class AceRace extends Game {
         }
     }
 
-    private void stopMinecartSystem() {
+    // The access modifier has temporarily been changed to public
+    // so that it is accessible by Plugin.java.
+    // A better system will be planned in the future.
+    public void stopMinecartSystem() {
         if (minecartSpawnTask != null) {
             minecartSpawnTask.cancel();
             minecartSpawnTask = null;
@@ -265,7 +283,6 @@ public class AceRace extends Game {
             minecartTickTask = null;
         }
 
-        // Remove tracked minecarts
         for (Minecart cart : activeMinecarts) {
             if (cart != null && cart.isValid()) cart.remove();
         }
