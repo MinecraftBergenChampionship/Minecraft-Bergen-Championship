@@ -1,7 +1,14 @@
 package me.kotayka.mbc.games.acerace;
 
 import me.kotayka.mbc.MBC;
+import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -9,16 +16,15 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class handles powerup related effects for AceRace.
  * Note: The `public` access modifier exists so outside packages can access this class, which is planned to be changed.
  */
-public final class PowerupHandler {
+public final class PowerupHandler implements Listener {
     // Ace Race Powerups represented as Minecraft Items.
     private static final Material BANANA_PEEL = Material.LIGHT_WEIGHTED_PRESSURE_PLATE;
     private static final Material MEATBALL = Material.SNOWBALL;
@@ -29,8 +35,8 @@ public final class PowerupHandler {
     private static final Material TNT = Material.TNT;
 
     // PotionEffects
-    private static final PotionEffect STUN_SLOW = new PotionEffect(PotionEffectType.SLOWNESS, 10, 10, false);
-    private static final PotionEffect STUN_JUMP = new PotionEffect(PotionEffectType.JUMP_BOOST, 10, 128, false);
+    private static final PotionEffect STUN_SLOW = new PotionEffect(PotionEffectType.SLOWNESS, 10, 10);
+    private static final PotionEffect STUN_JUMP = new PotionEffect(PotionEffectType.JUMP_BOOST, 10, 128);
 
     // Collections of Powerup meta for convenient access.
     private static final Map<Material, AceRacePowerup> POWERUP_MATERIALS = Map.ofEntries(
@@ -43,15 +49,11 @@ public final class PowerupHandler {
         Map.entry(STAR, AceRacePowerup.STAR)
     );
 
-    private static final Map<AceRacePowerup, ItemStack> POWERUP_ITEMS = Map.ofEntries(
-        Map.entry(AceRacePowerup.BANANA_PEEL, new ItemStack(BANANA_PEEL, 2)),
-        Map.entry(AceRacePowerup.SUGAR_HIGH, new ItemStack(SUGAR_HIGH, 1)),
-        Map.entry(AceRacePowerup.MEATBALL, new ItemStack(MEATBALL, 3)),
-        Map.entry(AceRacePowerup.LEAP, new ItemStack(LEAP, 1)),
-        Map.entry(AceRacePowerup.TNT, new ItemStack(TNT, 2)),
-        Map.entry(AceRacePowerup.ROCKET_LAUNCHER, new ItemStack(ROCKET_LAUNCHER, 1)),
-        Map.entry(AceRacePowerup.STAR, new ItemStack(STAR, 1))
-    );
+    private static final Map<AceRacePowerup, ItemStack> POWERUP_ITEMS = initializePowerupMeta();
+    private static final Map<AreaEffectCloud, AceRacePlayer> playerCloudMap = new HashMap<>();
+
+    private static final Set<Player> starPlayers = new HashSet<>();
+    private static int starTask = -1;
 
     /**
      * TODO: access modifier is questionable, all AceRace items should be in the same package.
@@ -80,11 +82,11 @@ public final class PowerupHandler {
             case BANANA_PEEL:
                 int count = playerInventory.getItemInMainHand().getAmount();
                 if (count > 1) {
-                    playerInventory.getItemInMainHand().setAmount(1);
+                    playerInventory.getItemInMainHand().setAmount(count-1);
                 } else {
                     playerInventory.remove(BANANA_PEEL);
                 }
-                useBanana(player.getPlayer());
+                useBanana(player);
                 break;
             case LEAP:
                 player.getPlayer().getInventory().remove(LEAP);
@@ -93,7 +95,7 @@ public final class PowerupHandler {
             case SUGAR_HIGH:
                 int sugar_count = playerInventory.getItemInMainHand().getAmount();
                 if (sugar_count > 1) {
-                    playerInventory.getItemInMainHand().setAmount(1);
+                    playerInventory.getItemInMainHand().setAmount(sugar_count - 1);
                 } else {
                     playerInventory.remove(SUGAR_HIGH);
                 }
@@ -139,6 +141,10 @@ public final class PowerupHandler {
 
                 useRocketLauncher(player.getPlayer());
                 break;
+            case STAR:
+                player.getPlayer().getInventory().remove(STAR);
+                useStar(player);
+                break;
         }
     }
 
@@ -174,12 +180,13 @@ public final class PowerupHandler {
     }
 
 
-    private static void useBanana(Player player) {
-        Location location = player.getLocation().clone();
+    private static void useBanana(AceRacePlayer player) {
+        Location location = player.getPlayer().getLocation().clone();
 
         Bukkit.getScheduler().runTaskLater(MBC.getInstance().getPlugin(), () -> {
             AreaEffectCloud cloud = (AreaEffectCloud) location.getWorld()
                     .spawnEntity(location, EntityType.AREA_EFFECT_CLOUD);
+            playerCloudMap.put(cloud, player);
 
             cloud.setDuration(140);
             cloud.setRadius(2.5f);
@@ -208,6 +215,7 @@ public final class PowerupHandler {
 
 
     private static void useSugarHigh(Player player) {
+        player.playSound(player.getLocation(), "sfx.speed_pad", SoundCategory.BLOCKS, 1, 2);
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 140, 1));
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 140, 4));
         player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 140, 4));
@@ -224,6 +232,22 @@ public final class PowerupHandler {
     }
 
     /**
+     * Handles using star effects for player.
+     *
+     * @see this.starEffects
+     * @param player The player who is activating the effects.
+     */
+    private static void useStar(AceRacePlayer player) {
+        Bukkit.broadcastMessage(player.getParticipant().getFormattedName() + ChatColor.GOLD + ChatColor.BOLD + " activated a Star Powerup!");
+        starPlayers.add(player.getPlayer());
+        player.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
+        player.getPlayer().removePotionEffect(PotionEffectType.SLOWNESS);
+        player.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
+        player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 4));
+        starEffects(player.getPlayer(), 10);
+    }
+
+    /**
      * Effects for stunning a player.
      * Prevents player from jumping and applies a brief slowness effect.
      *
@@ -232,5 +256,140 @@ public final class PowerupHandler {
     public void stunPlayer(Player stunnedPlayer) {
         stunnedPlayer.addPotionEffect(STUN_SLOW);
         stunnedPlayer.addPotionEffect(STUN_JUMP);
+    }
+
+    /**
+     * Handles visual effects and duration for players who use the star powerup.
+     *
+     * @param player player using the star powerup.
+     * @param timeLeft remaining time for star powerup.
+     */
+    private static void starEffects(Player player, int timeLeft) {
+        if (timeLeft == 0) {
+            starPlayers.remove(player);
+            return;
+        }
+
+        for (int i = 0; i < 10; i++) {
+            MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() { @Override
+                public void run() {
+                    player.spawnParticle(
+                            Particle.FIREWORK,
+                            player.getLocation().add(
+                                    -1 + Math.random()*3, 0.75, -1 + Math.random()*3
+                            ), 8);
+                    player.spawnParticle(
+                            Particle.NOTE,
+                            player.getLocation().add(
+                                    -1 + Math.random()*3, Math.random(), -1 + Math.random()*3
+                            ), 8);
+                }
+            }, i);
+        }
+
+
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() { @Override
+            public void run() { starEffects(player, timeLeft - 1); }
+        }, 20L);
+    }
+
+    /**
+     * Handles filtering area cloud effects from the BANANA_PEEL powerup.
+     *
+     * @see AceRace onAreaCloud
+     * @param cloud The AreaEffectCloud entity
+     * @param iterator Iterator over a mutable collection of affected entities.
+     */
+    static void handleAreaCloudEffect(AreaEffectCloud cloud, Iterator<LivingEntity> iterator) {
+        while (iterator.hasNext()) {
+            LivingEntity entity = iterator.next();
+            if (!(entity instanceof Player player)) continue;
+
+            Participant eventPlayer = Participant.getParticipant(player);
+            AceRacePlayer powerupUser = playerCloudMap.get(cloud);
+            if (powerupUser == null) continue;
+
+            //
+            if (eventPlayer == null || player.getGameMode() == GameMode.SPECTATOR ||
+                    eventPlayer.getTeam().getColor().equals(powerupUser.getParticipant().getTeam().getColor()) ||
+                    starPlayers.contains(player)) {
+                iterator.remove();
+            } else {
+                player.sendMessage(powerupUser.getParticipant().getFormattedName() + ChatColor.RED + " slowed you with their " + ChatColor.YELLOW + ChatColor.BOLD + "Banana Peel "
+                    + ChatColor.RESET + ChatColor.RED + "powerup!");
+                powerupUser.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You slowed " + eventPlayer.getFormattedName() + " with your "
+                    + ChatColor.YELLOW + ChatColor.BOLD + "Banana Peel "  + ChatColor.RESET + ChatColor.RED + "powerup!");
+            }
+        }
+    }
+
+    // Initialize ItemStack items for Powerups.
+    private static Map<AceRacePowerup, ItemStack> initializePowerupMeta() {
+        // banana
+        ItemStack banana = new ItemStack(BANANA_PEEL, 1);
+        ItemMeta meta = banana.getItemMeta();
+        Component displayName = Component.text("Banana Peel").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD);
+        meta.displayName(displayName);
+        banana.setItemMeta(meta);
+
+        // sugar
+        ItemStack sugar = new ItemStack(SUGAR_HIGH, 1);
+        meta = sugar.getItemMeta();
+        displayName = Component.text("Sugar Rush").decorate(TextDecoration.BOLD);
+        meta.displayName(displayName);
+        sugar.setItemMeta(meta);
+
+        // meatball
+        ItemStack meatball = new ItemStack(MEATBALL, 3);
+        meta = meatball.getItemMeta();
+        displayName = Component.text("Meatball").color(NamedTextColor.RED).decorate(TextDecoration.BOLD);
+        meta.displayName(displayName);
+        meatball.setItemMeta(meta);
+
+        // leap
+        ItemStack leap = new ItemStack(LEAP, 3);
+        meta = meatball.getItemMeta();
+        displayName = Component.text("Leap").decorate(TextDecoration.BOLD);
+        meta.displayName(displayName);
+        leap.setItemMeta(meta);
+
+        // tnt
+        ItemStack tnt= new ItemStack(TNT, 2);
+        meta = tnt.getItemMeta();
+        displayName = Component.text("TNT").color(NamedTextColor.RED).decorate(TextDecoration.BOLD);
+        meta.displayName(displayName);
+        tnt.setItemMeta(meta);
+
+        // rocket
+        ItemStack rocket = new ItemStack(ROCKET_LAUNCHER, 1);
+        meta = rocket.getItemMeta();
+        displayName = Component.text("Rocket Launcher").color(NamedTextColor.DARK_RED).decorate(TextDecoration.BOLD);
+        meta.displayName(displayName);
+        rocket.setItemMeta(meta);
+
+        // star
+        ItemStack star = new ItemStack(STAR, 1);
+        meta = star.getItemMeta();
+        displayName = Component.text("Super Star").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD);
+        meta.displayName(displayName);
+        star.setItemMeta(meta);
+
+        return Map.ofEntries(
+            Map.entry(AceRacePowerup.BANANA_PEEL, banana),
+            Map.entry(AceRacePowerup.SUGAR_HIGH, sugar),
+            Map.entry(AceRacePowerup.MEATBALL, meatball),
+            Map.entry(AceRacePowerup.LEAP, leap),
+            Map.entry(AceRacePowerup.TNT, tnt),
+            Map.entry(AceRacePowerup.ROCKET_LAUNCHER, rocket),
+            Map.entry(AceRacePowerup.STAR, star)
+        );
+    }
+
+    /**
+     *
+     * @return Unmodifiable view of players that are currently using the Star Powerup.
+     */
+    public static Set<Player> getStarPlayers() {
+        return Collections.unmodifiableSet(starPlayers);
     }
 }
