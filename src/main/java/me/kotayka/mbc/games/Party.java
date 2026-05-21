@@ -217,8 +217,7 @@ public class Party extends Game {
                 return;
         }
 
-        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
-            @Override
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() { @Override
             public void run() { randomGameEffect();}
           }, l);
     }

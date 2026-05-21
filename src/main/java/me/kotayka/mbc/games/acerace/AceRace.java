@@ -18,13 +18,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -161,7 +160,7 @@ public class AceRace extends Game {
                 long now = System.currentTimeMillis();
 
                 Long lastSpawn = spawnLocationCooldowns.get(spawnLoc);
-                if (lastSpawn != null && (now - lastSpawn) < 500) {
+                if (lastSpawn != null && (now - lastSpawn) < 1000) {
                     return;
                 }
 
@@ -178,7 +177,7 @@ public class AceRace extends Game {
             }
         };
 
-        minecartSpawnTask.runTaskTimer(MBC.getInstance().getPlugin(), 0L, 1L);
+        minecartSpawnTask.runTaskTimer(MBC.getInstance().getPlugin(), 0L, 2L);
 
         minecartTickTask = new BukkitRunnable() {
             @Override
@@ -662,16 +661,19 @@ public class AceRace extends Game {
     @EventHandler
     public void onSnowballHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Snowball snowball)) return;
-
         Entity hitEntity = event.getHitEntity();
         if (!(hitEntity instanceof Player victim)) return;
 
-        ProjectileSource shooterSource = snowball.getShooter();
+        Participant victimEventPlayer = Participant.getParticipant(victim);
+        if (victimEventPlayer == null || PowerupHandler.getStarPlayers().contains(victimEventPlayer.getPlayer())) return;
 
-        String attackerName = "Unknown";
-        if (shooterSource instanceof Player attacker) {
-            attackerName = attacker.getName();
+        ProjectileSource shooterSource = snowball.getShooter();
+        if (!(shooterSource instanceof Player attacker)) {
+            return;
         }
+        Participant attackerEventPlayer = Participant.getParticipant(attacker);
+        if (attackerEventPlayer == null || attackerEventPlayer.getTeam().equals(victimEventPlayer.getTeam())) return;
+        String attackerName = attackerEventPlayer.getFormattedName();
 
         victim.addPotionEffect(new PotionEffect(
                 PotionEffectType.BLINDNESS,
@@ -691,7 +693,20 @@ public class AceRace extends Game {
                 true
         ));
 
-        victim.sendMessage("You were hit by" + attackerName + "!");
+        victim.sendMessage(ChatColor.RED + "You were slowed by " + attackerName + ChatColor.RESET + ChatColor.RED + "!");
+    }
+
+    /**
+     * Handle filtering area cloud affected entities.
+     * See the corresponding implementation in the PowerupHandler.java class.
+     *
+     * @see PowerupHandler handleAreaCloudEffect
+     * @param e Standard event for area cloud effect application.
+     */
+    @EventHandler
+    private void onAreaCloud(AreaEffectCloudApplyEvent e) {
+        if (map.powerups)
+            PowerupHandler.handleAreaCloudEffect(e.getEntity(), e.getAffectedEntities().iterator());
     }
 
     @EventHandler
