@@ -57,6 +57,9 @@ public class AceRace extends Game {
     private static final List<Location> TRACK_SPAWN_LOCATIONS = new ArrayList<>();
     private final Map<Location, Long> spawnLocationCooldowns = new HashMap<>();
 
+    private static final ItemStack SPECTATOR_ITEM = new ItemStack(Material.ENDER_EYE);
+    private static final int SPECTATOR_TIME_TICKS = 400; // 20 seconds
+
     public SortedMap<Long, List<String>> fastestLaps = new TreeMap<>();
 
     public static final int FINISH_RACE_POINTS_18 = 12;
@@ -257,7 +260,7 @@ public class AceRace extends Game {
                 Player player = p.getPlayer();
                 if (player.getLocation().distance(loc) <= 1.5) {
                     AceRacePlayer acePlayer = getGamePlayer(player);
-                    if (acePlayer != null) {
+                    if (acePlayer != null && !PowerupHandler.getStarPlayers().contains(acePlayer.getPlayer())) {
                         int checkpoint = acePlayer.checkpoint;
                         player.teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength - 1 : checkpoint - 1));
                         player.removePotionEffect(PotionEffectType.SPEED);
@@ -376,7 +379,10 @@ public class AceRace extends Game {
                 MBC.getInstance().sendMutedMessages();
                 finishedIntro = true;
             } else if (timeRemaining == 60) {
-                Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.RED + "One minute left of practice!");
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "One minute left of practice!");
+                for (AceRacePlayer p : aceRacePlayerMap.values()) {
+                    p.getPlayer().getInventory().remove(SPECTATOR_ITEM.getType());
+                }
             }
         } else if (getState().equals(GameState.END_ROUND)) {
             if (timeRemaining <= 0) {
@@ -475,6 +481,7 @@ public class AceRace extends Game {
             p.getInventory().addItem(redDye);
             p.getInventory().addItem(yellowDye);
             p.getInventory().addItem(limeDye);
+            p.getInventory().setItem(8, SPECTATOR_ITEM);
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
@@ -631,6 +638,7 @@ public class AceRace extends Game {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
+        if (e.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             AceRacePlayer p = getGamePlayer(e.getPlayer());
             Material playerItem = e.getPlayer().getInventory().getItemInMainHand().getType();
@@ -646,6 +654,16 @@ public class AceRace extends Game {
                 if (playerItem == Material.RED_DYE) firstCheckpoint(e.getPlayer());
                 else if (playerItem == Material.YELLOW_DYE) lastCheckpoint(e.getPlayer());
                 else nextCheckpoint(e.getPlayer());
+            } else if (playerItem == SPECTATOR_ITEM.getType()) {
+                Player player = p.getPlayer();
+                Location loc = player.getLocation();
+                player.sendMessage(String.format(ChatColor.GREEN + "You've entered spectator view for %d seconds!", SPECTATOR_TIME_TICKS / 20));
+                player.sendMessage(ChatColor.YELLOW + "This item will disappear with one minute remaining.");
+                player.setGameMode(GameMode.SPECTATOR);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+                    player.setGameMode(GameMode.ADVENTURE);
+                    player.teleport(loc);
+                }, SPECTATOR_TIME_TICKS);
             } else {
                 // in all other cases, consider a powerup to be used.
                 // PowerupHandler.usePowerup() will determine appropriate effects if a powerup is used.
