@@ -9,4 +9,5 @@ public enum AceRacePowerup {
     TNT,
     STAR,
     ROCKET_LAUNCHER,
+    TELEPORTER
 }

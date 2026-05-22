@@ -266,6 +266,19 @@ public class AceRacePlayer extends GamePlayer {
         }
     }
 
+    /**
+     * Utility for Warp powerup.
+     * Returns a boolean indicating whether the checkpoint was set.
+     * @see PowerupHandler useTeleporter()
+     * @param i Checkpoint to set `this` player to.
+     */
+    public void warpCheckpointSetter(int i) {
+        if (!(i >= (ACE_RACE.map.mapLength) || i < 0)) {
+            checkpoint = i;
+            ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
+        }
+    }
+
     public void reset() {
         Arrays.fill(lapTimes, "");
         lap = 1;

@@ -29,11 +29,13 @@ public final class PowerupHandler implements Listener {
     // Ace Race Powerups represented as Minecraft Items.
     private static final Material BANANA_PEEL = Material.LIGHT_WEIGHTED_PRESSURE_PLATE;
     private static final Material MEATBALL = Material.SNOWBALL;
+    private static final Material RED_SHELL = Material.RED_CONCRETE_POWDER;
     private static final Material SUGAR_HIGH = Material.SUGAR;
     private static final Material LEAP = Material.FEATHER;
     private static final Material STAR = Material.NETHER_STAR;
     private static final Material ROCKET_LAUNCHER = Material.WOODEN_SHOVEL;
     private static final Material TNT = Material.TNT;
+    private static final Material TELEPORTER = Material.ENDER_PEARL;
 
     // Appropriate Set of Powerups
     private static final List<AceRacePowerup> TOP_SIXTH = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
@@ -48,9 +50,15 @@ public final class PowerupHandler implements Listener {
             AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.TELEPORTER
     );
 
+    // Powerup Customization
+    private static final int POWERUP_SPIN_DURATION_TICKS = 60; // 3 seconds
+    private static final int STAR_DURATION_SECONDS = 10;
+    private static final int STUN_DURATION_TICKS = 60; // 3 seconds
+    private static final int TELEPORTER_DELAY_TICKS = 50; // 2.5 seconds
+
     // PotionEffects
-    private static final PotionEffect STUN_SLOW = new PotionEffect(PotionEffectType.SLOWNESS, 10, 10);
-    private static final PotionEffect STUN_JUMP = new PotionEffect(PotionEffectType.JUMP_BOOST, 10, 128);
+    private static final PotionEffect STUN_SLOW = new PotionEffect(PotionEffectType.SLOWNESS, STUN_DURATION_TICKS, 10);
+    private static final PotionEffect STUN_BLIND = new PotionEffect(PotionEffectType.BLINDNESS, STUN_DURATION_TICKS + 15, 1);
 
     // Collections of Powerup meta for convenient access.
     private static final Map<Material, AceRacePowerup> POWERUP_MATERIALS = Map.ofEntries(
@@ -60,6 +68,7 @@ public final class PowerupHandler implements Listener {
         Map.entry(LEAP, AceRacePowerup.LEAP),
         Map.entry(ROCKET_LAUNCHER, AceRacePowerup.ROCKET_LAUNCHER),
         Map.entry(TNT, AceRacePowerup.TNT),
+        Map.entry(TELEPORTER, AceRacePowerup.TELEPORTER),
         Map.entry(STAR, AceRacePowerup.STAR)
     );
 
@@ -84,7 +93,7 @@ public final class PowerupHandler implements Listener {
         if (playersWithPowerup.contains(player)) return;
 
         for (Material powerupMaterial : POWERUP_MATERIALS.keySet()) {
-            player.setCooldown(powerupMaterial, AceRace.POWERUP_SPIN_LENGTH_TICKS + 2);
+            player.setCooldown(powerupMaterial, POWERUP_SPIN_DURATION_TICKS + 2);
         }
 
         // TODO: Determine which powerup list to pull from based on placement
@@ -117,9 +126,9 @@ public final class PowerupHandler implements Listener {
         PlayerInventory playerInventory = player.getPlayer().getInventory();
         switch (powerup) {
             case BANANA_PEEL:
-                int count = playerInventory.getItemInMainHand().getAmount();
-                if (count > 1) {
-                    playerInventory.getItemInMainHand().setAmount(count-1);
+                int banana_count = playerInventory.getItemInMainHand().getAmount();
+                if (banana_count > 1) {
+                    playerInventory.getItemInMainHand().setAmount(banana_count-1);
                 } else {
                     playerInventory.remove(BANANA_PEEL);
                     playersWithPowerup.remove(player.getPlayer());
@@ -127,7 +136,13 @@ public final class PowerupHandler implements Listener {
                 useBanana(player);
                 break;
             case LEAP:
-                player.getPlayer().getInventory().remove(LEAP);
+                int leap_count = playerInventory.getItemInMainHand().getAmount();
+                if (leap_count > 1) {
+                    playerInventory.getItemInMainHand().setAmount(leap_count-1);
+                } else {
+                    playerInventory.remove(LEAP);
+                    playersWithPowerup.remove(player.getPlayer());
+                }
                 useLeap(player.getPlayer());
                 break;
             case SUGAR_HIGH:
@@ -182,6 +197,11 @@ public final class PowerupHandler implements Listener {
                 }
 
                 useRocketLauncher(player.getPlayer());
+                break;
+            case TELEPORTER:
+                player.getPlayer().getInventory().remove(TELEPORTER);
+                useTeleporter(player);
+                playersWithPowerup.remove(player.getPlayer());
                 break;
             case STAR:
                 player.getPlayer().getInventory().remove(STAR);
@@ -271,6 +291,37 @@ public final class PowerupHandler implements Listener {
     }
 
     /**
+     * Handles effects for teleporter powerup.
+     * @implNote Uses stunPlayer() to temporarily reduce player's movement.
+     * @see PowerupHandler stunPlayer
+     * @implNote Checkpoint behavior is currently handled in AceRacePlayer warpCheckpointSetter
+     * @see AceRacePlayer warpCheckpointSetter
+     * @param player Player using the teleporter powerup.
+     */
+    private static void useTeleporter(AceRacePlayer player) {
+        Player p = player.getPlayer();
+        int checkpoint = player.checkpoint;
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+            player.warpCheckpointSetter(checkpoint+1);
+            p.teleport(AceRaceMap.respawns.get((checkpoint%AceRaceMap.respawns.size())));
+            p.removePotionEffect(PotionEffectType.SPEED);
+            p.setFireTicks(0);
+            p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+        }, TELEPORTER_DELAY_TICKS);
+        stunPlayer(p);
+
+        for (int i = 0; i < STUN_DURATION_TICKS; i+=4) {
+            MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+                p.spawnParticle(
+                        Particle.PORTAL,
+                        p.getLocation().add(
+                                -1 + Math.random()*3, 0.75, -1 + Math.random()*3
+                    ), 8);
+            }, i);
+        }
+    }
+
+    /**
      * Handles using star effects for player.
      *
      * @see this.starEffects
@@ -278,12 +329,12 @@ public final class PowerupHandler implements Listener {
      */
     private static void useStar(AceRacePlayer player) {
         Bukkit.broadcastMessage(player.getParticipant().getFormattedName() + ChatColor.GOLD + ChatColor.BOLD + " activated a Star Powerup!");
-        starPlayers.add(player.getPlayer());
-        player.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
-        player.getPlayer().removePotionEffect(PotionEffectType.SLOWNESS);
-        player.getPlayer().removePotionEffect(PotionEffectType.JUMP_BOOST);
-        player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 4));
-        starEffects(player.getPlayer(), 10);
+        Player p = player.getPlayer();
+        starPlayers.add(p);
+        p.removePotionEffect(PotionEffectType.BLINDNESS);
+        p.removePotionEffect(PotionEffectType.SLOWNESS);
+        p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, STAR_DURATION_SECONDS * 20, 5));
+        starEffects(p, STAR_DURATION_SECONDS);
     }
 
     /**
@@ -292,9 +343,9 @@ public final class PowerupHandler implements Listener {
      *
      * @param stunnedPlayer Player being stunned
      */
-    public void stunPlayer(Player stunnedPlayer) {
+    private static void stunPlayer(Player stunnedPlayer) {
         stunnedPlayer.addPotionEffect(STUN_SLOW);
-        stunnedPlayer.addPotionEffect(STUN_JUMP);
+        stunnedPlayer.addPotionEffect(STUN_BLIND);
     }
 
     /**
@@ -309,7 +360,7 @@ public final class PowerupHandler implements Listener {
             return;
         }
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < STAR_DURATION_SECONDS; i++) {
             MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() { @Override
                 public void run() {
                     player.spawnParticle(
@@ -373,15 +424,13 @@ public final class PowerupHandler implements Listener {
         Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
             player.getInventory().setItem(slot, POWERUP_ITEMS.get(powerups.get((int)(Math.random() * powerups.size()))));
             player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
-        }, AceRace.POWERUP_SPIN_LENGTH_TICKS + 2L);
-        for (int i = 0; i < AceRace.POWERUP_SPIN_LENGTH_TICKS; i++) {
-            int itemSlot = i;
-            if (i % 2 == 0) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
-                    player.getInventory().setItem(slot, POWERUP_ITEMS.get(powerups.get(itemSlot%powerups.size())));
-                    player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                }, i);
-            }
+        }, POWERUP_SPIN_DURATION_TICKS + 2L);
+        for (int i = 0; i < POWERUP_SPIN_DURATION_TICKS; i+=4) {
+            int itemSlot = i/4;
+            Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+                player.getInventory().setItem(slot, POWERUP_ITEMS.get(powerups.get(itemSlot%powerups.size())));
+                player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            }, i);
         }
    }
 
@@ -436,6 +485,13 @@ public final class PowerupHandler implements Listener {
         meta.displayName(displayName);
         star.setItemMeta(meta);
 
+        // teleporter
+        ItemStack teleporter = new ItemStack(TELEPORTER, 1);
+        meta = teleporter.getItemMeta();
+        displayName = Component.text("Warp").color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD);
+        meta.displayName(displayName);
+        teleporter.setItemMeta(meta);
+
         return Map.ofEntries(
             Map.entry(AceRacePowerup.BANANA_PEEL, banana),
             Map.entry(AceRacePowerup.SUGAR_HIGH, sugar),
@@ -443,6 +499,7 @@ public final class PowerupHandler implements Listener {
             Map.entry(AceRacePowerup.LEAP, leap),
             Map.entry(AceRacePowerup.TNT, tnt),
             Map.entry(AceRacePowerup.ROCKET_LAUNCHER, rocket),
+            Map.entry(AceRacePowerup.TELEPORTER, teleporter),
             Map.entry(AceRacePowerup.STAR, star)
         );
     }
