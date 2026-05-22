@@ -72,6 +72,9 @@ public abstract class SkybattleMap extends MBCMap {
         for (Entity boat : getWorld().getEntitiesByClass(Boat.class)) {
             boat.remove();
         }
+        for (Entity potion : getWorld().getEntitiesByClass(ThrownPotion.class)) {
+            potion.remove();
+        }
     }
 
     /**

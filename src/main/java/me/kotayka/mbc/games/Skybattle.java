@@ -5,10 +5,7 @@ import me.kotayka.mbc.gameMaps.skybattleMap.Campfire;
 import me.kotayka.mbc.gameMaps.skybattleMap.Endlantis;
 import me.kotayka.mbc.gameMaps.skybattleMap.Icelantis;
 import me.kotayka.mbc.gameMaps.skybattleMap.SkybattleMap;
-import me.kotayka.mbc.gamePlayers.LockdownPlayer;
-import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
 import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
-import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
