@@ -2,6 +2,7 @@ package me.kotayka.mbc.games.acerace;
 
 import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
+import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -34,6 +35,19 @@ public final class PowerupHandler implements Listener {
     private static final Material ROCKET_LAUNCHER = Material.WOODEN_SHOVEL;
     private static final Material TNT = Material.TNT;
 
+    // Appropriate Set of Powerups
+    private static final List<AceRacePowerup> TOP_SIXTH = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
+    private static final List<AceRacePowerup> TOP_THIRD = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
+    private static final List<AceRacePowerup> TOP_HALF = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
+    private static final List<AceRacePowerup> BOTTOM_THIRD = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
+    private static final List<AceRacePowerup> BOTTOM_SIXTH = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
+    // This list is reserved for the very first checkpoint on the very first lap.
+    private static final List<AceRacePowerup> FIRST_CHECKPOINT_POWERUPS = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
+    private static final List<AceRacePowerup> PRACTICE_POWERUPS = Arrays.asList(
+            AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.STAR, AceRacePowerup.TNT,
+            AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.TELEPORTER
+    );
+
     // PotionEffects
     private static final PotionEffect STUN_SLOW = new PotionEffect(PotionEffectType.SLOWNESS, 10, 10);
     private static final PotionEffect STUN_JUMP = new PotionEffect(PotionEffectType.JUMP_BOOST, 10, 128);
@@ -53,16 +67,39 @@ public final class PowerupHandler implements Listener {
     private static final Map<AreaEffectCloud, AceRacePlayer> playerCloudMap = new HashMap<>();
 
     private static final Set<Player> starPlayers = new HashSet<>();
-    private static int starTask = -1;
+    private static final Set<Player> playersWithPowerup = new HashSet<>();
+
+    private static final Map<Entity, Participant> tntMap = new HashMap<>();
 
     /**
-     * TODO: access modifier is questionable, all AceRace items should be in the same package.
+     * TODO: Access modifier may be `protected` if all Ace Race modules were in the same package.
      *
      * Handles providing a player with a powerup, depending on their position at function call.
-     * @param player player to receive a powerup
+     * @param aceRacePlayer player to receive a powerup
      */
-    public static void givePowerup(AceRacePlayer player) {
-        player.getPlayer().getInventory().addItem(POWERUP_ITEMS.get(AceRacePowerup.LEAP));
+    public static void givePowerup(AceRacePlayer aceRacePlayer) {
+        Player player = aceRacePlayer.getPlayer();
+
+        // Do not give powerup if player has not fully used theirs
+        if (playersWithPowerup.contains(player)) return;
+
+        for (Material powerupMaterial : POWERUP_MATERIALS.keySet()) {
+            player.setCooldown(powerupMaterial, AceRace.POWERUP_SPIN_LENGTH_TICKS + 2);
+        }
+
+        // TODO: Determine which powerup list to pull from based on placement
+
+        int slot = 0;
+        for (; slot < 10; slot++) {
+            if (player.getInventory().getItem(slot) == null)
+                break;
+        }
+
+        // If hotbar is filled, just do not give a powerup
+        if (slot >= 10) return;
+
+        playersWithPowerup.add(player);
+        giveRandomPowerup(PRACTICE_POWERUPS, player, slot);
     }
 
     /**
@@ -85,6 +122,7 @@ public final class PowerupHandler implements Listener {
                     playerInventory.getItemInMainHand().setAmount(count-1);
                 } else {
                     playerInventory.remove(BANANA_PEEL);
+                    playersWithPowerup.remove(player.getPlayer());
                 }
                 useBanana(player);
                 break;
@@ -98,6 +136,7 @@ public final class PowerupHandler implements Listener {
                     playerInventory.getItemInMainHand().setAmount(sugar_count - 1);
                 } else {
                     playerInventory.remove(SUGAR_HIGH);
+                    playersWithPowerup.remove(player.getPlayer());
                 }
                 useSugarHigh(player.getPlayer());
                 break;
@@ -107,6 +146,7 @@ public final class PowerupHandler implements Listener {
                     playerInventory.getItemInMainHand().setAmount(meatball_count - 1);
                 } else {
                     playerInventory.remove(MEATBALL);
+                    playersWithPowerup.remove(player.getPlayer());
                 }
                 break;
             case TNT:
@@ -115,8 +155,9 @@ public final class PowerupHandler implements Listener {
                     playerInventory.getItemInMainHand().setAmount(tnt_count - 1);
                 } else {
                     playerInventory.remove(TNT);
+                    playersWithPowerup.remove(player.getPlayer());
                 }
-                throwTNT(player.getPlayer());
+                throwTNT(player.getParticipant());
                 break;
             case ROCKET_LAUNCHER:
                 if (!lookingAtBlock) return;
@@ -132,6 +173,7 @@ public final class PowerupHandler implements Listener {
 
                     if (newDamage >= max) {
                         playerInventory.setItemInMainHand(null);
+                        playersWithPowerup.remove(player.getPlayer());
                     } else {
                         damageable.setDamage(newDamage);
                         item.setItemMeta((ItemMeta) damageable);
@@ -144,14 +186,9 @@ public final class PowerupHandler implements Listener {
             case STAR:
                 player.getPlayer().getInventory().remove(STAR);
                 useStar(player);
+                playersWithPowerup.remove(player.getPlayer());
                 break;
         }
-    }
-
-    // Handles calling the appropriate effects depending on how a powerup interacted with a player.
-    // For specific implementation, please see the corresponding interaction method.
-    static void powerupInteract() {
-
     }
 
     private static void useRocketLauncher(Player player) {
@@ -165,12 +202,14 @@ public final class PowerupHandler implements Listener {
         player.setVelocity(velocity);
     }
 
-    private static void throwTNT(Player player) {
+    private static void throwTNT(Participant eventPlayer) {
+        Player player = eventPlayer.getPlayer();
         Location loc = player.getEyeLocation().add(
                 player.getLocation().getDirection().multiply(1.2)
         );
 
         TNTPrimed tnt = player.getWorld().spawn(loc, TNTPrimed.class);
+        tntMap.put(tnt, eventPlayer);
 
         tnt.setFuseTicks(80);
         tnt.setYield(0f);
@@ -323,6 +362,29 @@ public final class PowerupHandler implements Listener {
         }
     }
 
+    /**
+     * Handles visual effects and providing a powerup to a given player.
+     *
+     * @param powerups List of items that represent the available powerups a player may receive.
+     * @param player Player who is receiving the powerup.
+     * @param slot The inventory slot, provided as an integer, in which to provide the Powerup.
+     */
+    private static void giveRandomPowerup(List<AceRacePowerup> powerups, Player player, int slot) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+            player.getInventory().setItem(slot, POWERUP_ITEMS.get(powerups.get((int)(Math.random() * powerups.size()))));
+            player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
+        }, AceRace.POWERUP_SPIN_LENGTH_TICKS + 2L);
+        for (int i = 0; i < AceRace.POWERUP_SPIN_LENGTH_TICKS; i++) {
+            int itemSlot = i;
+            if (i % 2 == 0) {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+                    player.getInventory().setItem(slot, POWERUP_ITEMS.get(powerups.get(itemSlot%powerups.size())));
+                    player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                }, i);
+            }
+        }
+   }
+
     // Initialize ItemStack items for Powerups.
     private static Map<AceRacePowerup, ItemStack> initializePowerupMeta() {
         // banana
@@ -391,5 +453,13 @@ public final class PowerupHandler implements Listener {
      */
     public static Set<Player> getStarPlayers() {
         return Collections.unmodifiableSet(starPlayers);
+    }
+
+    /**
+     *
+     * @return Unmodifiable view of map over TNT entities and the player that threw them.
+     */
+    public static Map<Entity, Participant> getTNTMap() {
+        return Collections.unmodifiableMap(tntMap);
     }
 }
