@@ -39,6 +39,7 @@ public final class PowerupHandler {
     private static final Material ROCKET_LAUNCHER = Material.WOODEN_SHOVEL;
     private static final Material TNT = Material.TNT;
     private static final Material TELEPORTER = Material.ENDER_PEARL;
+    private static final Material FIREBALL = Material.FIRE_CHARGE;
 
     // Appropriate Set of Powerups
     private static final List<AceRacePowerup> TOP_SIXTH = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
@@ -80,6 +81,7 @@ public final class PowerupHandler {
         Map.entry(ROCKET_LAUNCHER, AceRacePowerup.ROCKET_LAUNCHER),
         Map.entry(TNT, AceRacePowerup.TNT),
         Map.entry(TELEPORTER, AceRacePowerup.TELEPORTER),
+        Map.entry(FIREBALL, AceRacePowerup.FIREBALL),
         Map.entry(STAR, AceRacePowerup.STAR)
     );
 
@@ -212,7 +214,10 @@ public final class PowerupHandler {
                 throwTNT(player.getParticipant());
                 break;
             case ROCKET_LAUNCHER:
-                if (!lookingAtBlock) return;
+                if (!lookingAtBlock) {
+                    player.getPlayer().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Look down and behind to propel forward!");
+                    return;
+                }
 
                 ItemStack item = playerInventory.getItemInMainHand();
                 ItemMeta meta = item.getItemMeta();
@@ -243,6 +248,11 @@ public final class PowerupHandler {
             case STAR:
                 player.getPlayer().getInventory().remove(STAR);
                 useStar(player);
+                playersWithPowerup.remove(player.getPlayer());
+                break;
+            case FIREBALL:
+                player.getPlayer().getInventory().remove(FIREBALL);
+                useFireball(player.getPlayer());
                 playersWithPowerup.remove(player.getPlayer());
                 break;
         }
@@ -375,6 +385,18 @@ public final class PowerupHandler {
     }
 
     /**
+     * Handles initial effects of using the fireball powerup
+     * @param player The player using the fireball powerup
+     */
+    private static void useFireball(Player player) {
+        Fireball f = player.getWorld().spawn(player.getEyeLocation(), Fireball.class);
+        player.getWorld().playSound(player.getLocation(), Sound.ITEM_FIRECHARGE_USE, 1.0f, 1.0f);
+        f.setShooter(player.getPlayer());
+        f.setIsIncendiary(false);
+        f.setYield(0);
+    }
+
+    /**
      * Effects for stunning a player.
      * Prevents player from jumping and applies a brief slowness effect.
      *
@@ -465,6 +487,10 @@ public final class PowerupHandler {
         }
     }
 
+    static void handleFireballExplosion(List<Player> affected, Entity fireball) {
+
+    }
+
     /**
      * Handles visual effects and providing a powerup to a given player.
      *
@@ -543,6 +569,13 @@ public final class PowerupHandler {
         displayName = Component.text("Warp").color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD);
         meta.displayName(displayName);
         teleporter.setItemMeta(meta);
+
+        // fireball
+        ItemStack fireball = new ItemStack(FIREBALL, 1);
+        meta = fireball.getItemMeta();
+        displayName = Component.text("Fireball").color(NamedTextColor.RED).decorate(TextDecoration.BOLD);
+        meta.displayName(displayName);
+        fireball.setItemMeta(meta);
 
         return Map.ofEntries(
             Map.entry(AceRacePowerup.BANANA_PEEL, banana),

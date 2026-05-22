@@ -12,11 +12,9 @@ import net.royawesome.jlibnoise.module.combiner.Power;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.TNT;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
@@ -340,25 +338,48 @@ public class AceRace extends Game {
     }
 
     @EventHandler
-    public void onTntExplode(EntityExplodeEvent event) {
+    public void onEntityExplode(EntityExplodeEvent event) {
+        Entity explodingEntity = event.getEntity();
+        boolean isFireball = explodingEntity instanceof Fireball;
+        boolean isTNT = explodingEntity instanceof TNT || explodingEntity instanceof TNTPrimed;
+
+        if (!isFireball && !isTNT) return;
         Location center = event.getLocation();
-        double radius = 5.0;
+        double radius = isTNT ? 5.0 : 3.0;
 
         List<Player> players = center.getWorld().getPlayers();
-        Entity tnt = event.getEntity();
 
-        Participant powerupUser = PowerupHandler.getTNTMap().get(tnt);
-        if (powerupUser == null) return;
-        for (Player p : players) {
-            if (p.getLocation().distance(center) <= radius) {
-                AceRacePlayer acePlayer = getGamePlayer(p);
-                if (acePlayer != null && !PowerupHandler.getStarPlayers().contains(p) && !(powerupUser.getTeam().equals(acePlayer.getParticipant().getTeam()))) {
-                    int checkpoint = acePlayer.checkpoint;
-                    p.teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength - 1 : checkpoint - 1));
-                    p.removePotionEffect(PotionEffectType.SPEED);
-                    p.setFireTicks(0);
+        if (isTNT) {
+            Entity tnt = event.getEntity();
+            Participant powerupUser = PowerupHandler.getTNTMap().get(tnt);
+            if (powerupUser == null) return;
+            for (Player p : players) {
+                if (p.getLocation().distance(center) <= radius) {
+                    AceRacePlayer acePlayer = getGamePlayer(p);
+                    if (acePlayer != null && !PowerupHandler.getStarPlayers().contains(p) && !(powerupUser.getTeam().equals(acePlayer.getParticipant().getTeam()))) {
+                        int checkpoint = acePlayer.checkpoint;
+                        p.teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength - 1 : checkpoint - 1));
+                        p.removePotionEffect(PotionEffectType.SPEED);
+                        p.setFireTicks(0);
 
-                    p.sendMessage(ChatColor.RED + "You were blown up by " + powerupUser.getFormattedName() + ChatColor.RESET + ChatColor.RED + "!");
+                        p.sendMessage(ChatColor.RED + "You were blown up by " + powerupUser.getFormattedName() + ChatColor.RESET + ChatColor.RED + "!");
+                    }
+                }
+            }
+        } else {
+            Fireball fireball = (Fireball) event.getEntity();
+            Participant powerupUser = Participant.getParticipant((Player) fireball.getShooter());
+            if (powerupUser == null) return;
+            for (Player p : players) {
+                if (p.getLocation().distance(center) <= radius) {
+                    AceRacePlayer acePlayer = getGamePlayer(p);
+                    if (acePlayer != null && !PowerupHandler.getStarPlayers().contains(p) && !(powerupUser.getTeam().equals(acePlayer.getParticipant().getTeam()))) {
+                        PowerupHandler.stunPlayer(p);
+                        p.removePotionEffect(PotionEffectType.SPEED);
+                        p.setFireTicks(0);
+
+                        p.sendMessage(ChatColor.RED + "You were blown up by " + powerupUser.getFormattedName() + ChatColor.RESET + ChatColor.RED + "!");
+                    }
                 }
             }
         }
