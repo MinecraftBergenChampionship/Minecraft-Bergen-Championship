@@ -18,7 +18,7 @@ import java.util.List;
  */
 public abstract class AceRaceMap extends MBCMap {
     public World world = AceRace.world;
-    public List<Location> respawns;
+    public static List<Location> respawns;
     public List<Location> checkpoints;
     public int mapLength;
     public boolean powerups;
@@ -34,7 +34,7 @@ public abstract class AceRaceMap extends MBCMap {
     }
 
     public void loadCheckpoints(Location[] respawns, Location[] checkpoints) {
-        this.respawns = new ArrayList<>(Arrays.asList(respawns));
+        AceRaceMap.respawns = new ArrayList<>(Arrays.asList(respawns));
         this.checkpoints = new ArrayList<>(Arrays.asList(checkpoints));
 
         mapLength = checkpoints.length;

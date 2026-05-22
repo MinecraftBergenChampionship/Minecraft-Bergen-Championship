@@ -46,7 +46,6 @@ public class AceRace extends Game {
     public AceRacePlayer[][] lapThree;
     public ArrayList<AceRacePlayer> currentPlacements = new ArrayList<>();
     public long startingTime;
-    public static final int POWERUP_SPIN_LENGTH_TICKS = 60; // 3 seconds
 
     private final List<Minecart> activeMinecarts = new ArrayList<>();
     private final Map<UUID, Long> minecartSpawnTimes = new HashMap<>();
