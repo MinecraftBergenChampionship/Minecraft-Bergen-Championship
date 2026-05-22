@@ -9,9 +9,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
@@ -353,6 +351,15 @@ public class Lobby extends Minigame {
     }
 
     public void toVoting() {
+        // Prevent pearl hanging
+        if (world != null) {
+            for (Entity entity : world.getEntities()) {
+                if (entity instanceof EnderPearl) {
+                    entity.remove();
+                }
+            }
+        }
+
         HandlerList.unregisterAll(this);
         miniBeepEnd("Mini Beep has ended due to voting!");
         endPvp();
