@@ -42,16 +42,24 @@ public final class PowerupHandler {
 
     // Appropriate Set of Powerups
     private static final List<AceRacePowerup> TOP_SIXTH = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
-    private static final List<AceRacePowerup> TOP_THIRD = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
-    private static final List<AceRacePowerup> TOP_HALF = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
-    private static final List<AceRacePowerup> BOTTOM_THIRD = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
-    private static final List<AceRacePowerup> BOTTOM_SIXTH = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
+    private static final List<AceRacePowerup> TOP_THIRD = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.MEATBALL);
+    private static final List<AceRacePowerup> TOP_HALF = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.LEAP);
+    private static final List<AceRacePowerup> BOTTOM_THIRD = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.STAR, AceRacePowerup.MEATBALL, AceRacePowerup.ROCKET_LAUNCHER, AceRacePowerup.SUGAR_HIGH);
+    private static final List<AceRacePowerup> BOTTOM_SIXTH = Arrays.asList(AceRacePowerup.TELEPORTER, AceRacePowerup.STAR, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.ROCKET_LAUNCHER);
+
     // This list is reserved for the very first checkpoint on the very first lap.
     private static final List<AceRacePowerup> FIRST_CHECKPOINT_POWERUPS = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
     private static final List<AceRacePowerup> PRACTICE_POWERUPS = Arrays.asList(
             AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.STAR, AceRacePowerup.TNT,
-            AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.TELEPORTER
+            AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.TELEPORTER, AceRacePowerup.ROCKET_LAUNCHER
     );
+
+    // Cutoffs for each powerup level
+    private static final double CUTOFF_TOP_SIXTH = (1.0)/6;
+    private static final double CUTOFF_TOP_THIRD = (1.0)/3;
+    private static final double CUTOFF_TOP_HALF =  (1.0)/2;
+    private static final double CUTOFF_BOTTOM_THIRD =  (2.0)/3;
+    private static final double CUTOFF_BOTTOM_SIXTH =  (5.0)/6;
 
     // Powerup Customization
     private static final int POWERUP_SPIN_DURATION_TICKS = 60; // 3 seconds
@@ -100,8 +108,6 @@ public final class PowerupHandler {
             player.setCooldown(powerupMaterial, POWERUP_SPIN_DURATION_TICKS + 2);
         }
 
-        // TODO: Determine which powerup list to pull from based on placement
-
         int slot = 0;
         for (; slot < 10; slot++) {
             if (player.getInventory().getItem(slot) == null)
@@ -111,8 +117,30 @@ public final class PowerupHandler {
         // If hotbar is filled, just do not give a powerup
         if (slot >= 10) return;
 
+        List<AceRacePowerup> powerups;
+        if (aceRacePlayer.onFirstCheckpoint()) {
+            powerups = FIRST_CHECKPOINT_POWERUPS;
+        } else {
+            int place = aceRacePlayer.getCurrentPlacement();
+            int players = MBC.getInstance().getPlayers().size();
+            double percentile = (1.0 * place) / players;
+            if (percentile <= CUTOFF_TOP_SIXTH) {
+                powerups = TOP_SIXTH;
+            } else if (percentile <= CUTOFF_TOP_THIRD) {
+                powerups = TOP_THIRD;
+            } else if (percentile <= CUTOFF_TOP_HALF) {
+                powerups = TOP_HALF;
+            } else if (percentile <= CUTOFF_BOTTOM_THIRD) {
+                powerups = BOTTOM_THIRD;
+            } else if (percentile <= CUTOFF_BOTTOM_SIXTH) {
+                powerups = BOTTOM_SIXTH;
+            } else {
+                powerups = BOTTOM_SIXTH;
+            }
+        }
+
         playersWithPowerup.add(player);
-        giveRandomPowerup(PRACTICE_POWERUPS, player, slot);
+        giveRandomPowerup(powerups, player, slot);
     }
 
     /**

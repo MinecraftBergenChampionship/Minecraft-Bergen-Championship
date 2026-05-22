@@ -254,6 +254,11 @@ public class AceRacePlayer extends GamePlayer {
             }
             checkpoint++;
             ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
+            if (ACE_RACE.getState().equals(GameState.ACTIVE)) {
+                currentPlace = ACE_RACE.checkpointPlacement(this, lap, checkpoint);
+                String currentPlacementString = AceRace.getPlace(currentPlace);
+                this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You are currently in " + currentPlacementString + " place.");
+            }
         }
     }
 
@@ -281,6 +286,26 @@ public class AceRacePlayer extends GamePlayer {
             checkpoint = i;
             ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
         }
+    }
+
+    /**
+     * Determine whether the player is on their first checkpoint.
+     *
+     * @see PowerupHandler givePowerup()
+     * @return Whether the player is on their very first checkpoint.
+     */
+    public boolean onFirstCheckpoint() {
+       return (lap == 1 && checkpoint == 0);
+    }
+
+    /**
+     *
+     *
+     * @see PowerupHandler givePowerup()
+     * @return Integer representing the current placement of `this` player during the race.
+     */
+    public int getCurrentPlacement() {
+        return ACE_RACE.checkpointPlacement(this, lap, checkpoint);
     }
 
     public void reset() {
