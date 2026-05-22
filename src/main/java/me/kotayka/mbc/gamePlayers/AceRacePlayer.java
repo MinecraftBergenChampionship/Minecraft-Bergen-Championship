@@ -247,9 +247,18 @@ public class AceRacePlayer extends GamePlayer {
             }
         } else {
             // Handle case where a player has skipped a non-final checkpoint.
-
-
-
+            if (checkpoint != 0) {
+                this.getParticipant().getPlayer().sendTitle(" ", ChatColor.YELLOW + "Checkpoint " + (checkpoint+1) + "/" + ACE_RACE.map.mapLength, 0, 40, 20);
+                if (givePowerup)
+                    PowerupHandler.givePowerup(this);
+                checkpoint++;
+                ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
+            }
+            if (ACE_RACE.getState().equals(GameState.ACTIVE) && !(lap == 1 && checkpoint == 0)) {
+                currentPlace = ACE_RACE.checkpointPlacement(this, lap, checkpoint);
+                String currentPlacementString = AceRace.getPlace(currentPlace);
+                this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You are currently in " + currentPlacementString + " place.");
+            }
         }
     }
 
