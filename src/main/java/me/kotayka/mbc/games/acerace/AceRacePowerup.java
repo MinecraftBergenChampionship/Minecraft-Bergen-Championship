@@ -8,5 +8,5 @@ public enum AceRacePowerup {
     LEAP,
     TNT,
     STAR,
-    ROCKET_LAUNCHER
+    ROCKET_LAUNCHER,
 }

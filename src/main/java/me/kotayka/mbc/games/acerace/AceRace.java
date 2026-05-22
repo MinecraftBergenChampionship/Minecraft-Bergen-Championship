@@ -20,7 +20,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
@@ -47,6 +46,7 @@ public class AceRace extends Game {
     public AceRacePlayer[][] lapThree;
     public ArrayList<AceRacePlayer> currentPlacements = new ArrayList<>();
     public long startingTime;
+    public static final int POWERUP_SPIN_LENGTH_TICKS = 60; // 3 seconds
 
     private final List<Minecart> activeMinecarts = new ArrayList<>();
     private final Map<UUID, Long> minecartSpawnTimes = new HashMap<>();
@@ -335,15 +335,20 @@ public class AceRace extends Game {
         double radius = 5.0;
 
         List<Player> players = center.getWorld().getPlayers();
+        Entity tnt = event.getEntity();
 
+        Participant powerupUser = PowerupHandler.getTNTMap().get(tnt);
+        if (powerupUser == null) return;
         for (Player p : players) {
             if (p.getLocation().distance(center) <= radius) {
                 AceRacePlayer acePlayer = getGamePlayer(p);
-                if (acePlayer != null) {
+                if (acePlayer != null && !PowerupHandler.getStarPlayers().contains(p) && !(powerupUser.getTeam().equals(acePlayer.getParticipant().getTeam()))) {
                     int checkpoint = acePlayer.checkpoint;
                     p.teleport(map.getRespawns().get((checkpoint == 0) ? map.mapLength - 1 : checkpoint - 1));
                     p.removePotionEffect(PotionEffectType.SPEED);
                     p.setFireTicks(0);
+
+                    p.sendMessage(ChatColor.RED + "You were blown up by " + powerupUser.getFormattedName() + ChatColor.RESET + ChatColor.RED + "!");
                 }
             }
         }
