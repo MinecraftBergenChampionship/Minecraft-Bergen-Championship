@@ -8,6 +8,7 @@ import me.kotayka.mbc.gameMaps.aceRaceMap.AceRaceMap;
 import me.kotayka.mbc.gameMaps.aceRaceMap.QueakiesGoldMine;
 import me.kotayka.mbc.gamePlayers.AceRacePlayer;
 
+import net.royawesome.jlibnoise.module.combiner.Power;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -19,6 +20,7 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -101,6 +103,12 @@ public class AceRace extends Game {
                                 "⑭ Top 8 Bonuses- 1st:+20, 2nd,3rd:+15, 4th,5th:+10, 6th-10th:+5"
                 });
 
+        // With powerups, set PVP to TRUE so players with a Star powerup are able to stun players.
+        // Normally, players will be unable to attack since they will be given weakness when loadPlayers()
+        // is called.
+        if (map.powerups)
+            setPVP(true);
+
         World aceRaceWorld = Bukkit.getWorld("acerace");
         stopMinecartSystem();
         if (aceRaceWorld != null) {
@@ -179,7 +187,7 @@ public class AceRace extends Game {
             }
         };
 
-        minecartSpawnTask.runTaskTimer(MBC.getInstance().getPlugin(), 0L, 2L);
+        minecartSpawnTask.runTaskTimer(MBC.getInstance().getPlugin(), 0L, 4L);
 
         minecartTickTask = new BukkitRunnable() {
             @Override
@@ -242,7 +250,7 @@ public class AceRace extends Game {
             }
         };
 
-        minecartTickTask.runTaskTimer(MBC.getInstance().getPlugin(), 0L, 1L);
+        minecartTickTask.runTaskTimer(MBC.getInstance().getPlugin(), 0L, 4L);
     }
 
     private void triggerMinecartExplosion(Minecart cart, boolean isCollision) {
@@ -486,6 +494,7 @@ public class AceRace extends Game {
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
 
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
+            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION, 10, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, PotionEffect.INFINITE_DURATION, 1, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 1, false, false));
@@ -698,25 +707,35 @@ public class AceRace extends Game {
         if (attackerEventPlayer == null || attackerEventPlayer.getTeam().equals(victimEventPlayer.getTeam())) return;
         String attackerName = attackerEventPlayer.getFormattedName();
 
-        victim.addPotionEffect(new PotionEffect(
-                PotionEffectType.BLINDNESS,
-                100,
-                0,
-                false,
-                true,
-                true
-        ));
 
-        victim.addPotionEffect(new PotionEffect(
-                PotionEffectType.SLOWNESS,
-                100,
-                2,
-                false,
-                true,
-                true
-        ));
+        boolean success = PowerupHandler.stunPlayer(victim);
+        if (success) {
+            victim.sendMessage(ChatColor.RED + "You were slowed by " + attackerName + ChatColor.RESET + ChatColor.RED + "!");
+        }
+    }
 
-        victim.sendMessage(ChatColor.RED + "You were slowed by " + attackerName + ChatColor.RESET + ChatColor.RED + "!");
+    @EventHandler
+    private void onAttack(EntityDamageByEntityEvent e) {
+        e.setCancelled(true);
+
+        if (!(e.getEntity() instanceof Player) || !(e.getDamager() instanceof Player)) {
+            return;
+        }
+
+        Participant damager = Participant.getParticipant((Player) e.getDamager());
+        Participant victim = Participant.getParticipant((Player) e.getEntity());
+        if (damager == null || victim == null) {
+            return;
+        }
+
+        if (!PowerupHandler.getStarPlayers().contains(damager.getPlayer()) || damager.getTeam().equals(victim.getTeam())) {
+            return;
+        }
+
+        boolean success = PowerupHandler.stunPlayer(victim.getPlayer());
+        if (success) {
+            victim.getPlayer().sendMessage(ChatColor.RED + "You were stunned by " + damager.getFormattedName() + ChatColor.RESET + ChatColor.RED + "!");
+        }
     }
 
     /**

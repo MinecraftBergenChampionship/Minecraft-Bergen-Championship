@@ -60,8 +60,8 @@ public final class PowerupHandler {
     private static final int TELEPORTER_DELAY_TICKS = 50; // 2.5 seconds
 
     // PotionEffects
-    private static final PotionEffect STUN_SLOW = new PotionEffect(PotionEffectType.SLOWNESS, STUN_DURATION_TICKS, 10);
-    private static final PotionEffect STUN_BLIND = new PotionEffect(PotionEffectType.BLINDNESS, STUN_DURATION_TICKS + 15, 1);
+    private static final PotionEffect STUN_SLOW = new PotionEffect(PotionEffectType.SLOWNESS, STUN_DURATION_TICKS, 10, false, true, true);
+    private static final PotionEffect STUN_BLIND = new PotionEffect(PotionEffectType.BLINDNESS, STUN_DURATION_TICKS + 15, 1, false, true, true);
 
     // Collections of Powerup meta for convenient access.
     private static final Map<Material, AceRacePowerup> POWERUP_MATERIALS = Map.ofEntries(
@@ -80,6 +80,7 @@ public final class PowerupHandler {
 
     private static final Set<Player> starPlayers = new HashSet<>();
     private static final Set<Player> playersWithPowerup = new HashSet<>();
+    private static final Set<Player> stunnedPlayers = new HashSet<>();
 
     private static final Map<Entity, Participant> tntMap = new HashMap<>();
 
@@ -299,8 +300,6 @@ public final class PowerupHandler {
 
     /**
      * Handles effects for teleporter powerup.
-     * @implNote Uses stunPlayer() to temporarily reduce player's movement.
-     * @see PowerupHandler stunPlayer
      * @implNote Checkpoint behavior is currently handled in AceRacePlayer warpCheckpointSetter
      * @see AceRacePlayer warpCheckpointSetter
      * @param player Player using the teleporter powerup.
@@ -315,7 +314,9 @@ public final class PowerupHandler {
             p.setFireTicks(0);
             p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
         }, TELEPORTER_DELAY_TICKS);
-        stunPlayer(p);
+
+        p.addPotionEffect(STUN_SLOW);
+        p.addPotionEffect(STUN_BLIND);
 
         for (int i = 0; i < STUN_DURATION_TICKS; i+=4) {
             MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
@@ -340,6 +341,7 @@ public final class PowerupHandler {
         starPlayers.add(p);
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.SLOWNESS);
+        p.removePotionEffect(PotionEffectType.WEAKNESS);
         p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, STAR_DURATION_SECONDS * 20, 5));
         starEffects(p, STAR_DURATION_SECONDS);
     }
@@ -348,11 +350,25 @@ public final class PowerupHandler {
      * Effects for stunning a player.
      * Prevents player from jumping and applies a brief slowness effect.
      *
+     * Stunned players are tracked such that they cannot be stunned multiple times
+     * while still in a stunned state.
+     *
      * @param stunnedPlayer Player being stunned
+     * @return Whether the result of this call was successful
      */
-    public static void stunPlayer(Player stunnedPlayer) {
+    public static boolean stunPlayer(Player stunnedPlayer) {
+        // Prevent multi-stun
+        if (stunnedPlayers.contains(stunnedPlayer)) return false;
+
+        stunnedPlayers.add(stunnedPlayer);
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+            stunnedPlayers.remove(stunnedPlayer);
+        }, STUN_DURATION_TICKS);
+
         stunnedPlayer.addPotionEffect(STUN_SLOW);
         stunnedPlayer.addPotionEffect(STUN_BLIND);
+        return true;
     }
 
     /**
@@ -364,6 +380,7 @@ public final class PowerupHandler {
     private static void starEffects(Player player, int timeLeft) {
         if (timeLeft == 0) {
             starPlayers.remove(player);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, PotionEffect.INFINITE_DURATION, 10, false, false));
             return;
         }
 
