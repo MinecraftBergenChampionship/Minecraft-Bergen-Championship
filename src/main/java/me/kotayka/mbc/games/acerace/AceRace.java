@@ -387,7 +387,6 @@ public class AceRace extends Game {
         }
 
         event.blockList().clear();
-        stopMinecartSystem();
     }
 
     public void events() {
@@ -582,6 +581,7 @@ public class AceRace extends Game {
     }
 
     public int checkpointPlacement(AceRacePlayer p, int lap, int checkpoint) {
+        checkpoint = checkpoint % map.checkpoints.size();
         switch(lap) {
             case 1:
                 for (int i = 0; i < lapOne.length; i++) {
@@ -672,6 +672,14 @@ public class AceRace extends Game {
         Material i = e.getCurrentItem().getType();
         if (i == null) e.setCancelled(true);
         if (i.equals(Material.LEATHER_BOOTS)) e.setCancelled(true);
+
+        if (!(e.getWhoClicked() instanceof Player player)) return;
+
+        int slot = e.getSlot();
+
+        if (slot == 8) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler

@@ -74,15 +74,15 @@ public final class PowerupHandler {
 
     // Collections of Powerup meta for convenient access.
     private static final Map<Material, AceRacePowerup> POWERUP_MATERIALS = Map.ofEntries(
-        Map.entry(BANANA_PEEL, AceRacePowerup.BANANA_PEEL),
-        Map.entry(SUGAR_HIGH, AceRacePowerup.SUGAR_HIGH),
-        Map.entry(MEATBALL, AceRacePowerup.MEATBALL),
-        Map.entry(LEAP, AceRacePowerup.LEAP),
-        Map.entry(ROCKET_LAUNCHER, AceRacePowerup.ROCKET_LAUNCHER),
-        Map.entry(TNT, AceRacePowerup.TNT),
-        Map.entry(TELEPORTER, AceRacePowerup.TELEPORTER),
-        Map.entry(FIREBALL, AceRacePowerup.FIREBALL),
-        Map.entry(STAR, AceRacePowerup.STAR)
+            Map.entry(BANANA_PEEL, AceRacePowerup.BANANA_PEEL),
+            Map.entry(SUGAR_HIGH, AceRacePowerup.SUGAR_HIGH),
+            Map.entry(MEATBALL, AceRacePowerup.MEATBALL),
+            Map.entry(LEAP, AceRacePowerup.LEAP),
+            Map.entry(ROCKET_LAUNCHER, AceRacePowerup.ROCKET_LAUNCHER),
+            Map.entry(TNT, AceRacePowerup.TNT),
+            Map.entry(TELEPORTER, AceRacePowerup.TELEPORTER),
+            Map.entry(FIREBALL, AceRacePowerup.FIREBALL),
+            Map.entry(STAR, AceRacePowerup.STAR)
     );
 
     private static final Map<AceRacePowerup, ItemStack> POWERUP_ITEMS = initializePowerupMeta();
@@ -106,18 +106,17 @@ public final class PowerupHandler {
         // Do not give powerup if player has not fully used theirs
 //        if (playersWithPowerup.contains(player)) return;
 
-        for (Material powerupMaterial : POWERUP_MATERIALS.keySet()) {
-            player.setCooldown(powerupMaterial, POWERUP_SPIN_DURATION_TICKS + 2);
-        }
-
-        int slot = 0;
-        for (; slot < 10; slot++) {
-            if (player.getInventory().getItem(slot) == null)
+        // Find first available slot in slots 0-8 (slot 9 is reserved for the cooldown spinner)
+        int targetSlot = -1;
+        for (int s = 0; s < 9; s++) {
+            if (player.getInventory().getItem(s) == null) {
+                targetSlot = s;
                 break;
+            }
         }
 
-        // If hotbar is filled, just do not give a powerup
-        if (slot >= 10) return;
+        // If slots 0-8 are all filled, do not give a powerup
+        if (targetSlot == -1) return;
 
         List<AceRacePowerup> powerups;
         if (aceRacePlayer.onFirstCheckpoint()) {
@@ -142,7 +141,7 @@ public final class PowerupHandler {
         }
 
         playersWithPowerup.add(player);
-        giveRandomPowerup(powerups, player, slot);
+        giveRandomPowerup(powerups, player, targetSlot);
     }
 
     /**
@@ -155,62 +154,28 @@ public final class PowerupHandler {
      */
     static void usePowerup(AceRacePlayer player, Material heldItem, boolean lookingAtBlock) {
         if (!POWERUP_MATERIALS.containsKey(heldItem)) return;
+        if (player.getPlayer().getInventory().getHeldItemSlot() == 8) return;
 
         AceRacePowerup powerup = POWERUP_MATERIALS.get(heldItem);
         PlayerInventory playerInventory = player.getPlayer().getInventory();
         switch (powerup) {
             case BANANA_PEEL:
-                int banana_count = playerInventory.getItemInMainHand().getAmount();
-                if (banana_count > 1) {
-                    playerInventory.getItemInMainHand().setAmount(banana_count - 1);
-                }
-                int count = playerInventory.getItemInMainHand().getAmount();
-                if (count > 1) {
-                    playerInventory.getItemInMainHand().setAmount(1);
-                } else {
-                    playerInventory.remove(BANANA_PEEL);
-                    playersWithPowerup.remove(player.getPlayer());
-                }
+                consumeOneFromMainHand(player.getPlayer(), playerInventory);
                 useBanana(player);
                 break;
             case LEAP:
-                int leap_count = playerInventory.getItemInMainHand().getAmount();
-                if (leap_count > 1) {
-                    playerInventory.getItemInMainHand().setAmount(leap_count-1);
-                } else {
-                    playerInventory.remove(LEAP);
-                    playersWithPowerup.remove(player.getPlayer());
-                }
-                player.getPlayer().getInventory().remove(LEAP);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory);
                 useLeap(player.getPlayer());
                 break;
             case SUGAR_HIGH:
-                int sugar_count = playerInventory.getItemInMainHand().getAmount();
-                if (sugar_count > 1) {
-                    playerInventory.getItemInMainHand().setAmount(sugar_count - 1);
-                } else {
-                    playerInventory.remove(SUGAR_HIGH);
-                    playersWithPowerup.remove(player.getPlayer());
-                }
+                consumeOneFromMainHand(player.getPlayer(), playerInventory);
                 useSugarHigh(player.getPlayer());
                 break;
             case MEATBALL:
-                int meatball_count = playerInventory.getItemInMainHand().getAmount();
-                if (meatball_count > 1) {
-                    playerInventory.getItemInMainHand().setAmount(meatball_count - 1);
-                } else {
-                    playerInventory.remove(MEATBALL);
-                    playersWithPowerup.remove(player.getPlayer());
-                }
+                consumeOneFromMainHand(player.getPlayer(), playerInventory);
                 break;
             case TNT:
-                int tnt_count = playerInventory.getItemInMainHand().getAmount();
-                if (tnt_count > 1) {
-                    playerInventory.getItemInMainHand().setAmount(tnt_count - 1);
-                } else {
-                    playerInventory.remove(TNT);
-                    playersWithPowerup.remove(player.getPlayer());
-                }
+                consumeOneFromMainHand(player.getPlayer(), playerInventory);
                 throwTNT(player.getParticipant());
                 break;
             case ROCKET_LAUNCHER:
@@ -241,20 +206,34 @@ public final class PowerupHandler {
                 useRocketLauncher(player.getPlayer());
                 break;
             case TELEPORTER:
-                player.getPlayer().getInventory().remove(TELEPORTER);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory);
                 useTeleporter(player);
-                playersWithPowerup.remove(player.getPlayer());
                 break;
             case STAR:
-                player.getPlayer().getInventory().remove(STAR);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory);
                 useStar(player);
-                playersWithPowerup.remove(player.getPlayer());
                 break;
             case FIREBALL:
-                player.getPlayer().getInventory().remove(FIREBALL);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory);
                 useFireball(player.getPlayer());
-                playersWithPowerup.remove(player.getPlayer());
                 break;
+        }
+    }
+
+    /**
+     * Removes exactly one item from the player's main hand.
+     * If the stack has more than one, decrements the count.
+     * If it was the last one, clears the slot and removes the player from playersWithPowerup.
+     */
+    private static void consumeOneFromMainHand(Player player, PlayerInventory inventory) {
+        ItemStack held = inventory.getItemInMainHand();
+        if (held == null || held.getType() == Material.AIR) return;
+        int newAmount = held.getAmount() - 1;
+        if (newAmount <= 0) {
+            inventory.setItemInMainHand(null);
+            playersWithPowerup.remove(player);
+        } else {
+            held.setAmount(newAmount);
         }
     }
 
@@ -278,7 +257,7 @@ public final class PowerupHandler {
         TNTPrimed tnt = player.getWorld().spawn(loc, TNTPrimed.class);
         tntMap.put(tnt, eventPlayer);
 
-        tnt.setFuseTicks(80);
+        tnt.setFuseTicks(50);
         tnt.setYield(0f);
 
         Vector velocity = player.getLocation().getDirection().multiply(1.2);
@@ -362,7 +341,7 @@ public final class PowerupHandler {
                         Particle.PORTAL,
                         p.getLocation().add(
                                 -1 + Math.random()*3, 0.75, -1 + Math.random()*3
-                    ), 8);
+                        ), 8);
             }, i);
         }
     }
@@ -436,24 +415,24 @@ public final class PowerupHandler {
 
         for (int i = 0; i < STAR_DURATION_SECONDS; i++) {
             MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() { @Override
-                public void run() {
-                    player.spawnParticle(
-                            Particle.FIREWORK,
-                            player.getLocation().add(
-                                    -1 + Math.random()*3, 0.75, -1 + Math.random()*3
-                            ), 8);
-                    player.spawnParticle(
-                            Particle.NOTE,
-                            player.getLocation().add(
-                                    -1 + Math.random()*3, Math.random(), -1 + Math.random()*3
-                            ), 8);
-                }
+            public void run() {
+                player.spawnParticle(
+                        Particle.FIREWORK,
+                        player.getLocation().add(
+                                -1 + Math.random()*3, 0.75, -1 + Math.random()*3
+                        ), 8);
+                player.spawnParticle(
+                        Particle.NOTE,
+                        player.getLocation().add(
+                                -1 + Math.random()*3, Math.random(), -1 + Math.random()*3
+                        ), 8);
+            }
             }, i);
         }
 
 
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() { @Override
-            public void run() { starEffects(player, timeLeft - 1); }
+        public void run() { starEffects(player, timeLeft - 1); }
         }, 20L);
     }
 
@@ -480,9 +459,9 @@ public final class PowerupHandler {
                 iterator.remove();
             } else {
                 player.sendMessage(powerupUser.getParticipant().getFormattedName() + ChatColor.RED + " slowed you with their " + ChatColor.YELLOW + ChatColor.BOLD + "Banana Peel "
-                    + ChatColor.RESET + ChatColor.RED + "powerup!");
+                        + ChatColor.RESET + ChatColor.RED + "powerup!");
                 powerupUser.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You slowed " + eventPlayer.getFormattedName() + " with your "
-                    + ChatColor.YELLOW + ChatColor.BOLD + "Banana Peel "  + ChatColor.RESET + ChatColor.RED + "powerup!");
+                        + ChatColor.YELLOW + ChatColor.BOLD + "Banana Peel "  + ChatColor.RESET + ChatColor.RED + "powerup!");
             }
         }
     }
@@ -493,24 +472,34 @@ public final class PowerupHandler {
 
     /**
      * Handles visual effects and providing a powerup to a given player.
+     * The spin animation plays in slot 9 (index 8). Once the spin finishes,
+     * the chosen powerup is placed in {@code targetSlot} and a cooldown is
+     * applied only to that powerup's material.
      *
-     * @param powerups List of items that represent the available powerups a player may receive.
-     * @param player Player who is receiving the powerup.
-     * @param slot The inventory slot, provided as an integer, in which to provide the Powerup.
+     * @param powerups   List of powerups the player may receive.
+     * @param player     Player who is receiving the powerup.
+     * @param targetSlot The inventory slot (0-8) where the final powerup will land.
      */
-    private static void giveRandomPowerup(List<AceRacePowerup> powerups, Player player, int slot) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
-            player.getInventory().setItem(slot, POWERUP_ITEMS.get(powerups.get((int)(Math.random() * powerups.size()))));
-            player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
-        }, POWERUP_SPIN_DURATION_TICKS + 2L);
-        for (int i = 0; i < POWERUP_SPIN_DURATION_TICKS; i+=4) {
-            int itemSlot = i/4;
+    private static void giveRandomPowerup(List<AceRacePowerup> powerups, Player player, int targetSlot) {
+        final int SPIN_SLOT = 8; // slot 9 in the hotbar (0-indexed)
+        AceRacePowerup chosenPowerup = powerups.get((int) (Math.random() * powerups.size()));
+
+        // Spin animation in slot 9
+        for (int i = 0; i < POWERUP_SPIN_DURATION_TICKS; i += 4) {
+            int frame = i / 4;
             Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
-                player.getInventory().setItem(slot, POWERUP_ITEMS.get(powerups.get(itemSlot%powerups.size())));
+                player.getInventory().setItem(SPIN_SLOT, POWERUP_ITEMS.get(powerups.get(frame % powerups.size())));
                 player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
             }, i);
         }
-   }
+
+        // After spin: clear slot 9, place powerup in target slot, apply cooldown only to chosen material
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+            player.getInventory().setItem(SPIN_SLOT, null);
+            player.getInventory().setItem(targetSlot, POWERUP_ITEMS.get(chosenPowerup));
+            player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
+        }, POWERUP_SPIN_DURATION_TICKS + 2L);
+    }
 
     // Initialize ItemStack items for Powerups.
     private static Map<AceRacePowerup, ItemStack> initializePowerupMeta() {
@@ -578,14 +567,14 @@ public final class PowerupHandler {
         fireball.setItemMeta(meta);
 
         return Map.ofEntries(
-            Map.entry(AceRacePowerup.BANANA_PEEL, banana),
-            Map.entry(AceRacePowerup.SUGAR_HIGH, sugar),
-            Map.entry(AceRacePowerup.MEATBALL, meatball),
-            Map.entry(AceRacePowerup.LEAP, leap),
-            Map.entry(AceRacePowerup.TNT, tnt),
-            Map.entry(AceRacePowerup.ROCKET_LAUNCHER, rocket),
-            Map.entry(AceRacePowerup.TELEPORTER, teleporter),
-            Map.entry(AceRacePowerup.STAR, star)
+                Map.entry(AceRacePowerup.BANANA_PEEL, banana),
+                Map.entry(AceRacePowerup.SUGAR_HIGH, sugar),
+                Map.entry(AceRacePowerup.MEATBALL, meatball),
+                Map.entry(AceRacePowerup.LEAP, leap),
+                Map.entry(AceRacePowerup.TNT, tnt),
+                Map.entry(AceRacePowerup.ROCKET_LAUNCHER, rocket),
+                Map.entry(AceRacePowerup.TELEPORTER, teleporter),
+                Map.entry(AceRacePowerup.STAR, star)
         );
     }
 
