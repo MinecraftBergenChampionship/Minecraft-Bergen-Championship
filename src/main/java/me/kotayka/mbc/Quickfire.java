@@ -42,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 
 import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
 import me.kotayka.mbc.gameMaps.quickfireMap.SnowGlobe;
+import me.kotayka.mbc.gameMaps.quickfireMap.West;
 import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -49,7 +50,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 
 public class Quickfire extends FinaleGame {
-    private final QuickfireMap map = new SnowGlobe(this);
+    private final QuickfireMap map = new West(this);
     public static final ItemStack CROSSBOW = new ItemStack(Material.CROSSBOW);
     public static final ItemStack BOOTS = new ItemStack(Material.LEATHER_BOOTS);
     public Map<UUID, QuickfirePlayer> quickfirePlayers = new HashMap<>();
@@ -166,7 +167,7 @@ public class Quickfire extends FinaleGame {
         UUID malena = UUID.fromString("00b80aa8-fd4a-400a-8a54-bb12d93ee988");
         UUID nathaniel = UUID.fromString("485c4607-0a5d-42ff-b5a3-7d2c5b5d1dd8");
         UUID forrest = UUID.fromString("81de6059-a7ef-478f-9b0a-9631fcf4043b");
-        //UUID james = UUID.fromString("e469f61b-5dd1-427d-b54f-2cefbd7abf0c");
+        UUID james = UUID.fromString("e469f61b-5dd1-427d-b54f-2cefbd7abf0c");
         UUID danny = UUID.fromString("f4220995-3609-4007-9438-4f4d89e9d993");
         UUID mari = UUID.fromString("7f04d129-e313-4711-870f-d04db68274c2");
 
@@ -198,6 +199,7 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongs.put(forrest, "walkout.tigerblocks");
         playerWalkoutSongs.put(danny, "walkout.friegg");
         playerWalkoutSongs.put(mari, "walkout.bowwo");
+        playerWalkoutSongs.put(james, "walkout.imperialbomber");
 
         playerWalkoutBlurbs.put(cam, "The worldwide #1 supporter of milk...");
         playerWalkoutBlurbs.put(collin, "Don't ask him how he eats his Chicken Nuggets...");
@@ -227,6 +229,7 @@ public class Quickfire extends FinaleGame {
         playerWalkoutBlurbs.put(forrest, "Known to many as the \"Red Chud\"...");
         playerWalkoutBlurbs.put(danny, "This chip guy is coming for the 'chip...");
         playerWalkoutBlurbs.put(mari, "The pro gamer from the land of corn...");
+        playerWalkoutBlurbs.put(james, "A most auspicious member of the team...");
 
         playerWalkoutSongNames.put(cam, "Sleepyhead, Passion Pit");
         playerWalkoutSongNames.put(collin, "Radioactive, Imagine Dragons");
@@ -256,6 +259,7 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongNames.put(forrest, "Hips Don't Lie, Shakira");
         playerWalkoutSongNames.put(danny, "Tornado, Good Kid");
         playerWalkoutSongNames.put(mari, "So Much Better, Legally Blonde: The Musical");
+        playerWalkoutSongNames.put(james, "Mr. Brightside, The Killers");
     }
 
     @Override
@@ -363,7 +367,7 @@ public class Quickfire extends FinaleGame {
                             song = defaultWalkoutSong;
                         }
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            p.playSound(p, song, SoundCategory.RECORDS, 1, 1);
+                            p.playSound(p, song, SoundCategory.RECORDS, 0.75f, 1);
                         }
                     }
                     case (7) -> {
@@ -425,7 +429,7 @@ public class Quickfire extends FinaleGame {
                             song = defaultWalkoutSong;
                         }
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            p.playSound(p, song, 1, 1);
+                            p.playSound(p, song, SoundCategory.RECORDS, 0.75f, 1);
                         }
                     }
                     case (1) -> {
