@@ -322,6 +322,8 @@ public class AceRace extends Game {
             p.getPlayer().teleport(map.getIntroLocation());
             p.reset();
         }
+
+        Bukkit.broadcastMessage("Map Size: "+map.checkpoints.size());
         lapOne = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
         lapTwo = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
         lapThree = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
@@ -572,12 +574,7 @@ public class AceRace extends Game {
         // Attempt to set a checkpoint whenever a carpet block is reached.
         // If powerups are enabled, provide a powerup on black carpet.
         Material block = e.getTo().getBlock().getType();
-        if (block.toString().toLowerCase().contains("carpet")) {
-            // For simplicity, provide a powerup whenever a black carpet checkpoint is reached.
-            // TODO: player.setCheckpoint() should return a boolean indicating whether it was successful, then a powerup should be given here.
-            //       Powerups should also not be distributed on Lap completion.
-            player.setCheckpoint(map.powerups && block == Material.BLACK_CARPET && getState() == GameState.ACTIVE);
-        }
+        player.setCheckpoint(map.powerups && getState() == GameState.ACTIVE);
     }
 
     public AceRacePlayer getGamePlayer(Player p) {
@@ -588,6 +585,10 @@ public class AceRace extends Game {
         switch(lap) {
             case 1:
                 for (int i = 0; i < lapOne.length; i++) {
+                    Bukkit.broadcastMessage("" + i);
+                    if (lapOne[checkpoint][i] == p) {
+                        return -1;
+                    }
                     if (lapOne[checkpoint][i] == null) {
                         lapOne[checkpoint][i] = p;
                         return (i+1);
@@ -596,6 +597,9 @@ public class AceRace extends Game {
                 return -1;
             case 2:
                 for (int i = 0; i < lapTwo.length; i++) {
+                    if (lapTwo[checkpoint][i] == p) {
+                        return -1;
+                    }
                     if (lapTwo[checkpoint][i] == null) {
                         lapTwo[checkpoint][i] = p;
                         return (i+1);
@@ -604,6 +608,9 @@ public class AceRace extends Game {
                 return -1;
             case 3:
                 for (int i = 0; i < lapThree.length; i++) {
+                    if (lapThree[checkpoint][i] == p) {
+                        return -1;
+                    }
                     if (lapThree[checkpoint][i] == null) {
                         lapThree[checkpoint][i] = p;
                         return (i+1);

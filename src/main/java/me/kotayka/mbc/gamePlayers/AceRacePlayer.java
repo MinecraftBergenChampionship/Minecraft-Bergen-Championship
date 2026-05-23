@@ -213,52 +213,98 @@ public class AceRacePlayer extends GamePlayer {
      *           including jump pads and carpet.
      */
     public void setCheckpoint(boolean givePowerup) {
-        // exit if player is Spectator or done with race
-        if (getParticipant().getPlayer().getGameMode().equals(GameMode.SPECTATOR)) return;
 
-        // check distance to next checkpoint and the following checkpoint
-        Location location = getParticipant().getPlayer().getLocation();
-        boolean nextCheckpoint = ACE_RACE.map.checkpoints.get(checkpoint % ACE_RACE.map.mapLength).distance(location) <= 12;
-        boolean skipCheckpoint = ACE_RACE.map.checkpoints.get((checkpoint + 1) % ACE_RACE.map.mapLength).distance(location) <= 12;
 
-        if (!nextCheckpoint && !skipCheckpoint) return;
+        if (getParticipant().getPlayer().getGameMode().equals(GameMode.SPECTATOR))
+            return;
 
-        // Prioritize if the player has reached the first checkpoint.
-        if (nextCheckpoint) {
-            // case for finishing lap
-            if (checkpoint == ACE_RACE.map.mapLength) {
-                checkpoint = 0;
-                ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
-                Lap();
-            } else { // not last checkpoint
-                if (checkpoint != 0) {
-                    // This code segment specifically does not run for the initial checkpoint.
-                    this.getParticipant().getPlayer().sendTitle(" ", ChatColor.YELLOW + "Checkpoint " + (checkpoint+1) + "/" + ACE_RACE.map.mapLength, 0, 40, 20);
-                    if (givePowerup)
-                        PowerupHandler.givePowerup(this);
-                }
-                checkpoint++;
-                ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
-            }
-            if (ACE_RACE.getState().equals(GameState.ACTIVE) && !(lap == 1 && checkpoint == 0)) {
-                currentPlace = ACE_RACE.checkpointPlacement(this, lap, checkpoint);
-                String currentPlacementString = AceRace.getPlace(currentPlace);
-                this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You are currently in " + currentPlacementString + " place.");
-            }
+        Location playerLoc = getParticipant().getPlayer().getLocation();
+        Location center = ACE_RACE.map.center;
+
+        Location checkpointLoc =
+                ACE_RACE.map.checkpoints.get(checkpoint % ACE_RACE.map.mapLength);
+
+        givePowerup = givePowerup && ACE_RACE.map.powerupCheckpoints.contains(checkpoint);
+
+        double playerAngle = Math.toDegrees(Math.atan2(
+                playerLoc.getZ() - center.getZ(),
+                playerLoc.getX() - center.getX()
+        ));
+
+        double checkpointAngle = Math.toDegrees(Math.atan2(
+                checkpointLoc.getZ() - center.getZ(),
+                checkpointLoc.getX() - center.getX()
+        ));
+
+        playerAngle = (playerAngle + 360) % 360;
+        checkpointAngle = (checkpointAngle + 360) % 360;
+
+        double diff = (playerAngle - checkpointAngle + 360) % 360;
+
+        boolean reachedCheckpoint = diff <= 5 && playerAngle > checkpointAngle;
+
+        if (!reachedCheckpoint)
+            return;
+
+        if (checkpoint == ACE_RACE.map.mapLength) {
+
+            checkpoint = 0;
+
+            ACE_RACE.createLine(
+                    5,
+                    ChatColor.GREEN + "Checkpoint: " +
+                            ChatColor.RESET + checkpoint + "/" +
+                            ACE_RACE.map.checkpoints.size(),
+                    this.getParticipant()
+            );
+
+            Lap();
+
         } else {
+
             if (checkpoint != 0) {
-                // This code segment specifically does not run for the initial checkpoint.
-                this.getParticipant().getPlayer().sendTitle(" ", ChatColor.YELLOW + "Checkpoint " + (checkpoint+1) + "/" + ACE_RACE.map.mapLength, 0, 40, 20);
-                if (givePowerup)
-                    PowerupHandler.givePowerup(this);
+
+                this.getParticipant().getPlayer().sendTitle(
+                        " ",
+                        ChatColor.YELLOW + "Checkpoint " +
+                                (checkpoint + 1) + "/" +
+                                ACE_RACE.map.mapLength,
+                        0,
+                        40,
+                        20
+                );
+
+
             }
+
+            if (givePowerup)
+                PowerupHandler.givePowerup(this);
+
             checkpoint++;
-            ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
-            if (ACE_RACE.getState().equals(GameState.ACTIVE)) {
-                currentPlace = ACE_RACE.checkpointPlacement(this, lap, checkpoint);
-                String currentPlacementString = AceRace.getPlace(currentPlace);
-                this.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You are currently in " + currentPlacementString + " place.");
-            }
+
+            ACE_RACE.createLine(
+                    5,
+                    ChatColor.GREEN + "Checkpoint: " +
+                            ChatColor.RESET + checkpoint + "/" +
+                            ACE_RACE.map.checkpoints.size(),
+                    this.getParticipant()
+            );
+        }
+
+        if (ACE_RACE.getState().equals(GameState.ACTIVE)
+                && !(lap == 1 && checkpoint == 0)) {
+
+            currentPlace = ACE_RACE.checkpointPlacement(this, lap, checkpoint);
+
+            String currentPlacementString =
+                    AceRace.getPlace(currentPlace);
+
+            this.getParticipant().getPlayer().sendMessage(
+                    ChatColor.GREEN +
+                            "You are currently in " +
+                            currentPlacementString +
+                            " place."
+            );
         }
     }
 

@@ -20,22 +20,27 @@ public abstract class AceRaceMap extends MBCMap {
     public World world = AceRace.world;
     public static List<Location> respawns;
     public List<Location> checkpoints;
+    public List<Integer> powerupCheckpoints;
     public int mapLength;
     public boolean powerups;
+
+    public Location center;
 
     public List<String> deathObjects;
 
     private final int deathY;
 
-    public AceRaceMap(int deathY, Location intro, String... deathObject) {
+    public AceRaceMap(int deathY, Location intro, Location center, String... deathObject) {
         super(Bukkit.getWorld("AceRace"), intro);
         this.deathY = deathY;
+        this.center = center;
         deathObjects=new ArrayList<>(Arrays.asList(deathObject));
     }
 
-    public void loadCheckpoints(Location[] respawns, Location[] checkpoints) {
+    public void loadCheckpoints(Location[] respawns, Location[] checkpoints, List<Integer> powerupCheckpoints) {
         AceRaceMap.respawns = new ArrayList<>(Arrays.asList(respawns));
         this.checkpoints = new ArrayList<>(Arrays.asList(checkpoints));
+        this.powerupCheckpoints = powerupCheckpoints;
 
         mapLength = checkpoints.length;
     }

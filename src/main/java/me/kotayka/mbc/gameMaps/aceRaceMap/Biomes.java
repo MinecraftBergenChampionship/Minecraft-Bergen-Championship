@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import java.util.Arrays;
+
 public class Biomes extends AceRaceMap {
     boolean powerups = false;
     Location[] respawns = {
@@ -33,10 +35,10 @@ public class Biomes extends AceRaceMap {
     };
 
     public Biomes() {
-        super(0, new Location(Bukkit.getWorld("AceRace"), 2, 45, 116), "Lava");
+        super(0, new Location(Bukkit.getWorld("AceRace"), 2, 45, 116), new Location(Bukkit.getWorld("AceRace"), 0, 0, 0), new String[]{"Lava"});
         mapName = "Biomes";
         creatorName = "bigkirbypuff_";
-        loadCheckpoints(respawns, checkpoints);
+        loadCheckpoints(respawns, checkpoints, Arrays.asList(new Integer[] {}));
     }
 
     public void setBarriers(boolean barriers) {

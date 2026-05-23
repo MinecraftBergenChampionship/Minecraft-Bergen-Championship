@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import java.util.Arrays;
+
 public class iDrgCity extends AceRaceMap {
     boolean powerups = false;
     Location[] respawns = {
@@ -33,10 +35,10 @@ public class iDrgCity extends AceRaceMap {
     };
 
     public iDrgCity() {
-        super(5, new Location(Bukkit.getWorld("AceRace"), -926, 42, -1080, -45, 0), "Lava");
+        super(5, new Location(Bukkit.getWorld("AceRace"), -926, 42, -1080, -45, 0), new Location(Bukkit.getWorld("AceRace"), -1000, 42, -1000), "Lava");
         mapName = "iDrg City";
         creatorName = "iDrg";
-        loadCheckpoints(respawns, checkpoints);
+        loadCheckpoints(respawns, checkpoints, Arrays.asList(new Integer[] {}));
     }
 
     public void setBarriers(boolean barriers) {

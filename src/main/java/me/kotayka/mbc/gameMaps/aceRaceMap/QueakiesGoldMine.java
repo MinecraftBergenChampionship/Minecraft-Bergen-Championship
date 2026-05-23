@@ -4,6 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class QueakiesGoldMine extends AceRaceMap {
     Location[] respawns = {
             new Location(getWorld(), -1005, 101, 880, -90, 0),  // default
@@ -30,11 +33,11 @@ public class QueakiesGoldMine extends AceRaceMap {
     };
 
     public QueakiesGoldMine() {
-        super(97, new Location(Bukkit.getWorld("AceRace"), -1005, 101, 880, -90, 0), "Lava");
+        super(97, new Location(Bukkit.getWorld("AceRace"), -1005, 101, 880, -90, 0), new Location(Bukkit.getWorld("AceRace"), -1000, 101, 1000),"Lava");
         super.powerups = true;
         mapName = "Queakie's Gold Mine";
         creatorName = "bigkirbypuff_, Pengu1n__, iDrg";
-        loadCheckpoints(respawns, checkpoints);
+        loadCheckpoints(respawns, checkpoints, Arrays.asList(new Integer[] {1, 3, 6}));
     }
 
     public void setBarriers(boolean barriers) {

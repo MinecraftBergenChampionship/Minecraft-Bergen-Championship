@@ -104,7 +104,7 @@ public final class PowerupHandler {
         Player player = aceRacePlayer.getPlayer();
 
         // Do not give powerup if player has not fully used theirs
-        if (playersWithPowerup.contains(player)) return;
+//        if (playersWithPowerup.contains(player)) return;
 
         for (Material powerupMaterial : POWERUP_MATERIALS.keySet()) {
             player.setCooldown(powerupMaterial, POWERUP_SPIN_DURATION_TICKS + 2);
