@@ -3,10 +3,9 @@ package me.kotayka.mbc.games;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import me.kotayka.mbc.*;
-import me.kotayka.mbc.gameMaps.sgMaps.JesuscraftTwo;
 import me.kotayka.mbc.gameMaps.sgMaps.BCA;
+import me.kotayka.mbc.gameMaps.sgMaps.SG4;
 import me.kotayka.mbc.gameMaps.sgMaps.SurvivalGamesMap;
-import me.kotayka.mbc.gamePlayers.SkybattlePlayer;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -48,7 +47,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class SurvivalGames extends Game {
-    private final SurvivalGamesMap map = new BCA();
+    private final SurvivalGamesMap map = new SG4();
     private WorldBorder border = null;
     private List<SurvivalGamesItem> items;
 
@@ -500,15 +499,16 @@ public class SurvivalGames extends Game {
      * If empty, updates list of eligible Super Chests.
      */
     public void regenChest() {
-        double totalWeight = 115.5;
+        double totalWeight = 0.0;
+        for (SurvivalGamesItem item : items) {
+            totalWeight += item.getWeight();
+        }
 
         Random rand = new Random();
         Chunk[] c = map.getWorld().getLoadedChunks();
         for (Chunk chunk : c) {//loop through loaded chunks
             for (int x = 0; x < chunk.getTileEntities().length; x++) {//loop through tile entities within loaded chunks
-                if (chunk.getTileEntities()[x] instanceof Chest) {
-                    Chest chest = (Chest) chunk.getTileEntities()[x];
-
+                if (chunk.getTileEntities()[x] instanceof Chest chest) {
                     chest.getInventory().clear();
                     int chestItems = rand.nextInt(2) + 5;
                     for (int b = 0; b < chestItems; b++) {

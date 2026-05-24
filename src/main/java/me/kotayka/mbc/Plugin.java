@@ -108,6 +108,8 @@ public class Plugin extends JavaPlugin implements Listener {
                 it.remove();
             } else if (recipe.getResult().getType() == Material.SHIELD) {
                 it.remove();
+            } else if (recipe.getResult().getType() == Material.FLINT_AND_STEEL) {
+                it.remove();
             }
         }
     }

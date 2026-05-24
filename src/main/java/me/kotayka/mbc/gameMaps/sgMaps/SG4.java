@@ -27,7 +27,7 @@ public class SG4 extends SurvivalGamesMap {
         super.middleChests = this.middleChests;
         super.spawnY = 31;
         super.mapName = "SG4";
-        super.creatorName = "Team Nectar and Team Vareide";
+        super.creatorName = "Team Vareide";
         super.type = "Cornucopia";
         super.CENTER = new Location(getWorld(), 0, 10, 0);
         super.hasElevationBorder = false;

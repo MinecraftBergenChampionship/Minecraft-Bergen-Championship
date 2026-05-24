@@ -323,7 +323,6 @@ public class AceRace extends Game {
             p.reset();
         }
 
-        Bukkit.broadcastMessage("Map Size: "+map.checkpoints.size());
         lapOne = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
         lapTwo = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
         lapThree = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
@@ -585,7 +584,6 @@ public class AceRace extends Game {
         switch(lap) {
             case 1:
                 for (int i = 0; i < lapOne.length; i++) {
-                    Bukkit.broadcastMessage("" + i);
                     if (lapOne[checkpoint][i] == p) {
                         return -1;
                     }
