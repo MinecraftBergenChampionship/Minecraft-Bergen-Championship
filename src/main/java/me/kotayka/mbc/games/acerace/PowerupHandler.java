@@ -355,6 +355,7 @@ public final class PowerupHandler {
     private static void useStar(AceRacePlayer player) {
         Bukkit.broadcastMessage(player.getParticipant().getFormattedName() + ChatColor.GOLD + ChatColor.BOLD + " activated a Star Powerup!");
         Player p = player.getPlayer();
+        p.sendMessage(ChatColor.GREEN + "Punch a player to stun them!");
         starPlayers.add(p);
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.SLOWNESS);
@@ -452,12 +453,15 @@ public final class PowerupHandler {
             AceRacePlayer powerupUser = playerCloudMap.get(cloud);
             if (powerupUser == null) continue;
 
-            //
             if (eventPlayer == null || player.getGameMode() == GameMode.SPECTATOR ||
                     eventPlayer.getTeam().getColor().equals(powerupUser.getParticipant().getTeam().getColor()) ||
-                    starPlayers.contains(player)) {
+                    starPlayers.contains(player) || stunnedPlayers.contains(player)) {
                 iterator.remove();
             } else {
+                stunnedPlayers.add(player);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+                    stunnedPlayers.remove(player);
+                }, STUN_DURATION_TICKS);
                 player.sendMessage(powerupUser.getParticipant().getFormattedName() + ChatColor.RED + " slowed you with their " + ChatColor.YELLOW + ChatColor.BOLD + "Banana Peel "
                         + ChatColor.RESET + ChatColor.RED + "powerup!");
                 powerupUser.getParticipant().getPlayer().sendMessage(ChatColor.GREEN + "You slowed " + eventPlayer.getFormattedName() + " with your "
