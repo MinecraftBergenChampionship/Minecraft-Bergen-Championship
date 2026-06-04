@@ -36,12 +36,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
-import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -105,13 +102,13 @@ public class SurvivalGames extends Game {
 
         try {
             readItems();
-        } catch(IOException | ParseException e) {
+        } catch(Exception e) {
             Bukkit.broadcastMessage(ChatColor.YELLOW+ e.getMessage());
             Bukkit.broadcastMessage(ChatColor.RED+"Unable to parse " + CHEST_FILE.getAbsolutePath() + " or " + SUPPLY_FILE.getAbsolutePath());
         }
     }
 
-    private void readItems() throws IOException, ParseException {
+    private void readItems() throws Exception {
         Gson gson = new Gson();
         Type listType = new TypeToken<List<SurvivalGamesItem>>() {}.getType();
         Reader reader = new FileReader(CHEST_FILE);
