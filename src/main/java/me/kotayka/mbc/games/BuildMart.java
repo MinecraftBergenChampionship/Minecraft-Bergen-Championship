@@ -321,7 +321,7 @@ public class BuildMart extends Game {
             return;
         }
 
-        if (m.toString().endsWith("FAN") || m.toString().endsWith("CORAL")) {
+        if (m.toString().endsWith("FAN") || m.toString().endsWith("CORAL") || m.toString().endsWith("PICKLE") || m.toString().endsWith("CANDLE")) {
             // TODO: This is a map dependent, temporary fix.
             // not that we'll have more maps anyway
             if (e.getBlock().getY() < 20) {

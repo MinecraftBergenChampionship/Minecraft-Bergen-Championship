@@ -209,6 +209,11 @@ public class Lobby extends Minigame {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, Sound.ENTITY_CHICKEN_EGG, 1, 1);
                     }
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.teleport(new Location(world, 0.5, 0, -44, -180, 0));
+                        p.setGameMode(GameMode.SPECTATOR);
+                        p.setSpectatorTarget(cameraman);
+                    }
                 }
                 case 198 -> {
                     Bukkit.broadcastMessage(ChatColor.BOLD+"\nOur building team: " + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "BappleBusiness, Grassy311, and _Coookie_!\n");
@@ -740,12 +745,9 @@ public class Lobby extends Minigame {
             timeRemaining = 15;
         } else {
             MBCTeam intro = teams.get(introCounter++);
-            if (!lastIntro.isEmpty()) {
-                for (Participant p : lastIntro) {
+            for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
                     p.getPlayer().setGameMode(GameMode.SPECTATOR);
                     p.getPlayer().setSpectatorTarget(cameraman);
-                }
-                lastIntro.clear();
             }
             lastIntro.addAll(intro.getPlayers());
             String introPlayers = "";

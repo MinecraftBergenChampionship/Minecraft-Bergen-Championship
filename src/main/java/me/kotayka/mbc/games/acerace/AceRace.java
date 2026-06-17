@@ -34,7 +34,6 @@ import org.bukkit.util.Vector;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.HashSet;
 
 public class AceRace extends Game {
     public AceRaceMap map = new QueakiesGoldMine();
@@ -109,9 +108,7 @@ public class AceRace extends Game {
 
         World aceRaceWorld = Bukkit.getWorld("acerace");
         stopMinecartSystem();
-        if (aceRaceWorld != null) {
-            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1074.30, 108.00, 910.68));
-            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1076.30, 107.00, 912.30));
+        if (aceRaceWorld != null && aceRaceWorld.getName().equals("Queakie's Gold Mine")) {
             TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1079.30, 106.00, 915.30));
             TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1080.30, 106.00, 918.70));
             TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1082.30, 106.00, 920.68));
@@ -134,8 +131,6 @@ public class AceRace extends Game {
             TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1098.70, 104.00, 922.30));
             TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1095.70, 105.00, 918.30));
             TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1095.70, 105.00, 916.30));
-            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1090.70, 106.00, 912.30));
-            TRACK_SPAWN_LOCATIONS.add(new Location(aceRaceWorld, -1087.70, 106.00, 910.24));
         }
     }
 
@@ -168,7 +163,7 @@ public class AceRace extends Game {
                 long now = System.currentTimeMillis();
 
                 Long lastSpawn = spawnLocationCooldowns.get(spawnLoc);
-                if (lastSpawn != null && (now - lastSpawn) < 1000) {
+                if (lastSpawn != null && (now - lastSpawn) < 2000) {
                     return;
                 }
 
@@ -323,9 +318,9 @@ public class AceRace extends Game {
             p.reset();
         }
 
-        lapOne = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
-        lapTwo = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
-        lapThree = new AceRacePlayer[map.checkpoints.size()][aceRacePlayerMap.size()];
+        lapOne = new AceRacePlayer[map.checkpoints.size()+1][aceRacePlayerMap.size()];
+        lapTwo = new AceRacePlayer[map.checkpoints.size()+1][aceRacePlayerMap.size()];
+        lapThree = new AceRacePlayer[map.checkpoints.size()+1][aceRacePlayerMap.size()];
 
         setTimer(TUTORIAL_TIME);
     }
@@ -346,7 +341,7 @@ public class AceRace extends Game {
 
         if (!isFireball && !isTNT) return;
         Location center = event.getLocation();
-        double radius = isTNT ? 5.0 : 3.0;
+        double radius = isTNT ? 4.0 : 3.0;
 
         List<Player> players = center.getWorld().getPlayers();
 
@@ -580,10 +575,12 @@ public class AceRace extends Game {
     }
 
     public int checkpointPlacement(AceRacePlayer p, int lap, int checkpoint) {
-        checkpoint = checkpoint % map.checkpoints.size();
+        if (checkpoint != map.checkpoints.size()) {
+            checkpoint = checkpoint % map.checkpoints.size();
+        }
         switch(lap) {
             case 1:
-                for (int i = 0; i < lapOne.length; i++) {
+                for (int i = 0; i < lapOne[checkpoint].length; i++) {
                     if (lapOne[checkpoint][i] == p) {
                         return -1;
                     }
@@ -594,7 +591,7 @@ public class AceRace extends Game {
                 }
                 return -1;
             case 2:
-                for (int i = 0; i < lapTwo.length; i++) {
+                for (int i = 0; i < lapTwo[checkpoint].length; i++) {
                     if (lapTwo[checkpoint][i] == p) {
                         return -1;
                     }
@@ -605,7 +602,7 @@ public class AceRace extends Game {
                 }
                 return -1;
             case 3:
-                for (int i = 0; i < lapThree.length; i++) {
+                for (int i = 0; i < lapThree[checkpoint].length; i++) {
                     if (lapThree[checkpoint][i] == p) {
                         return -1;
                     }

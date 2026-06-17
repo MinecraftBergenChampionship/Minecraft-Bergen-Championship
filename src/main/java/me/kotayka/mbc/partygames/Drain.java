@@ -428,7 +428,16 @@ public class Drain extends PartyGame {
             message = message + t.teamNameFormat() + ChatColor.BOLD + ": " + (pointMapTeam.get(t)) + " pattern points\n";
         }
         logger.log(message);
-        Bukkit.broadcastMessage(message);
+        
+        String patternsMessage = "\n" + ChatColor.BOLD + "Patterns Made By Team:\n";
+        for (MBCTeam t : MBC.getInstance().getValidTeams()) {
+            if (!patternsFound.containsKey(t))
+                patternsFound.put(t, 0);
+            patternsMessage = patternsMessage + t.teamNameFormat() + ChatColor.BOLD + ": " + (pointMapTeam.get(t)) + " drain points\n";
+        }
+        logger.log(patternsMessage);
+        Bukkit.broadcastMessage(patternsMessage);
+
 
         for (Participant p : MBC.getInstance().getPlayers()) {
             String playerMessage = "";
@@ -497,6 +506,7 @@ public class Drain extends PartyGame {
         Map<Participant, Integer> drainMap = new HashMap<Participant, Integer>();
         Map<Participant, Integer> pointMap = new HashMap<Participant, Integer>();
         Map<MBCTeam, Integer> pointMapTeam = new HashMap<MBCTeam, Integer>();
+        Map<MBCTeam, Integer> drainMapTeam = new HashMap<MBCTeam, Integer>();
         int totalDrained = 0;
         for (int i = 0; i < drainedBlocks.length; i++) {
             for (int j = 0; j < drainedBlocks[i].length; j++) {
@@ -523,8 +533,10 @@ public class Drain extends PartyGame {
             pointMap.put(p, pointsGained);
             if (pointMapTeam.containsKey(p.getTeam())) {
                 pointMapTeam.replace(p.getTeam(), pointMapTeam.get(p.getTeam()) + pointsGained);
+                drainMapTeam.replace(p.getTeam(), drainMapTeam.get(p.getTeam()) + drained);
             } else {
                 pointMapTeam.put(p.getTeam(), pointsGained);
+                drainMapTeam.put(p.getTeam(), drained);
             }
         }
 
@@ -535,6 +547,14 @@ public class Drain extends PartyGame {
             message = message + t.teamNameFormat() + ChatColor.BOLD + ": " + (pointMapTeam.get(t)) + " drain points\n";
         }
         logger.log(message);
+
+        String drainedMessage = "\n" + ChatColor.BOLD + "Drained Blocks By Team:\n";
+        for (MBCTeam t : MBC.getInstance().getValidTeams()) {
+            if (!drainMapTeam.containsKey(t))
+                drainMapTeam.put(t, 0);
+            drainedMessage = drainedMessage + t.teamNameFormat() + ChatColor.BOLD + ": " + (drainMapTeam.get(t)) + " blocks drained\n";
+        }
+        logger.log(drainedMessage);
         Bukkit.broadcastMessage(message);
 
         for (Participant p : MBC.getInstance().getPlayers()) {
@@ -828,7 +848,7 @@ public class Drain extends PartyGame {
                     break;
                 case (3):
                     if (Bukkit.getWorld("Party").getBlockAt((int) p.getX(), (int) p.getY() - 1, (int) p.getZ())
-                            .getType().equals(Material.BLACK_CONCRETE)) {
+                            .getType().equals(Material.ORANGE_CONCRETE)) {
 
                         p.sendMessage(ChatColor.GOLD + "By landing in the center, you completed a task!");
 

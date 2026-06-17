@@ -8,21 +8,18 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.*;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
-import java.util.Map;
 
 /**
  * This class handles powerup related effects for AceRace.
@@ -40,16 +37,30 @@ public final class PowerupHandler {
     private static final Material TNT = Material.TNT;
     private static final Material TELEPORTER = Material.ENDER_PEARL;
     private static final Material FIREBALL = Material.FIRE_CHARGE;
+    private static final Material LUNGE = Material.WOODEN_SPEAR;
 
     // Appropriate Set of Powerups
-    private static final List<AceRacePowerup> TOP_SIXTH = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
+    private static final List<AceRacePowerup> TOP_SIXTH = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.TNT, AceRacePowerup.MEATBALL);
     private static final List<AceRacePowerup> TOP_THIRD = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.MEATBALL);
-    private static final List<AceRacePowerup> TOP_HALF = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.LEAP);
-    private static final List<AceRacePowerup> BOTTOM_THIRD = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.STAR, AceRacePowerup.MEATBALL, AceRacePowerup.ROCKET_LAUNCHER, AceRacePowerup.SUGAR_HIGH);
+    private static final List<AceRacePowerup> TOP_HALF = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH);
+    private static final List<AceRacePowerup> BOTTOM_HALF = Arrays.asList(AceRacePowerup.LEAP, AceRacePowerup.STAR, AceRacePowerup.ROCKET_LAUNCHER, AceRacePowerup.SUGAR_HIGH);
     private static final List<AceRacePowerup> BOTTOM_SIXTH = Arrays.asList(AceRacePowerup.TELEPORTER, AceRacePowerup.STAR, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.ROCKET_LAUNCHER);
 
+    private static final List<AceRacePowerup> SPINNING_POWERUPS = Arrays.asList(
+            AceRacePowerup.BANANA_PEEL,
+            AceRacePowerup.SUGAR_HIGH,
+            AceRacePowerup.MEATBALL,
+            AceRacePowerup.LEAP,
+            AceRacePowerup.ROCKET_LAUNCHER,
+            AceRacePowerup.TNT,
+            AceRacePowerup.TELEPORTER,
+            AceRacePowerup.STAR
+    );
+
+
     // This list is reserved for the very first checkpoint on the very first lap.
-    private static final List<AceRacePowerup> FIRST_CHECKPOINT_POWERUPS = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT);
+    private static final List<AceRacePowerup> FIRST_CHECKPOINT_POWERUPS = Arrays.asList(AceRacePowerup.SUGAR_HIGH, AceRacePowerup.LEAP, AceRacePowerup.MEATBALL, AceRacePowerup.BANANA_PEEL);
+    //private static final List<AceRacePowerup> FIRST_CHECKPOINT_POWERUPS = Arrays.asList(AceRacePowerup.LUNGE);
     private static final List<AceRacePowerup> PRACTICE_POWERUPS = Arrays.asList(
             AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.STAR, AceRacePowerup.TNT,
             AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.TELEPORTER, AceRacePowerup.ROCKET_LAUNCHER
@@ -59,7 +70,7 @@ public final class PowerupHandler {
     private static final double CUTOFF_TOP_SIXTH = (1.0)/6;
     private static final double CUTOFF_TOP_THIRD = (1.0)/3;
     private static final double CUTOFF_TOP_HALF =  (1.0)/2;
-    private static final double CUTOFF_BOTTOM_THIRD =  (2.0)/3;
+    private static final double CUTOFF_BOTTOM_HALF =  (2.0)/3;
     private static final double CUTOFF_BOTTOM_SIXTH =  (5.0)/6;
 
     // Powerup Customization
@@ -82,7 +93,8 @@ public final class PowerupHandler {
             Map.entry(TNT, AceRacePowerup.TNT),
             Map.entry(TELEPORTER, AceRacePowerup.TELEPORTER),
             Map.entry(FIREBALL, AceRacePowerup.FIREBALL),
-            Map.entry(STAR, AceRacePowerup.STAR)
+            Map.entry(STAR, AceRacePowerup.STAR),
+            Map.entry(LUNGE, AceRacePowerup.LUNGE)
     );
 
     private static final Map<AceRacePowerup, ItemStack> POWERUP_ITEMS = initializePowerupMeta();
@@ -108,7 +120,7 @@ public final class PowerupHandler {
 
         // Find first available slot in slots 0-8 (slot 9 is reserved for the cooldown spinner)
         int targetSlot = -1;
-        for (int s = 0; s < 9; s++) {
+        for (int s = 0; s < 1; s++) {
             if (player.getInventory().getItem(s) == null) {
                 targetSlot = s;
                 break;
@@ -127,16 +139,22 @@ public final class PowerupHandler {
             double percentile = (1.0 * place) / players;
             if (percentile <= CUTOFF_TOP_SIXTH) {
                 powerups = TOP_SIXTH;
+                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top sixth");
             } else if (percentile <= CUTOFF_TOP_THIRD) {
                 powerups = TOP_THIRD;
+                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top third");
             } else if (percentile <= CUTOFF_TOP_HALF) {
                 powerups = TOP_HALF;
-            } else if (percentile <= CUTOFF_BOTTOM_THIRD) {
-                powerups = BOTTOM_THIRD;
+                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top half");
+            } else if (percentile <= CUTOFF_BOTTOM_HALF) {
+                powerups = BOTTOM_HALF;
+                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom half");
             } else if (percentile <= CUTOFF_BOTTOM_SIXTH) {
                 powerups = BOTTOM_SIXTH;
+                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom third");
             } else {
                 powerups = BOTTOM_SIXTH;
+                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom sixth");
             }
         }
 
@@ -154,7 +172,9 @@ public final class PowerupHandler {
      */
     static void usePowerup(AceRacePlayer player, Material heldItem, boolean lookingAtBlock) {
         if (!POWERUP_MATERIALS.containsKey(heldItem)) return;
-        if (player.getPlayer().getInventory().getHeldItemSlot() == 8) return;
+        if (player.getPlayer().getInventory().getHeldItemSlot() == 8)  {
+            return;
+        }
 
         AceRacePowerup powerup = POWERUP_MATERIALS.get(heldItem);
         PlayerInventory playerInventory = player.getPlayer().getInventory();
@@ -217,6 +237,8 @@ public final class PowerupHandler {
                 consumeOneFromMainHand(player.getPlayer(), playerInventory);
                 useFireball(player.getPlayer());
                 break;
+            case LUNGE:
+                break;
         }
     }
 
@@ -247,6 +269,8 @@ public final class PowerupHandler {
 
         player.setVelocity(velocity);
     }
+
+    
 
     private static void throwTNT(Participant eventPlayer) {
         Player player = eventPlayer.getPlayer();
@@ -488,11 +512,26 @@ public final class PowerupHandler {
         final int SPIN_SLOT = 8; // slot 9 in the hotbar (0-indexed)
         AceRacePowerup chosenPowerup = powerups.get((int) (Math.random() * powerups.size()));
 
+        Bukkit.broadcastMessage("chosen powerup: " + chosenPowerup.name());
+
+        List<AceRacePowerup> spin_powerups = new ArrayList<>();
+
+        for (AceRacePowerup p : SPINNING_POWERUPS) {
+            if (powerups.contains(p)) {
+                spin_powerups.add(p);
+            }
+        }
+        if (spin_powerups.isEmpty()) {
+            for (AceRacePowerup p : SPINNING_POWERUPS) {
+                spin_powerups.add(p);
+            }
+        }
+
         // Spin animation in slot 9
         for (int i = 0; i < POWERUP_SPIN_DURATION_TICKS; i += 4) {
             int frame = i / 4;
             Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
-                player.getInventory().setItem(SPIN_SLOT, POWERUP_ITEMS.get(powerups.get(frame % powerups.size())));
+                player.getInventory().setItem(SPIN_SLOT, POWERUP_ITEMS.get(spin_powerups.get(frame % spin_powerups.size())));
                 player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
             }, i);
         }
@@ -522,15 +561,15 @@ public final class PowerupHandler {
         sugar.setItemMeta(meta);
 
         // meatball
-        ItemStack meatball = new ItemStack(MEATBALL, 3);
+        ItemStack meatball = new ItemStack(MEATBALL, 5);
         meta = meatball.getItemMeta();
         displayName = Component.text("Meatball").color(NamedTextColor.RED).decorate(TextDecoration.BOLD);
         meta.displayName(displayName);
         meatball.setItemMeta(meta);
 
         // leap
-        ItemStack leap = new ItemStack(LEAP, 3);
-        meta = meatball.getItemMeta();
+        ItemStack leap = new ItemStack(LEAP, 1);
+        meta = leap.getItemMeta();
         displayName = Component.text("Leap").decorate(TextDecoration.BOLD);
         meta.displayName(displayName);
         leap.setItemMeta(meta);
@@ -570,6 +609,16 @@ public final class PowerupHandler {
         meta.displayName(displayName);
         fireball.setItemMeta(meta);
 
+        // lunge
+        ItemStack lunge = new ItemStack(LUNGE, 1);
+        meta = lunge.getItemMeta();
+        displayName = Component.text("Lunge").color(NamedTextColor.DARK_PURPLE).decorate(TextDecoration.BOLD);
+        meta.displayName(displayName);
+        Damageable damageable = (Damageable) meta;
+        damageable.setDamage(lunge.getType().getMaxDurability() - 1);
+        lunge.setItemMeta((ItemMeta) damageable);
+        lunge.addEnchantment(Enchantment.LUNGE, 3);
+
         return Map.ofEntries(
                 Map.entry(AceRacePowerup.BANANA_PEEL, banana),
                 Map.entry(AceRacePowerup.SUGAR_HIGH, sugar),
@@ -578,7 +627,8 @@ public final class PowerupHandler {
                 Map.entry(AceRacePowerup.TNT, tnt),
                 Map.entry(AceRacePowerup.ROCKET_LAUNCHER, rocket),
                 Map.entry(AceRacePowerup.TELEPORTER, teleporter),
-                Map.entry(AceRacePowerup.STAR, star)
+                Map.entry(AceRacePowerup.STAR, star),
+                Map.entry(AceRacePowerup.LUNGE, lunge)
         );
     }
 

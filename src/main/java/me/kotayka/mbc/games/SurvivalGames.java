@@ -746,6 +746,11 @@ public class SurvivalGames extends Game {
             if (playerDamage.get(damager) == null) {
                 return;
             }
+            ItemStack i = damager.getInventory().getItemInMainHand();
+            if (i != null && i.getType().name().contains("AXE")) {
+                double newDamage = e.getDamage() *0.75;
+                e.setDamage(newDamage);
+            }
             double previous = playerDamage.get(damager);
             Player damaged = (Player) e.getEntity();
             double damage = Math.min(e.getDamage(), damaged.getHealth());
@@ -1084,6 +1089,7 @@ public class SurvivalGames extends Game {
         // CROSSBOW: QUICK CHARGE 1 OR MULTISHOT
         // ARMOR: Protection 1
         // BOOTS: Feather Falling 1
+        // SPEAR: Lunge 1
 
         if (!(book.getItemMeta() instanceof EnchantmentStorageMeta)) {
             p.sendMessage("Book has no enchants!");
@@ -1122,6 +1128,10 @@ public class SurvivalGames extends Game {
             tool.addEnchantment(ench, 1);
             e.setCursor(null);
         } else if (tool.getType().equals(Material.BOW) && ench.equals(Enchantment.POWER)){
+            p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
+            tool.addEnchantment(ench, 1);
+            e.setCursor(null);
+        } else if (toolName.contains("SPEAR") && ench.equals(Enchantment.LUNGE)){
             p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
             tool.addEnchantment(ench, 1);
             e.setCursor(null);
@@ -1185,7 +1195,7 @@ public class SurvivalGames extends Game {
     }
 
     private GUIItem[] setupGUIItems() {
-        GUIItem[] items = new GUIItem[7];
+        GUIItem[] items = new GUIItem[8];
 
         ItemStack sharpness = new ItemStack(Material.DIAMOND_SWORD);
         sharpness.addEnchantment(Enchantment.SHARPNESS, 1);
@@ -1242,6 +1252,14 @@ public class SurvivalGames extends Game {
         multishot.setItemMeta(msMeta);
         multishot.setLore(List.of("Cost: 2 XP"));
         items[6] = new GUIItem(multishot, Enchantment.MULTISHOT, 2);
+
+        ItemStack lunge = new ItemStack(Material.DIAMOND_SPEAR);
+        lunge.addUnsafeEnchantment(Enchantment.LUNGE, 1);
+        ItemMeta lMeta = lunge.getItemMeta();
+        lMeta.setDisplayName(ChatColor.BLUE+"Lunge 1");
+        lunge.setItemMeta(lMeta);
+        lunge.setLore(List.of("Cost: 2 XP"));
+        items[7] = new GUIItem(lunge, Enchantment.LUNGE, 2);
 
         return items;
     }

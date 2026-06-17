@@ -231,6 +231,11 @@ public class DecisionDome extends Minigame {
                 p.getPlayer().playSound(p.getPlayer(), "igm.decision_dome",SoundCategory.RECORDS, 1, 1);
             }
         }
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            if (p.getTeam().equals(MBC.getInstance().spectator)) {
+                p.getPlayer().teleport(new Location(world, 0, -30, 0));
+            }
+        }
 
         if (chooser != null) chooser.getPlayer().teleport(new Location(world, 0, -34.5, 0));
     }

@@ -124,8 +124,15 @@ public abstract class Minigame implements Scoreboard, Listener {
     public void Unpause() {
         Bukkit.broadcastMessage("Starting!");
         if (timeRemaining < 5) timeRemaining = 5;
-        gameState = GameState.STARTING;
+        if (name().equals("Ace Race")) {
+            gameState = GameState.END_ROUND;
+        }
+        else {
+            gameState = GameState.STARTING;
+        }
+        
         setTimer(timeRemaining);
+        
     }
 
     public void stopTimer() {

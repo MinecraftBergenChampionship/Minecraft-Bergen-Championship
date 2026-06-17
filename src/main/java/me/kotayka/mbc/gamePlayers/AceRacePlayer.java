@@ -330,6 +330,9 @@ public class AceRacePlayer extends GamePlayer {
     public void warpCheckpointSetter(int i) {
         if (!(i >= (ACE_RACE.map.mapLength) || i < 0)) {
             checkpoint = i;
+            //if (ACE_RACE.map.powerups && ACE_RACE.getState() == GameState.ACTIVE && ACE_RACE.map.powerupCheckpoints.contains(checkpoint))
+                //PowerupHandler.givePowerup(this);
+
             ACE_RACE.createLine(5, ChatColor.GREEN+"Checkpoint: " +ChatColor.RESET+ checkpoint + "/" + ACE_RACE.map.checkpoints.size(), this.getParticipant());
         }
     }
@@ -341,7 +344,7 @@ public class AceRacePlayer extends GamePlayer {
      * @return Whether the player is on their very first checkpoint.
      */
     public boolean onFirstCheckpoint() {
-       return (lap == 1 && checkpoint == 0);
+       return (lap == 1 && checkpoint < 3);
     }
 
     /**

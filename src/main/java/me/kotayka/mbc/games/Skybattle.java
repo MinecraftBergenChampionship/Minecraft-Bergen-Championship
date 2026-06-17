@@ -555,6 +555,11 @@ public class Skybattle extends Game {
         // for any general attack
         if (e.getDamager() instanceof Player) {
             player.lastDamager = (Player) e.getDamager();
+            ItemStack i = ((Player) e.getDamager()).getInventory().getItemInMainHand();
+            if (i != null && i.getType().name().contains("AXE")) {
+                double newDamage = e.getDamage() *0.75;
+                e.setDamage(newDamage);
+            }
         }
     }
 

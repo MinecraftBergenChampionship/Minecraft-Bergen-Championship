@@ -11,5 +11,6 @@ public enum BreakAreaType {
     OAK_LOGS,
     CHERRY_LOGS,
     DARK_OAK_LOGS,
-    MANGROVE_LOGS
+    MANGROVE_LOGS,
+    PALE_OAK_LOGS
 }
