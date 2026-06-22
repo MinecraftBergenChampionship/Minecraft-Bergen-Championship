@@ -2,7 +2,7 @@
 
 Source code for MBC Events. Code is dependent on pre-built maps which will remain private.
 
-**Disclaimer**
+## Disclaimer
 This tournament was initially inspired by, and serves as a partial recreation of, popular Minecraft tournaments such as [MCC](https://twitter.com/mcchampionship_), [BlockWars](https://twitter.com/BlockWarsEvent), and [Pandora's Box](https://twitter.com/PandorasBoxMC). We are not affiliated with these events, nor are we affiliated with Mojang or Minecraft.
 
 **MBC Events are private and no maps will be made available for download.**
