@@ -11,5 +11,6 @@ public enum AceRacePowerup {
     ROCKET_LAUNCHER,
     TELEPORTER,
     STAR,
-    LUNGE
+    LUNGE,
+    GOLDEN_LUNGE
 }

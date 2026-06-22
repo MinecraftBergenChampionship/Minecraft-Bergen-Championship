@@ -23,6 +23,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Spleef extends Game {
     private SpleefMap map = null;
@@ -44,7 +45,7 @@ public class Spleef extends Game {
     private boolean isBlind = false;
 
     // scoring
-    private final int SURVIVAL_POINTS = 2;
+    private final int SURVIVAL_POINTS = 1;
     private final int KILL_POINTS_18 = 3;
     private final int KILL_POINTS_24 = 5;
     private final int KILL_POINTS = KILL_POINTS_24;
@@ -54,6 +55,10 @@ public class Spleef extends Game {
     private Map<Location, SpleefBlock> brokenBlocks = new HashMap<>();
     private final long DAMAGE_COOLDOWN = 850;
     private final int[] BONUS_POINTS = {20, 15, 15, 10, 10, 8, 8, 8, 5, 5, 3, 3}; // 24 player; these numbers are arbitrary
+    private final int[] TEAM_BONUS = {5, 4, 3, 3, 2, 2};
+    private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
+    private List<SpleefPlayer> playerPlacements = new ArrayList<>();
+    private int deadTeams = 0;
     //private final int[] BONUS_POINTS = {10, 7, 6, 5, 4, 3, 2, 1};
     // NOTE: 16 player bonus is probably different
 
@@ -108,6 +113,9 @@ public class Spleef extends Game {
         );
         brokenBlocks.clear();
         map.resetMap();
+        if (teamPlacements != null) {
+            teamPlacements.clear();
+        }
     }
 
     @Override
@@ -190,6 +198,9 @@ public class Spleef extends Game {
         map = maps.get((int) (Math.random()*maps.size()));
         maps.remove(map);
         map.resetMap();
+        if (teamPlacements != null) {
+            teamPlacements.clear();
+        }
     }
 
     @Override
@@ -301,6 +312,10 @@ public class Spleef extends Game {
                         }
                     }
                     roundOverGraphics();
+                    for (Participant p : playersAlive) {
+                        MBCTeam t = p.getTeam();
+                        teamPlacements.put(t, 1);
+                    }
                     roundWinners(0, SURVIVAL_POINTS);
                     placementPoints();
                     setGameState(GameState.END_ROUND);
@@ -315,6 +330,10 @@ public class Spleef extends Game {
                         }
                     }
                     gameOverGraphics();
+                    for (Participant p : playersAlive) {
+                        MBCTeam t = p.getTeam();
+                        teamPlacements.put(t, 1);
+                    }
                     roundWinners(0, SURVIVAL_POINTS);
                     placementPoints();
                     setGameState(GameState.END_GAME);
@@ -416,6 +435,44 @@ public class Spleef extends Game {
 
     }
 
+    public void teamBonuses() {
+        for (MBCTeam t : getValidTeams()) {
+            for (Participant p : t.getPlayers()) {
+                if (p.getTeam() == MBC.getInstance().spectator) continue;
+                if (teamPlacements.get(t) == null) continue;
+                int placement = teamPlacements.get(t);
+                p.addCurrentScore(TEAM_BONUS[placement-1]);
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter(TEAM_BONUS[placement-1]));
+            }
+        }
+
+        Map<MBCTeam, Integer> averagePlacement = new HashMap<>();
+        Map<MBCTeam, Integer> currentPlayers = new HashMap<>();
+        for (MBCTeam t : getValidTeams()) {
+            for (Participant p : t.getPlayers()) {
+                if (p.getTeam() == MBC.getInstance().spectator) continue;
+                if (averagePlacement.containsKey(t)) {
+                    averagePlacement.replace(t, (averagePlacement.get(t)*currentPlayers.get(t) + playerPlacements.indexOf(p))/(currentPlayers.get(t)+1));
+                    currentPlayers.replace(t, currentPlayers.get(t)+1);
+                }
+                else {
+                    averagePlacement.put(t, playerPlacements.indexOf(p));
+                    currentPlayers.put(t, 1);
+                }
+            }
+        }
+
+        List<Map.Entry<MBCTeam, Integer>> sortedList = averagePlacement.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
+
+        for (int i = 0; i < sortedList.size(); i++) {
+            MBCTeam t = sortedList.get(i).getKey();
+            for (Participant p : t.getPlayers()) {
+                p.addCurrentScore(TEAM_BONUS[i]);
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team's average placement was " + getPlace(i+1) + "!" + MBC.scoreFormatter(TEAM_BONUS[i]));
+            }
+        }
+    }
+
     public void handleDeath(SpleefPlayer victim) {
         String deathMessage;
         if (victim.getLastDamager() == null) {
@@ -446,6 +503,21 @@ public class Spleef extends Game {
                 play.sendMessage(deathMessage);
             }
         }
+
+        int count = 0;
+        for (Participant p : victim.getParticipant().getTeam().teamPlayers) {
+            if (p.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
+                count++;
+            }
+        }
+
+        if (count == victim.getParticipant().getTeam().teamPlayers.size() && victim.getParticipant().getTeam() != MBC.getInstance().spectator) {
+            teamPlacements.put(victim.getParticipant().getTeam(), getValidTeams().size() - deadTeams);
+            deadTeams++;
+        }
+
+        playerPlacements.add(victim);
+
 
         victim.getPlayer().sendMessage(ChatColor.RED+"You died!");
         victim.getPlayer().sendTitle(" ", ChatColor.RED+"You died!", 0, 60, 20);

@@ -38,13 +38,14 @@ public final class PowerupHandler {
     private static final Material TELEPORTER = Material.ENDER_PEARL;
     private static final Material FIREBALL = Material.FIRE_CHARGE;
     private static final Material LUNGE = Material.WOODEN_SPEAR;
+    private static final Material GOLDEN_LUNGE = Material.GOLDEN_SPEAR;
 
     // Appropriate Set of Powerups
     private static final List<AceRacePowerup> TOP_SIXTH = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.TNT, AceRacePowerup.MEATBALL);
     private static final List<AceRacePowerup> TOP_THIRD = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.MEATBALL);
     private static final List<AceRacePowerup> TOP_HALF = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH);
-    private static final List<AceRacePowerup> BOTTOM_HALF = Arrays.asList(AceRacePowerup.LEAP, AceRacePowerup.STAR, AceRacePowerup.ROCKET_LAUNCHER, AceRacePowerup.SUGAR_HIGH);
-    private static final List<AceRacePowerup> BOTTOM_SIXTH = Arrays.asList(AceRacePowerup.TELEPORTER, AceRacePowerup.STAR, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.ROCKET_LAUNCHER);
+    private static final List<AceRacePowerup> BOTTOM_HALF = Arrays.asList(AceRacePowerup.LEAP, AceRacePowerup.STAR, AceRacePowerup.ROCKET_LAUNCHER, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.GOLDEN_LUNGE);
+    private static final List<AceRacePowerup> BOTTOM_SIXTH = Arrays.asList(AceRacePowerup.TELEPORTER, AceRacePowerup.STAR, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.ROCKET_LAUNCHER, AceRacePowerup.GOLDEN_LUNGE);
 
     private static final List<AceRacePowerup> SPINNING_POWERUPS = Arrays.asList(
             AceRacePowerup.BANANA_PEEL,
@@ -60,7 +61,7 @@ public final class PowerupHandler {
 
     // This list is reserved for the very first checkpoint on the very first lap.
     private static final List<AceRacePowerup> FIRST_CHECKPOINT_POWERUPS = Arrays.asList(AceRacePowerup.SUGAR_HIGH, AceRacePowerup.LEAP, AceRacePowerup.MEATBALL, AceRacePowerup.BANANA_PEEL);
-    //private static final List<AceRacePowerup> FIRST_CHECKPOINT_POWERUPS = Arrays.asList(AceRacePowerup.LUNGE);
+    //private static final List<AceRacePowerup> FIRST_CHECKPOINT_POWERUPS = Arrays.asList(AceRacePowerup.GOLDEN_LUNGE);
     private static final List<AceRacePowerup> PRACTICE_POWERUPS = Arrays.asList(
             AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.STAR, AceRacePowerup.TNT,
             AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.TELEPORTER, AceRacePowerup.ROCKET_LAUNCHER
@@ -76,6 +77,7 @@ public final class PowerupHandler {
     // Powerup Customization
     private static final int POWERUP_SPIN_DURATION_TICKS = 60; // 3 seconds
     private static final int STAR_DURATION_SECONDS = 10;
+    private static final int LUNGE_DURATION_SECONDS = 8;
     private static final int STUN_DURATION_TICKS = 60; // 3 seconds
     private static final int TELEPORTER_DELAY_TICKS = 50; // 2.5 seconds
 
@@ -94,13 +96,15 @@ public final class PowerupHandler {
             Map.entry(TELEPORTER, AceRacePowerup.TELEPORTER),
             Map.entry(FIREBALL, AceRacePowerup.FIREBALL),
             Map.entry(STAR, AceRacePowerup.STAR),
-            Map.entry(LUNGE, AceRacePowerup.LUNGE)
+            Map.entry(LUNGE, AceRacePowerup.LUNGE),
+            Map.entry(GOLDEN_LUNGE, AceRacePowerup.GOLDEN_LUNGE)
     );
 
     private static final Map<AceRacePowerup, ItemStack> POWERUP_ITEMS = initializePowerupMeta();
     private static final Map<AreaEffectCloud, AceRacePlayer> playerCloudMap = new HashMap<>();
 
     private static final Set<Player> starPlayers = new HashSet<>();
+    private static final Set<Player> goldenLungers = new HashSet<>();
     private static final Set<Player> playersWithPowerup = new HashSet<>();
     private static final Set<Player> stunnedPlayers = new HashSet<>();
 
@@ -238,6 +242,8 @@ public final class PowerupHandler {
                 useFireball(player.getPlayer());
                 break;
             case LUNGE:
+                break;
+            case GOLDEN_LUNGE:
                 break;
         }
     }
@@ -386,6 +392,24 @@ public final class PowerupHandler {
         p.removePotionEffect(PotionEffectType.WEAKNESS);
         p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, STAR_DURATION_SECONDS * 20, 5));
         starEffects(p, STAR_DURATION_SECONDS);
+    }
+
+    /**
+     * Handles using golden lunge effects for player.
+     *
+     * @param player The player who is activating the effects.
+     */
+    public static void useGoldenLunge(Player player) {
+        if (!goldenLungers.contains(player)) {
+            player.sendMessage(ChatColor.GREEN + "You have " + LUNGE_DURATION_SECONDS + " seconds of unlimited lunges!");
+            goldenLungers.add(player);
+            MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() { @Override
+            public void run() {
+                player.getInventory().remove(GOLDEN_LUNGE);
+                goldenLungers.remove(player);
+            }
+            }, 160L); // change this if the lunge duration changes
+        }   
     }
 
     /**
@@ -591,7 +615,7 @@ public final class PowerupHandler {
         // star
         ItemStack star = new ItemStack(STAR, 1);
         meta = star.getItemMeta();
-        displayName = Component.text("Super Star").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD);
+        displayName = Component.text("Super Star").color(NamedTextColor.AQUA).decorate(TextDecoration.BOLD);
         meta.displayName(displayName);
         star.setItemMeta(meta);
 
@@ -617,7 +641,15 @@ public final class PowerupHandler {
         Damageable damageable = (Damageable) meta;
         damageable.setDamage(lunge.getType().getMaxDurability() - 1);
         lunge.setItemMeta((ItemMeta) damageable);
-        lunge.addEnchantment(Enchantment.LUNGE, 3);
+        lunge.addEnchantment(Enchantment.LUNGE, 2);
+
+        // lunge
+        ItemStack goldenLunge = new ItemStack(GOLDEN_LUNGE, 1);
+        meta = goldenLunge.getItemMeta();
+        displayName = Component.text("Golden Lunge").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD);
+        meta.displayName(displayName);
+        goldenLunge.setItemMeta(meta);
+        goldenLunge.addEnchantment(Enchantment.LUNGE, 2);
 
         return Map.ofEntries(
                 Map.entry(AceRacePowerup.BANANA_PEEL, banana),
@@ -628,7 +660,8 @@ public final class PowerupHandler {
                 Map.entry(AceRacePowerup.ROCKET_LAUNCHER, rocket),
                 Map.entry(AceRacePowerup.TELEPORTER, teleporter),
                 Map.entry(AceRacePowerup.STAR, star),
-                Map.entry(AceRacePowerup.LUNGE, lunge)
+                Map.entry(AceRacePowerup.LUNGE, lunge),
+                Map.entry(AceRacePowerup.GOLDEN_LUNGE, goldenLunge)
         );
     }
 

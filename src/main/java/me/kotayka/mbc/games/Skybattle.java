@@ -36,19 +36,19 @@ public class Skybattle extends Game {
     public Map<Entity,Player> witchSpawners = new HashMap<>();
      private final int ORIGINAL_KILL_POINTS_18 = 9;
     private final int ORIGINAL_KILL_POINTS_24 = 10;
-    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_18;
+    private final int ORIGINAL_KILL_POINTS = ORIGINAL_KILL_POINTS_24;
 
     private final int THREE_KILL_POINTS_18 = 7;
     private final int THREE_KILL_POINTS_24 = 8;
-    private final int THREE_KILL_POINTS = THREE_KILL_POINTS_18;
+    private final int THREE_KILL_POINTS = THREE_KILL_POINTS_24;
 
     private final int SIX_KILL_POINTS_18 = 6;
     private final int SIX_KILL_POINTS_24 = 7;
-    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_18;
+    private final int SIX_KILL_POINTS = SIX_KILL_POINTS_24;
 
     private final int NINE_KILL_POINTS_18 = 5;
     private final int NINE_KILL_POINTS_24 = 6;
-    private final int NINE_KILL_POINTS = NINE_KILL_POINTS_18;
+    private final int NINE_KILL_POINTS = NINE_KILL_POINTS_24;
     private int deadTeams = 0; // just to avoid sync issues w/teamsAlive.size()
     private Map<MBCTeam, Integer> teamPlacements = new HashMap<>();
     private final int SURVIVAL_POINTS = 1;
@@ -419,8 +419,8 @@ public class Skybattle extends Game {
                 if (p.getTeam() == MBC.getInstance().spectator) continue;
                 if (teamPlacements.get(t) == null) continue;
                 int placement = teamPlacements.get(t);
-                p.addCurrentScore(TEAM_BONUSES_3[placement-1] / t.getPlayers().size());
-                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_3[placement-1] / t.getPlayers().size())));
+                p.addCurrentScore(TEAM_BONUSES_4[placement-1] / t.getPlayers().size());
+                p.getPlayer().sendMessage(ChatColor.GREEN + "Your team came in " + getPlace(placement) + "!" + MBC.scoreFormatter((int)(TEAM_BONUSES_4[placement-1] / t.getPlayers().size())));
             }
         }
     }
