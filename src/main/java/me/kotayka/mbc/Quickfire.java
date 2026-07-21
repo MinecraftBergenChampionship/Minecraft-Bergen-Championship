@@ -41,7 +41,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import me.kotayka.mbc.gameMaps.quickfireMap.QuickfireMap;
-import me.kotayka.mbc.gameMaps.quickfireMap.SnowGlobe;
 import me.kotayka.mbc.gameMaps.quickfireMap.West;
 import me.kotayka.mbc.gamePlayers.QuickfirePlayer;
 import net.md_5.bungee.api.ChatMessageType;
@@ -170,6 +169,10 @@ public class Quickfire extends FinaleGame {
         UUID james = UUID.fromString("e469f61b-5dd1-427d-b54f-2cefbd7abf0c");
         UUID danny = UUID.fromString("f4220995-3609-4007-9438-4f4d89e9d993");
         UUID mari = UUID.fromString("7f04d129-e313-4711-870f-d04db68274c2");
+        UUID albert = UUID.fromString("2646fde5-b991-4d49-a2d8-8bab44aa6255");
+        UUID elliot = UUID.fromString("5fc3df22-6db0-4a86-b194-123d17fa9ddb");
+        UUID liam = UUID.fromString("b5da0d77-5bc1-494d-af80-00d50a3ed967");
+        UUID jocelyn = UUID.fromString("d5cd3d2c-907b-4827-aa32-e88e2825147a");
 
         playerWalkoutSongs.put(cam, "walkout.bigkirbypuff");
         playerWalkoutSongs.put(collin, "walkout.rspacerr");
@@ -200,9 +203,13 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongs.put(danny, "walkout.friegg");
         playerWalkoutSongs.put(mari, "walkout.bowwo");
         playerWalkoutSongs.put(james, "walkout.imperialbomber");
+        playerWalkoutSongs.put(albert, "walkout.bebead");
+        playerWalkoutSongs.put(elliot, "walkout.mcneel");
+        playerWalkoutSongs.put(liam, "walkout.laminatoryt");
+        playerWalkoutSongs.put(jocelyn, "walkout.aioqiia");
 
         playerWalkoutBlurbs.put(cam, "The worldwide #1 supporter of milk...");
-        playerWalkoutBlurbs.put(collin, "Don't ask him how he eats his Chicken Nuggets...");
+        playerWalkoutBlurbs.put(collin, "He's unemployed, so you know he's good...");
         playerWalkoutBlurbs.put(caleb, "With his mouse in one hand and an extra large boba in the other...");
         playerWalkoutBlurbs.put(devin, "The powerless president and fraudulent dictator of Ethipia...");
         playerWalkoutBlurbs.put(nikola, "Watch out for his railroad tunnels underneath the Quickfire arena...");
@@ -212,27 +219,31 @@ public class Quickfire extends FinaleGame {
         playerWalkoutBlurbs.put(cookie, "One could say she's a \"tough cookie\"...");
         playerWalkoutBlurbs.put(tony, "When his pants turn brown... run...");
         playerWalkoutBlurbs.put(carrie, "A woman of many middle names...");
-        playerWalkoutBlurbs.put(cres, "Everybody, raise your ya ya ya for...");
+        playerWalkoutBlurbs.put(cres, "He's lowkenuinely iconic NOT by mistake...");
         playerWalkoutBlurbs.put(mango, "AHHHHHHHHHHH!");
         playerWalkoutBlurbs.put(liz, "To everyone's shock, awe, and disbelief...");
         playerWalkoutBlurbs.put(esther, "Don't ask her about her time working at Paris Baguette...");
-        playerWalkoutBlurbs.put(janzelle, "She is not in danger - she IS the danger...");
+        playerWalkoutBlurbs.put(janzelle, "A new bombshell has entered the villa...");
         playerWalkoutBlurbs.put(pickle, "Pickle, puh Pickle, puh, puh, puh, Pickle Pickle...");
         playerWalkoutBlurbs.put(noah, "Just the name \"Noah Paul Gaming\" strikes fear in his competitors...");
         playerWalkoutBlurbs.put(queakie, "Ready to find your entire family genealogy...");
         playerWalkoutBlurbs.put(penguin, "He has MBC rings for every finger on his hand...");
         playerWalkoutBlurbs.put(ehnry, "He's spent thousands of dollars on CS2 cases...");
         playerWalkoutBlurbs.put(sam, "Dancing her way into quickfire...");
-        playerWalkoutBlurbs.put(blueboy, "IMG_0351.png...");
+        playerWalkoutBlurbs.put(blueboy, "This blue boy is the king of cats...");
         playerWalkoutBlurbs.put(malena, "No, it's NOT offensive to her culture to listen to emo music...");
         playerWalkoutBlurbs.put(nathaniel, "He has a \"noteworthy\" relationship with Aristotle...");
         playerWalkoutBlurbs.put(forrest, "Known to many as the \"Red Chud\"...");
-        playerWalkoutBlurbs.put(danny, "This chip guy is coming for the 'chip...");
+        playerWalkoutBlurbs.put(danny, "Preparing to hit an Electric Wind God Fist...");
         playerWalkoutBlurbs.put(mari, "The pro gamer from the land of corn...");
         playerWalkoutBlurbs.put(james, "A most auspicious member of the team...");
+        playerWalkoutBlurbs.put(albert, "MBC's blondest competitor...");
+        playerWalkoutBlurbs.put(elliot, "Just waking up from his nap to win Quickfire...");
+        playerWalkoutBlurbs.put(liam, "");
+        playerWalkoutBlurbs.put(jocelyn, "");
 
         playerWalkoutSongNames.put(cam, "Sleepyhead, Passion Pit");
-        playerWalkoutSongNames.put(collin, "Radioactive, Imagine Dragons");
+        playerWalkoutSongNames.put(collin, "Clarity (Muffoxx Edit), Zedd");
         playerWalkoutSongNames.put(caleb, "HOT TO GO!, Chappell Roan");
         playerWalkoutSongNames.put(devin, "Desenfocao', Rauw Alejandro");
         playerWalkoutSongNames.put(nikola, "Boss, Plok!");
@@ -242,24 +253,28 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongNames.put(cookie, "Low, Flo Rida & T-Pain");
         playerWalkoutSongNames.put(tony, "We are Charlie Kirk, SPALEXMA");
         playerWalkoutSongNames.put(carrie, "Like a G6, Far East Movement");
-        playerWalkoutSongNames.put(cres, "Gameboy, KATSEYE");
+        playerWalkoutSongNames.put(cres, "It's Me, ILLIT");
         playerWalkoutSongNames.put(mango, "The Devourer of Gods, Terraria Calamity Mod");
         playerWalkoutSongNames.put(liz, "Fight Song, Sister Sin");
         playerWalkoutSongNames.put(esther, "SHYNE, Travis Scott");
-        playerWalkoutSongNames.put(janzelle, "Next Level Charli, Charli XCX");
+        playerWalkoutSongNames.put(janzelle, "Hunger Games, Bajan Canadian");
         playerWalkoutSongNames.put(pickle, "Pickle Song");
         playerWalkoutSongNames.put(noah, "Steve Intro, Super Smash Bros. Ultimate");
         playerWalkoutSongNames.put(queakie, "We Like to Party, Vengaboys");
         playerWalkoutSongNames.put(penguin, "The Duck Song, Bryant Oden");
         playerWalkoutSongNames.put(ehnry, "Get Outside, Youtube Audio Library");
         playerWalkoutSongNames.put(sam, "I Wish that Heaven had a Phone to Call You Up");
-        playerWalkoutSongNames.put(blueboy, "Simple and Clean, Hikaru Utada");
+        playerWalkoutSongNames.put(blueboy, "Eatin' Rats, Mewgenics");
         playerWalkoutSongNames.put(malena, "Strangers, Ethel Cain");
         playerWalkoutSongNames.put(nathaniel, "Tubthumping, Chumbawamba");
         playerWalkoutSongNames.put(forrest, "Hips Don't Lie, Shakira");
-        playerWalkoutSongNames.put(danny, "Tornado, Good Kid");
+        playerWalkoutSongNames.put(danny, "Run The World!!!, Dayglow");
         playerWalkoutSongNames.put(mari, "So Much Better, Legally Blonde: The Musical");
         playerWalkoutSongNames.put(james, "Mr. Brightside, The Killers");
+        playerWalkoutSongNames.put(albert, "Chicago, Michael Jackson");
+        playerWalkoutSongNames.put(elliot, "iPod Touch, Ninajirachi");
+        playerWalkoutSongNames.put(liam, "Shake Back, Kodak Black");
+        playerWalkoutSongNames.put(jocelyn, "Hard Times, Paramore");
     }
 
     @Override

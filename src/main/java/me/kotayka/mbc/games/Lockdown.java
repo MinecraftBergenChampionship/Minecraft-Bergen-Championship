@@ -714,7 +714,7 @@ public class Lockdown extends Game {
             int z = (l.getBlockZ());
 
             Block check = new Location(map.getWorld(), x, 1, z).getBlock();
-            if (check.getType().equals(Material.WAXED_EXPOSED_COPPER_BULB) && p.getY() < 4.5) {
+            if (check.getType().equals(Material.WAXED_EXPOSED_COPPER_BULB) && p.getY() < 6) {
                 p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "You are now escaping!" + ChatColor.RESET + "" + ChatColor.RED + 
                                                 " Hold shift and wait 5 seconds.");
                 p.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 100, 7, false, false));
