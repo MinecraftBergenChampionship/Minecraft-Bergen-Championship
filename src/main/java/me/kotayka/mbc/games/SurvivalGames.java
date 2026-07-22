@@ -1131,15 +1131,17 @@ public class SurvivalGames extends Game {
             p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
             tool.addEnchantment(ench, 1);
             e.setCursor(null);
-        } else if (toolName.contains("SPEAR") && ench.equals(Enchantment.LUNGE)){
-            p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
-            tool.addEnchantment(ench, 1);
-            e.setCursor(null);
-        } else {
+        } 
+        else {
             p.playSound(p, Sound.ENTITY_ITEM_BREAK, 1, 1);
             p.sendMessage(ChatColor.RED + "Cannot apply this enchantment to this item!");
             e.setCancelled(true);
         }
+        //else if (toolName.contains("SPEAR") && ench.equals(Enchantment.LUNGE)){
+            //p.playSound(p, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
+            //tool.addEnchantment(ench, 1);
+            //e.setCursor(null);
+        //} 
         e.setCancelled(true);
     }
 
@@ -1195,7 +1197,7 @@ public class SurvivalGames extends Game {
     }
 
     private GUIItem[] setupGUIItems() {
-        GUIItem[] items = new GUIItem[8];
+        GUIItem[] items = new GUIItem[7];
 
         ItemStack sharpness = new ItemStack(Material.DIAMOND_SWORD);
         sharpness.addEnchantment(Enchantment.SHARPNESS, 1);
@@ -1253,13 +1255,13 @@ public class SurvivalGames extends Game {
         multishot.setLore(List.of("Cost: 2 XP"));
         items[6] = new GUIItem(multishot, Enchantment.MULTISHOT, 2);
 
-        ItemStack lunge = new ItemStack(Material.DIAMOND_SPEAR);
-        lunge.addUnsafeEnchantment(Enchantment.LUNGE, 1);
-        ItemMeta lMeta = lunge.getItemMeta();
-        lMeta.setDisplayName(ChatColor.BLUE+"Lunge 1");
-        lunge.setItemMeta(lMeta);
-        lunge.setLore(List.of("Cost: 2 XP"));
-        items[7] = new GUIItem(lunge, Enchantment.LUNGE, 2);
+        //ItemStack lunge = new ItemStack(Material.DIAMOND_SPEAR);
+        //lunge.addUnsafeEnchantment(Enchantment.LUNGE, 1);
+        //ItemMeta lMeta = lunge.getItemMeta();
+        //lMeta.setDisplayName(ChatColor.BLUE+"Lunge 1");
+        //lunge.setItemMeta(lMeta);
+        //lunge.setLore(List.of("Cost: 2 XP"));
+        //items[7] = new GUIItem(lunge, Enchantment.LUNGE, 2);
 
         return items;
     }

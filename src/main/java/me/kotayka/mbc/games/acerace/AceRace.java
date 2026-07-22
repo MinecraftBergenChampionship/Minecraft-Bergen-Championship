@@ -745,14 +745,14 @@ public class AceRace extends Game {
         }
     }
 
-    @EventHandler
-    public void onSpearUse(PlayerItemDamageEvent event) {
+    //@EventHandler
+    //public void onSpearUse(PlayerItemDamageEvent event) {
         //Bukkit.broadcastMessage("checkeone");
-        if (event.getItem().getType().equals(Material.GOLDEN_SPEAR)) {
+        //if (event.getItem().getType().equals(Material.GOLDEN_SPEAR)) {
             //Bukkit.broadcastMessage("check two");
-            PowerupHandler.useGoldenLunge(event.getPlayer());
-        }
-    }
+            //PowerupHandler.useGoldenLunge(event.getPlayer());
+        //}
+    //}
 
     @EventHandler
     private void onAttack(EntityDamageByEntityEvent e) {

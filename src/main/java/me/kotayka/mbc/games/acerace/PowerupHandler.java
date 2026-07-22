@@ -37,15 +37,15 @@ public final class PowerupHandler {
     private static final Material TNT = Material.TNT;
     private static final Material TELEPORTER = Material.ENDER_PEARL;
     private static final Material FIREBALL = Material.FIRE_CHARGE;
-    private static final Material LUNGE = Material.WOODEN_SPEAR;
-    private static final Material GOLDEN_LUNGE = Material.GOLDEN_SPEAR;
+    //private static final Material LUNGE = Material.WOODEN_SPEAR;
+    //private static final Material GOLDEN_LUNGE = Material.GOLDEN_SPEAR;
 
     // Appropriate Set of Powerups
     private static final List<AceRacePowerup> TOP_SIXTH = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.TNT, AceRacePowerup.MEATBALL);
     private static final List<AceRacePowerup> TOP_THIRD = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.MEATBALL);
-    private static final List<AceRacePowerup> TOP_HALF = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH);
-    private static final List<AceRacePowerup> BOTTOM_HALF = Arrays.asList(AceRacePowerup.LEAP, AceRacePowerup.STAR, AceRacePowerup.ROCKET_LAUNCHER, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.GOLDEN_LUNGE);
-    private static final List<AceRacePowerup> BOTTOM_SIXTH = Arrays.asList(AceRacePowerup.TELEPORTER, AceRacePowerup.STAR, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.ROCKET_LAUNCHER, AceRacePowerup.GOLDEN_LUNGE);
+    private static final List<AceRacePowerup> TOP_HALF = Arrays.asList(AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH);
+    private static final List<AceRacePowerup> BOTTOM_HALF = Arrays.asList(AceRacePowerup.LEAP, AceRacePowerup.STAR, AceRacePowerup.ROCKET_LAUNCHER, AceRacePowerup.SUGAR_HIGH);
+    private static final List<AceRacePowerup> BOTTOM_SIXTH = Arrays.asList(AceRacePowerup.TELEPORTER, AceRacePowerup.STAR, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.ROCKET_LAUNCHER);
 
     private static final List<AceRacePowerup> SPINNING_POWERUPS = Arrays.asList(
             AceRacePowerup.BANANA_PEEL,
@@ -95,9 +95,9 @@ public final class PowerupHandler {
             Map.entry(TNT, AceRacePowerup.TNT),
             Map.entry(TELEPORTER, AceRacePowerup.TELEPORTER),
             Map.entry(FIREBALL, AceRacePowerup.FIREBALL),
-            Map.entry(STAR, AceRacePowerup.STAR),
-            Map.entry(LUNGE, AceRacePowerup.LUNGE),
-            Map.entry(GOLDEN_LUNGE, AceRacePowerup.GOLDEN_LUNGE)
+            Map.entry(STAR, AceRacePowerup.STAR)
+            //Map.entry(LUNGE, AceRacePowerup.LUNGE),
+            //Map.entry(GOLDEN_LUNGE, AceRacePowerup.GOLDEN_LUNGE)
     );
 
     private static final Map<AceRacePowerup, ItemStack> POWERUP_ITEMS = initializePowerupMeta();
@@ -399,18 +399,18 @@ public final class PowerupHandler {
      *
      * @param player The player who is activating the effects.
      */
-    public static void useGoldenLunge(Player player) {
-        if (!goldenLungers.contains(player)) {
-            player.sendMessage(ChatColor.GREEN + "You have " + LUNGE_DURATION_SECONDS + " seconds of unlimited lunges!");
-            goldenLungers.add(player);
-            MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() { @Override
-            public void run() {
-                player.getInventory().remove(GOLDEN_LUNGE);
-                goldenLungers.remove(player);
-            }
-            }, 160L); // change this if the lunge duration changes
-        }   
-    }
+    //public static void useGoldenLunge(Player player) {
+        //if (!goldenLungers.contains(player)) {
+            //player.sendMessage(ChatColor.GREEN + "You have " + LUNGE_DURATION_SECONDS + " seconds of unlimited lunges!");
+            //goldenLungers.add(player);
+            //MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() { @Override
+            //public void run() {
+               // player.getInventory().remove(GOLDEN_LUNGE);
+               // goldenLungers.remove(player);
+           // }
+           // }, 160L); // change this if the lunge duration changes
+       // }   
+   // }
 
     /**
      * Handles initial effects of using the fireball powerup
@@ -634,22 +634,22 @@ public final class PowerupHandler {
         fireball.setItemMeta(meta);
 
         // lunge
-        ItemStack lunge = new ItemStack(LUNGE, 1);
-        meta = lunge.getItemMeta();
-        displayName = Component.text("Lunge").color(NamedTextColor.DARK_PURPLE).decorate(TextDecoration.BOLD);
-        meta.displayName(displayName);
-        Damageable damageable = (Damageable) meta;
-        damageable.setDamage(lunge.getType().getMaxDurability() - 1);
-        lunge.setItemMeta((ItemMeta) damageable);
-        lunge.addEnchantment(Enchantment.LUNGE, 2);
+        //ItemStack lunge = new ItemStack(LUNGE, 1);
+        //meta = lunge.getItemMeta();
+        //displayName = Component.text("Lunge").color(NamedTextColor.DARK_PURPLE).decorate(TextDecoration.BOLD);
+        //meta.displayName(displayName);
+        //Damageable damageable = (Damageable) meta;
+        //damageable.setDamage(lunge.getType().getMaxDurability() - 1);
+        //lunge.setItemMeta((ItemMeta) damageable);
+        //lunge.addEnchantment(Enchantment.LUNGE, 2);
 
         // lunge
-        ItemStack goldenLunge = new ItemStack(GOLDEN_LUNGE, 1);
-        meta = goldenLunge.getItemMeta();
-        displayName = Component.text("Golden Lunge").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD);
-        meta.displayName(displayName);
-        goldenLunge.setItemMeta(meta);
-        goldenLunge.addEnchantment(Enchantment.LUNGE, 2);
+        //ItemStack goldenLunge = new ItemStack(GOLDEN_LUNGE, 1);
+        //meta = goldenLunge.getItemMeta();
+        //displayName = Component.text("Golden Lunge").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD);
+        //meta.displayName(displayName);
+        //goldenLunge.setItemMeta(meta);
+        //goldenLunge.addEnchantment(Enchantment.LUNGE, 2);
 
         return Map.ofEntries(
                 Map.entry(AceRacePowerup.BANANA_PEEL, banana),
@@ -659,9 +659,9 @@ public final class PowerupHandler {
                 Map.entry(AceRacePowerup.TNT, tnt),
                 Map.entry(AceRacePowerup.ROCKET_LAUNCHER, rocket),
                 Map.entry(AceRacePowerup.TELEPORTER, teleporter),
-                Map.entry(AceRacePowerup.STAR, star),
-                Map.entry(AceRacePowerup.LUNGE, lunge),
-                Map.entry(AceRacePowerup.GOLDEN_LUNGE, goldenLunge)
+                Map.entry(AceRacePowerup.STAR, star)
+                //Map.entry(AceRacePowerup.LUNGE, lunge),
+                //Map.entry(AceRacePowerup.GOLDEN_LUNGE, goldenLunge)
         );
     }
 
