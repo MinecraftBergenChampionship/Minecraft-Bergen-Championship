@@ -13,8 +13,8 @@
     <description>MBC Plugin</description>
     <properties>
         <java.version>25</java.version>
-        <mc.version>26.1.2</mc.version>
-        <paper.version>26.1.2</paper.version>
+        <mc.version>1.21.1</mc.version>
+        <paper.version>1.21.1</paper.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
@@ -122,10 +122,10 @@
 
     <dependencies>
         <!-- https://github.com/PaperMC/Paper/issues/12849 -->
-       <dependency>
+        <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>[26.1.2.build,)</version>
+            <version>1.21.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -145,7 +145,7 @@
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
-            <version>7.4.0</version>
+            <version>7.3.0</version>
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->

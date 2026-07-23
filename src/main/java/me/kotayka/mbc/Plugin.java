@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.boss.BossBar;
 import org.bukkit.boss.KeyedBossBar;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Recipe;
@@ -15,7 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
-import java.util.List;
 
 public class Plugin extends JavaPlugin implements Listener {
 
