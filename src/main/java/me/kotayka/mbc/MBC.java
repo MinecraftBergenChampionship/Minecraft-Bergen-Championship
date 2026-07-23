@@ -1022,6 +1022,10 @@ public class MBC implements Listener {
     }
 
     public void ready(MBCTeam t, Player p) {
+        if (t instanceof Spectator) {
+            p.sendMessage("Spectator team cannot ready up!");
+            return;
+        }
         if (ready.get(t) != null && ready.get(t).equals(Boolean.FALSE)) {
             Bukkit.broadcastMessage(t.teamNameFormat() + " are ready!");
             ready.put(t, Boolean.TRUE);
