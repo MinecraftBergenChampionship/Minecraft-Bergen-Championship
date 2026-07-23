@@ -1093,6 +1093,9 @@ public class DecisionDome extends Minigame {
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
             p.getPlayer().sendTitle(" ", team.teamNameFormat() + ChatColor.RESET + " were dunked!", 0, 60, 30);
             p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 1, 1);
+            if (p.getTeam() instanceof Spectator) {
+                p.getPlayer().setGameMode(GameMode.SPECTATOR);
+            }
             if (p.getTeam().equals(team) && !p.equals(swapper)) {
                 p.getPlayer().teleport(getTeleportLocation(p.getTeam().getChatColor()));
                 p.getPlayer().setVelocity(new Vector(0, 0, 0));
