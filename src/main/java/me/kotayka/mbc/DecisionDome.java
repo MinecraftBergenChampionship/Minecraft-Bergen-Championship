@@ -68,8 +68,8 @@ public class DecisionDome extends Minigame {
     private final int VOTING_TIME = 30;
     // Note that min triple chicken time here is denoted by time when triple time ends. With t = 30,
     // a MIN_TRIPLE_CHICKEN_TIME of 22 allows for only 8 seconds of triple chicken time.
-    private final int MIN_TRIPLE_CHICKEN_TIME = 25;
-    private final int MAX_TRIPLE_CHICKEN_TIME = 10;
+    private final int MIN_TRIPLE_CHICKEN_TIME = 22;
+    private final int MAX_TRIPLE_CHICKEN_TIME = 15;
 
     private List<MBCTeam> powerupTeams = new ArrayList<>();
     private final Map<VotePowerup, Integer> lastPlaceWeights = Map.ofEntries(
@@ -104,8 +104,8 @@ public class DecisionDome extends Minigame {
     private int currentSection = (int) (Math.random() * gameNames.size());
     private Section winner;
     private boolean tie = false;
-    //                                  vv Earliest triple expire   vv Latest triple expire (longest)
-    private int tripleTime = (int) (Math.random() * MIN_TRIPLE_CHICKEN_TIME) + MAX_TRIPLE_CHICKEN_TIME;
+    //                                               vv Earliest triple expire                             vv Latest triple expire (longest)
+    private int tripleTime = (int) (Math.random() * (MIN_TRIPLE_CHICKEN_TIME - MAX_TRIPLE_CHICKEN_TIME)) + MAX_TRIPLE_CHICKEN_TIME;
     private boolean tripled = true;
 
     public DecisionDome(boolean revealedGames) {
@@ -321,7 +321,7 @@ public class DecisionDome extends Minigame {
                         swapper.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "Walls will be raised with 11 seconds left!");
                         swapper.sendMessage(MBC.MBC_STRING_PREFIX + ChatColor.RED + "Get in your section with 8 seconds remaining for your vote to count!");
                     }
-                    timeRemaining = 15;
+                    timeRemaining = 17;
                 }
                 case VOTING_TIME -> startVoting();
             }
@@ -384,8 +384,8 @@ public class DecisionDome extends Minigame {
                     setGameState(GameState.END_GAME);
                     HandlerList.unregisterAll(this);
                     timeRemaining = 13;
-                    //                                  vv Earliest triple expire   vv Latest triple expire (longest)
-                    tripleTime = (int) (Math.random() * MIN_TRIPLE_CHICKEN_TIME) + MAX_TRIPLE_CHICKEN_TIME;
+                    //                                   vv Earliest triple expire                             vv Latest triple expire (longest)
+                    tripleTime = (int) (Math.random() * (MIN_TRIPLE_CHICKEN_TIME - MAX_TRIPLE_CHICKEN_TIME)) + MAX_TRIPLE_CHICKEN_TIME;
                 }
             }
         } else if (getState().equals(GameState.END_GAME)) {
