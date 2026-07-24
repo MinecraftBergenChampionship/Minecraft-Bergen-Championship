@@ -28,7 +28,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
         super.replicationLocations.put(BreakAreaType.DARK_OAK_LOGS, new Location(w, -4, -16, 159));
         super.replicationLocations.put(BreakAreaType.CHERRY_LOGS, new Location(w, 5, -16, 159));
         super.replicationLocations.put(BreakAreaType.MANGROVE_LOGS, new Location(w, 14, -16, 159));
-        super.replicationLocations.put(BreakAreaType.PALE_OAK_LOGS, new Location(w, 23, -16, 159));
+        //super.replicationLocations.put(BreakAreaType.PALE_OAK_LOGS, new Location(w, 23, -16, 159));
         super.replicationLocations.put(BreakAreaType.SAND, new Location(w, -60, -16, 159));
         super.replicationLocations.put(BreakAreaType.ORES, new Location(w, -78, -16, 159));
         this.BUILD_MART = buildMart;
@@ -109,7 +109,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
         addBreakArea(new BreakArea(Material.DARK_OAK_LOG, new Location(w, -91, 73, -4), new Location(w, -83, 79, 4), BreakAreaType.DARK_OAK_LOGS, new Location(w, -81, 72, 7, -180, 0)));
         addBreakArea(new BreakArea(Material.ACACIA_LOG, new Location(w, -91, 82, -4), new Location(w, -83, 88, 4), BreakAreaType.ACACIA_LOGS, new Location(w, -81, 81, 6, -180, 0)));
         addBreakArea(new BreakArea(Material.SPRUCE_LOG, new Location(w, -105, 73, 10), new Location(w, -97, 79, 18), BreakAreaType.SPRUCE_LOGS, new Location(w, -94, 72, 14, 90, 0)));
-        addBreakArea(new BreakArea(Material.PALE_OAK_LOG, new Location(w, -105, 82, 10), new Location(w, -97, 88, 18), BreakAreaType.PALE_OAK_LOGS, new Location(w, -96, 81, 14, 90, 0)));
+        //addBreakArea(new BreakArea(Material.PALE_OAK_LOG, new Location(w, -105, 82, 10), new Location(w, -97, 88, 18), BreakAreaType.PALE_OAK_LOGS, new Location(w, -96, 81, 14, 90, 0)));
 
         // stone
         addBreakArea(new BreakArea(Material.STONE, new Location(w, -8, 67, -84), new Location(w, 2, 73, -74), new Location(w, -11, 74, -87, -90, 0)));
