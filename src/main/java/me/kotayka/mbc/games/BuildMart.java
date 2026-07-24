@@ -172,7 +172,10 @@ public class BuildMart extends Game {
             if (timeRemaining == 0) {
                 map.openPortals(true);
                 for (Participant p : MBC.getInstance().getPlayers()) {
+                    boolean flying  = p.getPlayer().isFlying();
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
+                    p.getPlayer().setAllowFlight(true);
+                    p.getPlayer().setFlying(flying);
                 }
                 setGameState(GameState.ACTIVE);
                 timeRemaining = 720;
@@ -184,6 +187,7 @@ public class BuildMart extends Game {
                     }
                     for (Participant p : MBC.getInstance().getPlayers()) {
                         p.getPlayer().setGameMode(GameMode.ADVENTURE);
+                        p.getPlayer().setAllowFlight(true);
                     }
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.playSound(p, "igm.build_mart", SoundCategory.RECORDS, 1, 1);
