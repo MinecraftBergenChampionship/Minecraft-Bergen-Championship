@@ -59,7 +59,8 @@ public class DecisionDome extends Minigame {
     private final World world = Bukkit.getWorld("DecisionDome");
     private boolean revealedGames;
     // Icon display code is kinda missy can probably be improved; a refactoring of game class may need to be made for cleanest icon support but not doing it yet @see Game
-    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑮ Build Mart", "⑬ Survival Games", "⑲ Lockdown", "⑯ Spleef", "⑰ Party", "⑱ Power Tag", "⑭ Ace Race")); // skips skybattle
+    public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑮ Build Mart", "⑲ Lockdown", "⑰ Party", "⑱ Power Tag", "⑭ Ace Race", "⑫ Skybattle")); // skips sg and spleef
+    //public List<String> gameNames = new ArrayList<>(Arrays.asList("⑪ TGTTOS", "⑮ Build Mart", "⑬ Survival Games", "⑲ Lockdown", "⑯ Spleef", "⑰ Party", "⑱ Power Tag", "⑭ Ace Race")); // skips skybattle
     //public List<String> gameNames = new ArrayList<>(Arrays.asList("⑬ Survival Games", "⑪ TGTTOS", "⑭ Ace Race", "⑲ Lockdown", "⑯ Spleef", "⑮ Build Mart", "⑰ Party", "⑱ Power Tag", "⑫ Skybattle"));
     private List<VoteChicken> chickens = new ArrayList<>(MBC.getInstance().getPlayers().size());
     private final Map<Material, Section> sections = new HashMap<>(8);
