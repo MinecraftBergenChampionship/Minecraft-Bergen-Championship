@@ -303,6 +303,7 @@ public abstract class Game extends Minigame {
     }
 
     public void snowballHit(Snowball proj, Player p) {
+        if (p.getNoDamageTicks() > 0) return;
         Vector snowballVelocity = proj.getVelocity();
         p.damage(0.1);
         p.setVelocity(new Vector(snowballVelocity.getX() * 0.1, 0.18, snowballVelocity.getZ() * 0.1));
