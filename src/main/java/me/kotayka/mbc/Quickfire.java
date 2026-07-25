@@ -239,8 +239,8 @@ public class Quickfire extends FinaleGame {
         playerWalkoutBlurbs.put(james, "A most auspicious member of the team...");
         playerWalkoutBlurbs.put(albert, "MBC's blondest competitor...");
         playerWalkoutBlurbs.put(elliot, "Just waking up from his nap to win Quickfire...");
-        playerWalkoutBlurbs.put(liam, "");
-        playerWalkoutBlurbs.put(jocelyn, "");
+        playerWalkoutBlurbs.put(liam, "Visiting from Neptune to negotiate with earthly governments...");
+        playerWalkoutBlurbs.put(jocelyn, "She's able to eloquently communicate with lemurs...");
 
         playerWalkoutSongNames.put(cam, "Sleepyhead, Passion Pit");
         playerWalkoutSongNames.put(collin, "Clarity (Muffoxx Edit), Zedd");
