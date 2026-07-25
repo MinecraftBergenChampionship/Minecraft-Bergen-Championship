@@ -247,7 +247,11 @@ public final class PowerupHandler {
                             ItemMeta purpleMeta = practicePowerup.getItemMeta();
                             purpleMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.DARK_PURPLE + "Practice Powerup");
                             practicePowerup.setItemMeta(purpleMeta);
-                            playerInventory.setItemInMainHand(practicePowerup);
+
+                            playerInventory.setItemInMainHand(null);
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+                                playerInventory.addItem(practicePowerup);
+                            }, 20L);
                         } else {
                             playerInventory.setItemInMainHand(null);
                             playersWithPowerup.remove(player.getPlayer());
@@ -311,7 +315,9 @@ public final class PowerupHandler {
                     if (inventory.getItem(8) == null || inventory.getItem(8).getType() != AceRace.SPECTATOR_ITEM.getType()) {
                         inventory.setItem(8, AceRace.SPECTATOR_ITEM);
                     }
-                    inventory.addItem(practicePowerup);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+                        inventory.addItem(practicePowerup);
+                    }, 20L);
                 }
             }, powerupDuration);
 

@@ -4,6 +4,7 @@ import me.kotayka.mbc.commands.*;
 import me.kotayka.mbc.commands.tab.*;
 import me.kotayka.mbc.games.acerace.AceRace;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.boss.BossBar;
 import org.bukkit.boss.KeyedBossBar;
@@ -110,6 +111,8 @@ public class Plugin extends JavaPlugin implements Listener {
                 it.remove();
             }
         }
+
+        Bukkit.broadcastMessage(ChatColor.GREEN + "MBC v2.2.0 is enabled!");
     }
 
     @Override
