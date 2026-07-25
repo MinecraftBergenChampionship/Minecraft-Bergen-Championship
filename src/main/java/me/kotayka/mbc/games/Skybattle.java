@@ -565,15 +565,9 @@ public class Skybattle extends Game {
 
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent e) {
-        // TODO this isn't registering for some reason
         if (!isGameActive()) return;
         if (e.getHitEntity() == null) return;
         if (!(e.getEntity().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
-
-        /* temp
-        if(e.getEntityType() != EntityType.SNOWBALL) return;
-        if(!(e.getEntity().getShooter() instanceof Player) || !(e.getHitEntity() instanceof Player)) return;
-        */
 
         SkybattlePlayer player = skybattlePlayerMap.get(e.getHitEntity().getUniqueId());
         Participant damager = Participant.getParticipant((Player) e.getEntity().getShooter());
@@ -584,9 +578,9 @@ public class Skybattle extends Game {
         if (e.getEntity() instanceof Snowball) {
             snowballHit((Snowball) e.getEntity(), player.getPlayer());
             player.lastDamager = damager.getPlayer();
-            return;
+        } else {
+            player.lastDamager = (Player) e.getEntity().getShooter();
         }
-        player.lastDamager = (Player) e.getEntity().getShooter();
     }
 
     @EventHandler

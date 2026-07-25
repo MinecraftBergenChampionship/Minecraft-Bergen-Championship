@@ -438,7 +438,7 @@ public class MBC implements Listener {
                 case TUTORIAL:
                 case END_ROUND:
                     ((Game) currentGame).disconnect = true;
-                    Bukkit.broadcastMessage("[Debug] disconnect during transition state!");
+                    // Bukkit.broadcastMessage("[Debug] disconnect during transition state!");
                     break;
                 case STARTING:
                     currentGame.Pause();
@@ -1022,6 +1022,10 @@ public class MBC implements Listener {
     }
 
     public void ready(MBCTeam t, Player p) {
+        if (t instanceof Spectator) {
+            p.sendMessage("Spectator team cannot ready up!");
+            return;
+        }
         if (ready.get(t) != null && ready.get(t).equals(Boolean.FALSE)) {
             Bukkit.broadcastMessage(t.teamNameFormat() + " are ready!");
             ready.put(t, Boolean.TRUE);

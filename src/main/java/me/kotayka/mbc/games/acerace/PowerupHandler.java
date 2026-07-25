@@ -60,10 +60,10 @@ public final class PowerupHandler {
 
 
     // This list is reserved for the very first checkpoint on the very first lap.
-    private static final List<AceRacePowerup> FIRST_CHECKPOINT_POWERUPS = Arrays.asList(AceRacePowerup.SUGAR_HIGH, AceRacePowerup.LEAP, AceRacePowerup.MEATBALL, AceRacePowerup.BANANA_PEEL);
+    private static final List<AceRacePowerup> FIRST_CHECKPOINT_POWERUPS = Arrays.asList(AceRacePowerup.BANANA_PEEL, AceRacePowerup.MEATBALL, AceRacePowerup.TNT);
     //private static final List<AceRacePowerup> FIRST_CHECKPOINT_POWERUPS = Arrays.asList(AceRacePowerup.GOLDEN_LUNGE);
     private static final List<AceRacePowerup> PRACTICE_POWERUPS = Arrays.asList(
-            AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.STAR, AceRacePowerup.TNT,
+            AceRacePowerup.BANANA_PEEL, AceRacePowerup.LEAP, AceRacePowerup.TNT, AceRacePowerup.STAR,
             AceRacePowerup.MEATBALL, AceRacePowerup.SUGAR_HIGH, AceRacePowerup.TELEPORTER, AceRacePowerup.ROCKET_LAUNCHER
     );
 
@@ -80,6 +80,7 @@ public final class PowerupHandler {
     private static final int LUNGE_DURATION_SECONDS = 8;
     private static final int STUN_DURATION_TICKS = 60; // 3 seconds
     private static final int TELEPORTER_DELAY_TICKS = 50; // 2.5 seconds
+    private static final int SUGAR_HIGH_DURATION_TICKS = 140;
 
     // PotionEffects
     private static final PotionEffect STUN_SLOW = new PotionEffect(PotionEffectType.SLOWNESS, STUN_DURATION_TICKS, 10, false, true, true);
@@ -111,7 +112,26 @@ public final class PowerupHandler {
     private static final Map<Entity, Participant> tntMap = new HashMap<>();
 
     /**
-     * TODO: Access modifier may be `protected` if all Ace Race modules were in the same package.
+     * Separate simplified function for providing a powerup during tutorial phase.
+     * Rather than
+     *
+     * @see PowerupHandler givePowerup()
+     * @see PowerupHandler giveRandomPowerupTutorial()
+     * @param aceRacePlayer
+     */
+    public static void givePowerupTutorial(AceRacePlayer aceRacePlayer, int targetSlot) {
+        Player player = aceRacePlayer.getPlayer();
+
+        for (Material powerupMaterial : POWERUP_MATERIALS.keySet()) {
+            player.setCooldown(powerupMaterial, POWERUP_SPIN_DURATION_TICKS + 2);
+        }
+
+        if (targetSlot < 0 || targetSlot > 8) return;
+
+        giveRandomPowerupTutorial(player, targetSlot);
+    }
+
+    /**
      *
      * Handles providing a player with a powerup, depending on their position at function call.
      * @param aceRacePlayer player to receive a powerup
@@ -120,7 +140,11 @@ public final class PowerupHandler {
         Player player = aceRacePlayer.getPlayer();
 
         // Do not give powerup if player has not fully used theirs
-//        if (playersWithPowerup.contains(player)) return;
+        if (playersWithPowerup.contains(player)) return;
+
+        for (Material powerupMaterial : POWERUP_MATERIALS.keySet()) {
+            player.setCooldown(powerupMaterial, POWERUP_SPIN_DURATION_TICKS + 2);
+        }
 
         // Find first available slot in slots 0-8 (slot 9 is reserved for the cooldown spinner)
         int targetSlot = -1;
@@ -143,22 +167,22 @@ public final class PowerupHandler {
             double percentile = (1.0 * place) / players;
             if (percentile <= CUTOFF_TOP_SIXTH) {
                 powerups = TOP_SIXTH;
-                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top sixth");
+                Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top sixth");
             } else if (percentile <= CUTOFF_TOP_THIRD) {
                 powerups = TOP_THIRD;
-                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top third");
+                Bukkit.broadcastMessage("DEGBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top third");
             } else if (percentile <= CUTOFF_TOP_HALF) {
                 powerups = TOP_HALF;
-                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top half");
+                Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top half");
             } else if (percentile <= CUTOFF_BOTTOM_HALF) {
                 powerups = BOTTOM_HALF;
-                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom half");
+                Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom half");
             } else if (percentile <= CUTOFF_BOTTOM_SIXTH) {
                 powerups = BOTTOM_SIXTH;
-                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom third");
+                Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom third");
             } else {
                 powerups = BOTTOM_SIXTH;
-                Bukkit.broadcastMessage(aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom sixth");
+                Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom sixth");
             }
         }
 
@@ -174,7 +198,7 @@ public final class PowerupHandler {
      * @param heldItem Item currently being used
      * @implNote Currently only fires powerups if used in their main hand, not in their offhand.
      */
-    static void usePowerup(AceRacePlayer player, Material heldItem, boolean lookingAtBlock) {
+    static void usePowerup(AceRacePlayer player, Material heldItem, boolean lookingAtBlock, boolean tutorial) {
         if (!POWERUP_MATERIALS.containsKey(heldItem)) return;
         if (player.getPlayer().getInventory().getHeldItemSlot() == 8)  {
             return;
@@ -184,22 +208,22 @@ public final class PowerupHandler {
         PlayerInventory playerInventory = player.getPlayer().getInventory();
         switch (powerup) {
             case BANANA_PEEL:
-                consumeOneFromMainHand(player.getPlayer(), playerInventory);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory, tutorial);
                 useBanana(player);
                 break;
             case LEAP:
-                consumeOneFromMainHand(player.getPlayer(), playerInventory);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory, tutorial);
                 useLeap(player.getPlayer());
                 break;
             case SUGAR_HIGH:
-                consumeOneFromMainHand(player.getPlayer(), playerInventory);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory, tutorial);
                 useSugarHigh(player.getPlayer());
                 break;
             case MEATBALL:
-                consumeOneFromMainHand(player.getPlayer(), playerInventory);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory, tutorial);
                 break;
             case TNT:
-                consumeOneFromMainHand(player.getPlayer(), playerInventory);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory, tutorial);
                 throwTNT(player.getParticipant());
                 break;
             case ROCKET_LAUNCHER:
@@ -218,8 +242,20 @@ public final class PowerupHandler {
                     int newDamage = damageable.getDamage() + step;
 
                     if (newDamage >= max) {
-                        playerInventory.setItemInMainHand(null);
-                        playersWithPowerup.remove(player.getPlayer());
+                        if (tutorial) {
+                            ItemStack practicePowerup = new ItemStack(Material.PURPLE_DYE);
+                            ItemMeta purpleMeta = practicePowerup.getItemMeta();
+                            purpleMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.DARK_PURPLE + "Practice Powerup");
+                            practicePowerup.setItemMeta(purpleMeta);
+
+                            playerInventory.setItemInMainHand(null);
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+                                playerInventory.addItem(practicePowerup);
+                            }, 20L);
+                        } else {
+                            playerInventory.setItemInMainHand(null);
+                            playersWithPowerup.remove(player.getPlayer());
+                        }
                     } else {
                         damageable.setDamage(newDamage);
                         item.setItemMeta((ItemMeta) damageable);
@@ -230,15 +266,15 @@ public final class PowerupHandler {
                 useRocketLauncher(player.getPlayer());
                 break;
             case TELEPORTER:
-                consumeOneFromMainHand(player.getPlayer(), playerInventory);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory, tutorial);
                 useTeleporter(player);
                 break;
             case STAR:
-                consumeOneFromMainHand(player.getPlayer(), playerInventory);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory, tutorial);
                 useStar(player);
                 break;
             case FIREBALL:
-                consumeOneFromMainHand(player.getPlayer(), playerInventory);
+                consumeOneFromMainHand(player.getPlayer(), playerInventory, tutorial);
                 useFireball(player.getPlayer());
                 break;
             case LUNGE:
@@ -253,13 +289,38 @@ public final class PowerupHandler {
      * If the stack has more than one, decrements the count.
      * If it was the last one, clears the slot and removes the player from playersWithPowerup.
      */
-    private static void consumeOneFromMainHand(Player player, PlayerInventory inventory) {
+    private static void consumeOneFromMainHand(Player player, PlayerInventory inventory, boolean tutorial) {
         ItemStack held = inventory.getItemInMainHand();
         if (held == null || held.getType() == Material.AIR) return;
+        Material mat = held.getType();
         int newAmount = held.getAmount() - 1;
         if (newAmount <= 0) {
+            // do not allow player to receive powerups until duration of effects is over
+            long powerupDuration = 0L;
+            if (mat == STAR) {
+                powerupDuration = STAR_DURATION_SECONDS * 20;
+            } else if (mat == SUGAR_HIGH) {
+                powerupDuration = SUGAR_HIGH_DURATION_TICKS;
+            }
+
             inventory.setItemInMainHand(null);
-            playersWithPowerup.remove(player);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+                if (!tutorial) {
+                    playersWithPowerup.remove(player);
+                } else {
+                    ItemStack practicePowerup = new ItemStack(Material.PURPLE_DYE);
+                    ItemMeta purpleMeta = practicePowerup.getItemMeta();
+                    purpleMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.DARK_PURPLE + "Practice Powerup");
+                    practicePowerup.setItemMeta(purpleMeta);
+                    if (inventory.getItem(8) == null || inventory.getItem(8).getType() != AceRace.SPECTATOR_ITEM.getType()) {
+                        inventory.setItem(8, AceRace.SPECTATOR_ITEM);
+                    }
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+                        inventory.addItem(practicePowerup);
+                    }, 20L);
+                }
+            }, powerupDuration);
+
         } else {
             held.setAmount(newAmount);
         }
@@ -330,9 +391,9 @@ public final class PowerupHandler {
 
     private static void useSugarHigh(Player player) {
         player.playSound(player.getLocation(), "sfx.speed_pad", SoundCategory.BLOCKS, 1, 2);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 140, 1));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 140, 4));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 140, 4));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, SUGAR_HIGH_DURATION_TICKS, 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, SUGAR_HIGH_DURATION_TICKS, 4));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, SUGAR_HIGH_DURATION_TICKS, 4));
     }
 
     /**
@@ -535,9 +596,6 @@ public final class PowerupHandler {
     private static void giveRandomPowerup(List<AceRacePowerup> powerups, Player player, int targetSlot) {
         final int SPIN_SLOT = 8; // slot 9 in the hotbar (0-indexed)
         AceRacePowerup chosenPowerup = powerups.get((int) (Math.random() * powerups.size()));
-
-        Bukkit.broadcastMessage("chosen powerup: " + chosenPowerup.name());
-
         List<AceRacePowerup> spin_powerups = new ArrayList<>();
 
         for (AceRacePowerup p : SPINNING_POWERUPS) {
@@ -563,6 +621,37 @@ public final class PowerupHandler {
         // After spin: clear slot 9, place powerup in target slot, apply cooldown only to chosen material
         Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
             player.getInventory().setItem(SPIN_SLOT, null);
+            player.getInventory().setItem(targetSlot, POWERUP_ITEMS.get(chosenPowerup));
+            player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
+        }, POWERUP_SPIN_DURATION_TICKS + 2L);
+    }
+
+    private static void giveRandomPowerupTutorial(Player player, int targetSlot) {
+        AceRacePowerup chosenPowerup = PRACTICE_POWERUPS.get((int) (Math.random() * PRACTICE_POWERUPS.size()));
+        List<AceRacePowerup> spin_powerups = new ArrayList<>();
+
+        for (AceRacePowerup p : SPINNING_POWERUPS) {
+            if (PRACTICE_POWERUPS.contains(p)) {
+                spin_powerups.add(p);
+            }
+        }
+        if (spin_powerups.isEmpty()) {
+            for (AceRacePowerup p : SPINNING_POWERUPS) {
+                spin_powerups.add(p);
+            }
+        }
+
+        // Spin animation in slot 9
+        for (int i = 0; i < POWERUP_SPIN_DURATION_TICKS; i += 4) {
+            int frame = i / 4;
+            Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+                player.getInventory().setItem(targetSlot, POWERUP_ITEMS.get(spin_powerups.get(frame % spin_powerups.size())));
+                player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            }, i);
+        }
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), () -> {
+            player.getInventory().setItem(targetSlot, null);
             player.getInventory().setItem(targetSlot, POWERUP_ITEMS.get(chosenPowerup));
             player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
         }, POWERUP_SPIN_DURATION_TICKS + 2L);
@@ -679,5 +768,12 @@ public final class PowerupHandler {
      */
     public static Map<Entity, Participant> getTNTMap() {
         return Collections.unmodifiableMap(tntMap);
+    }
+
+    /**
+     * @return Unmodifiable view over all powerup materials
+     */
+    public static Set<Material> getPowerupMaterials() {
+        return Collections.unmodifiableSet(POWERUP_MATERIALS.keySet());
     }
 }

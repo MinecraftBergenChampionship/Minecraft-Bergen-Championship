@@ -464,12 +464,12 @@ public class Lobby extends Minigame {
         miniBeepStartable = true;
         pvpStartable = true;
         if (MBC.getInstance().gameNum == 4) {
-            setTimer(420);
+            setTimer(300);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p, "igm.lobby", SoundCategory.RECORDS, 1, 1);
             }
         } else {
-            setTimer(121);
+            setTimer(91);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p, "igm.lobby", SoundCategory.RECORDS, 1, 1);
             }
@@ -1112,7 +1112,7 @@ public class Lobby extends Minigame {
 
     public void miniBeepStart() {
         loadCourses();
-        setBeepTimer(75);
+        setBeepTimer(68);
     }
 
     public void miniBeepEnd() {

@@ -52,7 +52,7 @@ public class Colosseum extends SpleefMap {
                     paste_to.setBlockData(paste_from.getBlockData());
 
                     if (copy_from_x > -408 && copy_from_x < -392 && copy_from_z > -408 && copy_from_z < -392) {
-                        if (paste_from.getType().equals(Material.SMOOTH_STONE) || paste_from.getType().equals(Material.IRON_BARS) || paste_from.getType().equals(Material.IRON_CHAIN)) {
+                        if (paste_from.getType().equals(Material.SMOOTH_STONE) || paste_from.getType().equals(Material.IRON_BARS) || paste_from.getType().equals(Material.CHAIN)) {
                             stonePillarDecayingBlocks.add(paste_to);
                         }
                     }
@@ -127,7 +127,7 @@ public class Colosseum extends SpleefMap {
                         case SANDSTONE, SMOOTH_STONE, DIRT, COARSE_DIRT, PODZOL, DIRT_PATH -> b.setType(Material.YELLOW_CONCRETE);
                         case YELLOW_CONCRETE -> b.setType(Material.ORANGE_CONCRETE);
                         case ORANGE_CONCRETE -> b.setType(Material.RED_CONCRETE);
-                        case RED_CONCRETE, IRON_BARS, IRON_CHAIN -> {
+                        case RED_CONCRETE, IRON_BARS, CHAIN -> {
                             b.setType(Material.AIR);
                             toRemove.add(b);
                         }

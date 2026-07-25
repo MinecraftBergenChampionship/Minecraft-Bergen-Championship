@@ -837,12 +837,22 @@ public class Lockdown extends Game {
      * Spawns a snowball projectile from `shooter`
      * {@link #onPlayerInteract} calls this function on valid shot attempt.
      * @param shooter The player who is shooting.
+     * Reference
+     * <a href="https://github.com/GorgeousOne/Minecraft-Paintball/blob/e9becad2bd0bc6fc600b3a20daaf51d2963d3c66/src/main/java/me/gorgeousone/paintball/kit/AbstractKit.java#L70">...</a>
      */
     private void shootPaintball(Player shooter) {
         if (canShoot.containsKey(shooter.getUniqueId()) && canShoot.get(shooter.getUniqueId())) {
             Snowball proj = shooter.launchProjectile(Snowball.class);
-            proj.setVelocity(proj.getVelocity().multiply(1.25));
-            shooter.playSound(shooter.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 2);
+            proj.setShooter(shooter);
+            Vector facing = shooter.getLocation().getDirection();
+            proj.setVelocity(facing.clone().multiply(1.75));
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.getUniqueId() == shooter.getUniqueId()) {
+                    player.playSound(shooter.getEyeLocation(), Sound.ENTITY_CHICKEN_EGG, .5f, 1.35f);
+                } else {
+                    player.playSound(shooter.getEyeLocation(), Sound.ENTITY_CHICKEN_EGG, .5f, 1.15f);
+                }
+            }
 
             canShoot.put(shooter.getUniqueId(), false);
             cooldowns.put(shooter.getUniqueId(), System.currentTimeMillis());
@@ -1344,10 +1354,13 @@ public class Lockdown extends Game {
         if (shooter.getTeam().getTeamName().equals(hit.getTeam().getTeamName())) return;
 
         Player hitPlayer = hit.getPlayer();
-        Vector velocity = projectile.getVelocity();
         projectile.remove();
 
         Participant damaged = Participant.getParticipant(hitPlayer);
+
+        if (hitPlayer.getNoDamageTicks() > 0) {
+            return;
+        }
 
         shooter.getPlayer().playSound(shooter.getPlayer(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
         hit.getPlayer().playSound(hit.getPlayer(), Sound.BLOCK_GLASS_BREAK, 1, 1.5f);

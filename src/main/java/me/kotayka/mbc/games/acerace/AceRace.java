@@ -25,6 +25,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
@@ -56,8 +57,8 @@ public class AceRace extends Game {
     private static final List<Location> TRACK_SPAWN_LOCATIONS = new ArrayList<>();
     private final Map<Location, Long> spawnLocationCooldowns = new HashMap<>();
 
-    private static final ItemStack SPECTATOR_ITEM = new ItemStack(Material.ENDER_EYE);
-    private static final int SPECTATOR_TIME_TICKS = 400; // 20 seconds
+    static final ItemStack SPECTATOR_ITEM = new ItemStack(Material.ENDER_EYE);
+    private static final int SPECTATOR_TIME_TICKS = 200; // 10 seconds
 
     public SortedMap<Long, List<String>> fastestLaps = new TreeMap<>();
 
@@ -388,12 +389,19 @@ public class AceRace extends Game {
             if (timeRemaining == 0) {
                 Bukkit.broadcastMessage(ChatColor.BOLD + "" + ChatColor.YELLOW + "Practice Over!");
                 for (AceRacePlayer p : aceRacePlayerMap.values()) {
+                    for (Material m : PowerupHandler.getPowerupMaterials()) {
+                        p.getPlayer().getInventory().remove(m);
+                    }
+
                     p.getPlayer().setVelocity(new Vector(0,0,0));
                     p.getPlayer().removePotionEffect(PotionEffectType.SPEED);
                     p.getPlayer().sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "Practice Over!", "", 0, 60, 20);
+                    p.getPlayer().getInventory().remove(SPECTATOR_ITEM);
                     p.getPlayer().getInventory().remove(Material.RED_DYE);
                     p.getPlayer().getInventory().remove(Material.YELLOW_DYE);
                     p.getPlayer().getInventory().remove(Material.LIME_DYE);
+                    p.getPlayer().getInventory().remove(Material.PURPLE_DYE);
+
                     createLine(6, ChatColor.GREEN.toString()+ChatColor.BOLD+"Lap: " + ChatColor.RESET+"1/3", p.getParticipant());
                 }
                 setGameState(GameState.END_ROUND);
@@ -406,6 +414,10 @@ public class AceRace extends Game {
             } else if (timeRemaining == 60) {
                 Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "One minute left of practice!");
                 for (AceRacePlayer p : aceRacePlayerMap.values()) {
+                    for (Material m : PowerupHandler.getPowerupMaterials()) {
+                        p.getPlayer().getInventory().remove(m);
+                    }
+                    p.getPlayer().getInventory().remove(Material.PURPLE_DYE);
                     p.getPlayer().getInventory().remove(SPECTATOR_ITEM.getType());
                 }
             }
@@ -485,6 +497,7 @@ public class AceRace extends Game {
         itemMeta.setUnbreakable(true);
         trident.setItemMeta(itemMeta);
         trident.addEnchantment(Enchantment.RIPTIDE, 1);
+
         ItemStack leatherBoots = new ItemStack(Material.LEATHER_BOOTS);
         leatherBoots.addEnchantment(Enchantment.DEPTH_STRIDER, 1);
 
@@ -492,20 +505,28 @@ public class AceRace extends Game {
         ItemMeta redMeta = redDye.getItemMeta();
         redMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.RED + "Return To Start");
         redDye.setItemMeta(redMeta);
+
         ItemStack yellowDye = new ItemStack(Material.YELLOW_DYE);
         ItemMeta yellowMeta = redDye.getItemMeta();
         yellowMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.YELLOW + "Last Checkpoint");
         yellowDye.setItemMeta(yellowMeta);
+
         ItemStack limeDye = new ItemStack(Material.LIME_DYE);
         ItemMeta limeMeta = limeDye.getItemMeta();
         limeMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.GREEN + "Next Checkpoint");
         limeDye.setItemMeta(limeMeta);
+
+        ItemStack practicePowerup = new ItemStack(Material.PURPLE_DYE);
+        ItemMeta purpleMeta = practicePowerup.getItemMeta();
+        purpleMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.DARK_PURPLE + "Practice Powerup");
+        practicePowerup.setItemMeta(purpleMeta);
 
         for (Participant p : MBC.getInstance().getPlayers()) {
             p.getInventory().clear();
             p.getInventory().addItem(redDye);
             p.getInventory().addItem(yellowDye);
             p.getInventory().addItem(limeDye);
+            p.getInventory().addItem(practicePowerup);
             p.getInventory().setItem(8, SPECTATOR_ITEM);
             p.getInventory().setBoots(p.getTeam().getColoredLeatherArmor(leatherBoots));
 
@@ -695,8 +716,27 @@ public class AceRace extends Game {
                 if (playerItem == Material.RED_DYE) firstCheckpoint(e.getPlayer());
                 else if (playerItem == Material.YELLOW_DYE) lastCheckpoint(e.getPlayer());
                 else nextCheckpoint(e.getPlayer());
+            } else if (playerItem == Material.PURPLE_DYE) {
+                if (getState() == GameState.TUTORIAL && timeRemaining > 60) {
+                    e.getPlayer().sendMessage(ChatColor.YELLOW + "Powerups will be disabled with 1 minute remaining!");
+                    PowerupHandler.givePowerupTutorial(p, e.getPlayer().getInventory().getHeldItemSlot());
+                } else {
+                    e.getPlayer().sendMessage(ChatColor.RED + "Powerups have been disabled!");
+                    for (Material m : PowerupHandler.getPowerupMaterials()) {
+                        e.getPlayer().getInventory().remove(m);
+                    }
+                    e.getPlayer().getInventory().remove(Material.PURPLE_DYE);
+                    e.getPlayer().getInventory().remove(Material.ENDER_EYE);
+                }
             } else if (playerItem == SPECTATOR_ITEM.getType()) {
                 Player player = p.getPlayer();
+                if (getState() == GameState.TUTORIAL && timeRemaining <= 60) {
+                    for (Material m : PowerupHandler.getPowerupMaterials()) {
+                        player.getInventory().remove(m);
+                    }
+                    player.getInventory().remove(Material.PURPLE_DYE);
+                    player.getInventory().remove(Material.ENDER_EYE);
+                }
                 Location loc = player.getLocation();
                 player.sendMessage(String.format(ChatColor.GREEN + "You've entered spectator view for %d seconds!", SPECTATOR_TIME_TICKS / 20));
                 player.sendMessage(ChatColor.YELLOW + "This item will disappear with one minute remaining.");
@@ -706,10 +746,23 @@ public class AceRace extends Game {
                     player.teleport(loc);
                 }, SPECTATOR_TIME_TICKS);
             } else {
+                Player player = p.getPlayer();
                 // in all other cases, consider a powerup to be used.
                 // PowerupHandler.usePowerup() will determine appropriate effects if a powerup is used.
                 // if a powerup is not used, no additional effects will occur, and the event will not be cancelled.
-                PowerupHandler.usePowerup(p, playerItem, e.getAction() == Action.RIGHT_CLICK_BLOCK);
+                if (getState() == GameState.TUTORIAL && timeRemaining <= 60) {
+                    player.sendMessage(ChatColor.RED + "Powerups have been disabled!");
+                    for (Material m : PowerupHandler.getPowerupMaterials()) {
+                        player.getInventory().remove(m);
+                    }
+                    player.getInventory().remove(Material.PURPLE_DYE);
+                    player.getInventory().remove(Material.ENDER_EYE);
+                } else {
+                    Material m = player.getInventory().getItemInMainHand().getType();
+                    if (!player.hasCooldown(m)) {
+                        PowerupHandler.usePowerup(p, playerItem, e.getAction() == Action.RIGHT_CLICK_BLOCK, getState() == GameState.TUTORIAL && timeRemaining > 60);
+                    }
+                }
             }
         }
 
@@ -789,6 +842,15 @@ public class AceRace extends Game {
     private void onAreaCloud(AreaEffectCloudApplyEvent e) {
         if (map.powerups)
             PowerupHandler.handleAreaCloudEffect(e.getEntity(), e.getAffectedEntities().iterator());
+    }
+
+    /**
+     * Prevent inventory manipulation with offhand
+     * @param e PlayerSwapHandItemsEvent
+     */
+    @EventHandler
+    public void swapOffhand(PlayerSwapHandItemsEvent e) {
+        e.setCancelled(true);
     }
 
     @EventHandler

@@ -261,7 +261,7 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongNames.put(pickle, "Pickle Song");
         playerWalkoutSongNames.put(noah, "Steve Intro, Super Smash Bros. Ultimate");
         playerWalkoutSongNames.put(queakie, "We Like to Party, Vengaboys");
-        playerWalkoutSongNames.put(penguin, "The Duck Song, Bryant Oden");
+        playerWalkoutSongNames.put(penguin, "Traitor, Olivia Rodrigo (JoJo Siwa cover)");
         playerWalkoutSongNames.put(ehnry, "Get Outside, Youtube Audio Library");
         playerWalkoutSongNames.put(sam, "I Wish that Heaven had a Phone to Call You Up");
         playerWalkoutSongNames.put(blueboy, "Eatin' Rats, Mewgenics");
