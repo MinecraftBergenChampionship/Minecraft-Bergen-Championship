@@ -726,9 +726,17 @@ public class AceRace extends Game {
                         e.getPlayer().getInventory().remove(m);
                     }
                     e.getPlayer().getInventory().remove(Material.PURPLE_DYE);
+                    e.getPlayer().getInventory().remove(Material.ENDER_EYE);
                 }
             } else if (playerItem == SPECTATOR_ITEM.getType()) {
                 Player player = p.getPlayer();
+                if (getState() == GameState.TUTORIAL && timeRemaining <= 60) {
+                    for (Material m : PowerupHandler.getPowerupMaterials()) {
+                        player.getInventory().remove(m);
+                    }
+                    player.getInventory().remove(Material.PURPLE_DYE);
+                    player.getInventory().remove(Material.ENDER_EYE);
+                }
                 Location loc = player.getLocation();
                 player.sendMessage(String.format(ChatColor.GREEN + "You've entered spectator view for %d seconds!", SPECTATOR_TIME_TICKS / 20));
                 player.sendMessage(ChatColor.YELLOW + "This item will disappear with one minute remaining.");
@@ -743,11 +751,12 @@ public class AceRace extends Game {
                 // PowerupHandler.usePowerup() will determine appropriate effects if a powerup is used.
                 // if a powerup is not used, no additional effects will occur, and the event will not be cancelled.
                 if (getState() == GameState.TUTORIAL && timeRemaining <= 60) {
-                    player.sendMessage("Powerups have been disabled!");
+                    player.sendMessage(ChatColor.RED + "Powerups have been disabled!");
                     for (Material m : PowerupHandler.getPowerupMaterials()) {
                         player.getInventory().remove(m);
                     }
                     player.getInventory().remove(Material.PURPLE_DYE);
+                    player.getInventory().remove(Material.ENDER_EYE);
                 } else {
                     Material m = player.getInventory().getItemInMainHand().getType();
                     if (!player.hasCooldown(m)) {

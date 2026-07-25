@@ -239,8 +239,8 @@ public class Quickfire extends FinaleGame {
         playerWalkoutBlurbs.put(james, "A most auspicious member of the team...");
         playerWalkoutBlurbs.put(albert, "MBC's blondest competitor...");
         playerWalkoutBlurbs.put(elliot, "Just waking up from his nap to win Quickfire...");
-        playerWalkoutBlurbs.put(liam, "");
-        playerWalkoutBlurbs.put(jocelyn, "");
+        playerWalkoutBlurbs.put(liam, "Visiting from Neptune to negotiate with earthly governments...");
+        playerWalkoutBlurbs.put(jocelyn, "She's able to eloquently communicate with lemurs...");
 
         playerWalkoutSongNames.put(cam, "Sleepyhead, Passion Pit");
         playerWalkoutSongNames.put(collin, "Clarity (Muffoxx Edit), Zedd");
@@ -261,7 +261,7 @@ public class Quickfire extends FinaleGame {
         playerWalkoutSongNames.put(pickle, "Pickle Song");
         playerWalkoutSongNames.put(noah, "Steve Intro, Super Smash Bros. Ultimate");
         playerWalkoutSongNames.put(queakie, "We Like to Party, Vengaboys");
-        playerWalkoutSongNames.put(penguin, "The Duck Song, Bryant Oden");
+        playerWalkoutSongNames.put(penguin, "Traitor, Olivia Rodrigo (JoJo Siwa cover)");
         playerWalkoutSongNames.put(ehnry, "Get Outside, Youtube Audio Library");
         playerWalkoutSongNames.put(sam, "I Wish that Heaven had a Phone to Call You Up");
         playerWalkoutSongNames.put(blueboy, "Eatin' Rats, Mewgenics");
