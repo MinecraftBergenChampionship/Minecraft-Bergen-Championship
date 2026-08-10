@@ -1,11 +1,18 @@
 name: MBC
 version: '${project.version}'
-main: me.kotayka.mbc.Plugin
-api-version: '1.20'
-authors: [ Kotayka, rspacerr, bigkirbypuff ]
+main: gg.mbc.EventPlugin
+api-version: '26.2'
+authors: [ Pengu1n, rspacerr, bigkirbypuff ]
 description: Minecraft Bergen Championship
 depend: [Citizens, WorldEdit]
 commands:
+  reload:
+    permission: minecraft.command.op
+    desscription: reloads the plugin
+    usage: /reload [confirm|debug]
+  debug:
+    permission: minecraft.command.op
+    description: sends debug messages
   mbchelp:
     description: list all commands
   changeTeam:

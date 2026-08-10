@@ -1,7 +1,7 @@
 package gg.mbc.event.managers;
 
-import gg.mbc.event.MBCEvent;
-import org.bukkit.plugin.Plugin;
+import gg.mbc.EventPlugin;
+import gg.mbc.event.EventState;
 
 /**
  * The Event Manager class coordinates the lifecycle of the event, primarily
@@ -9,8 +9,15 @@ import org.bukkit.plugin.Plugin;
  * as well as handling reloading.
  */
 public class EventManager {
+    private EventPlugin plugin;
+    private EventState eventState = EventState.INACTIVE;
 
-    public EventManager(Plugin plugin) {
+    public EventManager(EventPlugin plugin) {
+        this.plugin = plugin;
 
+    }
+
+    public EventState getState() {
+        return eventState;
     }
 }

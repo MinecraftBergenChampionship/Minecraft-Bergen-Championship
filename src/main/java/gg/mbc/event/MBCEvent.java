@@ -1,11 +1,11 @@
 package gg.mbc.event;
+import gg.mbc.EventPlugin;
 import gg.mbc.event.managers.EventScoreboardManager;
 import gg.mbc.event.managers.TeamManager;
 import gg.mbc.event.players.EventPlayer;
+import gg.mbc.event.teams.TeamType;
 import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.*;
 
@@ -13,7 +13,7 @@ public final class MBCEvent {
     public final static int MAX_TEAMS = 6;
     public final static int MAX_PLAYERS_PER_TEAM = 4;
 
-    private final Plugin plugin;
+    private final EventPlugin plugin;
     private static MBCEvent mbc = null;
     private boolean DEBUG_MODE = true;
 
@@ -23,15 +23,18 @@ public final class MBCEvent {
     // Contains data for all players logged onto the server while plugin is active.
     private final Map<UUID, EventPlayer> playerData;
 
-    private MBCEvent(Plugin plugin) {
+    private MBCEvent(EventPlugin plugin) {
         this.plugin = plugin;
 
         // managers
         this.scoreboardManager = new EventScoreboardManager();
-        this.teamManager= new TeamManager();
+        this.teamManager = new TeamManager();
 
         // event
         playerData = new HashMap<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            playerData.put(player.getUniqueId(), new EventPlayer(player, teamManager.getTeam(TeamType.SPECTATOR)));
+        }
     }
 
     /**
@@ -39,23 +42,10 @@ public final class MBCEvent {
      * Handles initialization of variables for this new instance.
      * @param plugin Representation of this plugin
      */
-    public static void createEvent(Plugin plugin) {
-        mbc = new MBCEvent(plugin);
-    }
-
-    void resetPlayerStatus() {
-        // Reset all player status
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            getInstance().playerData.put(player.getUniqueId(), new EventPlayer(player));
-            Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(20);
-            player.setInvulnerable(false);
-
-            for (Player player2 : Bukkit.getOnlinePlayers()) {
-                if (player2.getUniqueId() == player.getUniqueId()) continue;
-                player.showPlayer(plugin, player2);
-            }
+    public static void createEvent(EventPlugin plugin) {
+        if (mbc == null) {
+            mbc = new MBCEvent(plugin);
         }
-
     }
 
     /**
@@ -84,5 +74,35 @@ public final class MBCEvent {
      */
     public EventPlayer getPlayer(UUID id) {
         return playerData.get(id);
+    }
+
+    /**
+     * Adds the given player to event data registry
+     * @param p Instance of player to add to event data
+     */
+    public void addPlayer(Player p) {
+        UUID id = p.getUniqueId();
+        if (getPlayer(id) != null) return;
+        playerData.put(id, new EventPlayer(p, teamManager.getTeam(TeamType.SPECTATOR)));
+    }
+
+    public EventScoreboardManager getScoreboardManager() { return scoreboardManager; }
+    public TeamManager getTeamManager() { return teamManager; }
+
+    public EventPlugin getPlugin() {
+        return plugin;
+    }
+
+    /**
+     * Get debug information for teams
+     */
+    public void debugTeams() {
+        String message = teamManager.debugTeams();
+        plugin.getLogger().log(java.util.logging.Level.INFO, message);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.isOp()) {
+                player.sendMessage(message);
+            }
+        }
     }
 }

@@ -1,18 +1,21 @@
 package gg.mbc.event;
 
+import gg.mbc.event.teams.EventTeam;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
+import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static net.kyori.adventure.text.Component.text;
 
 /**
  * Utility class for MBC Events.
  */
 public final class MBCUtils {
-    public static final Material BOOST_PAD = Material.WAXED_EXPOSED_CUT_COPPER;
-    public static final Material MEGA_BOOST_PAD = Material.WAXED_WEATHERED_CUT_COPPER;
-    public static final Material JUMP_PAD = Material.WAXED_WEATHERED_COPPER;
-    private static final double JUMP_BUFFER_ROOM = 0.35;
-
     // Resource Pack
     public static final Character RED_ICON = 'Ⓡ';
     public static final Character YELLOW_ICON = 'Ⓨ';
@@ -37,6 +40,16 @@ public final class MBCUtils {
     public static final Character PINK_ICON_CHRISTMAS = 'ⓟ';
 
 
+    // Movement
+    public static final Material BOOST_PAD = Material.WAXED_EXPOSED_CUT_COPPER;
+    public static final Material MEGA_BOOST_PAD = Material.WAXED_WEATHERED_CUT_COPPER;
+    public static final Material JUMP_PAD = Material.WAXED_WEATHERED_COPPER;
+    public static final Material SPEED_PAD = Material.OBSERVER;
+    public static final double JUMP_BUFFER_ROOM = 0.35;
+    public static final Vector ZERO = new Vector(0, 0, 0);
+
+    // World
+    public static final List<Material> BLOCKED_RECIPES = Arrays.asList(Material.WOODEN_AXE, Material.SHIELD, Material.SNOW_BLOCK, Material.FLINT_AND_STEEL);
     /**
      * Alias for Mini Message deserialization; see more detail below
      * <a href="https://docs.papermc.io/paper/dev/component-api/introduction/">Documentation</a>
@@ -45,5 +58,9 @@ public final class MBCUtils {
      */
     public static Component mm(String message) {
         return MiniMessage.miniMessage().deserialize(message);
+    }
+
+    public static Component getDisplayName(EventTeam t, String name) {
+        return text().content(t.icon() + " ").append(text(name, t.textColor())).build();
     }
 }

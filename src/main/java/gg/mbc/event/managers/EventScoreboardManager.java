@@ -1,5 +1,6 @@
 package gg.mbc.event.managers;
 
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import gg.mbc.event.MBCEvent;
 import gg.mbc.event.teams.EventTeam;
 import net.kyori.adventure.text.Component;
@@ -26,7 +27,7 @@ public final class EventScoreboardManager {
      * @param team Team the player is currently on.
      */
     @SuppressWarnings("null")
-    public void initializePlayerScoreboard(Player player, EventTeam team) {
+    public void initializePlayerScoreboard(Player player, EventTeam team, TeamManager teamManager) {
         // Create board data for player if necessary
         Scoreboard board = playerScoreboards.get(player);
         if (board == null) {
@@ -48,7 +49,7 @@ public final class EventScoreboardManager {
         if (board.getTeam(team.scoreboardName()) == null) {
             Team thisScoreboardTeam = board.registerNewTeam(team.name());
             thisScoreboardTeam.color(team.textColor());
-            thisScoreboardTeam.prefix(team.displayName());
+            thisScoreboardTeam.prefix(Component.text(team.icon(), NamedTextColor.WHITE).append(Component.text(" ")));
             thisScoreboardTeam.addPlayer(player);
             thisScoreboardTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
         } else {
@@ -58,22 +59,20 @@ public final class EventScoreboardManager {
         }
 
         // add everyone else to this player's scoreboard
-        /*
         for (Player p : Bukkit.getOnlinePlayers()) {
-            EventTeam team = TeamManager.getTeam(player);
-            // add everyone else to this player's scoreboard
-            if (board.getTeam(p.getTeam().fullName) == null) {
-                Team scoreboardTeam = board.registerNewTeam(p.getTeam().fullName);
-                scoreboardTeam.setColor(p.getTeam().getChatColor());
-                scoreboardTeam.setPrefix(String.format("%s%c ", ChatColor.WHITE, p.getTeam().getIcon()));
+            EventTeam otherTeam = teamManager.getTeam(player);
+            String otherTeamName = otherTeam.scoreboardName();
+            if (board.getTeam(otherTeamName) == null) {
+                Team scoreboardTeam = board.registerNewTeam(otherTeamName);
+                scoreboardTeam.color(otherTeam.textColor());
+                scoreboardTeam.prefix(Component.text(otherTeam.icon(), NamedTextColor.WHITE).append(Component.text(" ")));
                 scoreboardTeam.setAllowFriendlyFire(false);
-                scoreboardTeam.addPlayer(p.getPlayer());
+                scoreboardTeam.addPlayer(p);
                 scoreboardTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             } else {
-                board.getTeam(p.getTeam().fullName).addPlayer(p.getPlayer());
+                board.getTeam(otherTeamName).addPlayer(p);
             }
 
-            if ()
-        } */
+        }
     }
 }
