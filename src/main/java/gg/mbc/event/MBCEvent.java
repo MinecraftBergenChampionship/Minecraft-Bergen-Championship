@@ -4,10 +4,13 @@ import gg.mbc.event.managers.EventScoreboardManager;
 import gg.mbc.event.managers.TeamManager;
 import gg.mbc.event.players.EventPlayer;
 import gg.mbc.event.teams.TeamType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.logging.Level;
 
 public final class MBCEvent {
     public final static int MAX_TEAMS = 6;
@@ -93,12 +96,11 @@ public final class MBCEvent {
         return plugin;
     }
 
-    /**
-     * Get debug information for teams
-     */
+
     public void debugTeams() {
-        String message = teamManager.debugTeams();
-        plugin.getLogger().log(java.util.logging.Level.INFO, message);
+        Component message = teamManager.debugTeams();
+        // String message = PlainTextComponentSerializer.plainText().serialize(teamManager.debugTeams());
+        plugin.getComponentLogger().info(message);
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.isOp()) {
                 player.sendMessage(message);

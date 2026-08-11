@@ -2,11 +2,11 @@ package gg.mbc.event;
 
 import gg.mbc.event.teams.EventTeam;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -61,6 +61,6 @@ public final class MBCUtils {
     }
 
     public static Component getDisplayName(EventTeam t, String name) {
-        return text().content(t.icon() + " ").append(text(name, t.textColor())).build();
+        return text(t.icon(), NamedTextColor.WHITE).append(text(" " + name, t.textColor()));
     }
 }

@@ -5,10 +5,13 @@ import gg.mbc.event.players.EventPlayer;
 import gg.mbc.event.teams.EventTeam;
 import gg.mbc.event.teams.TeamType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+
+import static net.kyori.adventure.text.Component.text;
 
 public class TeamManager {
     private final Map<TeamType, EventTeam> teams;
@@ -44,6 +47,7 @@ public class TeamManager {
         UUID id = player.getUniqueId();
         EventTeam previous = playerTeams.get(id);
         EventPlayer eventPlayer = MBCEvent.getInstance().getPlayer(id);
+        eventPlayer.changeEventName(newTeam);
         // If Player was not previously on a team
         if (previous != null) {
             previous.removePlayer(eventPlayer);
@@ -71,7 +75,7 @@ public class TeamManager {
             return false;
         }
         changeTeam(player, team);
-        Bukkit.broadcast(Component.text(player.getName()).append(Component.text(" has joined the ")).append(team.displayName()));
+        Bukkit.broadcast(text(player.getName(), NamedTextColor.GOLD).append(text(" has joined the ", NamedTextColor.WHITE)).append(team.displayName()));
         return true;
     }
 
@@ -114,19 +118,21 @@ public class TeamManager {
         return Collections.unmodifiableCollection(teamNames.keySet());
     }
 
-    public String debugTeams() {
-        StringBuilder debugMsg = new StringBuilder();
-        debugMsg.append("[BEGIN DEBUG MESSAGE]---------------------------\n")
-                .append(String.format("There are %d teams:\n", teams.size()));
+    /**
+     * Admin Debug Info Function
+     * @return Component representing debug message
+     */
+    public Component debugTeams() {
+        Component debugMsg = text("\n[BEGIN DEBUG MESSAGE]---------------------------\n")
+                .append(text("There are " + teams.size() + " teams:\n"));
         for (EventTeam team : teams.values()) {
-            debugMsg.append(String.format("\t- %s\n", team.displayName()))
-                    .append(String.format("\tTeam %s has %d players:\n", team.name(), team.players().size()));
+            debugMsg = debugMsg.append(team.displayName().append(
+                    text(String.format(" has %d player%s!\n", team.players().size(), team.players().size() == 1 ? "" : "s"))));
             for (EventPlayer player : team.players()) {
-                debugMsg.append(String.format("\t\t- %s\n", player.getEventName().toString()));
+                debugMsg = debugMsg.append(text("- ").append(player.getEventName()).append(text("\n")));
             }
         }
-        debugMsg.append("[END DEBUG MESSAGE]------------------------------\n");
-
-        return debugMsg.toString();
+        debugMsg = debugMsg.append(text("[END DEBUG MESSAGE]------------------------------\n"));
+        return debugMsg;
     }
 }
