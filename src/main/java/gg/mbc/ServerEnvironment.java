@@ -3,15 +3,19 @@ package gg.mbc;
 import gg.mbc.event.MBCUtils;
 import gg.mbc.event.ServerListener;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRules;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Recipe;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 public class ServerEnvironment {
     private final EventPlugin plugin;
     private final ServerListener globalListener;
+    private final World world;
 
     ServerEnvironment(EventPlugin plugin) {
         this.plugin = plugin;
@@ -27,6 +31,10 @@ public class ServerEnvironment {
                 it.remove();
             }
         }
+
+        world = Objects.requireNonNull(Bukkit.getWorld("world"));
+        world.setGameRule(GameRules.ADVANCE_TIME, false);
+        world.setTime(9000);
 
         plugin.getServer().getPluginManager().registerEvents(globalListener, plugin);
     }
