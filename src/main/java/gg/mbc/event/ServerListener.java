@@ -1,7 +1,10 @@
 package gg.mbc.event;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
+import gg.mbc.event.managers.TeamManager;
 import gg.mbc.event.players.EventPlayer;
+import gg.mbc.event.teams.TeamType;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SoundCategory;
@@ -12,10 +15,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+
+import java.util.UUID;
+
+import static net.kyori.adventure.text.Component.text;
 
 public class ServerListener implements Listener {
     final Plugin plugin;
@@ -32,18 +40,38 @@ public class ServerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         MBCEvent mbc = MBCEvent.getInstance();
         Player player = event.getPlayer();
-        if (mbc.getPlayer(player.getUniqueId()) == null) {
+        UUID id = player.getUniqueId();
+        if (mbc.getPlayer(id) == null) {
             // Player is new
+            TeamManager tm = mbc.getTeamManager();
             mbc.addPlayer(player);
+            tm.changeTeam(player, tm.getTeam(TeamType.SPECTATOR));
 
             // TODO: game scoreboard
         } else {
             // Player is relogging
-            EventPlayer eventPlayer = mbc.getPlayer(player.getUniqueId());
+            EventPlayer eventPlayer = mbc.getPlayer(id);
             eventPlayer.setPlayer(player);
+            TeamManager tm = mbc.getTeamManager();
+            tm.changeTeam(player, tm.getTeam(id));
 
             // TODO: game scoreboard
         }
+        EventPlayer eventPlayer = mbc.getPlayer(id);
+        event.joinMessage(eventPlayer.getEventName().append(text(" joined the game", NamedTextColor.WHITE)));
+    }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent event) {
+        MBCEvent mbc = MBCEvent.getInstance();
+        Player player = event.getPlayer();
+        EventPlayer eventPlayer = mbc.getPlayer(player.getUniqueId());
+        event.quitMessage(eventPlayer.getEventName().append(text(" left the game", NamedTextColor.WHITE)));
+
+        // Internally set to spectator
+        /*
+        TeamManager tm = mbc.getTeamManager();
+        tm.changeTeam(player, tm.getTeam(TeamType.SPECTATOR)); */
     }
 
     /**
