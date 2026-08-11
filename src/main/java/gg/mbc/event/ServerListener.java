@@ -1,7 +1,10 @@
 package gg.mbc.event;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
+import gg.mbc.event.managers.TeamManager;
 import gg.mbc.event.players.EventPlayer;
+import gg.mbc.event.teams.TeamType;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SoundCategory;
@@ -12,10 +15,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+
+import java.util.UUID;
+
+import static net.kyori.adventure.text.Component.text;
 
 public class ServerListener implements Listener {
     final Plugin plugin;
@@ -32,18 +40,38 @@ public class ServerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         MBCEvent mbc = MBCEvent.getInstance();
         Player player = event.getPlayer();
-        if (mbc.getPlayer(player.getUniqueId()) == null) {
+        UUID id = player.getUniqueId();
+        if (mbc.getPlayer(id) == null) {
             // Player is new
+            TeamManager tm = mbc.getTeamManager();
             mbc.addPlayer(player);
+            tm.changeTeam(player, tm.getTeam(TeamType.SPECTATOR));
 
             // TODO: game scoreboard
         } else {
             // Player is relogging
-            EventPlayer eventPlayer = mbc.getPlayer(player.getUniqueId());
+            EventPlayer eventPlayer = mbc.getPlayer(id);
             eventPlayer.setPlayer(player);
+            TeamManager tm = mbc.getTeamManager();
+            tm.changeTeam(player, tm.getTeam(id));
 
             // TODO: game scoreboard
         }
+        EventPlayer eventPlayer = mbc.getPlayer(id);
+        event.joinMessage(eventPlayer.getEventName().append(text(" joined the game", NamedTextColor.WHITE)));
+    }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent event) {
+        MBCEvent mbc = MBCEvent.getInstance();
+        Player player = event.getPlayer();
+        EventPlayer eventPlayer = mbc.getPlayer(player.getUniqueId());
+        event.quitMessage(eventPlayer.getEventName().append(text(" left the game", NamedTextColor.WHITE)));
+
+        // Internally set to spectator
+        /*
+        TeamManager tm = mbc.getTeamManager();
+        tm.changeTeam(player, tm.getTeam(TeamType.SPECTATOR)); */
     }
 
     /**
@@ -55,6 +83,9 @@ public class ServerListener implements Listener {
             event.setCancelled(true);
     }
 
+    /**
+     * Handle Global Jump/Speed pad Effects
+     */
     @EventHandler
     public void onJump(PlayerJumpEvent e) {
         if (isOnBlockWithBuffer(e.getPlayer(), MBCUtils.MEGA_BOOST_PAD)) {
@@ -65,7 +96,7 @@ public class ServerListener implements Listener {
                     Location l = p.getLocation();
                     l.setPitch(-30);
                     p.setVelocity(p.getVelocity().add(l.getDirection().multiply(4.0).setY(1.25)));
-                    p.playSound(p, "sfx.orange_red_jump_pad", SoundCategory.BLOCKS, 1, 1);
+                    p.playSound(p, MBCUtils.BOOST_PAD_SFX, SoundCategory.BLOCKS, 1, 1);
                 }
             }, 1);
             return;
@@ -79,7 +110,7 @@ public class ServerListener implements Listener {
                     Location l = p.getLocation();
                     l.setPitch(-30);
                     p.setVelocity(p.getVelocity().add(l.getDirection().multiply(2.0)));
-                    p.playSound(p, "sfx.orange_red_jump_pad", SoundCategory.BLOCKS, 1, 1);
+                    p.playSound(p, MBCUtils.BOOST_PAD_SFX, SoundCategory.BLOCKS, 1, 1);
                 }
             }, 1);
             return;
@@ -91,7 +122,7 @@ public class ServerListener implements Listener {
                 public void run() {
                     Player p = e.getPlayer();
                     p.setVelocity(p.getVelocity().add(new Vector(p.getVelocity().getX(), p.getVelocity().getY()*1.75, p.getVelocity().getZ())));
-                    p.playSound(p, "sfx.green_jump_pad", SoundCategory.BLOCKS, 1, 1);
+                    p.playSound(p, MBCUtils.JUMP_PAD_SFX, SoundCategory.BLOCKS, 1, 1);
                 }
             }, 1);
         }
@@ -102,7 +133,7 @@ public class ServerListener implements Listener {
         if (isOnBlockWithBuffer(e.getPlayer(), MBCUtils.SPEED_PAD)) {
             PotionEffect s = e.getPlayer().getPotionEffect(PotionEffectType.SPEED);
 
-            if (s == null) e.getPlayer().playSound(e.getPlayer(), "sfx.speed_pad", SoundCategory.BLOCKS, 1, 1);
+            if (s == null) e.getPlayer().playSound(e.getPlayer(), MBCUtils.SPEED_PAD_SFX, SoundCategory.BLOCKS, 1, 1);
             else if (s.isShorterThan(new PotionEffect(PotionEffectType.SPEED, 70, 3, false, false))) e.getPlayer().playSound(e.getPlayer(), "sfx.speed_pad", SoundCategory.BLOCKS, 1, 1);
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 3, false, false));
         }

@@ -47,7 +47,9 @@ public class TeamManager {
         UUID id = player.getUniqueId();
         EventTeam previous = playerTeams.get(id);
         EventPlayer eventPlayer = MBCEvent.getInstance().getPlayer(id);
+
         eventPlayer.changeEventName(newTeam);
+
         // If Player was not previously on a team
         if (previous != null) {
             previous.removePlayer(eventPlayer);
@@ -57,6 +59,9 @@ public class TeamManager {
             newTeam.addPlayer(eventPlayer);
             playerTeams.put(id, newTeam);
         }
+
+        EventScoreboardManager esm = MBCEvent.getInstance().getScoreboardManager();
+        esm.initializePlayerScoreboard(player, newTeam, this);
     }
 
     /**
@@ -132,7 +137,7 @@ public class TeamManager {
                 debugMsg = debugMsg.append(text("- ").append(player.getEventName()).append(text("\n")));
             }
         }
-        debugMsg = debugMsg.append(text("[END DEBUG MESSAGE]------------------------------\n"));
+        debugMsg = debugMsg.append(text("[END DEBUG MESSAGE]------------------------------"));
         return debugMsg;
     }
 }

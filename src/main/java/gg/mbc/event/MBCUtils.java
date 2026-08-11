@@ -39,7 +39,6 @@ public final class MBCUtils {
     public static final Character PURPLE_ICON_CHRISTMAS = 'ⓤ';
     public static final Character PINK_ICON_CHRISTMAS = 'ⓟ';
 
-
     // Movement
     public static final Material BOOST_PAD = Material.WAXED_EXPOSED_CUT_COPPER;
     public static final Material MEGA_BOOST_PAD = Material.WAXED_WEATHERED_CUT_COPPER;
@@ -47,6 +46,11 @@ public final class MBCUtils {
     public static final Material SPEED_PAD = Material.OBSERVER;
     public static final double JUMP_BUFFER_ROOM = 0.35;
     public static final Vector ZERO = new Vector(0, 0, 0);
+
+    // SFX
+    public static final String SPEED_PAD_SFX = "sfx.speed_pad";
+    public static final String JUMP_PAD_SFX = "sfx.green_jump_pad";
+    public static final String BOOST_PAD_SFX = "sfx.orange_red_jump_pad";
 
     // World
     public static final List<Material> BLOCKED_RECIPES = Arrays.asList(Material.WOODEN_AXE, Material.SHIELD, Material.SNOW_BLOCK, Material.FLINT_AND_STEEL);

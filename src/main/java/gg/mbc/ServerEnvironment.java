@@ -34,7 +34,7 @@ public class ServerEnvironment {
 
         world = Objects.requireNonNull(Bukkit.getWorld("world"));
         world.setGameRule(GameRules.ADVANCE_TIME, false);
-        world.setTime(9000);
+        world.setTime(6000);
 
         plugin.getServer().getPluginManager().registerEvents(globalListener, plugin);
     }
