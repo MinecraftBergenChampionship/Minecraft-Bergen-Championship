@@ -2,6 +2,7 @@ package gg.mbc;
 
 import gg.mbc.commands.changeteam;
 import gg.mbc.commands.debug;
+import gg.mbc.commands.ping;
 import gg.mbc.commands.reload;
 import gg.mbc.commands.tab.changeTeamTab;
 import gg.mbc.event.MBCEvent;
@@ -52,5 +53,6 @@ public class EventPlugin extends JavaPlugin {
 
         getCommand("debug").setExecutor(new debug());
         getCommand("reload").setExecutor(new reload());
+        getCommand("ping").setExecutor(new ping());
     }
 }

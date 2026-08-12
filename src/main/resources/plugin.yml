@@ -40,6 +40,7 @@ commands:
     permission: minecraft.command.op
   ping:
     description: gets player's ping
+    usage: /ping [player]
   announcement:
     description: announce a message server wide.
     permission: minecraft.command.op
