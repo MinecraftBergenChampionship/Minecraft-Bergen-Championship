@@ -89,7 +89,6 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
             </plugin>
-
         </plugins>
         <resources>
             <resource>
@@ -161,6 +160,24 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>(20231013,)</version>
+        </dependency>
+        <!--unit testing-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockbukkit.mockbukkit</groupId>
+            <artifactId>mockbukkit-v26.2</artifactId>
+            <version>4.116.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

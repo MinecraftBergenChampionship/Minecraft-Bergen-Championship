@@ -14,7 +14,6 @@ public class EventManager {
 
     public EventManager(EventPlugin plugin) {
         this.plugin = plugin;
-
     }
 
     public EventState getState() {

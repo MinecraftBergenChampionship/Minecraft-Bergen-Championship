@@ -1,0 +1,108 @@
+name: MBC
+version: '${project.version}'
+main: gg.mbc.EventPlugin
+api-version: '26.2'
+authors: [ Pengu1n, rspacerr, bigkirbypuff ]
+description: Minecraft Bergen Championship
+depend: [Citizens, WorldEdit]
+commands:
+  reload:
+    permission: minecraft.command.op
+    description: reloads the plugin
+    usage: /reload [confirm|debug]
+  debug:
+    permission: minecraft.command.op
+    description: sends debug messages
+  mbchelp:
+    description: list all commands
+  changeTeam:
+    description: Changing a team
+  playmusic:
+    description: Playing music
+    permission: minecraft.command.op
+  minibeepstop:
+    description: Stop mini beep in lobby
+    permission: minecraft.command.op
+  hardmode:
+    description: activates or deactiviates hard mode
+    permission: minecraft.command.op
+  pvpstop:
+    description: Stop pvp in lobby
+    permission: minecraft.command.op
+  start:
+    description: start a game
+    permission: minecraft.command.op
+  pause:
+    description: pause game/event
+    permission: minecraft.command.op
+  unpause:
+    description: unpause game/event
+    permission: minecraft.command.op
+  ping:
+    description: gets player's ping
+    usage: /ping [player]
+  announcement:
+    description: announce a message server wide.
+    permission: minecraft.command.op
+    aliases: [shout, announce]
+  readycheck:
+    description: announce to players to ready up.
+    permission: minecraft.command.op
+  ready:
+    description: indicate a team is ready.
+  skip:
+    permission: minecraft.command.op
+    description: skip
+  notready:
+    description: indicate a team is not ready, if they were previously.
+  startevent:
+    description: begin event once all teams are ready.
+  placement:
+    description: gets player's individual placement information
+    aliases: [place, score, standing]
+  individual:
+    description: gets top 8 individual
+    aliases: [lb, indiv, leaderboard]
+  scores:
+    description: gets top 8 individual and player placement
+    aliases: [placements, places, standings]
+  playerscore:
+    description: admin command to set player scores in case of emergency restart
+    permission: minecraft.command.op
+  teamscore:
+    description: admin command to set team scores in case of emergency restart
+    permission: minecraft.command.op
+  endgame:
+    description: stops a game immediately without carrying scores over
+    permission: minecraft.command.op
+  statlogs:
+    description: for admin stat archive
+    permission: minecraft.command.op
+  gamenum:
+    description: admin set game number
+    permission: minecraft.command.op
+  checkbuild:
+    description: checks a build during build mart
+  invincible:
+    description: debug to toggle invincibility
+    permission: minecraft.command.op
+  spawnNPC:
+    description: spawns a npc at that location
+    permission: minecraft.command.op
+  removeSection:
+    description: removes a decision dome section of that game name
+    permission: minecraft.command.op
+  scoring:
+    description: retrieves scoring for the specified game
+  despawnNPCS:
+    description: despawns all NPCs
+    permission: minecraft.command.op
+  partygame:
+    description: start a party game
+    permission: minecraft.command.op
+  nick:
+    description: nick
+    permisison: minecraft.command.op
+  loadPlayers:
+    description: Loads players into preregistered teams
+    permission: minecraft.command.op

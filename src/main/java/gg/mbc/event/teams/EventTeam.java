@@ -1,10 +1,8 @@
 package gg.mbc.event.teams;
 
-import gg.mbc.event.MBCUtils;
 import gg.mbc.event.players.EventPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.bukkit.Color;
 
 import java.util.Collection;
@@ -34,7 +32,7 @@ public class EventTeam {
         this.scoreboardName = type.scoreboardName();
         players = new HashSet<>();
 
-        this.displayName = text(icon, NamedTextColor.WHITE).append(text(" " + name, textColor));
+        this.displayName = text(icon, NamedTextColor.WHITE).append(text(name, textColor));
     }
 
     // Add and Remove players from team

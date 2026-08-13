@@ -6,8 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
-import java.util.HashMap;
-
 import static net.kyori.adventure.text.Component.text;
 
 public final class EventScoreboardManager {

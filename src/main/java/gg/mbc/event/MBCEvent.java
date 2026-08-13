@@ -5,12 +5,10 @@ import gg.mbc.event.managers.TeamManager;
 import gg.mbc.event.players.EventPlayer;
 import gg.mbc.event.teams.TeamType;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.logging.Level;
 
 public final class MBCEvent {
     public final static int MAX_TEAMS = 6;
