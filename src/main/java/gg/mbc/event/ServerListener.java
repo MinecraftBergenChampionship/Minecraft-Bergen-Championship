@@ -4,7 +4,12 @@ import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import gg.mbc.event.managers.TeamManager;
 import gg.mbc.event.players.EventPlayer;
 import gg.mbc.event.teams.TeamType;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SoundCategory;
@@ -21,6 +26,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static net.kyori.adventure.text.Component.text;
@@ -68,10 +74,34 @@ public class ServerListener implements Listener {
         EventPlayer eventPlayer = mbc.getPlayer(player.getUniqueId());
         event.quitMessage(eventPlayer.getEventName().append(text(" left the game", NamedTextColor.WHITE)));
 
+        // TODO: logistics in game
         // Internally set to spectator
         /*
         TeamManager tm = mbc.getTeamManager();
         tm.changeTeam(player, tm.getTeam(TeamType.SPECTATOR)); */
+    }
+
+
+    /**
+     * Formatting for chat display, as well as emoji support
+     * @see MBCUtils::getEmojis()
+     * https://github.com/MrQuackDuck/ImageEmojis/blob/705197c486f68a8f497a15356eb766701cde6dbc/src/main/java/mrquackduck/imageemojis/server/listeners/SendMessageListener.java#L35
+     * */
+    @EventHandler
+    public void onPlayerChat(AsyncChatEvent event) {
+        Player player = event.getPlayer();
+        TextComponent msg = (TextComponent) event.originalMessage();
+        Component name = MBCEvent.getInstance().getPlayer(player.getUniqueId()).getEventName();
+        for (Map.Entry<String, Character> emoji : MBCUtils.getEmojis().entrySet()) {
+            TextComponent replacement = Component.text(emoji.getValue());
+            TextReplacementConfig replacementConfig = TextReplacementConfig.builder()
+                    .match(emoji.getKey())
+                    .replacement(replacement)
+                    .build();
+            msg = (TextComponent) msg.replaceText(replacementConfig);
+        }
+        event.setCancelled(true);
+        Bukkit.broadcast(name.append(text(": ").append(msg)));
     }
 
     /**

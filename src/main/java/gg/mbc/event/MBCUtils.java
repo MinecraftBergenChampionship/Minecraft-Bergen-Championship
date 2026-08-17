@@ -7,8 +7,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -24,6 +23,7 @@ public final class MBCUtils {
     public static final Character PURPLE_ICON = 'Ⓤ';
     public static final Character PINK_ICON = 'Ⓟ';
     public static final Character SPECTATOR_ICON = 's';
+    public static final Character CROWN_ICON = '④';
 
     public static final Character RED_ICON_HALLOWEEN = 'Ⓛ';
     public static final Character YELLOW_ICON_HALLOWEEN = 'Ⓜ';
@@ -38,6 +38,12 @@ public final class MBCUtils {
     public static final Character BLUE_ICON_CHRISTMAS = 'ⓑ';
     public static final Character PURPLE_ICON_CHRISTMAS = 'ⓤ';
     public static final Character PINK_ICON_CHRISTMAS = 'ⓟ';
+
+    private static final Map<String, Character> emojis = new HashMap<>(Map.of(
+            ":red:", RED_ICON, ":yellow:", YELLOW_ICON, ":green:", GREEN_ICON,
+            ":blue:", BLUE_ICON, ":purple:", PURPLE_ICON, ":pink:", PINK_ICON,
+            ":w:", CROWN_ICON, ":crown:", CROWN_ICON, ":dub:", CROWN_ICON, ":win:", CROWN_ICON
+    ));
 
     // Movement
     public static final Material BOOST_PAD = Material.WAXED_EXPOSED_CUT_COPPER;
@@ -66,5 +72,9 @@ public final class MBCUtils {
 
     public static Component getDisplayName(EventTeam t, String name) {
         return text(t.icon(), NamedTextColor.WHITE).append(text(" " + name, t.textColor()));
+    }
+
+    public static Map<String, Character> getEmojis() {
+        return Collections.unmodifiableMap(emojis);
     }
 }
