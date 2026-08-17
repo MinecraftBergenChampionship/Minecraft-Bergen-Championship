@@ -53,8 +53,9 @@ public final class EventScoreboardManager {
         }
 
         // add everyone else to this player's scoreboard
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            EventTeam otherTeam = teamManager.getTeam(player);
+        for (Player player2 : Bukkit.getOnlinePlayers()) {
+            if (player2.getUniqueId() == player.getUniqueId()) continue;
+            EventTeam otherTeam = teamManager.getTeam(player2);
             if (otherTeam == null) continue;
             String otherTeamName = otherTeam.scoreboardName();
             if (board.getTeam(otherTeamName) == null) {
@@ -62,11 +63,28 @@ public final class EventScoreboardManager {
                 scoreboardTeam.color(otherTeam.textColor());
                 scoreboardTeam.prefix(text(otherTeam.icon(), NamedTextColor.WHITE).append(text(" ")));
                 scoreboardTeam.setAllowFriendlyFire(false);
-                scoreboardTeam.addPlayer(p);
+                scoreboardTeam.addPlayer(player2);
                 scoreboardTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             } else {
-                board.getTeam(otherTeamName).addPlayer(p);
+                board.getTeam(otherTeamName).addPlayer(player2);
             }
+
+            // adds this player to everyone else's teams
+            Scoreboard secondScoreboard = player2.getScoreboard();
+            if (secondScoreboard.getTeam(team.scoreboardName()) == null) {
+                Team otherScoreboardTeam = secondScoreboard.registerNewTeam(team.scoreboardName());
+                otherScoreboardTeam.color(team.textColor());
+                otherScoreboardTeam.prefix(text(team.icon(), NamedTextColor.WHITE).append(text(" ")));
+                otherScoreboardTeam.setAllowFriendlyFire(false);
+                otherScoreboardTeam.addPlayer(player);
+                otherScoreboardTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+            } else {
+                // add player to team
+                Team otherScoreboardTeam = secondScoreboard.getTeam(team.scoreboardName());
+                otherScoreboardTeam.addPlayer(player);
+                otherScoreboardTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+            }
+
         }
     }
 }
