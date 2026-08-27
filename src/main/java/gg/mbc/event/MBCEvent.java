@@ -1,8 +1,10 @@
 package gg.mbc.event;
 import gg.mbc.EventPlugin;
+import gg.mbc.event.managers.EventScheduler;
 import gg.mbc.event.managers.EventScoreboardManager;
 import gg.mbc.event.managers.TeamManager;
 import gg.mbc.event.players.EventPlayer;
+import gg.mbc.event.scoring.ScoreManager;
 import gg.mbc.event.teams.TeamType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -20,6 +22,8 @@ public final class MBCEvent {
 
     private final EventScoreboardManager scoreboardManager;
     private final TeamManager teamManager;
+    private final EventScheduler scheduler;
+    private final ScoreManager scoreManager;
 
     // Contains data for all players logged onto the server while plugin is active.
     private final Map<UUID, EventPlayer> playerData;
@@ -30,12 +34,23 @@ public final class MBCEvent {
         // managers
         this.scoreboardManager = new EventScoreboardManager();
         this.teamManager = new TeamManager();
+        this.scheduler = new EventScheduler(plugin);
+        this.scoreManager = new ScoreManager(teamManager);
 
         // event
         playerData = new HashMap<>();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            playerData.put(player.getUniqueId(), new EventPlayer(player, teamManager.getTeam(TeamType.SPECTATOR)));
+            initializePlayerData(player);
         }
+    }
+
+    /**
+     * Specifically handles creation of new player and adds it to all proper registries.
+     * @param p Player whose data to register
+     */
+    private void initializePlayerData(Player p) {
+        EventPlayer player = new EventPlayer(p, teamManager.getTeam(TeamType.SPECTATOR));
+        playerData.put(p.getUniqueId(), player);
     }
 
     /**
@@ -52,7 +67,8 @@ public final class MBCEvent {
     /**
      * Stops the event and destroys this current instance;
      */
-    public static void stopEvent() {
+    public void stopEvent() {
+        scheduler.clearActiveEvents();
         mbc = null;
     }
 
@@ -84,11 +100,12 @@ public final class MBCEvent {
     public void addPlayer(Player p) {
         UUID id = p.getUniqueId();
         if (getPlayer(id) != null) return;
-        playerData.put(id, new EventPlayer(p, teamManager.getTeam(TeamType.SPECTATOR)));
+        initializePlayerData(p);
     }
 
     public EventScoreboardManager getScoreboardManager() { return scoreboardManager; }
     public TeamManager getTeamManager() { return teamManager; }
+    public ScoreManager getScoreManager() { return scoreManager; }
 
     public EventPlugin getPlugin() {
         return plugin;

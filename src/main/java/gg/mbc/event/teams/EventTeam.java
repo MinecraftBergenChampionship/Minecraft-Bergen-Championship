@@ -13,7 +13,10 @@ import java.util.Set;
 import static net.kyori.adventure.text.Component.text;
 
 public class EventTeam {
+    public static final int MAX_NAME_LENGTH = 16;
+
     // Display
+    private final TeamType type;
     private final String name;
     private final String scoreboardName;
     private final Character icon;
@@ -25,6 +28,7 @@ public class EventTeam {
     private final Set<EventPlayer> players;
 
     public EventTeam(TeamType type) {
+        this.type = type;
         this.name = type.teamName();
         this.icon = type.icon();
         this.color = type.color();
@@ -32,7 +36,7 @@ public class EventTeam {
         this.scoreboardName = type.scoreboardName();
         players = new HashSet<>();
 
-        this.displayName = text(icon, NamedTextColor.WHITE).append(text(name, textColor));
+        this.displayName = text(icon + " ", NamedTextColor.WHITE).append(text(name, textColor));
     }
 
     // Add and Remove players from team
@@ -47,4 +51,8 @@ public class EventTeam {
     public NamedTextColor textColor() { return textColor; }
     public String scoreboardName() { return scoreboardName; }
     public Character icon() { return icon; }
+    public TeamType type() { return type; }
+
+    @Override
+    public int hashCode() { return type.sortID; }
 }
