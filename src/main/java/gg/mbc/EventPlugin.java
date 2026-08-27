@@ -33,7 +33,7 @@ public class EventPlugin extends JavaPlugin {
         // Stop all games that are occurring
 
         // Destroy current instance of event
-        MBCEvent.stopEvent();
+        MBCEvent.getInstance().stopEvent();
 
         // Reset server environment
         serverEnvironment = null;
