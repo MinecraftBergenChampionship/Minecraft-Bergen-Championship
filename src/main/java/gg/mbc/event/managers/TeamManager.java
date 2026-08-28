@@ -117,9 +117,16 @@ public class TeamManager {
     }
 
     /**
+     * @return all TeamTypes as an iterable collection.
+     */
+    public Collection<TeamType> getTypes() {
+        return Collections.unmodifiableCollection(teams.keySet());
+    }
+
+    /**
      * @return all TeamTypes in String format as an iterable collection.
      */
-    public Collection<String> getTypes() {
+    public Collection<String> getTeamNames() {
         return Collections.unmodifiableCollection(teamNames.keySet());
     }
 

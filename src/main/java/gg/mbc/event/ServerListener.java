@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import gg.mbc.event.managers.TeamManager;
 import gg.mbc.event.players.EventPlayer;
 import gg.mbc.event.teams.TeamType;
+import gg.mbc.util.MBCUtils;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -84,7 +85,7 @@ public class ServerListener implements Listener {
 
     /**
      * Formatting for chat display, as well as emoji support
-     * @see MBCUtils::getEmojis()
+     * @see MBCUtils ::getEmojis()
      * https://github.com/MrQuackDuck/ImageEmojis/blob/705197c486f68a8f497a15356eb766701cde6dbc/src/main/java/mrquackduck/imageemojis/server/listeners/SendMessageListener.java#L35
      * */
     @EventHandler

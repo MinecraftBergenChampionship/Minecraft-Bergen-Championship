@@ -1,6 +1,6 @@
 package gg.mbc.event.teams;
 
-import gg.mbc.event.MBCUtils;
+import gg.mbc.util.MBCUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 

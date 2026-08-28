@@ -1,6 +1,6 @@
 package gg.mbc;
 
-import gg.mbc.event.MBCUtils;
+import gg.mbc.util.MBCUtils;
 import gg.mbc.event.ServerListener;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRules;

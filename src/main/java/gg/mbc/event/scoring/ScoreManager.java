@@ -7,22 +7,9 @@ import gg.mbc.event.scoring.comparators.EventPlayerComparator;
 import gg.mbc.event.scoring.comparators.EventTeamComparator;
 import gg.mbc.event.teams.EventTeam;
 import gg.mbc.event.teams.TeamType;
+import gg.mbc.util.Tuple;
 
 import java.util.*;
-
-/**
- * This utility class is currently just used for this class.
- * If use is found elsewhere, this can be moved to a new 'utilities' package with MBCUtilits.
- */
-class Tuple<K,V> {
-    K first;
-    V second;
-
-    Tuple(K first, V second) {
-        this.first = first;
-        this.second= second;
-    }
-}
 
 public class ScoreManager {
     private final Map<UUID, PlayerScoreReport> playerScores;

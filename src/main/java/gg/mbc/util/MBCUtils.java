@@ -1,4 +1,4 @@
-package gg.mbc.event;
+package gg.mbc.util;
 
 import gg.mbc.event.teams.EventTeam;
 import net.kyori.adventure.text.Component;

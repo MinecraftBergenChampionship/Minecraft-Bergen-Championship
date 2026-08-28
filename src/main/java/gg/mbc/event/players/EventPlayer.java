@@ -1,6 +1,6 @@
 package gg.mbc.event.players;
 
-import gg.mbc.event.MBCUtils;
+import gg.mbc.util.MBCUtils;
 import gg.mbc.event.teams.EventTeam;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
