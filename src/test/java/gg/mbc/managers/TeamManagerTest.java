@@ -43,10 +43,10 @@ public class TeamManagerTest extends EventPluginTest {
     }
 
     @Test
-    @DisplayName("Test getTypes")
+    @DisplayName("Test TeamType values")
     public void testGetTypes() {
         Set<TeamType> types = new HashSet<>(Set.of(TeamType.RED, TeamType.YELLOW, TeamType.BLUE, TeamType.PURPLE, TeamType.GREEN, TeamType.PINK, TeamType.SPECTATOR));
-        for (TeamType t : manager.getTypes()) {
+        for (TeamType t : TeamType.values()) {
             Assertions.assertTrue(types.contains(t));
             types.remove(t);
         }
@@ -56,7 +56,7 @@ public class TeamManagerTest extends EventPluginTest {
     @Test
     @DisplayName("Test getTeam")
     public void testGetTeam() {
-        for (TeamType t : manager.getTypes()) {
+        for (TeamType t : TeamType.values()) {
             Assertions.assertEquals(t, manager.getTeam(t).type());
             Assertions.assertEquals(t, manager.getTeam(t.teamName()).type());
             Assertions.assertEquals(t, manager.getTeam(t.scoreboardName()).type());
@@ -67,7 +67,7 @@ public class TeamManagerTest extends EventPluginTest {
     @Test
     @DisplayName("Test changeTeam")
     public void testChangeTeamOnce() {
-        for (TeamType t : manager.getTypes()) {
+        for (TeamType t : TeamType.values()) {
             PlayerMock player = server.addPlayer();
             EventTeam team = manager.getTeam(player);
             Assertions.assertEquals(TeamType.SPECTATOR, team.type());
@@ -79,13 +79,13 @@ public class TeamManagerTest extends EventPluginTest {
     @Test
     @DisplayName("Test changeTeam")
     public void testChangeTeamTwice() {
-        for (TeamType t : manager.getTypes()) {
+        for (TeamType t : TeamType.values()) {
             PlayerMock player = server.addPlayer();
             EventTeam team = manager.getTeam(player);
             Assertions.assertEquals(TeamType.SPECTATOR, team.type());
             manager.changeTeam(player, manager.getTeam(t));
             Assertions.assertEquals(t, manager.getTeam(player).type());
-            for (TeamType t2 : manager.getTypes()) {
+            for (TeamType t2 : TeamType.values()) {
                 manager.changeTeam(player, manager.getTeam(t2));
                 if (t2 != t) {
                     Assertions.assertNotEquals(t, manager.getTeam(player).type());
@@ -101,7 +101,7 @@ public class TeamManagerTest extends EventPluginTest {
     public void testChangeTeamString() {
         // Get string names
         List<Tuple<TeamType, String>> teamNames = new ArrayList<>();
-        for (TeamType t : manager.getTypes()) {
+        for (TeamType t : TeamType.values()) {
             teamNames.add(new Tuple<>(t, t.scoreboardName()));
             teamNames.add(new Tuple<>(t, t.teamName()));
             teamNames.add(new Tuple<>(t, t.name()));
