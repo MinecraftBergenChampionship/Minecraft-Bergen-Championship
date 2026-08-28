@@ -57,23 +57,19 @@ public class ping implements CommandExecutor {
 
         sender.sendMessage("Conducting ping test...");
         Player tmpPlayer= player;
-
         new BukkitRunnable() {
             double total = 0;
             int i = 0;
-
             @Override
             public void run() {
                 if (!tmpPlayer.isOnline()) {
                     this.cancel();
                     return;
                 }
-
                 long ping = tmpPlayer.getPing();
                 total += ping;
                 sender.sendMessage(eventPlayer.getEventName().append(text("'s ping: ").append(text(ping + "ms", pingColor(ping)))));
                 ((Player) sender).playSound((Player) sender, Sound.ENTITY_ARROW_HIT_PLAYER, 1,1);
-
                 i++;
                 if (i >= 5) {
                     this.cancel();

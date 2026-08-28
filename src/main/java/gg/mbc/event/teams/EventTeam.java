@@ -17,12 +17,12 @@ public class EventTeam {
 
     // Display
     private final TeamType type;
-    private final String name;
+    private String name;
+    private Component displayName;
     private final String scoreboardName;
     private final Character icon;
     private final NamedTextColor textColor;
     private final Color color;
-    private final Component displayName;
 
     // Players
     private final Set<EventPlayer> players;
@@ -52,6 +52,27 @@ public class EventTeam {
     public String scoreboardName() { return scoreboardName; }
     public Character icon() { return icon; }
     public TeamType type() { return type; }
+
+    /**
+     * Changes the display name of the team.
+     * It is guaranteed that
+     * @param name New name to change to.
+     * @return boolean value indicating success of the operation
+     */
+    public boolean changeName(String name) {
+        if (name.length() > MAX_NAME_LENGTH) return false;
+        this.name = name;
+        this.displayName = text(icon + " ", NamedTextColor.WHITE).append(text(name, textColor));
+        return true;
+    }
+
+    /**
+     * Reset the name of this team.
+     */
+    public void resetName() {
+        this.name = type.name();
+        this.displayName = text(icon + " ", NamedTextColor.WHITE).append(text(name, textColor));
+    }
 
     @Override
     public int hashCode() { return type.sortID; }
