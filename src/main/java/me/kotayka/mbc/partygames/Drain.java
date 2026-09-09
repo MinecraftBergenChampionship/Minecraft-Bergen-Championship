@@ -4,6 +4,7 @@ import me.kotayka.mbc.*;
 import me.kotayka.mbc.gameMaps.dragonsMap.Arrgh;
 import me.kotayka.mbc.gameMaps.dragonsMap.ConchStreet;
 import me.kotayka.mbc.gameMaps.dragonsMap.DragonsMap;
+import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.block.Block;
@@ -255,6 +256,12 @@ public class Drain extends PartyGame {
                     }
                     generalPoints();
                 }
+                if (timeRemaining == 11) {
+                    Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Most Drained Blocks: ");
+                }
+                if (timeRemaining == 10) {
+                    mostBlocksDrainedPrint();
+                }
                 if (timeRemaining == 0) {
                     endEvents();
                     return;
@@ -263,6 +270,59 @@ public class Drain extends PartyGame {
         }
     }
 
+     /**
+     * Displays the top 5 players based off of most kills.
+     */
+    private void mostBlocksDrainedPrint() {
+        Participant[] blocksDrained = new Participant[5];
+
+        Map<Participant, Integer> drainMap = new HashMap<Participant, Integer>();
+        int totalDrained = 0;
+        for (int i = 0; i < drainedBlocks.length; i++) {
+            for (int j = 0; j < drainedBlocks[i].length; j++) {
+                if (drainedBlocks[i][j] != null) {
+                    Participant drainer = drainedBlocks[i][j];
+                    if (drainMap.containsKey(drainer)) {
+                        drainMap.replace(drainer, drainMap.get(drainer) + 1);
+                    } else {
+                        drainMap.put(drainer, 1);
+                    }
+                    totalDrained++;
+                }
+            }
+        }
+
+
+        ArrayList<Participant> arrayDrainPlayers = new ArrayList(drainMap.values());
+        for (int j = 0; j < arrayDrainPlayers.size(); j++) {
+            Participant p = arrayDrainPlayers.get(j);
+            for (int i = 0; i < blocksDrained.length; i++) {
+                if (blocksDrained[i] == null) {
+                    blocksDrained[i] = p;
+                    break;
+                }
+                if (drainMap.get(blocksDrained[i]) < drainMap.get(p)) {
+                    Participant q = p;
+                    p = blocksDrained[i];
+                    blocksDrained[i] = q;
+                }
+            }
+        }
+
+
+        StringBuilder topFive = new StringBuilder();
+        
+        //Bukkit.broadcastMessage("[Debug] fastestLaps.keySet().size() == " + fastestLaps.keySet().size());
+        for (int i = 0; i < blocksDrained.length; i++) {
+            if (blocksDrained[i] == null) break;
+            topFive.append(String.format((i+1) + ". %-18s %-9s\n", blocksDrained[i].getFormattedName(), (drainMap.get(blocksDrained[i]))));
+            
+        }
+        Bukkit.broadcastMessage(topFive.toString());
+
+    }
+
+    
     /**
      * Calculates, gives, and broadcasts message concerning special task points.
      */
@@ -404,7 +464,7 @@ public class Drain extends PartyGame {
 
         for (MBCTeam t : patternsFound.keySet()) {
             for (Participant p : t.getPlayers()) {
-                int patterns = patternsFound.get(t) / t.getPlayers().size();
+                double patterns = (1.0*patternsFound.get(t)) / ((double)(t.getPlayers().size()));
                 int pointsGained = (int) (PATTERN_POINTS * 1.0 / (double) (MBC.getInstance().getPlayers().size()));
                 if (totalPatterns != 0) {
                     pointsGained = (int) (PATTERN_POINTS * ((double) patterns) / ((double) totalPatterns));
@@ -428,15 +488,7 @@ public class Drain extends PartyGame {
             message = message + t.teamNameFormat() + ChatColor.BOLD + ": " + (pointMapTeam.get(t)) + " pattern points\n";
         }
         logger.log(message);
-        
-        String patternsMessage = "\n" + ChatColor.BOLD + "Patterns Made By Team:\n";
-        for (MBCTeam t : MBC.getInstance().getValidTeams()) {
-            if (!patternsFound.containsKey(t))
-                patternsFound.put(t, 0);
-            patternsMessage = patternsMessage + t.teamNameFormat() + ChatColor.BOLD + ": " + (pointMapTeam.get(t)) + " drain points\n";
-        }
-        logger.log(patternsMessage);
-        Bukkit.broadcastMessage(patternsMessage);
+        Bukkit.broadcastMessage(message);
 
 
         for (Participant p : MBC.getInstance().getPlayers()) {
@@ -446,7 +498,7 @@ public class Drain extends PartyGame {
                         + ChatColor.BOLD + pointMap.get(p) + ChatColor.RESET + "" + ChatColor.GREEN
                         + " points!";
                 p.getPlayer().sendMessage(playerMessage);
-                logger.log(p.getFormattedName() + ": " + patternsFound.get(p.getTeam()) + " blocks drained, " + pointMap.get(p)
+                logger.log(p.getFormattedName() + ": " + patternsFound.get(p.getTeam()) + " patterns made, " + pointMap.get(p)
                         + " points gained");
             }
         }
@@ -789,7 +841,7 @@ public class Drain extends PartyGame {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
-        if (p.getY() <= 1.5 && Bukkit.getWorld("Party").getBlockAt((int) p.getX(), (int) p.getY(), (int) p.getZ())
+        if (p.getY() < 2.0 && Bukkit.getWorld("Party").getBlockAt((int) p.getX(), (int) p.getY(), (int) p.getZ())
                 .getType().equals(Material.WATER)) {
             Participant part = Participant.getParticipant(p);
             if (!getState().equals(GameState.ACTIVE) || !p.getGameMode().equals(GameMode.ADVENTURE)) {
@@ -942,7 +994,7 @@ public class Drain extends PartyGame {
             p.teleport(getSpawnLocation(part));
             return;
         }
-        if (p.getY() <= 1.5 && !Bukkit.getWorld("Party").getBlockAt((int) p.getX(), (int) p.getY(), (int) p.getZ())
+        if (p.getY() < 2 && !Bukkit.getWorld("Party").getBlockAt((int) p.getX(), (int) p.getY(), (int) p.getZ())
                 .getType().equals(Material.WATER)) {
             Participant part = Participant.getParticipant(p);
             p.teleport(getSpawnLocation(part));

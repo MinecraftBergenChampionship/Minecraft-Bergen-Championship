@@ -3,8 +3,11 @@ package me.kotayka.mbc.gamePlayers;
 import me.kotayka.mbc.Participant;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 
@@ -14,6 +17,7 @@ public class PowerTagPlayer extends GamePlayer {
     private int hideRounds = 0;
     private int timeSurvived = 0;
     private List<PowerTagPlayer> playersFound = new ArrayList<>();
+    public Map<PowerTagPlayer, Location> tensedList = new HashMap<>();
 
     public PowerTagPlayer(Participant p) {
         super(p);
@@ -73,6 +77,14 @@ public class PowerTagPlayer extends GamePlayer {
 
     public List<PowerTagPlayer> getPlayersFound() {
         return playersFound;
+    }
+
+    public void addTensed(PowerTagPlayer tenser, Location l) {
+        tensedList.put(tenser, l);
+    }
+
+    public void removeTensed(PowerTagPlayer tenser) {
+        tensedList.remove(tenser);
     }
 
     

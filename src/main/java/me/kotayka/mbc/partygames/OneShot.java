@@ -678,7 +678,51 @@ public class OneShot extends PartyGame {
             b.setVisible(false);
         }
 
-        endEvents();
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { topPlayerReveal();}
+          }, 60L);
+        
+    }
+
+    private void topPlayerReveal() {
+        
+        Bukkit.broadcastMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Most Kills: ");
+
+        OneShotPlayer[] kills = new OneShotPlayer[5];
+
+        ArrayList<OneShotPlayer> oneshotPlayers = new ArrayList(oneShotPlayerMap.values());
+        for (int j = 0; j < oneShotPlayerMap.size(); j++) {
+            OneShotPlayer p = oneShotPlayerMap.get(j);
+            for (int i = 0; i < kills.length; i++) {
+                if (kills[i] == null) {
+                    kills[i] = p;
+                    break;
+                }
+                if (kills[i].getKills() < p.getKills()) {
+                    OneShotPlayer q = p;
+                    p = kills[i];
+                    kills[i] = q;
+                }
+            }
+        }
+
+
+        StringBuilder topFive = new StringBuilder();
+        
+        //Bukkit.broadcastMessage("[Debug] fastestLaps.keySet().size() == " + fastestLaps.keySet().size());
+        for (int i = 0; i < kills.length; i++) {
+            if (kills[i] == null) break;
+            topFive.append(String.format((i+1) + ". %-18s %-9s\n", kills[i].getParticipant().getFormattedName(), (kills[i].getKills())));
+            
+        }
+        Bukkit.broadcastMessage(topFive.toString());
+        
+        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+            @Override
+            public void run() { endEvents();}
+          }, 60L);
+        
     }
 
     private void Death(Participant shot, Participant damager) {

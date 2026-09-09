@@ -162,9 +162,9 @@ public final class PowerupHandler {
         if (aceRacePlayer.onFirstCheckpoint()) {
             powerups = FIRST_CHECKPOINT_POWERUPS;
         } else {
-            int place = aceRacePlayer.getCurrentPlacement();
+            int place = aceRacePlayer.currentPlace;
             int players = MBC.getInstance().getPlayers().size();
-            double percentile = (1.0 * place) / players;
+            double percentile = (1.0 * place) / (1.0*players);
             if (percentile <= CUTOFF_TOP_SIXTH) {
                 powerups = TOP_SIXTH;
                 Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top sixth");
