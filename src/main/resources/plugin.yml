@@ -10,7 +10,7 @@ commands:
     permission: op
     description: reloads the plugin
     usage: /reload [confirm|debug]
-  changename:
+  teamname:
     description: change or reset your team name
     usage: /teamname change [name]
   debug:

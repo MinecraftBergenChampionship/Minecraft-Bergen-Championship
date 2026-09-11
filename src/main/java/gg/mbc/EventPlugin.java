@@ -15,11 +15,11 @@ public class EventPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        initializeCommands();
         MBCEvent.createEvent(this);
         if (serverEnvironment == null) {
             serverEnvironment = new ServerEnvironment(this);
         }
+        initializeCommands();
 
         serverEnvironment.resetPlayerStatus();
         Bukkit.broadcast(Component.text("MBC has been enabled!", NamedTextColor.GREEN));

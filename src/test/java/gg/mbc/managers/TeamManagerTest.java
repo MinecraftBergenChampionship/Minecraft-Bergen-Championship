@@ -95,7 +95,6 @@ public class TeamManagerTest extends EventPluginTest {
         }
     }
 
-
     @Test
     @DisplayName("Test changeTeam with string attributes")
     public void testChangeTeamString() {
@@ -135,5 +134,48 @@ public class TeamManagerTest extends EventPluginTest {
             manager.changeTeam(player, name);
             Assertions.assertEquals(type, manager.getTeam(player).type());
         }
+    }
+
+    @Test
+    @DisplayName("Test changeTeam on disconnect")
+    public void testChangeTeamDisconnect() {
+        PlayerMock player = server.addPlayer();
+        EventTeam team = manager.getTeam(player);
+        Assertions.assertEquals(TeamType.SPECTATOR, team.type());
+        player.disconnect();
+        team = manager.getTeam(player);
+        Assertions.assertEquals(TeamType.SPECTATOR, team.type());
+        player.reconnect();
+        Assertions.assertEquals(TeamType.SPECTATOR, team.type());
+
+        for (TeamType type : TeamType.values()) {
+            EventTeam newTeam = manager.getTeam(type);
+            manager.changeTeam(player, newTeam);
+            Assertions.assertEquals(type, newTeam.type());
+            Assertions.assertEquals(type, manager.getTeam(player).type());
+            player.disconnect();
+            Assertions.assertEquals(type, manager.getTeam(player).type());
+            player.reconnect();
+            Assertions.assertEquals(type, manager.getTeam(player).type());
+        }
+    }
+
+    @Test
+    @DisplayName("Test changeTeam fail on team name")
+    public void testChangeTeamFail() {
+        PlayerMock player = server.addPlayer("player_name");
+        EventTeam team = manager.getTeam(player);
+        Assertions.assertNotNull(team);
+        Assertions.assertEquals(TeamType.SPECTATOR, team.type());
+        Assertions.assertFalse(manager.changeTeam(player, "hi1"));
+        Assertions.assertFalse(manager.changeTeam(player, "hi2"));
+        Assertions.assertFalse(manager.changeTeam(player, "player_name"));
+        Assertions.assertFalse(manager.changeTeam(player, "red "));
+        Assertions.assertFalse(manager.changeTeam(player, "YELLOWa"));
+        Assertions.assertFalse(manager.changeTeam(player, "Blue1"));
+        Assertions.assertFalse(manager.changeTeam(player, " "));
+        Assertions.assertFalse(manager.changeTeam(player, ""));
+        Assertions.assertFalse(manager.changeTeam(player, "1923870298347"));
+        Assertions.assertFalse(manager.changeTeam(player, "%%%%*$#(*&@)#(*&@!)(*\n"));
     }
 }
