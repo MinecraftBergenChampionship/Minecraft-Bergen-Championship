@@ -53,6 +53,7 @@ import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.tgttosMap.Boats;
 import me.kotayka.mbc.gameMaps.tgttosMap.Cliffs;
 import me.kotayka.mbc.gameMaps.tgttosMap.Elytra;
+import me.kotayka.mbc.gameMaps.tgttosMap.Freeway;
 import me.kotayka.mbc.gameMaps.tgttosMap.Glide;
 import me.kotayka.mbc.gameMaps.tgttosMap.Meatball;
 import me.kotayka.mbc.gameMaps.tgttosMap.Pit;
@@ -74,7 +75,7 @@ public class TGTTOS extends Game {
                     new Cliffs(), new Skydive(), new Boats(), 
                     new Glide(), new SquidGame(), new Trident()
             ));
-    private List<TGTTOSMap> mapsFirst = new ArrayList<>(Arrays.asList(new Temple()));
+    private List<TGTTOSMap> mapsFirst = new ArrayList<>(Arrays.asList(new Temple(), new Freeway()));
 
     private List<Participant> finishedParticipants;
     private ArrayList<String> deathMessages = new ArrayList<>();

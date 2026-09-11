@@ -109,6 +109,7 @@ public class BuildMartMap extends AbstractBuildMartMap {
         addBreakArea(new BreakArea(Material.DARK_OAK_LOG, new Location(w, -91, 73, -4), new Location(w, -83, 79, 4), BreakAreaType.DARK_OAK_LOGS, new Location(w, -81, 72, 7, -180, 0)));
         addBreakArea(new BreakArea(Material.ACACIA_LOG, new Location(w, -91, 82, -4), new Location(w, -83, 88, 4), BreakAreaType.ACACIA_LOGS, new Location(w, -81, 81, 6, -180, 0)));
         addBreakArea(new BreakArea(Material.SPRUCE_LOG, new Location(w, -105, 73, 10), new Location(w, -97, 79, 18), BreakAreaType.SPRUCE_LOGS, new Location(w, -94, 72, 14, 90, 0)));
+        addBreakArea(new BreakArea(Material.SPRUCE_LOG, new Location(w, -105, 82, 10), new Location(w, -97, 88, 18), BreakAreaType.SPRUCE_LOGS, new Location(w, -96, 81, 14, 90, 0)));
         // addBreakArea(new BreakArea(Material.PALE_OAK_LOG, new Location(w, -105, 82, 10), new Location(w, -97, 88, 18), BreakAreaType.PALE_OAK_LOGS, new Location(w, -96, 81, 14, 90, 0)));
 
         // stone

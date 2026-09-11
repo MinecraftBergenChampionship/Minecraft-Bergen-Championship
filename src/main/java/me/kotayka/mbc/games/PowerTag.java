@@ -882,7 +882,7 @@ public class PowerTag extends Game {
     */
     public void turretUse(PowerTagPlayer p) {
         Player play = p.getPlayer();
-        Location l = new Location(TAG_WORLD, 0.5 + ((int)play.getX()), 0.0 + ((int)play.getY()), 0.5 + ((int)play.getZ()));
+        Location l = new Location(TAG_WORLD, ((int)play.getX()) - 0.5, 0.0 + ((int)play.getY()), ((int)play.getZ())-0.5);
         if (turrets.values().contains(l)) {
             play.sendMessage(ChatColor.DARK_AQUA + "You can't place your turret on top of another turret!");
         }

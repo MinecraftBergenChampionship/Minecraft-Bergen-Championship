@@ -9,7 +9,7 @@ public class Temple extends TGTTOSMap {
         super("Temple", "bigkirbypuff_", new ItemStack[]{new ItemStack(Material.LEATHER_BOOTS)});
         super.loadMap(
             new Location[]{new Location(getWorld(), -505, 75, -487, 90, 0), new Location(getWorld(), -505, 75, -492, 90, 0), new Location(getWorld(), -505, 75, -497, 90, 0), new Location(getWorld(), -505, 75, -502, 90, 0), new Location(getWorld(), -505, 75, -507, 90, 0), new Location(getWorld(), -505, 75, -512, 90, 0)}, 
-            new Location[]{new Location(getWorld(), -657, 60, -494), new Location(getWorld(), -657, 60, -505)},
+            new Location[]{new Location(getWorld(), -657, 62, -494), new Location(getWorld(), -657, 62, -505)},
                0
         );
         randomDoorsGenerate();
@@ -60,20 +60,20 @@ public class Temple extends TGTTOSMap {
 
         switch (i) {
             case 0:
-                getWorld().getBlockAt(-526, 73, -492).setType(Material.AIR);
+                getWorld().getBlockAt(-526, 73, -492).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-523, 69, -491).setType(Material.OAK_WOOD);
                 break;
             case 1:
-                getWorld().getBlockAt(-526, 73, -499).setType(Material.AIR);
+                getWorld().getBlockAt(-526, 73, -499).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-523, 69, -498).setType(Material.OAK_WOOD);
                 break;
             case 2:
-                getWorld().getBlockAt(-526, 73, -506).setType(Material.AIR);
+                getWorld().getBlockAt(-526, 73, -506).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-523, 69, -505).setType(Material.OAK_WOOD);
                 break;
             case 3:
             default:
-                getWorld().getBlockAt(-526, 73, -513).setType(Material.AIR);
+                getWorld().getBlockAt(-526, 73, -513).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-523, 69, -512).setType(Material.OAK_WOOD);
                 break;
         }
@@ -94,40 +94,40 @@ public class Temple extends TGTTOSMap {
 
         switch (i) {
             case 0:
-                getWorld().getBlockAt(-556, 73, -492).setType(Material.AIR);
+                getWorld().getBlockAt(-556, 73, -492).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-553, 69, -491).setType(Material.OAK_WOOD);
                 break;
             case 1:
-                getWorld().getBlockAt(-556, 73, -499).setType(Material.AIR);
+                getWorld().getBlockAt(-556, 73, -499).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-553, 69, -498).setType(Material.OAK_WOOD);
                 break;
             case 2:
-                getWorld().getBlockAt(-556, 73, -506).setType(Material.AIR);
+                getWorld().getBlockAt(-556, 73, -506).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-553, 69, -505).setType(Material.OAK_WOOD);
                 break;
             case 3:
             default:
-                getWorld().getBlockAt(-556, 73, -513).setType(Material.AIR);
+                getWorld().getBlockAt(-556, 73, -513).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-553, 69, -512).setType(Material.OAK_WOOD);
                 break;
         }
 
         switch (j) {
             case 0:
-                getWorld().getBlockAt(-556, 73, -492).setType(Material.AIR);
+                getWorld().getBlockAt(-556, 73, -492).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-553, 69, -491).setType(Material.OAK_WOOD);
                 break;
             case 1:
-                getWorld().getBlockAt(-556, 73, -499).setType(Material.AIR);
+                getWorld().getBlockAt(-556, 73, -499).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-553, 69, -498).setType(Material.OAK_WOOD);
                 break;
             case 2:
-                getWorld().getBlockAt(-556, 73, -506).setType(Material.AIR);
+                getWorld().getBlockAt(-556, 73, -506).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-553, 69, -505).setType(Material.OAK_WOOD);
                 break;
             case 3:
             default:
-                getWorld().getBlockAt(-556, 73, -513).setType(Material.AIR);
+                getWorld().getBlockAt(-556, 73, -513).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-553, 69, -512).setType(Material.OAK_WOOD);
                 break;
         }
@@ -144,38 +144,37 @@ public class Temple extends TGTTOSMap {
         getWorld().getBlockAt(-583, 69, -498).setType(Material.GOLD_BLOCK);
         getWorld().getBlockAt(-583, 69, -505).setType(Material.GOLD_BLOCK);
         getWorld().getBlockAt(-583, 69, -512).setType(Material.GOLD_BLOCK);
-
-
+        
         switch (i) {
             case 0:
-                getWorld().getBlockAt(-586, 73, -499).setType(Material.AIR);
-                getWorld().getBlockAt(-586, 73, -506).setType(Material.AIR);
-                getWorld().getBlockAt(-586, 73, -513).setType(Material.AIR);
+                getWorld().getBlockAt(-586, 73, -499).setType(Material.REDSTONE_BLOCK);
+                getWorld().getBlockAt(-586, 73, -506).setType(Material.REDSTONE_BLOCK);
+                getWorld().getBlockAt(-586, 73, -513).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-583, 69, -498).setType(Material.OAK_WOOD);
                 getWorld().getBlockAt(-583, 69, -505).setType(Material.OAK_WOOD);
                 getWorld().getBlockAt(-583, 69, -512).setType(Material.OAK_WOOD);
                 break;
             case 1:
-                getWorld().getBlockAt(-586, 73, -492).setType(Material.AIR);
-                getWorld().getBlockAt(-586, 73, -506).setType(Material.AIR);
-                getWorld().getBlockAt(-586, 73, -513).setType(Material.AIR);
+                getWorld().getBlockAt(-586, 73, -492).setType(Material.REDSTONE_BLOCK);
+                getWorld().getBlockAt(-586, 73, -506).setType(Material.REDSTONE_BLOCK);
+                getWorld().getBlockAt(-586, 73, -513).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-583, 69, -491).setType(Material.OAK_WOOD);
                 getWorld().getBlockAt(-583, 69, -505).setType(Material.OAK_WOOD);
                 getWorld().getBlockAt(-583, 69, -512).setType(Material.OAK_WOOD);
                 break;
             case 2:
-                getWorld().getBlockAt(-586, 73, -492).setType(Material.AIR);
-                getWorld().getBlockAt(-586, 73, -499).setType(Material.AIR);
-                getWorld().getBlockAt(-586, 73, -513).setType(Material.AIR);
+                getWorld().getBlockAt(-586, 73, -492).setType(Material.REDSTONE_BLOCK);
+                getWorld().getBlockAt(-586, 73, -499).setType(Material.REDSTONE_BLOCK);
+                getWorld().getBlockAt(-586, 73, -513).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-583, 69, -491).setType(Material.OAK_WOOD);
                 getWorld().getBlockAt(-583, 69, -498).setType(Material.OAK_WOOD);
                 getWorld().getBlockAt(-583, 69, -512).setType(Material.OAK_WOOD);
                 break;
             case 3:
             default:
-                getWorld().getBlockAt(-586, 73, -492).setType(Material.AIR);
-                getWorld().getBlockAt(-586, 73, -499).setType(Material.AIR);
-                getWorld().getBlockAt(-586, 73, -506).setType(Material.AIR);
+                getWorld().getBlockAt(-586, 73, -492).setType(Material.REDSTONE_BLOCK);
+                getWorld().getBlockAt(-586, 73, -499).setType(Material.REDSTONE_BLOCK);
+                getWorld().getBlockAt(-586, 73, -506).setType(Material.REDSTONE_BLOCK);
                 getWorld().getBlockAt(-583, 69, -491).setType(Material.OAK_WOOD);
                 getWorld().getBlockAt(-583, 69, -498).setType(Material.OAK_WOOD);
                 getWorld().getBlockAt(-583, 69, -505).setType(Material.OAK_WOOD);
