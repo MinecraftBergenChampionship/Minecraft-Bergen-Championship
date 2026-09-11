@@ -868,6 +868,10 @@ public class Lockdown extends Game {
      */
     private void handlePotionStatus(LockdownPlayer player) {
        player.setPotion(false);
+        if (player.getPlayer().getGameMode() == GameMode.SURVIVAL && !isGameActive()) {
+            player.getPlayer().getInventory().addItem(HEAL_POTION);
+        }
+        
         Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
             public void run() {

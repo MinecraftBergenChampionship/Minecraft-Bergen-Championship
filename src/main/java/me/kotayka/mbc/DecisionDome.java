@@ -228,6 +228,7 @@ public class DecisionDome extends Minigame {
             for (Participant p : t.getPlayers()) {
                 p.getPlayer().teleport(l);
                 p.getPlayer().setVelocity(new Vector(0, 0, 0));
+                p.getPlayer().setMaxHealth(20);
                 p.getPlayer().removePotionEffect(PotionEffectType.SPEED);
                 p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
                 p.getPlayer().getInventory().clear();

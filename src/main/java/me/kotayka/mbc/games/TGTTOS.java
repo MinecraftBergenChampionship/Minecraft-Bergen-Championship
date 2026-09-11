@@ -59,6 +59,7 @@ import me.kotayka.mbc.gameMaps.tgttosMap.Pit;
 import me.kotayka.mbc.gameMaps.tgttosMap.Skydive;
 import me.kotayka.mbc.gameMaps.tgttosMap.SquidGame;
 import me.kotayka.mbc.gameMaps.tgttosMap.TGTTOSMap;
+import me.kotayka.mbc.gameMaps.tgttosMap.Temple;
 import me.kotayka.mbc.gameMaps.tgttosMap.Trident;
 import me.kotayka.mbc.gameMaps.tgttosMap.Walls;
 import net.md_5.bungee.api.ChatMessageType;
@@ -73,7 +74,7 @@ public class TGTTOS extends Game {
                     new Cliffs(), new Skydive(), new Boats(), 
                     new Glide(), new SquidGame(), new Trident()
             ));
-    private List<TGTTOSMap> mapsFirst = new ArrayList<>(Arrays.asList());
+    private List<TGTTOSMap> mapsFirst = new ArrayList<>(Arrays.asList(new Temple()));
 
     private List<Participant> finishedParticipants;
     private ArrayList<String> deathMessages = new ArrayList<>();

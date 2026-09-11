@@ -394,6 +394,7 @@ public class PowerTag extends Game {
     public void teleportPlayers() {
         for (PowerTagPlayer p : hunters) {
             p.getPlayer().teleport(hunterSpawn);
+            p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
         }
         for (PowerTagPlayer p : hiders) {
             p.getPlayer().teleport(hiderSpawns[(int)(Math.random()*hiderSpawns.length)]);
