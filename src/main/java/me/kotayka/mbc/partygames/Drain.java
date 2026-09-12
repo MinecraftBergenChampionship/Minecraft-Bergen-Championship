@@ -293,7 +293,7 @@ public class Drain extends PartyGame {
         }
 
 
-        ArrayList<Participant> arrayDrainPlayers = new ArrayList(drainMap.values());
+        ArrayList<Participant> arrayDrainPlayers = new ArrayList(drainMap.keySet());
         for (int j = 0; j < arrayDrainPlayers.size(); j++) {
             Participant p = arrayDrainPlayers.get(j);
             for (int i = 0; i < blocksDrained.length; i++) {

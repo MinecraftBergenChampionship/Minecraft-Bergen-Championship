@@ -267,18 +267,19 @@ public class Lockdown extends Game {
                                 //p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.GREEN+"" + ChatColor.BOLD+"AXES AND BOWS", "", 20, 60, 20);
                                 //p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.BLOCKS, 1, 1);
                                 //break;
-                            case(2):
+                            case(3):
                                 giveTridentKit(p);
                                 p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.AQUA+"" + ChatColor.BOLD+"TRIDENTS", "", 20, 60, 20);
                                 p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.BLOCKS, 1, 1);
                                 break;
-                            case(3):
+                            case(4):
                                 givePaintballKit(p);
                                 p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.LIGHT_PURPLE+"" + ChatColor.BOLD+"PAINTBALL", "", 20, 60, 20);
                                 p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.BLOCKS, 1, 1);
                                 paintballTask(p);
                                 break;
                             case(1):
+                            case(2):
                             default:
                                 giveSwordKit(p);
                                 p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.RED+"" + ChatColor.BOLD+"SWORDS AND CROSSBOWS", "", 20, 60, 20);
