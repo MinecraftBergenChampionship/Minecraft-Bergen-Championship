@@ -31,7 +31,7 @@ public class ScoreManager {
         teamComparator = new EventTeamComparator(this, tm);
         playerComparator = new EventPlayerComparator(this, tm, teamComparator);
 
-                teamLeaderboard = new TreeMap<>(teamComparator);
+        teamLeaderboard = new TreeMap<>(teamComparator);
         individualLeaderboard = new TreeMap<>(playerComparator);
     }
 

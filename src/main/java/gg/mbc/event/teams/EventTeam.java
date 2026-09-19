@@ -14,6 +14,7 @@ import static net.kyori.adventure.text.Component.text;
 
 public class EventTeam {
     public static final int MAX_NAME_LENGTH = 16;
+    private static final String NAME_RESTRICTIONS = ".*[\\p{L}\\p{M}].*";
 
     // Display
     private final TeamType type;
@@ -55,12 +56,13 @@ public class EventTeam {
 
     /**
      * Changes the display name of the team.
-     * It is guaranteed that
      * @param name New name to change to.
      * @return boolean value indicating success of the operation
      */
     public boolean changeName(String name) {
-        if (name.length() > MAX_NAME_LENGTH) return false;
+        name = name.trim();
+        if (!name.matches(NAME_RESTRICTIONS)) return false;
+        if (name.length() > MAX_NAME_LENGTH || name.isEmpty()) return false;
         this.name = name;
         this.displayName = text(icon + " ", NamedTextColor.WHITE).append(text(name, textColor));
         return true;
