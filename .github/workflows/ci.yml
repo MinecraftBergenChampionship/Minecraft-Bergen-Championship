@@ -1,0 +1,28 @@
+name: build
+
+on:
+  push:
+    branches:
+      - [main, master]
+  pull_request:
+    branches:
+      - [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goal: [test, verify, package]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+          cache-read-only: true
+      - name: Build
+        run: mvn ${{ matrix.goal }}

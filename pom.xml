@@ -30,8 +30,17 @@
                     <source>21</source>
                     <target>21</target>
                     <excludes>
-                        <exclude>**/me/*</exclude>
+                        <exclude>**/me/**</exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <classpathDependencyExcludes>
+                    </classpathDependencyExcludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -50,6 +59,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
             <plugin>
                 <groupId>net.md-5</groupId>
                 <artifactId>specialsource-maven-plugin</artifactId>
@@ -83,6 +93,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
             <!--https://stackoverflow.com/questions/75682819/failed-with-malformedinputexception-input-length-1-when-building-java-applica -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -127,7 +138,7 @@
        <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>[26.2.build,)</version>
+            <version>26.2.build.112-stable</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
