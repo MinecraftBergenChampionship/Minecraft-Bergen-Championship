@@ -4,7 +4,9 @@ import gg.mbc.event.teams.EventTeam;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -60,6 +62,9 @@ public final class MBCUtils {
 
     // World
     public static final List<Material> BLOCKED_RECIPES = Arrays.asList(Material.WOODEN_AXE, Material.SHIELD, Material.SNOW_BLOCK, Material.FLINT_AND_STEEL);
+    public static final String LOBBY_WORLD_NAME = "world";
+    public static final String DECISION_DOME_WORLD = "DecisionDome";
+
     /**
      * Alias for Mini Message deserialization; see more detail below
      * <a href="https://docs.papermc.io/paper/dev/component-api/introduction/">Documentation</a>

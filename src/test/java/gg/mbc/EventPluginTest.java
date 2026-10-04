@@ -1,5 +1,6 @@
 package gg.mbc;
 
+import gg.mbc.util.MBCUtils;
 import org.bukkit.World;
 import org.junit.jupiter.api.*;
 import org.mockbukkit.mockbukkit.MockBukkit;
@@ -15,7 +16,7 @@ public class EventPluginTest {
         this.server = MockBukkit.mock();
 
         // Server environment assumes the existence of a world "world"
-        this.world = server.addSimpleWorld("world");
+        this.world = server.addSimpleWorld(MBCUtils.LOBBY_WORLD_NAME);
 
         this.plugin = MockBukkit.load(EventPlugin.class);
     }

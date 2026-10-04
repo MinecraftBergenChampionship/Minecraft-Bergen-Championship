@@ -32,7 +32,7 @@ public class ServerEnvironment {
             }
         }
 
-        world = Objects.requireNonNull(Bukkit.getWorld("world"));
+        world = Objects.requireNonNull(Bukkit.getWorld(MBCUtils.LOBBY_WORLD_NAME));
         world.setGameRule(GameRules.ADVANCE_TIME, false);
         world.setTime(6000);
 
