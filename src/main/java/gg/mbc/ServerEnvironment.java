@@ -2,24 +2,25 @@ package gg.mbc;
 
 import gg.mbc.util.MBCUtils;
 import gg.mbc.event.ServerListener;
-import org.bukkit.Bukkit;
-import org.bukkit.GameRules;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Recipe;
 
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 
+/**
+ * Singleton class representing
+ */
 public class ServerEnvironment {
     private final EventPlugin plugin;
     private final ServerListener globalListener;
     private final World world;
+    private final List<NamespacedKey> recipes;
 
     ServerEnvironment(EventPlugin plugin) {
         this.plugin = plugin;
-        this.globalListener = new ServerListener(plugin);
+        this.recipes = new ArrayList<>();
 
         // prevent crafting certain items
         Iterator<Recipe> it = plugin.getServer().recipeIterator();
@@ -29,7 +30,16 @@ public class ServerEnvironment {
             if (recipe == null) continue;
             if (MBCUtils.BLOCKED_RECIPES.contains(recipe.getResult().getType())) {
                 it.remove();
+            } else {
+                if (recipe instanceof Keyed key) {
+                    recipes.add(key.getKey());
+                }
             }
+        }
+
+        this.globalListener = new ServerListener(plugin);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.discoverRecipes(recipes);
         }
 
         world = Objects.requireNonNull(Bukkit.getWorld(MBCUtils.LOBBY_WORLD_NAME));
@@ -55,5 +65,12 @@ public class ServerEnvironment {
                 player.showPlayer(plugin, player2);
             }
         }
+    }
+
+    /**
+     * @return all global crafting recipes.
+     */
+    public List<NamespacedKey> getRecipes() {
+        return Collections.unmodifiableList(recipes);
     }
 }

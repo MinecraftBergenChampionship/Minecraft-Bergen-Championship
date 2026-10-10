@@ -1,6 +1,7 @@
 package gg.mbc.event;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
+import gg.mbc.EventPlugin;
 import gg.mbc.event.managers.TeamManager;
 import gg.mbc.event.players.EventPlayer;
 import gg.mbc.event.teams.TeamType;
@@ -22,7 +23,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -33,9 +33,9 @@ import java.util.UUID;
 import static net.kyori.adventure.text.Component.text;
 
 public class ServerListener implements Listener {
-    final Plugin plugin;
+    final EventPlugin plugin;
 
-    public ServerListener(Plugin plugin) {
+    public ServerListener(EventPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -48,6 +48,7 @@ public class ServerListener implements Listener {
         MBCEvent mbc = MBCEvent.getInstance();
         Player player = event.getPlayer();
         UUID id = player.getUniqueId();
+        player.discoverRecipes(plugin.getServerEnvironment().getRecipes());
         if (mbc.getPlayer(id) == null) {
             // Player is new
             TeamManager tm = mbc.getTeamManager();

@@ -37,6 +37,17 @@ public class EventPlugin extends JavaPlugin {
         Bukkit.broadcast(Component.text("MBC has been disabled!", NamedTextColor.RED));
     }
 
+    /**
+     * @return singleton instance of server environment
+     * @throws NullPointerException if server environment is null
+     */
+    public ServerEnvironment getServerEnvironment() {
+        if (serverEnvironment == null) {
+            throw new NullPointerException("No server environment was defined.");
+        }
+        return serverEnvironment;
+    }
+
     public void reloadPlugin() {
         onDisable();
         onEnable();
