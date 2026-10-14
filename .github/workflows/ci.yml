@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - rewrite-2026
   pull_request:
     branches:
       - main
+      - rewrite-2026
 
 jobs:
   build:
