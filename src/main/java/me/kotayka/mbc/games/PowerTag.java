@@ -271,6 +271,9 @@ public class PowerTag extends Game {
                     for (PowerTagPlayer p : powerTagPlayerMap.values()) {
                         p.getPlayer().setInvulnerable(false);
                     }
+                    for (PowerTagPlayer p : hunters) {
+                        p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
+                    }
                     timeRemaining = 110;
                 }
                 else countdownHiders();
