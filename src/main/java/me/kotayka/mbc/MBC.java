@@ -389,6 +389,8 @@ public class MBC implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        event.getPlayer().discoverRecipes(me.kotayka.mbc.Plugin.getRecipes());
+
         if (!Participant.contains(event.getPlayer())) { // new login this instance
             Participant newPlayer = null;
             if (!started) {

@@ -52,7 +52,6 @@ import me.kotayka.mbc.MBC;
 import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.tgttosMap.Boats;
 import me.kotayka.mbc.gameMaps.tgttosMap.Cliffs;
-import me.kotayka.mbc.gameMaps.tgttosMap.Elytra;
 import me.kotayka.mbc.gameMaps.tgttosMap.Freeway;
 import me.kotayka.mbc.gameMaps.tgttosMap.Glide;
 import me.kotayka.mbc.gameMaps.tgttosMap.Meatball;
@@ -85,7 +84,8 @@ public class TGTTOS extends Game {
 
     // Meatball cooldowns from Dragons
     private Map<UUID, Boolean> canJump = new HashMap<>(); // this is only for meatball currently
-    private Map<Player, Long> cooldowns = new HashMap<>();
+    private Map<UUID, Long> cooldowns = new HashMap<>();
+    private Map<UUID, Player> playerIDs = new HashMap<>();
     private DecimalFormat df = new DecimalFormat("#.#");
     private int cooldownID = -1;
 
@@ -265,6 +265,7 @@ public class TGTTOS extends Game {
         getLogger().log(ChatColor.AQUA.toString() + ChatColor.BOLD + "New Map: " + ChatColor.WHITE + map.getName());
 
         for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            playerIDs.put(p.getPlayer().getUniqueId(), p.getPlayer());
             p.getPlayer().setVelocity(new Vector(0, 0, 0));
             p.getPlayer().teleport(map.getSpawnLocation(MBC.getInstance().teams.indexOf(p.getTeam())));
             p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
@@ -416,15 +417,15 @@ public class TGTTOS extends Game {
 
         if (map instanceof Meatball) {
             cooldownID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MBC.getInstance().plugin, () -> {
-
-                Iterator<Map.Entry<Player, Long>> iterator = cooldowns.entrySet().iterator();
+                Iterator<Map.Entry<UUID, Long>> iterator = cooldowns.entrySet().iterator();
                 while (iterator.hasNext()) {
-                    Map.Entry<Player, Long> entry = iterator.next();
+                    Map.Entry<UUID, Long> entry = iterator.next();
+                    Player player = playerIDs.get(entry.getKey());
                     long storedTime = entry.getValue();
 
                     if (System.currentTimeMillis() - storedTime >= 10000) {
-                        entry.getKey().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
-                        canJump.put(entry.getKey().getUniqueId(), true);
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
+                        canJump.put(entry.getKey(), true);
                         iterator.remove();
                         continue;
                     }
@@ -440,7 +441,7 @@ public class TGTTOS extends Game {
                     }
 
                     String actionBarMessage = seconds + " seconds left §c" + "▐".repeat(iCooldown) + "§a" + "▐".repeat(10 - iCooldown);
-                    entry.getKey().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(actionBarMessage));
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(actionBarMessage));
                 }
             }, 20, 1);
         }
@@ -731,7 +732,7 @@ public class TGTTOS extends Game {
                 player.setVelocity(player.getLocation().getDirection().multiply(1.25));
                 map.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
                 canJump.put(player.getUniqueId(), false);
-                cooldowns.put(player, System.currentTimeMillis());
+                cooldowns.put(player.getUniqueId(), System.currentTimeMillis());
             }
             else {
                 long storedTime = cooldowns.get(player);
