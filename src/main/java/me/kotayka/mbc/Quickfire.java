@@ -246,7 +246,7 @@ public class Quickfire extends FinaleGame {
         playerWalkoutBlurbs.put(liam, "Visiting from Neptune to negotiate with earthly governments...");
         playerWalkoutBlurbs.put(jocelyn, "She's able to eloquently communicate with lemurs...");
         playerWalkoutBlurbs.put(curvedrain, "He's ready to steal... the MOON!!!");
-        playerWalkoutBlurbs.put(sussy, "OWO what's this?");
+        playerWalkoutBlurbs.put(sussy, "Here to catch the impostor...");
 
         playerWalkoutSongNames.put(cam, "Sleepyhead, Passion Pit");
         playerWalkoutSongNames.put(collin, "Clarity (Muffoxx Edit), Zedd");
