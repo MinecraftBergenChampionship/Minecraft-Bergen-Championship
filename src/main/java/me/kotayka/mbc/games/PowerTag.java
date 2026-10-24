@@ -8,14 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -916,7 +909,18 @@ public class PowerTag extends Game {
             armorStand.setItem(EquipmentSlot.FEET, leatherBoots);
             TAG_WORLD.playSound(p.getPlayer().getLocation(), Sound.BLOCK_TRIAL_SPAWNER_EJECT_ITEM, 1, 1);
             p.getPlayer().getInventory().removeItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
-            Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + ChatColor.DARK_AQUA + " has placed their turret, which will glow for a short time!");
+            Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + ChatColor.DARK_AQUA + " has placed their turret!");
+            MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
+                @Override
+                public void run() {
+                    if (armorStand != null) {
+                        armorStand.remove();
+                        armorStand.setGlowing(false);
+                        TAG_WORLD.playSound(armorStand.getLocation(), Sound.ENTITY_ARMOR_STAND_BREAK, 1, 1);
+                        TAG_WORLD.spawnParticle(Particle.WHITE_SMOKE, armorStand.getLocation(), 3);
+                    }
+                }
+            }, 900L);
         }
     }
 
