@@ -2,20 +2,15 @@ package me.kotayka.mbc.gameMaps.bsabmMaps;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Orientable;
+import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Chain;
 import org.bukkit.block.data.type.Slab;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.Player;
-
-import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
 
 public class Build {
     private Block[][][] blocks = new Block[6][7][7];
@@ -135,19 +130,22 @@ public class Build {
             return false;
         }
 
-        /*
         // Check if stairs, slabs, and  are in the right orientation
-        if (b.getType().toString().endsWith("STAIRS")) {
-            if (((Stairs) b.getBlockData()).getFacing() != ((Stairs) toMatch.getBlockData()).getFacing()) {
+        if (b.getBlockData() instanceof Directional && toMatch.getBlockData() instanceof Directional) {
+            if (((Directional) b.getBlockData()).getFacing() != ((Directional) toMatch.getBlockData()).getFacing()) {
                 return false;
             }
         }
 
-        if (b.getType() == Material.CHAIN) {
-            if (((Chain) b.getBlockData()).getAxis() != ((Chain) toMatch.getBlockData()).getAxis()) {
+        if (b.getBlockData() instanceof Slab && toMatch.getBlockData() instanceof Slab) {
+            if (((Slab) b.getBlockData()).getType() != ((Slab) toMatch.getBlockData()).getType()) {
                 return false;
             }
-        }*/
+        }
+
+        if (b.getBlockData() instanceof Chain && toMatch.getBlockData() instanceof Chain) {
+            return ((Chain) b.getBlockData()).getAxis() == ((Chain) toMatch.getBlockData()).getAxis();
+        }
 
         return true;
     }
@@ -215,27 +213,40 @@ public class Build {
                                         ChatColor.GREEN, ChatColor.RESET, check.getType(), b.getType(), checkX, checkY, checkZ)
                         );
                         i++;
+                        WORLD.spawnParticle(Particle.HAPPY_VILLAGER, b.getLocation().add(0.5, 0.5, 0.5), 5);
                     }
-                    /*
-                    else if (b.getType().toString().endsWith("STAIRS")) {
-                        if (((Stairs) check.getBlockData()).getFacing() != ((Stairs) b.getBlockData()).getFacing()) {
+                    if (b.getBlockData() instanceof Directional && check.getBlockData() instanceof Directional) {
+                        if (((Directional) b.getBlockData()).getFacing() != ((Directional) check.getBlockData()).getFacing()) {
                             sender.sendMessage(
-                                    String.format("%s[checkbuild] %sFound stair block facing %s which should be %s at (%d, %d, %d)",
-                                            ChatColor.GREEN, ChatColor.RESET, ((Stairs) b).getFacing(), ((Stairs) check).getFacing(), checkX, checkY, checkZ)
+                                    String.format("%s[checkbuild] %sBlock %s at (%d, %d, %d) has incorrect orientation!",
+                                            ChatColor.GREEN, ChatColor.RESET, b.getType(), checkX, checkY, checkZ)
                             );
-                            i++;
-                        }
-                    } else if (b.getType() == Material.CHAIN) {
-                        if (((Chain) b.getBlockData()).getAxis() != ((Chain) check.getBlockData()).getAxis()) {
-                            sender.sendMessage(
-                                    String.format("%s[checkbuild] %sFound chain block with axis %s which should be %s at (%d, %d, %d)",
-                                            ChatColor.GREEN, ChatColor.RESET, ((Chain) b).getAxis(), ((Chain) check).getAxis(), checkX, checkY, checkZ)
-                            );
+                            WORLD.spawnParticle(Particle.HAPPY_VILLAGER, b.getLocation().add(0.5, 0.5, 0.5), 5);
                             i++;
                         }
                     }
 
-                     */
+                    if (b.getBlockData() instanceof Slab && check.getBlockData() instanceof Slab) {
+                        if (((Slab) b.getBlockData()).getType() != ((Slab) check.getBlockData()).getType()) {
+                            sender.sendMessage(
+                                    String.format("%s[checkbuild] %sBlock %s at (%d, %d, %d) has incorrect orientation!",
+                                            ChatColor.GREEN, ChatColor.RESET, b.getType(), checkX, checkY, checkZ)
+                            );
+                            i++;
+                            WORLD.spawnParticle(Particle.HAPPY_VILLAGER, b.getLocation().add(0.5, 0.5, 0.5), 5);
+                        }
+                    }
+                    if (b.getBlockData() instanceof Chain && check.getBlockData() instanceof Chain) {
+                        if (((Chain) b.getBlockData()).getAxis() != ((Chain) check.getBlockData()).getAxis()) {
+                            sender.sendMessage(
+                                    String.format("%s[checkbuild] %sFound chain block with axis %s which should be %s at (%d, %d, %d)",
+                                            ChatColor.GREEN, ChatColor.RESET, ((Chain) b.getBlockData()).getAxis(), ((Chain) check.getBlockData()).getAxis(), checkX, checkY, checkZ)
+                            );
+                            i++;
+                            WORLD.spawnParticle(Particle.HAPPY_VILLAGER, b.getLocation().add(0.5, 0.5, 0.5), 5);
+                        }
+                    }
+
                     if (i >= 5) {
                         return;
                     }
