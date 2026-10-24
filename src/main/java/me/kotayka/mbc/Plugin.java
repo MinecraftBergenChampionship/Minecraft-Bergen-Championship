@@ -12,13 +12,10 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class Plugin extends JavaPlugin implements Listener {
-    private static List<NamespacedKey> recipes;
+    private static List<NamespacedKey> recipes = new ArrayList<>();
 
     @Override
     public void onEnable() {
