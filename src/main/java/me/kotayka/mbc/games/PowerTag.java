@@ -917,12 +917,7 @@ public class PowerTag extends Game {
             TAG_WORLD.playSound(p.getPlayer().getLocation(), Sound.BLOCK_TRIAL_SPAWNER_EJECT_ITEM, 1, 1);
             p.getPlayer().getInventory().removeItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
             Bukkit.broadcastMessage(p.getParticipant().getFormattedName() + ChatColor.DARK_AQUA + " has placed their turret, which will glow for a short time!");
-            MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
-            @Override
-            public void run() { armorStand.setGlowing(false);}
-            }, 100L);
         }
-        
     }
 
     /**
@@ -1645,7 +1640,8 @@ public class PowerTag extends Game {
         if (timeRemaining <= 90 && hunterPowerup.equals(hunterPowerupList[5]) && p.getPlayer().getGameMode().equals(GameMode.SURVIVAL) && aliveHiders.contains(p)) {
             for (PowerTagPlayer hunter : turrets.keySet()) {
                 Location l = turrets.get(hunter);
-                if (l.distance(p.getPlayer().getLocation()) < 3) {
+                PotionEffect has_inv = p.getPlayer().getPotionEffect(PotionEffectType.INVISIBILITY);
+                if (l.distance(p.getPlayer().getLocation()) < 3 && has_inv == null) {
                     PotionEffect s = p.getPlayer().getPotionEffect(PotionEffectType.SLOWNESS);
 
                     if (s == null) {
