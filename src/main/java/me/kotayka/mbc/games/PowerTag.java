@@ -518,24 +518,25 @@ public class PowerTag extends Game {
     * Hider uses powerup. Will only run if hider has ability to use powerup
     */
     public void hiderUsePowerup(PowerTagPlayer p) {
-        p.getPlayer().getInventory().removeItem(getHiderPowerupTool());
+        // p.getPlayer().getInventory().removeItem(getHiderPowerupTool());
+        p.getPlayer().setCooldown(Material.LIME_DYE, 400);
         if (hiderPowerupMap.get(p).equals(hiderPowerupList[0])) {
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 2, false, false));
             p.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(hiderPowerupMap.get(p)));
         }
         if (hiderPowerupMap.get(p).equals(hiderPowerupList[1])) {
+            p.getPlayer().getInventory().removeItem(getHiderPowerupTool());
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20, 255, false, true));
             p.getPlayer().getInventory().setBoots(new ItemStack(Material.AIR));
 
             MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
                 @Override
-                public void run() { p.getPlayer().getInventory().setBoots(p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_BOOTS)));}
+                public void run() {
+                    p.getPlayer().getInventory().setBoots(p.getParticipant().getTeam().getColoredLeatherArmor(new ItemStack(Material.LEATHER_BOOTS)));
+                    returnPowerupTool(p);
+                }
               }, 30L);
         }
-        MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
-            @Override
-            public void run() { returnPowerupTool(p);}
-          }, 400L);
     }
 
     /**
@@ -835,10 +836,16 @@ public class PowerTag extends Game {
         else p.getPlayer().sendMessage(ChatColor.RED + "" +ChatColor.BOLD + "You found " + stunCount + " hiders, who have all been stunned!");
         
         TAG_WORLD.playSound(p.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-        p.getPlayer().getInventory().removeItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
+        p.getPlayer().setCooldown(Material.BLAZE_ROD, 500);
+        // p.getPlayer().getInventory().removeItem(getHunterPowerupTool(hunterPowerup, hunterPowerupList));
         MBC.getInstance().plugin.getServer().getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
-            public void run() { postTremorUse(p);}
+            public void run() {
+                // postTremorUse(p);
+                if (getState().equals(GameState.ACTIVE)) {
+                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BREWING_STAND_BREW, 1, 1);
+                }
+            }
           }, 500L);
     }
 
@@ -1411,9 +1418,10 @@ public class PowerTag extends Game {
      */
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
-
         PowerTagPlayer p = powerTagPlayerMap.get(e.getPlayer().getUniqueId());
+        Player player = e.getPlayer();
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
+            if (player.hasCooldown(Material.LIME_DYE) || player.hasCooldown(Material.BLAZE_ROD)) return;
             if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.SUGAR && hiders.contains(p) && !hiderPowerupMap.get(p).equals(hiderPowerupList[0])) {
                 hiderPowerupMap.replace(p, hiderPowerupList[0]);
                 p.getPlayer().sendMessage(ChatColor.GREEN + "You have selected: " + ChatColor.RESET + "" + ChatColor.BLUE + "" + ChatColor.BOLD + "SPEED");
