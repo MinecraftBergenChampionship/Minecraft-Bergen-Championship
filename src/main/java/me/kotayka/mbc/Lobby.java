@@ -580,6 +580,10 @@ public class Lobby extends Minigame {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(LOBBY);
         }
+
+        for (Participant p : MBC.getInstance().getPlayersAndSpectators()) {
+            p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+        }
     }
 
     public void loadPlayersScoreReveal() {
@@ -1499,16 +1503,21 @@ public class Lobby extends Minigame {
         if (getState().equals(GameState.END_ROUND) && timeRemaining > 60 || getState().equals(GameState.TUTORIAL) && timeRemaining > 20) {
             e.getPlayer().setGameMode(GameMode.SPECTATOR);
             e.getPlayer().setSpectatorTarget(cameraman);
-        } else {
-            Player p = e.getPlayer();
-            p.teleport(LOBBY);
-            p.getInventory().clear();
-            p.setInvulnerable(false);
-            p.removePotionEffect(PotionEffectType.NIGHT_VISION);
-            p.removePotionEffect(PotionEffectType.RESISTANCE);
-            p.addPotionEffect(MBC.SATURATION);
-            p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
         }
+        Player p = e.getPlayer();
+        p.teleport(LOBBY);
+        p.getInventory().clear();
+        p.setInvulnerable(false);
+        p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+        p.removePotionEffect(PotionEffectType.RESISTANCE);
+        p.addPotionEffect(MBC.SATURATION);
+        p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, PotionEffect.INFINITE_DURATION, 10, false, false));
+        if (!(MBC.getInstance().getMinigame() instanceof Quickfire)) {
+            p.getPlayer().setMaxHealth(20);
+            p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
+        }
+        Participant par = Participant.getParticipant(p);
+        par.board.getTeam(par.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
     }
 
     /**

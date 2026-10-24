@@ -21,6 +21,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
@@ -123,6 +124,7 @@ public class Skybattle extends Game {
             p.getPlayer().removePotionEffect(PotionEffectType.INFESTED);
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false));
             p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 255, false, false));
+            p.board.getTeam(p.getTeam().getTeamFullName()).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             if (roundNum == 1) {
                 skybattlePlayerMap.put(p.getPlayer().getUniqueId(), new SkybattlePlayer(p));
                 playersAlive.add(p);

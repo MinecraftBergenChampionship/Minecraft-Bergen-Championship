@@ -3,9 +3,7 @@ package me.kotayka.mbc;
 import me.kotayka.mbc.commands.*;
 import me.kotayka.mbc.commands.tab.*;
 import me.kotayka.mbc.games.acerace.AceRace;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.boss.BossBar;
 import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.Player;
@@ -14,9 +12,10 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
+import java.util.*;
 
 public class Plugin extends JavaPlugin implements Listener {
+    private static List<NamespacedKey> recipes = new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -109,10 +108,18 @@ public class Plugin extends JavaPlugin implements Listener {
                 it.remove();
             } else if (recipe.getResult().getType() == Material.FLINT_AND_STEEL) {
                 it.remove();
+            } else {
+                if (recipe instanceof Keyed key) {
+                    recipes.add(key.getKey());
+                }
             }
         }
 
         Bukkit.broadcastMessage(ChatColor.GREEN + "MBC v2.2.0 is enabled!");
+    }
+
+    public static Collection<NamespacedKey> getRecipes() {
+        return Collections.unmodifiableCollection(recipes);
     }
 
     @Override

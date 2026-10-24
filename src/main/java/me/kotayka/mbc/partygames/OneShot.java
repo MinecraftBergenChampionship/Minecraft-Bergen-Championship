@@ -551,7 +551,10 @@ public class OneShot extends PartyGame {
 
     @EventHandler
     public void hit(EntityDamageByEntityEvent event) {
-        if (!getState().equals(GameState.ACTIVE)) return;
+        if (!getState().equals(GameState.ACTIVE)) {
+            event.setCancelled(true);
+            return;
+        }
         if (!(event.getEntity() instanceof Player) || !(event.getDamager() instanceof Player)) return;
         if (((Player) event.getDamager()).getGameMode() != GameMode.ADVENTURE) return;
         if (teamKills.get(Participant.getParticipant(((Player) event.getDamager())).getTeam()) != KILLS_PER_WEAPON*4) return;

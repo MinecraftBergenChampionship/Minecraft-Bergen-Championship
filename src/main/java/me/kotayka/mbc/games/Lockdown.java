@@ -37,6 +37,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -46,6 +47,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
@@ -62,8 +64,6 @@ import me.kotayka.mbc.Participant;
 import me.kotayka.mbc.gameMaps.lockdownMaps.Abandoned;
 import me.kotayka.mbc.gameMaps.lockdownMaps.LockdownMap;
 import me.kotayka.mbc.gamePlayers.LockdownPlayer;
-import me.kotayka.mbc.gamePlayers.PowerTagPlayer;
-import me.kotayka.mbc.gamePlayers.SpleefPlayer;
 
 public class Lockdown extends Game {
     public LockdownMap map = new Abandoned(this);
@@ -267,19 +267,18 @@ public class Lockdown extends Game {
                                 //p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.GREEN+"" + ChatColor.BOLD+"AXES AND BOWS", "", 20, 60, 20);
                                 //p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.BLOCKS, 1, 1);
                                 //break;
-                            case(3):
+                            case(2):
                                 giveTridentKit(p);
                                 p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.AQUA+"" + ChatColor.BOLD+"TRIDENTS", "", 20, 60, 20);
                                 p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.BLOCKS, 1, 1);
                                 break;
-                            case(4):
+                            case(3):
                                 givePaintballKit(p);
                                 p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.LIGHT_PURPLE+"" + ChatColor.BOLD+"PAINTBALL", "", 20, 60, 20);
                                 p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.BLOCKS, 1, 1);
                                 paintballTask(p);
                                 break;
                             case(1):
-                            case(2):
                             default:
                                 giveSwordKit(p);
                                 p.getPlayer().sendTitle(ChatColor.BOLD+"Kit: " + ChatColor.RED+"" + ChatColor.BOLD+"SWORDS AND CROSSBOWS", "", 20, 60, 20);
@@ -296,6 +295,7 @@ public class Lockdown extends Game {
                 for (LockdownPlayer p : lockdownPlayerMap.values()) {
                     p.getPlayer().setInvulnerable(false);
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
+                    p.getPlayer().removePotionEffect(PotionEffectType.RESISTANCE);
 
                     if (roundNum != 3) {
                         p.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
@@ -307,51 +307,6 @@ public class Lockdown extends Game {
             }
         } else if (getState().equals(GameState.ACTIVE)) {
             repeatingSneakEvent();
-            if (timeRemaining == 235) {
-                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking in 10 seconds! All outer rooms will soon be closed!");
-                for (LockdownPlayer p : lockdownPlayerMap.values()) {
-                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
-                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1);
-                }
-            }
-            if (timeRemaining == 225) {
-                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking!");
-                for (LockdownPlayer p : lockdownPlayerMap.values()) {
-                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING!", "", 20, 60, 20);
-                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
-                }
-                border.setSize(154, 45);
-            }
-            if (timeRemaining == 130) {
-                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking in 10 seconds! All rooms except the middle will soon be closed!");
-                for (LockdownPlayer p : lockdownPlayerMap.values()) {
-                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
-                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1);
-                }
-            }
-            if (timeRemaining == 120) {
-                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking!");
-                for (LockdownPlayer p : lockdownPlayerMap.values()) {
-                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING!", "", 20, 60, 20);
-                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
-                }
-                border.setSize(76, 45);
-            }
-            if (timeRemaining == 55) {
-                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking! Use the evacuation zone to escape!");
-                for (LockdownPlayer p : lockdownPlayerMap.values()) {
-                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
-                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1);
-                }
-            }
-            if (timeRemaining == 45) {
-                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Final border closing!");
-                for (LockdownPlayer p : lockdownPlayerMap.values()) {
-                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING!", "Escape if you can!", 20, 60, 20);
-                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
-                }
-                border.setSize(6, 45);
-            }
             if (timeRemaining == 0) {
                 if (cooldownTaskID != -1) {
                     Bukkit.getScheduler().cancelTask(cooldownTaskID);
@@ -362,6 +317,7 @@ public class Lockdown extends Game {
                     p.getPlayer().sendMessage(ChatColor.RED + "You got locked in! You earn no escape points.");
                     p.getPlayer().getInventory().clear();
                     p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WARDEN_SONIC_BOOM, 1, 1);
+                    p.getPlayer().setInvulnerable(true);
                 }
                 woolPoints();
                 if (roundNum < 3) {
@@ -377,12 +333,51 @@ public class Lockdown extends Game {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.stopSound("igm.lockdown", SoundCategory.RECORDS);
                         p.getPlayer().removePotionEffect(PotionEffectType.LEVITATION);
+                        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 900, 10, false, false));
                     }
                     timeRemaining = 40;
                     setGameState(GameState.END_GAME);
                 }
+            } else if (timeRemaining == 235) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking in 10 seconds! All outer rooms will soon be closed!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1);
+                }
+            } else if (timeRemaining == 225) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED + "BORDER SHRINKING!", "", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+                }
+                border.setSize(154, 45);
+            } else if (timeRemaining == 130) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking in 10 seconds! All rooms except the middle will soon be closed!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1);
+                }
+            } else if (timeRemaining == 120) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING!", "", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+                }
+                border.setSize(76, 45);
+            } else if (timeRemaining == 55) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Border shrinking! Use the evacuation zone to escape!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING IN 10 SECONDS!", "", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1);
+                }
+            } else if (timeRemaining == 45) {
+                Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "Final border closing!");
+                for (LockdownPlayer p : lockdownPlayerMap.values()) {
+                    p.getPlayer().sendTitle(ChatColor.RED+"BORDER SHRINKING!", "Escape if you can!", 20, 60, 20);
+                    p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN, 1, 1);
+                }
+                border.setSize(6, 45);
             }
-
         } else if (getState().equals(GameState.END_ROUND)) {
             if (timeRemaining == 5) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -793,45 +788,40 @@ public class Lockdown extends Game {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (e.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
-        if (!isGameActive()) return;
-
+        if (!isGameActive()) {
+            Player player = e.getPlayer();
+            Material heldItem = player.getInventory().getItemInMainHand().getType();
+            if ((heldItem == Material.SPLASH_POTION && e.getHand() == EquipmentSlot.HAND) || (player.getInventory().getItemInOffHand().getType() == Material.SPLASH_POTION  && e.getHand() == EquipmentSlot.OFF_HAND)) {
+                e.setCancelled(true);
+            }
+            return;
+        }
         if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Set<Material> trapdoorList = Set.of(Material.OAK_TRAPDOOR, Material.DARK_OAK_TRAPDOOR, Material.SPRUCE_TRAPDOOR, Material.BIRCH_TRAPDOOR,
                                         Material.ACACIA_TRAPDOOR, Material.CHERRY_TRAPDOOR, Material.MANGROVE_TRAPDOOR, Material.JUNGLE_TRAPDOOR,
                                         Material.CRIMSON_TRAPDOOR, Material.WARPED_TRAPDOOR);
-            if(trapdoorList.contains(e.getClickedBlock().getType())) e.setCancelled(true);
+            if(trapdoorList.contains(e.getClickedBlock().getType())) {
+                e.setCancelled(true);
+                return;
+            }
         }
 
-        // handle shooting paintballs
+        // handle shooting paintballs and potions
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             Player player = e.getPlayer();
             Material heldItem = player.getInventory().getItemInMainHand().getType();
             if (heldItem == Material.DIAMOND_HORSE_ARMOR) {
                 shootPaintball(player);
-            } else if ((heldItem == Material.SPLASH_POTION && e.getHand() == EquipmentSlot.HAND) || (player.getInventory().getItemInOffHand().getType() == Material.SPLASH_POTION  && e.getHand() == EquipmentSlot.OFF_HAND)) {
+            }
+            if ((heldItem == Material.SPLASH_POTION && e.getHand() == EquipmentSlot.HAND) || (player.getInventory().getItemInOffHand().getType() == Material.SPLASH_POTION  && e.getHand() == EquipmentSlot.OFF_HAND)) {
                 LockdownPlayer lockdownPlayer = lockdownPlayerMap.get(player.getUniqueId());
-                if (lockdownPlayer != null) handlePotionStatus(lockdownPlayer);
+                if (lockdownPlayer.getPlayer().hasCooldown(HEAL_POTION.getType())) {
+                    e.setCancelled(true);
+                    return;
+                }
+                handlePotionStatus(lockdownPlayer);
             }
         }
-    }
-
-    @EventHandler
-    public void onSwapHandItems(PlayerSwapHandItemsEvent e) {
-        if (e.getOffHandItem() != null && e.getOffHandItem().getType() == Material.SPLASH_POTION) {
-            e.setCancelled(true);
-        }
-        if (e.getOffHandItem() != null && e.getMainHandItem().getType() == Material.SPLASH_POTION) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent e) {
-        if (e.getCursor() != null && e.getCursor().getType() == Material.SPLASH_POTION) {
-            if (e.getSlot() == 40) { // Slot 40 is the offhand slot
-                e.setCancelled(true);
-            }
-    }   
     }
 
     /**
@@ -868,20 +858,15 @@ public class Lockdown extends Game {
      * @param player Player who threw the potion
      */
     private void handlePotionStatus(LockdownPlayer player) {
-       player.setPotion(false);
-        if (player.getPlayer().getGameMode() == GameMode.SURVIVAL && !isGameActive()) {
-            player.getPlayer().getInventory().addItem(HEAL_POTION);
-        }
-        
         Bukkit.getScheduler().scheduleSyncDelayedTask(MBC.getInstance().getPlugin(), new Runnable() {
             @Override
             public void run() {
+                player.getPlayer().setCooldown(HEAL_POTION.getType(), 540);
                 if (player.getPlayer().getGameMode() == GameMode.SURVIVAL && isGameActive()) {
-                    player.setPotion(true);
                     player.getPlayer().getInventory().addItem(HEAL_POTION);
                 }
             }
-        }, 600);
+        }, 60L);
     }
 
     /**
@@ -1638,6 +1623,7 @@ public class Lockdown extends Game {
         if (p == null) return;
         p.lastDamager = null;
         p.setPlayer(e.getPlayer());
+        e.getPlayer().setInvulnerable(false);
 
         // if log back in during paused/starting, manually teleport them
         if (!(getState().equals(GameState.PAUSED)) && !(getState().equals(GameState.STARTING))) {
