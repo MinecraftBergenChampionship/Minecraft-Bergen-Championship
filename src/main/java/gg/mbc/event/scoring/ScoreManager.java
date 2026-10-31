@@ -54,7 +54,7 @@ public class ScoreManager {
     public TeamScoreReport getTeamScore(TeamType type) {
         TeamScoreReport res = teamScores.get(type);
         if (res == null) {
-            throw new RuntimeException("Unable to find Score Report for " + type);
+            throw new RuntimeException("Unable to find Score Report for Team " + type);
         }
         return res;
     }
@@ -89,6 +89,6 @@ public class ScoreManager {
                 return pair.second;
             }
         }
-        throw new RuntimeException("Unable to get game");
+        throw new RuntimeException("ScoreManager was unable to get game");
     }
 }
