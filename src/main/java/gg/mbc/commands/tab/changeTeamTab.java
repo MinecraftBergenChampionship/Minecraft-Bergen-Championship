@@ -23,7 +23,7 @@ public class changeTeamTab implements TabCompleter {
             return playerNames;
         }
         if (args.length == 1) {
-            return new ArrayList<>(MBCEvent.getInstance().getTeamManager().getTeamNames());
+            return new ArrayList<>(MBCEvent.getInstance().getTeamManager().getTeamScoreboardNames());
         }
         return null;
     }
