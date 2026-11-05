@@ -13,7 +13,7 @@ import java.util.Set;
 import static net.kyori.adventure.text.Component.text;
 
 public class EventTeam {
-    public static final int MAX_NAME_LENGTH = 16;
+    public static final int MAX_NAME_LENGTH = 21;
     private static final String NAME_RESTRICTIONS = ".*[\\p{L}\\p{M}].*";
 
     // Display
@@ -57,12 +57,15 @@ public class EventTeam {
     /**
      * Changes the display name of the team.
      * @param name New name to change to.
+     * @param allNames Collection of all team names
      * @return boolean value indicating success of the operation
      */
-    public boolean changeName(String name) {
+    public boolean changeName(String name, Collection<String> allNames) {
         name = name.trim();
+        if (this.name.equals(name)){return true;}
         if (!name.matches(NAME_RESTRICTIONS)) return false;
         if (name.length() > MAX_NAME_LENGTH || name.isEmpty()) return false;
+        if (allNames.contains(name)) return false;
         this.name = name;
         this.displayName = text(icon + " ", NamedTextColor.WHITE).append(text(name, textColor));
         return true;

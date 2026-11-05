@@ -2,7 +2,6 @@ package gg.mbc.event.managers;
 
 import gg.mbc.EventPlugin;
 import gg.mbc.event.scheduling.EventStage;
-import gg.mbc.event.scheduling.TimedEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;

@@ -120,8 +120,18 @@ public class TeamManager {
     /**
      * @return all TeamTypes in String format as an iterable collection.
      */
-    public Collection<String> getTeamNames() {
+    public Collection<String> getTeamScoreboardNames() {
         return Collections.unmodifiableCollection(teamNames.keySet());
+    }
+
+    //ADD DESCRIPTION AFTER TEST
+    public Collection<String> getTeamNames() {
+        Set<EventTeam> allTeams = new HashSet<>(teams.values());
+        Collection<String> allTeamNames = new HashSet<>();
+        for (EventTeam team : allTeams){
+            allTeamNames.add(team.name());
+        }
+        return allTeamNames;
     }
 
     /**

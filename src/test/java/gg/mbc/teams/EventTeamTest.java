@@ -16,6 +16,7 @@ import org.mockbukkit.mockbukkit.entity.PlayerMock;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Collection;
 
 public class EventTeamTest extends EventPluginTest {
     TeamManager manager;
@@ -49,10 +50,12 @@ public class EventTeamTest extends EventPluginTest {
 
             Collections.shuffle(Arrays.asList(validNames));
             for (String name : validNames) {
-                Assertions.assertTrue(team.changeName(name));
+                Collection<String> teamNames = manager.getTeamNames();
+                Assertions.assertTrue(team.changeName(name, teamNames));
                 Assertions.assertEquals(name.trim(), team.name());
                 team = manager.getTeam(player);
                 Assertions.assertEquals(t, team.type());
+                team.resetName(); // Resets name after each test so tests do not run into duplicate names from previous tests when using teamNames collection
             }
         }
     }
@@ -71,15 +74,54 @@ public class EventTeamTest extends EventPluginTest {
             EventTeam team = manager.getTeam(player);
             String oldName = team.name();
             Assertions.assertEquals(t, team.type());
+            Collection<String> teamNames = manager.getTeamNames();
 
             Arrays.sort(invalidNames);
             for (String name : invalidNames) {
-                Assertions.assertFalse(team.changeName(name));
+                Assertions.assertFalse(team.changeName(name, teamNames));
                 Assertions.assertNotEquals(name, team.name());
                 Assertions.assertEquals(oldName, team.name());
                 team = manager.getTeam(player);
                 Assertions.assertEquals(t, team.type());
             }
+        }
+    }
+
+    //Creates two players and adds them to two different teams.
+    //Team 1 has set names, team 2 attempts to change name to something identical
+    //May be redundant but good to check
+    //This test breaks when testing for changing name to Red Rabbits
+    @Test
+    @DisplayName("Test changeTeamName to existing names")
+    public void testChangeTeamNameExisting(){
+        PlayerMock player1 = server.addPlayer();
+        PlayerMock player2 = server.addPlayer();
+        Assertions.assertEquals(TeamType.SPECTATOR, manager.getTeam(player1).type());
+        Assertions.assertEquals(TeamType.SPECTATOR, manager.getTeam(player2).type());
+        String[] setTeamNames = {"Player1's Team", "Green Grabbits", "HeeHeeMcHaw"};
+        TeamType[] teams = TeamType.values();
+
+        for (int i = 0; i < teams.length-1; i++){
+            System.out.println(i);
+            manager.changeTeam(player1, manager.getTeam(teams[i]));
+            EventTeam team1 = manager.getTeam(player1);
+            Assertions.assertEquals(teams[i], team1.type());
+            manager.changeTeam(player2, manager.getTeam(teams[i+1]));
+            EventTeam team2 = manager.getTeam(player2);
+            Assertions.assertEquals(teams[i+1], team2.type());
+            String oldName1 = team1.name();
+            String oldName2 = team2.name();
+            for (String name : setTeamNames){
+                Collection<String> teamNames = manager.getTeamNames();
+                Assertions.assertTrue(team1.changeName(name, teamNames));
+                teamNames = manager.getTeamNames(); //Resets so it has the new name
+                Assertions.assertTrue(teamNames.contains(name));
+                Assertions.assertFalse(team2.changeName(name, teamNames));
+                Assertions.assertNotEquals(oldName1, team1.name());
+                Assertions.assertEquals(oldName2, team2.name());
+            }
+            team1.resetName();
+            team2.resetName();
         }
     }
 }
