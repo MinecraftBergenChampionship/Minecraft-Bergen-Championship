@@ -10,7 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -124,7 +123,7 @@ public class TeamManager {
         return Collections.unmodifiableCollection(teamNames.keySet());
     }
 
-    //ADD DESCRIPTION AFTER TEST
+    // TODO: ADD DESCRIPTION AFTER TEST
     public Collection<String> getTeamNames() {
         Set<EventTeam> allTeams = new HashSet<>(teams.values());
         Collection<String> allTeamNames = new HashSet<>();
