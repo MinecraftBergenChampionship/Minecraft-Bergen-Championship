@@ -2,6 +2,7 @@ package gg.mbc.event.scoring;
 
 import gg.mbc.event.games.GameType;
 import gg.mbc.event.players.EventPlayer;
+import gg.mbc.event.scoring.comparators.EventPlayerComparator;
 import gg.mbc.event.teams.TeamType;
 
 import java.util.Map;

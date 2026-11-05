@@ -68,7 +68,7 @@ public final class MBCEvent {
      * Stops the event and destroys this current instance;
      */
     public void stopEvent() {
-        scheduler.clearActiveEvents();
+        scheduler.clearEvents();
         mbc = null;
     }
 

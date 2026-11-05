@@ -25,7 +25,7 @@ public class EventPlayerComparator implements Comparator<EventPlayer> {
      * - If equal, compare multiplied scores.
      * - If equal, compare (multiplied) team scores.
      * - If equal, compare unmultiplied team scores.
-     * - Otherwise, default to
+     * - Otherwise, TODO
      * This sequence is to avoid randomness with placement for voting comeback mechanics.
      * @param player1 Player to compare scores
      * @param player2 Player to compare scores
