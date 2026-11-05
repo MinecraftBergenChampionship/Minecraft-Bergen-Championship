@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -121,6 +122,13 @@ public class TeamManager {
      */
     public Collection<String> getTeamNames() {
         return Collections.unmodifiableCollection(teamNames.keySet());
+    }
+
+    /**
+     * @return EventTeam instances of all non-spectator teams.
+     */
+    public Collection<EventTeam> getActiveTeams() {
+        return teams.values().stream().filter(t -> t.type() != TeamType.SPECTATOR).toList();
     }
 
     /**
