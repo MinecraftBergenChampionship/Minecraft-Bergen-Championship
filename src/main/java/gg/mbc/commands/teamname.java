@@ -46,7 +46,7 @@ public class teamname implements CommandExecutor {
         }
         String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
         String setUpName = name.substring(0, Math.min(EventTeam.MAX_NAME_LENGTH, name.length()));
-        if (!team.name().equals(setUpName) && manager.getTeam(setUpName) != null){return false;}
+        if (!team.teamName().equals(setUpName) && manager.getTeam(setUpName) != null){return false;}
         return team.changeName(setUpName, manager.getTeamNames());
     }
 }
