@@ -109,7 +109,7 @@ public class TeamManager {
             return teamNames.get(s);
         }
         for (EventTeam team : teams.values()) {
-            if (team.name().equalsIgnoreCase(s) || team.scoreboardName().equalsIgnoreCase(s)) {
+            if (team.teamName().equalsIgnoreCase(s) || team.scoreboardName().equalsIgnoreCase(s)) {
                 return team;
             }
         }
@@ -128,7 +128,7 @@ public class TeamManager {
         Set<EventTeam> allTeams = new HashSet<>(teams.values());
         Collection<String> allTeamNames = new HashSet<>();
         for (EventTeam team : allTeams){
-            allTeamNames.add(team.name());
+            allTeamNames.add(team.teamName());
         }
         return allTeamNames;
     }

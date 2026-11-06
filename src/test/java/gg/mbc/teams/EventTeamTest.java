@@ -40,7 +40,7 @@ public class EventTeamTest extends EventPluginTest {
         PlayerMock player = server.addPlayer();
         Assertions.assertEquals(TeamType.SPECTATOR, manager.getTeam(player).type());
         String[] validNames = {
-            "Regular Name", "Red Rabbits", "SixteenCharacter", "@awesome",
+            "Regular Name", "SixteenCharacter", "@awesome",
             "x", ":mfw:", "123a", "a123", "#awesome", "冰淇淋", "Two Spaces Here?", "     trimmed     ",
         };
         for (TeamType t : TeamType.values()) {
@@ -52,7 +52,7 @@ public class EventTeamTest extends EventPluginTest {
             for (String name : validNames) {
                 Collection<String> teamNames = manager.getTeamNames();
                 Assertions.assertTrue(team.changeName(name, teamNames));
-                Assertions.assertEquals(name.trim(), team.name());
+                Assertions.assertEquals(name.trim(), team.teamName());
                 team = manager.getTeam(player);
                 Assertions.assertEquals(t, team.type());
                 team.resetName(); // Resets name after each test so tests do not run into duplicate names from previous tests when using teamNames collection
@@ -72,15 +72,15 @@ public class EventTeamTest extends EventPluginTest {
         for (TeamType t : TeamType.values()) {
             manager.changeTeam(player, manager.getTeam(t));
             EventTeam team = manager.getTeam(player);
-            String oldName = team.name();
+            String oldName = team.teamName();
             Assertions.assertEquals(t, team.type());
             Collection<String> teamNames = manager.getTeamNames();
 
             Arrays.sort(invalidNames);
             for (String name : invalidNames) {
                 Assertions.assertFalse(team.changeName(name, teamNames));
-                Assertions.assertNotEquals(name, team.name());
-                Assertions.assertEquals(oldName, team.name());
+                Assertions.assertNotEquals(name, team.teamName());
+                Assertions.assertEquals(oldName, team.teamName());
                 team = manager.getTeam(player);
                 Assertions.assertEquals(t, team.type());
             }
@@ -101,27 +101,29 @@ public class EventTeamTest extends EventPluginTest {
         String[] setTeamNames = {"Player1's Team", "Green Grabbits", "HeeHeeMcHaw"};
         TeamType[] teams = TeamType.values();
 
-        for (int i = 0; i < teams.length-1; i++){
-            System.out.println(i);
-            manager.changeTeam(player1, manager.getTeam(teams[i]));
-            EventTeam team1 = manager.getTeam(player1);
-            Assertions.assertEquals(teams[i], team1.type());
-            manager.changeTeam(player2, manager.getTeam(teams[i+1]));
-            EventTeam team2 = manager.getTeam(player2);
-            Assertions.assertEquals(teams[i+1], team2.type());
-            String oldName1 = team1.name();
-            String oldName2 = team2.name();
-            for (String name : setTeamNames){
-                Collection<String> teamNames = manager.getTeamNames();
-                Assertions.assertTrue(team1.changeName(name, teamNames));
-                teamNames = manager.getTeamNames(); //Resets so it has the new name
-                Assertions.assertTrue(teamNames.contains(name));
-                Assertions.assertFalse(team2.changeName(name, teamNames));
-                Assertions.assertNotEquals(oldName1, team1.name());
-                Assertions.assertEquals(oldName2, team2.name());
+        for (int i = 0; i < teams.length; i++){
+            for (int j = 0; j < teams.length; j++){
+                if (i==j){continue;}
+                manager.changeTeam(player1, manager.getTeam(teams[i]));
+                EventTeam team1 = manager.getTeam(player1);
+                Assertions.assertEquals(teams[i], team1.type());
+                manager.changeTeam(player2, manager.getTeam(teams[j]));
+                EventTeam team2 = manager.getTeam(player2);
+                Assertions.assertEquals(teams[j], team2.type());
+                String oldName1 = team1.teamName();
+                String oldName2 = team2.teamName();
+                for (String name : setTeamNames){
+                    Collection<String> teamNames = manager.getTeamNames();
+                    Assertions.assertTrue(team1.changeName(name, teamNames));
+                    teamNames = manager.getTeamNames(); //Resets so it has the new name
+                    Assertions.assertTrue(teamNames.contains(name));
+                    Assertions.assertFalse(team2.changeName(name, teamNames));
+                    Assertions.assertNotEquals(oldName1, team1.teamName());
+                    Assertions.assertEquals(oldName2, team2.teamName());
+                }
+                team1.resetName();
+                team2.resetName();
             }
-            team1.resetName();
-            team2.resetName();
         }
     }
 }
