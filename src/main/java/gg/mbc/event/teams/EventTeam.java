@@ -18,7 +18,7 @@ public class EventTeam {
 
     // Display
     private final TeamType type;
-    private String name;
+    private String teamName;
     private Component displayName;
     private final String scoreboardName;
     private final Character icon;
@@ -30,14 +30,14 @@ public class EventTeam {
 
     public EventTeam(TeamType type) {
         this.type = type;
-        this.name = type.teamName();
+        this.teamName = type.teamName();
         this.icon = type.icon();
         this.color = type.color();
         this.textColor = type.textColor();
         this.scoreboardName = type.scoreboardName();
         players = new HashSet<>();
 
-        this.displayName = text(icon + " ", NamedTextColor.WHITE).append(text(name, textColor));
+        this.displayName = text(icon + " ", NamedTextColor.WHITE).append(text(teamName, textColor));
     }
 
     // Add and Remove players from team
@@ -48,7 +48,7 @@ public class EventTeam {
     public Collection<EventPlayer> players() { return Collections.unmodifiableCollection(players); }
 
     public Component displayName() { return displayName; }
-    public String name() { return name; }
+    public String teamName() { return teamName; }
     public NamedTextColor textColor() { return textColor; }
     public String scoreboardName() { return scoreboardName; }
     public Character icon() { return icon; }
@@ -62,11 +62,11 @@ public class EventTeam {
      */
     public boolean changeName(String name, Collection<String> allNames) {
         name = name.trim();
-        if (this.name.equals(name)){return true;}
+        if (this.teamName.equals(name)){return true;}
         if (!name.matches(NAME_RESTRICTIONS)) return false;
         if (name.length() > MAX_NAME_LENGTH || name.isEmpty()) return false;
         if (allNames.contains(name)) return false;
-        this.name = name;
+        this.teamName = name;
         this.displayName = text(icon + " ", NamedTextColor.WHITE).append(text(name, textColor));
         return true;
     }
@@ -75,8 +75,8 @@ public class EventTeam {
      * Reset the name of this team.
      */
     public void resetName() {
-        this.name = type.name();
-        this.displayName = text(icon + " ", NamedTextColor.WHITE).append(text(name, textColor));
+        this.teamName = type.teamName();
+        this.displayName = text(icon + " ", NamedTextColor.WHITE).append(text(teamName, textColor));
     }
 
     @Override
