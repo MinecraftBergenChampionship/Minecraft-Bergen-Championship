@@ -123,7 +123,7 @@ public class TeamManager {
         return Collections.unmodifiableCollection(teamNames.keySet());
     }
 
-    //ADD DESCRIPTION AFTER TEST
+    // TODO: ADD DESCRIPTION AFTER TEST
     public Collection<String> getTeamNames() {
         Set<EventTeam> allTeams = new HashSet<>(teams.values());
         Collection<String> allTeamNames = new HashSet<>();
@@ -131,6 +131,13 @@ public class TeamManager {
             allTeamNames.add(team.teamName());
         }
         return allTeamNames;
+    }
+
+    /**
+     * @return EventTeam instances of all non-spectator teams.
+     */
+    public Collection<EventTeam> getActiveTeams() {
+        return teams.values().stream().filter(t -> t.type() != TeamType.SPECTATOR).toList();
     }
 
     /**
