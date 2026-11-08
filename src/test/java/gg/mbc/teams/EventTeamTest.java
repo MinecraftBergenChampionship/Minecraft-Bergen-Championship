@@ -126,4 +126,28 @@ public class EventTeamTest extends EventPluginTest {
             }
         }
     }
+
+    //Creates a player and team, loops through and changes the teams name, resets it
+    //and check if the reset name is the same as the original name
+    @Test
+    @DisplayName("Test EventTeam.resetName() command")
+    public void testResetName(){
+        PlayerMock player = server.addPlayer();
+        Assertions.assertEquals(TeamType.SPECTATOR, manager.getTeam(player).type());
+        String[] testNames = {"The Scurvy Squad", "The Leprosy Lads", "The Lords of Lime", "Red Rabbids"};
+
+        for (TeamType currTeam : TeamType.values()){
+            manager.changeTeam(player, manager.getTeam(currTeam));
+            EventTeam team = manager.getTeam(player);
+            String oldName = team.teamName();
+            Assertions.assertEquals(currTeam, team.type());
+            Collection<String> teamNames = manager.getTeamNames();
+            
+            for (String newName : testNames){
+                Assertions.assertTrue(team.changeName(newName, teamNames));
+                team.resetName();
+                Assertions.assertEquals(team.teamName(), oldName);
+            }
+        }
+    }
 }
