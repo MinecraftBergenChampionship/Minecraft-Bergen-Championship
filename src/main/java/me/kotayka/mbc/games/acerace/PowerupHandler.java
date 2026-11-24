@@ -167,22 +167,22 @@ public final class PowerupHandler {
             double percentile = (1.0 * place) / (1.0*players);
             if (percentile <= CUTOFF_TOP_SIXTH) {
                 powerups = TOP_SIXTH;
-                Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top sixth");
+                //Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top sixth");
             } else if (percentile <= CUTOFF_TOP_THIRD) {
                 powerups = TOP_THIRD;
-                Bukkit.broadcastMessage("DEGBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top third");
+                //Bukkit.broadcastMessage("DEGBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top third");
             } else if (percentile <= CUTOFF_TOP_HALF) {
                 powerups = TOP_HALF;
-                Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top half");
+                //Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in top half");
             } else if (percentile <= CUTOFF_BOTTOM_HALF) {
                 powerups = BOTTOM_HALF;
-                Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom half");
+                //Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom half");
             } else if (percentile <= CUTOFF_BOTTOM_SIXTH) {
                 powerups = BOTTOM_SIXTH;
-                Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom third");
+                //Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom third");
             } else {
                 powerups = BOTTOM_SIXTH;
-                Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom sixth");
+                //Bukkit.broadcastMessage("DEBUG: " + aceRacePlayer.getParticipant().getFormattedName() + ": " + aceRacePlayer.currentPlace + " place, thus in bottom sixth");
             }
         }
 
@@ -391,7 +391,6 @@ public final class PowerupHandler {
 
     private static void useSugarHigh(Player player) {
         player.playSound(player.getLocation(), "sfx.speed_pad", SoundCategory.BLOCKS, 1, 2);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, SUGAR_HIGH_DURATION_TICKS, 1));
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, SUGAR_HIGH_DURATION_TICKS, 4));
         player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, SUGAR_HIGH_DURATION_TICKS, 4));
     }

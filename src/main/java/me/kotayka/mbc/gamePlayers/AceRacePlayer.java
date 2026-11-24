@@ -277,8 +277,7 @@ public class AceRacePlayer extends GamePlayer {
 
             }
 
-            if (givePowerup)
-                PowerupHandler.givePowerup(this);
+            
 
             checkpoint++;
 
@@ -295,10 +294,12 @@ public class AceRacePlayer extends GamePlayer {
                 && !(lap == 1 && checkpoint == 0)) {
 
             currentPlace = ACE_RACE.checkpointPlacement(this, lap, checkpoint);
+            int increase = ACE_RACE.placementListChange(currentPlace, this);
 
             String currentPlacementString =
                     AceRace.getPlace(currentPlace);
 
+            
             this.getParticipant().getPlayer().sendMessage(
                     ChatColor.GREEN +
                             "You are currently in " +
@@ -306,6 +307,9 @@ public class AceRacePlayer extends GamePlayer {
                             " place."
             );
         }
+
+        if (givePowerup) 
+                PowerupHandler.givePowerup(this);
     }
 
     /**

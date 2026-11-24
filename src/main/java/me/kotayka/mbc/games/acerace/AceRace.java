@@ -491,6 +491,36 @@ public class AceRace extends Game {
         }
     }
 
+    //*
+    //  Move player to newPlace on currentPlacements leaderboard in manner which makes logical sense. Returns number of other players passed if any were passed, or 0 otherwise.
+    // */
+    public int placementListChange(int newPlace, AceRacePlayer p) {
+        int oldPlace = currentPlacements.indexOf(p);
+        if (oldPlace == -1) {
+            currentPlacements.set(newPlace-1, p); 
+            // if this is the first checkpoint that AceRacePlayer is passing, then the spot they get is the first time anyone is getting that spot. Thus they just get it.
+            return 0;
+        } 
+        else if (oldPlace > newPlace) { 
+            for (int i = oldPlace-1; i > newPlace-1; i--) {
+                AceRacePlayer old = currentPlacements.get(i-1);
+                currentPlacements.set(i, old);
+            }
+            currentPlacements.set(newPlace-1, p);
+            // in this scenario a player is currently at position newPlace-1, moving UP. so all players from newplace to oldplace move down. 
+            return oldPlace-newPlace;
+        }
+        else if (oldPlace == newPlace) {
+            // nothing happens. this will either happen if you dont move your spot and neither do the people around u, or if someone passes you.
+            return 0;
+        }
+        else {
+            // i dont think this will ever happen but if it does i have a failsafe
+            Bukkit.broadcastMessage("this isn't supposed to happen i think");
+            return -1;
+        }
+    }
+
     public void loadPlayers() {
         ItemStack trident = new ItemStack(Material.TRIDENT);
         ItemMeta itemMeta = trident.getItemMeta();
