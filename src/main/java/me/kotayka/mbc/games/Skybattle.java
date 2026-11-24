@@ -28,7 +28,7 @@ import java.util.*;
 public class Skybattle extends Game {
     public final Particle.DustOptions BORDER_PARTICLE = new Particle.DustOptions(Color.RED, 3);
     public final Particle.DustOptions TOP_BORDER_PARTICLE = new Particle.DustOptions(Color.ORANGE, 3);
-    public SkybattleMap map = new Endlantis(this);
+    public SkybattleMap map = new Icelantis(this);
     public Map<UUID, SkybattlePlayer> skybattlePlayerMap = new HashMap<>();
     // Primed TNT Entity, Player (that placed that block); used for determining kills since primed tnt is spawned by world
     public Map<Entity, Player> TNTPlacers = new HashMap<Entity, Player>(5);
